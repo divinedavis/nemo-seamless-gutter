@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1900 760" font-family="Helvetica, Arial, sans-serif">
+  <text x="950" y="410" text-anchor="middle" font-size="360" font-weight="bold"
+        letter-spacing="6" fill="#ffffff">NEMO</text>
+  <rect x="360" y="560" width="1180" height="32" rx="16" fill="#F16C27"/>
+  <text x="950" y="548" text-anchor="middle" font-size="160" font-weight="bold" letter-spacing="7">
+    <tspan fill="#F16C27">S</tspan><tspan fill="#ffffff">EAMLESS GUTTER</tspan>
+  </text>
+</svg>

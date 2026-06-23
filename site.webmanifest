@@ -1,0 +1,14 @@
+{
+  "name": "NEMO Seamless Gutter",
+  "short_name": "NEMO Gutter",
+  "description": "Seamless gutters, gutter guards, cleaning & repair in York County, PA. Free estimates.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#243C94",
+  "theme_color": "#243C94",
+  "icons": [
+    { "src": "/assets/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/assets/icon-512.png", "type": "image/png", "sizes": "512x512" },
+    { "src": "/assets/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
+  ]
+}

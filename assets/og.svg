@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" font-family="Helvetica, Arial, sans-serif">
+  <rect width="1200" height="630" fill="#ffffff"/>
+  <rect x="0" y="0" width="1200" height="14" fill="#243C94"/>
+  <rect x="0" y="616" width="1200" height="14" fill="#F16C27"/>
+  <g transform="translate(600,250) scale(0.52) translate(-950,-380)">
+    <text x="950" y="410" text-anchor="middle" font-size="360" font-weight="bold" letter-spacing="6" fill="#243C94">NEMO</text>
+    <rect x="360" y="560" width="1180" height="32" rx="16" fill="#F16C27"/>
+    <text x="950" y="548" text-anchor="middle" font-size="160" font-weight="bold" letter-spacing="7"><tspan fill="#F16C27">S</tspan><tspan fill="#243C94">EAMLESS GUTTER</tspan></text>
+  </g>
+  <text x="600" y="470" text-anchor="middle" font-size="44" font-weight="bold" fill="#10182a">Seamless Gutters Done Right · York, PA</text>
+  <text x="600" y="528" text-anchor="middle" font-size="34" fill="#F16C27" font-weight="bold">Free Estimates · (717) 891-6844</text>
+</svg>
