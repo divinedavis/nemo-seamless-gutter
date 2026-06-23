@@ -4,7 +4,7 @@ Marketing website + online booking for **NEMO Seamless Gutter**, a seamless gutt
 contractor serving York County, PA. *Seamless gutters done right.*
 
 - **Live:** https://nemoseamlessgutter.com (droplet `104.236.120.144`)
-- **Contact:** call/text **(717) 891-6844** · enemo@nemoseamlessgutter.com
+- **Contact:** call/text **(717) 578-0073** · enemo@nemoseamlessgutter.com
 - **Design:** brand blue (`#243C94`) + orange (`#F16C27`) from the NEMO logo.
 
 ## Structure

@@ -274,7 +274,7 @@ async function sendBookingEmails(booking) {
         (booking.service === 'consult'
           ? `We will call you at ${booking.phone}.\n`
           : `We will come to ${booking.address || 'your address'}.\n`) +
-        `\nNeed to change it? Call or text (717) 891-6844.\n\n— ${config.business.name}`,
+        `\nNeed to change it? Call or text (717) 578-0073.\n\n— ${config.business.name}`,
       icalEvent,
     });
   }
@@ -305,7 +305,7 @@ async function sendCancellationEmail(booking) {
       `Your ${svcLabel} with ${config.business.name}, scheduled for ${when} (ET), has been cancelled.\n\n` +
       `We're sorry for any inconvenience. You can easily reschedule:\n\n` +
       `  • Book a new time online: ${config.siteUrl}/#book\n` +
-      `  • Or contact us directly — call or text (717) 891-6844\n\n` +
+      `  • Or contact us directly — call or text (717) 578-0073\n\n` +
       `We'd still love to help with your project.\n\n— ${config.business.name}`,
     icalEvent,
   });

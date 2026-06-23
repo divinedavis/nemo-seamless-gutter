@@ -110,7 +110,7 @@
         if (seq !== state._seq) return; // a newer load started; drop this one
         slotsEl.innerHTML = '';
         if (!data.slots || !data.slots.length) {
-          msgEl.textContent = 'No open times that day — try another date, or call (717) 891-6844.';
+          msgEl.textContent = 'No open times that day — try another date, or call (717) 578-0073.';
           return;
         }
         msgEl.textContent = '';
@@ -127,7 +127,7 @@
       })
       .catch(function () {
         msgEl.className = 'slots-msg error';
-        msgEl.textContent = 'Could not load times. Please call or text (717) 891-6844.';
+        msgEl.textContent = 'Could not load times. Please call or text (717) 578-0073.';
       });
   }
 
@@ -174,7 +174,7 @@
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (res) {
         if (!res.ok) {
-          alert(res.j.error || 'Sorry, that booking failed. Please call (717) 891-6844.');
+          alert(res.j.error || 'Sorry, that booking failed. Please call (717) 578-0073.');
           submit.disabled = false;
           submit.textContent = 'Confirm Booking';
           if (res.j.error && /available|booked/i.test(res.j.error)) loadSlots();
@@ -183,7 +183,7 @@
         showDone(res.j);
       })
       .catch(function () {
-        alert('Could not reach the booking server. Please call or text (717) 891-6844.');
+        alert('Could not reach the booking server. Please call or text (717) 578-0073.');
         submit.disabled = false;
         submit.textContent = 'Confirm Booking';
       });
@@ -198,7 +198,7 @@
           '<h3>You\'re booked!</h3>' +
           '<p class="when">' + (j.service || 'Appointment') + '</p>' +
           '<p class="when">' + (j.when || '') + '</p>' +
-          '<p>' + (j.emailed ? 'A confirmation and calendar invite are on the way to your email.' : 'We\'ll reach out to confirm. Need anything? Call or text (717) 891-6844.') + '</p>' +
+          '<p>' + (j.emailed ? 'A confirmation and calendar invite are on the way to your email.' : 'We\'ll reach out to confirm. Need anything? Call or text (717) 578-0073.') + '</p>' +
         '</div></div>'
       )
     );
@@ -214,7 +214,7 @@
     root.appendChild(
       el(
         '<div class="booking"><div class="booking-unavailable">' +
-          'Online booking is warming up. Please call or text <a href="tel:+17178916844">(717) 891-6844</a> and we\'ll get you scheduled.' +
+          'Online booking is warming up. Please call or text <a href="tel:+17175780073">(717) 578-0073</a> and we\'ll get you scheduled.' +
         '</div></div>'
       )
     );

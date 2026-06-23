@@ -24,7 +24,7 @@ const config = {
 
   business: {
     name: 'NEMO Seamless Gutter',
-    phone: str('BUSINESS_PHONE', '(717) 891-6844'),
+    phone: str('BUSINESS_PHONE', '(717) 578-0073'),
     // 0 = Sunday ... 6 = Saturday. Each day: open/close in 24h local time, or null = closed.
     // Gutter crew hours: Mon–Fri 7:30 AM–6 PM, Sat 8 AM–2 PM ET, closed Sunday.
     hours: {
