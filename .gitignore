@@ -19,3 +19,7 @@ npm-debug.log*
 # os
 .DS_Store
 Thumbs.db
+
+# SEO automation secrets + generated drafts
+seo/.env
+seo/drafts/

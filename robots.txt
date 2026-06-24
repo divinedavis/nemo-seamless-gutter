@@ -37,5 +37,7 @@ Allow: /
 # Keep owner-only management pages out of the index
 Disallow: /booking/
 Disallow: /api/
+Disallow: /seo/
+Disallow: /setup.html
 
 Sitemap: https://nemoseamlessgutter.com/sitemap.xml

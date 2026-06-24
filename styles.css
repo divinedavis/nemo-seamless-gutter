@@ -307,3 +307,5 @@ h3{font-family:"Archivo",sans-serif;font-weight:700}
 .poster-brand{background:linear-gradient(160deg,var(--blue-soft),#fff);display:grid;place-items:center;padding:56px 40px;border:6px solid #fff}
 .poster-brand img{width:100%;max-width:340px;height:auto}
 @media (max-width:680px){ .brand-logo{height:34px} }
+
+.area-tags a{color:inherit;display:block}
