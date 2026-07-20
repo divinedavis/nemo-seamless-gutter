@@ -71,7 +71,7 @@ const config = {
   // Comma-separated; first is the primary (calendar organizer/attendee).
   ownerEmails: list('OWNER_EMAIL').length
     ? list('OWNER_EMAIL')
-    : ['enemo@nemoseamlessgutter.com'],
+    : ['eric@nemoseamlessgutter.com'],
   ownerName: str('OWNER_NAME', 'NEMO Seamless Gutter'),
 
   // Optional iCloud CalDAV write-back (app-specific password) for instant insertion
