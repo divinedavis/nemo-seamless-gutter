@@ -24,3 +24,27 @@ WEB_ROOT=$(pwd) python3 seo/indexnow_submit.py
 WEB_ROOT=$(pwd) python3 seo/gen_article.py            # draft
 WEB_ROOT=$(pwd) python3 seo/gen_article.py --publish   # publish newest draft
 ```
+
+## Mail configuration (added 2026-07-20)
+
+The Workspace **login** is `enemo@nemoseamlessgutter.com`. `eric@` is a working
+alias that reaches the same mailbox but **cannot authenticate** — verified by
+SMTP AUTH plus an MX `RCPT TO` probe. Anything that logs in must use `enemo@`.
+
+SMTP lives in `server/.env` (mode 600, gitignored) and is shared by the booking
+server and `health_check.py`:
+
+    SMTP_HOST=smtp.gmail.com
+    SMTP_PORT=587
+    SMTP_SECURE=false
+    SMTP_USER=enemo@nemoseamlessgutter.com
+    SMTP_PASS=<Google app password — macOS keychain: nemo-workspace-app-password>
+    FROM_EMAIL=enemo@nemoseamlessgutter.com
+    OWNER_EMAIL=eric@nemoseamlessgutter.com,enemo@nemoseamlessgutter.com
+
+The app password requires 2-Step Verification on the account and is created at
+myaccount.google.com/apppasswords.
+
+**Gotcha:** `node -e "require('./config')"` reports `smtp: (none)` because it
+does not load `.env`. That is a false alarm. The authoritative checks are the
+pm2 startup line `smtp: on`, or a real booking returning `"emailed":true`.
