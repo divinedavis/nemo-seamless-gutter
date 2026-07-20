@@ -24,3 +24,4 @@ Thumbs.db
 seo/.env
 seo/drafts/
 seo/used_topics.json
+seo/gsc-service-account.json
