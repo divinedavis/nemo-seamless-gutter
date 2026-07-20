@@ -190,6 +190,14 @@
   }
 
   function showDone(j) {
+    // Fires only after the server confirmed the booking, so failed and
+    // double-booked attempts are never counted as leads. analytics.js listens.
+    try {
+      document.dispatchEvent(new CustomEvent('nemo:booked', {
+        detail: { service: (j && j.service) || '' }
+      }));
+    } catch (_) { /* tracking must never break the confirmation screen */ }
+
     root.innerHTML = '';
     root.appendChild(
       el(

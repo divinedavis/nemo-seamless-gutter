@@ -28,7 +28,9 @@ def read_chrome():
     html = open(CHROME_PAGE).read()
     header = re.search(r"(<header class=\"site-header\".*?</header>)", html, re.S).group(1)
     footer_float = re.search(r"(<footer class=\"site-footer\".*?</body>)", html, re.S).group(1)
-    head_links = re.search(r"(<link rel=\"icon\".*?</head>)", html, re.S).group(1)
+    # Start at the Google tag, not the icon links -- otherwise generated
+    # pages ship without analytics and silently under-report traffic.
+    head_links = re.search(r"(<!-- Google tag.*?</head>)", html, re.S).group(1)
     return head_links, header, footer_float
 
 
@@ -52,8 +54,9 @@ SECTIONS = [
       type, pages requested, timestamps) for security and troubleshooting.</p>
       <p>We also use <strong>Google Analytics</strong> to understand which pages people find
       useful and which searches bring them here. Google Analytics sets cookies and collects
-      usage data, including a truncated version of your IP address. We have IP anonymization
-      enabled. We use this to improve the site, not to identify individual visitors.</p>
+      usage data. Google Analytics 4 anonymizes visitor IP addresses by default and does not
+      make them available to us. We use this to improve the site, not to identify individual
+      visitors.</p>
       <p>If you arrived from a Google ad, <strong>Google Ads</strong> may set a cookie so we
       can tell which ads lead to real enquiries. We see totals, not who you are.</p>"""),
 

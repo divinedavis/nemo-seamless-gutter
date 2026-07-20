@@ -59,7 +59,9 @@ def read_chrome():
     html = open(CHROME_PAGE).read()
     header = re.search(r"(<header class=\"site-header\".*?</header>)", html, re.S).group(1)
     footer_float = re.search(r"(<footer class=\"site-footer\".*?</body>)", html, re.S).group(1)
-    head_links = re.search(r"(<link rel=\"icon\".*?</head>)", html, re.S).group(1)
+    # Start at the Google tag, not the icon links -- otherwise generated
+    # pages ship without analytics and silently under-report traffic.
+    head_links = re.search(r"(<!-- Google tag.*?</head>)", html, re.S).group(1)
     return head_links, header, footer_float
 
 
