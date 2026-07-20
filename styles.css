@@ -209,6 +209,7 @@ h3{font-family:"Archivo",sans-serif;font-weight:700}
 .footer-col h4{color:#fff;font-family:"Archivo",sans-serif;font-size:1rem;margin-bottom:16px}
 .footer-col a{display:block;margin-bottom:10px;color:rgba(255,255,255,.74);font-size:.95rem}
 .footer-col a:hover{color:var(--blue-light)}
+.footer-col address{font-style:normal;margin-top:6px;color:rgba(255,255,255,.74);font-size:.95rem;line-height:1.5}
 .footer-bottom{display:flex;justify-content:space-between;gap:16px;padding-top:22px;font-size:.85rem;color:rgba(255,255,255,.6);flex-wrap:wrap}
 
 /* ===== Floating call ===== */
