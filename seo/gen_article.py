@@ -24,6 +24,7 @@ WEB_ROOT = os.environ.get("WEB_ROOT", "/var/www/nemo-seamless-gutter")
 BASE = "https://nemoseamlessgutter.com"
 MODEL = os.environ.get("NEMO_CONTENT_MODEL", "claude-sonnet-4-6")
 DRAFTS = os.path.join(WEB_ROOT, "seo", "drafts")
+USED_PATH = os.path.join(WEB_ROOT, "seo", "used_topics.json")
 CHROME_PAGE = os.path.join(WEB_ROOT, "guides", "seamless-vs-sectional-gutters.html")
 
 # Rotating long-tail topics aimed at York-County gutter searches.
@@ -62,14 +63,34 @@ def read_chrome():
     return head_links, header, footer_float
 
 
+def used_topics():
+    """Topics already drafted, by their TOPICS-list text.
+
+    We can't infer this from the filenames on disk: the draft is written as
+    slugify(Claude's title), which never matches slugify(topic). Tracking the
+    topic text in a state file is what keeps the monthly cron advancing instead
+    of regenerating TOPICS[0] forever.
+    """
+    if os.path.exists(USED_PATH):
+        try:
+            return set(json.load(open(USED_PATH)))
+        except (ValueError, OSError):
+            pass
+    return set()
+
+
+def mark_used(topic):
+    used = used_topics()
+    used.add(topic)
+    json.dump(sorted(used), open(USED_PATH, "w"), indent=2)
+
+
 def pick_topic():
-    done = {os.path.basename(p) for p in glob.glob(os.path.join(DRAFTS, "*.html"))}
-    done |= {os.path.basename(p) for p in glob.glob(os.path.join(WEB_ROOT, "guides", "*.html"))}
+    used = used_topics()
     for t in TOPICS:
-        slug = slugify(t)
-        if f"{slug}.html" not in done:
+        if t not in used:
             return t
-    return TOPICS[0]
+    return None
 
 
 def slugify(t):
@@ -182,10 +203,23 @@ def main():
         print(f"[gen_article] PUBLISHED {os.path.basename(dest)} -> /guides/. Run gen_sitemap.py + indexnow_submit.py.")
         return
     topic = pick_topic()
+    if topic is None:
+        print("[gen_article] every topic in TOPICS has been drafted; add more to keep publishing")
+        return
     art = claude(topic)
     slug = slugify(art["title"])
+    # Claude occasionally lands on a title we've already published. Never
+    # clobber a live guide — suffix instead.
+    taken = {os.path.basename(p) for p in glob.glob(os.path.join(DRAFTS, "*.html"))}
+    taken |= {os.path.basename(p) for p in glob.glob(os.path.join(WEB_ROOT, "guides", "*.html"))}
+    if f"{slug}.html" in taken:
+        n = 2
+        while f"{slug}-{n}.html" in taken:
+            n += 1
+        slug = f"{slug}-{n}"
     out = os.path.join(DRAFTS, f"{slug}.html")
     open(out, "w").write(build_page(art, slug))
+    mark_used(topic)
     print(f"[gen_article] DRAFT written: {out}\n  topic: {topic}\n  review it, then: gen_article.py --publish")
 
 
