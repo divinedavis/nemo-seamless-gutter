@@ -77,12 +77,12 @@ true|false` honestly, because the agent is only allowed to promise a callback if
 the message really went out. Leads that failed to send are visible with
 `GET /api/admin/leads` (admin token) and have `emailed = 0`.
 
-What Eric gets, written to be actionable from a notification preview:
+What Eric gets. The two things he acts on are the first two lines, because that is
+what a phone notification shows him before he opens anything; every field is
+labelled, so a missing one reads as "not given" rather than breaking a sentence:
 
 ```
 Subject: New lead: Dave Miller — 717-555-0199 — 12 Elm St, Dover PA
-
-Dave Miller called about gutters.
 
 CALL THEM BACK:  717-555-0199
 THEY'RE FREE:    weekday mornings before 11, or any time Saturday
@@ -90,10 +90,9 @@ THEY'RE FREE:    weekday mornings before 11, or any time Saturday
 Wants:    free on-site estimate for new seamless gutters
 Address:  12 Elm St, Dover PA
 Job:      Gutters pulling away from the back of the house, overflows every storm.
+Name:     Dave Miller
 
 Taken by the phone assistant on Wednesday, Jul 22 at 9:16 AM.
-
-Nothing is scheduled — they are expecting your call to set a time.
 ```
 
 **Anything the agent says about NEMO must be in `knowledge.md`.** The prompt tells

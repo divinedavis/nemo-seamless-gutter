@@ -242,29 +242,28 @@ async function sendLeadEmail(lead) {
   const taken = DateTime.utc().setZone(config.timezone).toFormat("cccc, LLL d 'at' h:mm a");
   const where = lead.address || 'address not given';
 
-  // Labelled lines rather than a sentence: the service text is whatever the caller
-  // said, so any phrasing has to read correctly without an article in front of it.
+  // Labelled lines throughout, no opening sentence: the name and the service text
+  // are whatever the caller gave, so a sentence built around them reads badly the
+  // moment one is missing. The two things Eric acts on go at the top, because on a
+  // phone he sees the first two lines before he opens anything.
   const lines = [
-    `${lead.name} called about gutters.`,
-    ``,
     `CALL THEM BACK:  ${lead.phone}`,
     `THEY'RE FREE:    ${lead.availability || 'not given — ask when you call'}`,
     ``,
     `Wants:    ${lead.service || 'not specified'}`,
     `Address:  ${where}`,
     `Job:      ${lead.notes || 'not described'}`,
+    `Name:     ${lead.name || 'not given'}`,
     ``,
     `Taken by the phone assistant on ${taken}.`,
     lead.caller_id && lead.caller_id !== lead.phone ? `Called from ${lead.caller_id}.` : null,
-    ``,
-    `Nothing is scheduled — they are expecting your call to set a time.`,
   ].filter((l) => l !== null);
 
   await tx.sendMail({
     from: `${config.business.name} <${from}>`,
     to: config.leadEmails.join(', '),
     replyTo: from,
-    subject: `New lead: ${lead.name} — ${lead.phone}${lead.address ? ` — ${lead.address}` : ''}`,
+    subject: `New lead: ${lead.name || 'name not given'} — ${lead.phone}${lead.address ? ` — ${lead.address}` : ''}`,
     text: lines.join('\n'),
   });
   return { sent: true };

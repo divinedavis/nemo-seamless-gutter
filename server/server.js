@@ -317,7 +317,10 @@ app.post('/api/lead', async (req, res) => {
   if (lead.phone.replace(/\D/g, '').length < 10) {
     return res.status(400).json({ error: 'A valid 10-digit callback number is required.' });
   }
-  if (lead.name.length < 2) lead.name = 'Name not given';
+  // Leave a missing name empty rather than substituting a placeholder — the email
+  // renders its own "not given" under the Name label, and a stored placeholder ends
+  // up read aloud or printed as though it were the person's name.
+  if (lead.name.length < 2) lead.name = '';
 
   // Store first: if the mail server is having a bad day the lead is still not lost,
   // and `emailed` shows which ones need chasing.
