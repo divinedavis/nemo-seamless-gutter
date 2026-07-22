@@ -50,11 +50,27 @@ lead time are configurable in `server/config.js` / env.
 | Method | Path | Purpose |
 | --- | --- | --- |
 | GET  | `/api/health` | health check |
-| GET  | `/api/services` | service list + booking rules |
+| GET  | `/api/services` | service list + booking rules + today's date and the next 14 days |
 | GET  | `/api/availability?service=&date=` | open slots for a day |
 | POST | `/api/book` | create a booking |
 | GET  | `/api/admin/bookings?token=` | upcoming bookings (admin) |
 | POST | `/api/admin/cancel?token=` | cancel a booking (admin) |
+
+`/api/services` returns the resolved calendar (`today`, `upcomingDays` with weekday
+names and open/closed) because the phone assistant reads it — working out that
+"Thursday" means the 23rd is exactly the arithmetic a language model gets subtly
+wrong, and a visit booked on the wrong morning is worse than no booking.
+
+Bookings carry a `source` of `web` or `phone-ai`. A request is only labelled
+`phone-ai` if it presents the `x-agent-token` header matching `AGENT_TOKEN`, so
+the label in Eric's inbox can be trusted; a spoofed body field can't claim it.
+
+## Phone assistant
+
+An ElevenLabs voice agent answers the phone, answers questions, and books
+estimates on the call using the API above. It lives in [`agent/`](agent/) — see
+[`agent/README.md`](agent/README.md) for how to edit what it says, how to test it
+without a phone number, and how to attach a real number.
 
 ### Configuration
 

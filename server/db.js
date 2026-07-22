@@ -24,10 +24,18 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_bookings_start ON bookings(start_utc);
 `);
 
+// Where the booking came from: 'web' (the site widget) or 'phone-ai' (the
+// ElevenLabs phone assistant, proven by the agent token). Added after the table
+// existed in production, so migrate in place rather than in the CREATE above.
+const hasSource = db.prepare(`PRAGMA table_info(bookings)`).all().some((c) => c.name === 'source');
+if (!hasSource) {
+  db.exec(`ALTER TABLE bookings ADD COLUMN source TEXT NOT NULL DEFAULT 'web'`);
+}
+
 const stmts = {
   insert: db.prepare(`
-    INSERT INTO bookings (uid, service, name, email, phone, address, notes, start_utc, end_utc, status, created_at)
-    VALUES (@uid, @service, @name, @email, @phone, @address, @notes, @start_utc, @end_utc, 'confirmed', @created_at)
+    INSERT INTO bookings (uid, service, name, email, phone, address, notes, start_utc, end_utc, status, source, created_at)
+    VALUES (@uid, @service, @name, @email, @phone, @address, @notes, @start_utc, @end_utc, 'confirmed', @source, @created_at)
   `),
   // Active bookings that overlap a [start,end) window.
   overlapping: db.prepare(`

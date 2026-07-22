@@ -95,11 +95,36 @@ async function busyForDay(dateISO) {
 app.get('/api/health', (_req, res) => res.json({ ok: true, service: 'nemo-seamless-gutter-booking' }));
 
 app.get('/api/services', (_req, res) => {
+  // The phone assistant calls this first. Hand it the calendar already worked
+  // out — "Thursday" -> 2026-07-24 is exactly the arithmetic an LLM gets subtly
+  // wrong, and a booking on the wrong day is worse than no booking at all.
+  const now = DateTime.now().setZone(config.timezone);
+  const upcomingDays = [];
+  for (let i = 0; i < 14; i += 1) {
+    const d = now.plus({ days: i });
+    const hours = config.business.hours[d.weekday % 7];
+    upcomingDays.push({
+      date: d.toFormat('yyyy-LL-dd'),
+      weekday: d.toFormat('cccc'),
+      open: Boolean(hours),
+      hours: hours ? `${hours.open}–${hours.close}` : 'closed',
+    });
+  }
+
   res.json({
     timezone: config.timezone,
+    today: now.toFormat('yyyy-LL-dd'),
+    todayWeekday: now.toFormat('cccc'),
+    localTime: now.toFormat('h:mm a'),
     leadTimeHours: config.business.leadTimeHours,
     maxDaysAhead: config.business.maxDaysAhead,
-    services: Object.values(config.services).map((s) => ({ id: s.id, label: s.label, durationMin: s.durationMin })),
+    services: Object.values(config.services).map((s) => ({
+      id: s.id,
+      label: s.label,
+      durationMin: s.durationMin,
+      requiresAddress: s.id !== 'consult',
+    })),
+    upcomingDays,
   });
 });
 
@@ -117,8 +142,14 @@ app.get('/api/availability', async (req, res) => {
 });
 
 app.post('/api/book', async (req, res) => {
+  // Every call from the phone assistant arrives from ElevenLabs' egress IP, so it
+  // would otherwise share one bucket with itself and lock out later callers.
+  // Give it its own, roomier bucket — a busy storm week is a lot of calls.
+  const fromAgent = Boolean(config.agentToken) && req.headers['x-agent-token'] === config.agentToken;
   const ip = (req.headers['x-forwarded-for'] || req.ip || '').split(',')[0].trim();
-  if (!rateLimit(ip, 8, 10 * 60000)) return res.status(429).json({ error: 'Too many requests, please try again later.' });
+  const limitKey = fromAgent ? 'phone-ai' : ip;
+  const limitMax = fromAgent ? 30 : 8;
+  if (!rateLimit(limitKey, limitMax, 10 * 60000)) return res.status(429).json({ error: 'Too many requests, please try again later.' });
 
   try {
     const b = req.body || {};
@@ -149,6 +180,9 @@ app.post('/api/book', async (req, res) => {
       notes: notes || null,
       start_utc: null,
       end_utc: null,
+      // Trusted, not caller-supplied: the token is what makes the label mean
+      // something, so a spoofed body field can't claim the assistant took it.
+      source: fromAgent ? 'phone-ai' : 'web',
       created_at: DateTime.utc().toISO(),
     };
 

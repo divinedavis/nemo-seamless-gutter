@@ -245,9 +245,13 @@ async function sendBookingEmails(booking) {
   await tx.sendMail({
     from: `${config.business.name} <${from}>`,
     to: config.ownerEmails.join(', '),
-    subject: `New booking: ${svc ? svc.label : 'Appointment'} — ${booking.name} (${when})`,
+    subject: `${booking.source === 'phone-ai' ? '[Phone assistant] ' : ''}New booking: ${svc ? svc.label : 'Appointment'} — ${booking.name} (${when})`,
     text:
-      `New ${svc ? svc.label : 'appointment'} booked via nemoseamlessgutter.com\n\n` +
+      (booking.source === 'phone-ai'
+        ? `Taken by the phone assistant — this customer called (717) 578-0073 and\n` +
+          `booked with the AI, so nobody has spoken to them yet. Worth a quick\n` +
+          `courtesy call before the visit.\n\n`
+        : `New ${svc ? svc.label : 'appointment'} booked via nemoseamlessgutter.com\n\n`) +
       `When:    ${when}\n` +
       `Name:    ${booking.name}\n` +
       `Phone:   ${booking.phone}\n` +

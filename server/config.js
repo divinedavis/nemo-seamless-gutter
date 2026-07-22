@@ -20,6 +20,11 @@ const config = {
   port: int('PORT', 3009),
   timezone: str('TZ', 'America/New_York'),
   adminToken: str('ADMIN_TOKEN', ''),
+  // Shared secret the ElevenLabs phone assistant sends as `x-agent-token`. It does
+  // not gate access — /api/book is public because the site widget uses it — it
+  // proves provenance, so a booking labelled "taken by the phone assistant" in
+  // Eric's inbox actually was. Unset = the phone assistant is simply not wired up.
+  agentToken: str('AGENT_TOKEN', ''),
   siteUrl: str('SITE_URL', 'https://nemoseamlessgutter.com'),
 
   business: {
