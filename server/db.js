@@ -32,6 +32,26 @@ if (!hasSource) {
   db.exec(`ALTER TABLE bookings ADD COLUMN source TEXT NOT NULL DEFAULT 'web'`);
 }
 
+// Leads taken by the phone assistant. Eric has no fixed schedule, so the assistant
+// does not touch a calendar — it takes a good message, emails him, and he calls the
+// customer back to agree a time. This table is the record in case an email is lost.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS leads (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    uid          TEXT NOT NULL UNIQUE,
+    name         TEXT NOT NULL,
+    phone        TEXT NOT NULL,
+    address      TEXT,
+    service      TEXT,
+    availability TEXT,
+    notes        TEXT,
+    caller_id    TEXT,
+    emailed      INTEGER NOT NULL DEFAULT 0,
+    created_at   TEXT NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS idx_leads_created ON leads(created_at);
+`);
+
 const stmts = {
   insert: db.prepare(`
     INSERT INTO bookings (uid, service, name, email, phone, address, notes, start_utc, end_utc, status, source, created_at)
@@ -54,6 +74,13 @@ const stmts = {
   `),
   byUid: db.prepare(`SELECT * FROM bookings WHERE uid = ?`),
   cancel: db.prepare(`UPDATE bookings SET status = 'cancelled' WHERE uid = ?`),
+
+  insertLead: db.prepare(`
+    INSERT INTO leads (uid, name, phone, address, service, availability, notes, caller_id, emailed, created_at)
+    VALUES (@uid, @name, @phone, @address, @service, @availability, @notes, @caller_id, @emailed, @created_at)
+  `),
+  markLeadEmailed: db.prepare(`UPDATE leads SET emailed = 1 WHERE uid = ?`),
+  recentLeads: db.prepare(`SELECT * FROM leads ORDER BY id DESC LIMIT 50`),
 };
 
 module.exports = { db, stmts };

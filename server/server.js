@@ -220,6 +220,60 @@ app.post('/api/book', async (req, res) => {
   }
 });
 
+// --- phone assistant leads ---
+// Unlike /api/book (public, used by the site widget) this is agent-only: it exists
+// solely to put mail in Eric's inbox, so leaving it open would be a spam cannon.
+app.post('/api/lead', async (req, res) => {
+  if (!config.agentToken || req.headers['x-agent-token'] !== config.agentToken) {
+    return res.status(401).json({ error: 'unauthorized' });
+  }
+  if (!rateLimit('lead', 40, 10 * 60000)) {
+    return res.status(429).json({ error: 'Too many requests, please try again later.' });
+  }
+
+  const b = req.body || {};
+  const clip = (v, n) => String(v == null ? '' : v).trim().slice(0, n);
+  const lead = {
+    uid: crypto.randomUUID(),
+    name: clip(b.name, 120),
+    phone: clip(b.phone, 40),
+    address: clip(b.address, 300) || null,
+    service: clip(b.service, 120) || null,
+    availability: clip(b.availability, 500) || null,
+    notes: clip(b.notes, 1500) || null,
+    caller_id: clip(b.caller_id, 40) || null,
+    emailed: 0,
+    created_at: DateTime.utc().toISO(),
+  };
+
+  if (lead.name.length < 2) return res.status(400).json({ error: 'A name is required.' });
+  if (lead.phone.replace(/\D/g, '').length < 10) {
+    return res.status(400).json({ error: 'A valid 10-digit callback number is required.' });
+  }
+
+  // Store first: if the mail server is having a bad day the lead is still not lost,
+  // and `emailed` shows which ones need chasing.
+  stmts.insertLead.run(lead);
+
+  let sent = false;
+  try {
+    sent = (await calendar.sendLeadEmail(lead)).sent;
+    if (sent) stmts.markLeadEmailed.run(lead.uid);
+  } catch (err) {
+    console.error('[lead] email failed:', err.message);
+  }
+
+  // Tell the agent plainly whether Eric was actually notified, so it can only
+  // promise a callback when the message really went out.
+  res.json({
+    ok: true,
+    emailed: sent,
+    message: sent
+      ? `Message delivered to Eric. Tell ${lead.name} that Eric will call them back on ${lead.phone} to set up a time.`
+      : `Saved, but the email did not go out. Tell ${lead.name} you have their details and Eric will call ${lead.phone}, then flag it.`,
+  });
+});
+
 // --- admin (token-protected) ---
 function requireAdmin(req, res) {
   const token = req.query.token || req.headers['x-admin-token'];
@@ -229,6 +283,12 @@ function requireAdmin(req, res) {
   }
   return true;
 }
+
+app.get('/api/admin/leads', (req, res) => {
+  if (!requireAdmin(req, res)) return;
+  const rows = stmts.recentLeads.all();
+  res.json({ count: rows.length, leads: rows });
+});
 
 app.get('/api/admin/bookings', (req, res) => {
   if (!requireAdmin(req, res)) return;

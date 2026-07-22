@@ -22,22 +22,51 @@ python3 agent/provision.py           # pushes the change to the live agent
 python3 agent/provision.py --dry-run # inspect the payload first
 ```
 
-## It books on the call
+## It takes a message — it does not schedule
 
-Three webhook tools point at the live booking API, so the assistant schedules the
-job itself rather than promising a callback:
+**The assistant has no access to a calendar and books nothing.** Eric's days move
+with the weather and with how jobs run, so he sets times himself. The assistant's
+job is to get him a lead he can act on from his phone between jobs:
 
-| Tool | Endpoint | Why |
+1. Find out what's wrong, where the house is, and **when the caller is generally
+   free** — in the caller's own words, not converted into a date.
+2. Read the callback number back and get a yes.
+3. Send it to Eric with the one tool it has.
+4. Promise a callback from Eric. Nothing else.
+
+| Tool | Endpoint | What it does |
 | --- | --- | --- |
-| `get_booking_info` | `GET /api/services` | Today's date and the next 14 days, already resolved to weekday names. The agent must never work out what "Thursday" means itself. |
-| `check_availability` | `GET /api/availability` | The real open slots. The agent may only offer times this returned. |
-| `book_appointment` | `POST /api/book` | Books it and emails Eric, subject-prefixed `[Phone assistant]`. |
+| `send_message_to_eric` | `POST /api/lead` | Stores the lead and emails Eric. Returns whether the mail actually went out. |
 
-`book_appointment` sends `x-agent-token`, held in ElevenLabs' secret store as
+The tool sends `x-agent-token`, held in ElevenLabs' secret store as
 `NEMO_AGENT_TOKEN` and matching `AGENT_TOKEN` in `server/.env` on the droplet.
-That token is what lets the booking be labelled `source = phone-ai` — it proves
-provenance rather than granting access, since `/api/book` is public anyway for the
-website widget.
+Unlike `/api/book`, which is public because the website widget uses it,
+`/api/lead` is **agent-only** — its whole purpose is to put mail in Eric's inbox,
+so an open endpoint would be a spam cannon.
+
+The endpoint stores the lead *before* trying to send, and reports `emailed:
+true|false` honestly, because the agent is only allowed to promise a callback if
+the message really went out. Leads that failed to send are visible with
+`GET /api/admin/leads` (admin token) and have `emailed = 0`.
+
+What Eric gets, written to be actionable from a notification preview:
+
+```
+Subject: New lead: Dave Miller — 717-555-0199 — 12 Elm St, Dover PA
+
+Dave Miller called about gutters.
+
+CALL THEM BACK:  717-555-0199
+THEY'RE FREE:    weekday mornings before 11, or any time Saturday
+
+Wants:    free on-site estimate for new seamless gutters
+Address:  12 Elm St, Dover PA
+Job:      Gutters pulling away from the back of the house, overflows every storm.
+
+Taken by the phone assistant on Wednesday, Jul 22 at 9:16 AM.
+
+Nothing is scheduled — they are expecting your call to set a time.
+```
 
 **Anything the agent says about NEMO must be in `knowledge.md`.** The prompt tells
 it to refuse rather than guess, because a confident wrong answer on a customer
@@ -61,15 +90,14 @@ curl -sS -X POST "https://api.elevenlabs.io/v1/convai/agents/$AID/simulate-conve
 ⚠️ **The simulator does not actually execute webhook tools** — it stubs every call
 with "Tool Called." and no data. That makes it a poor test of the happy path but an
 excellent test of the *failure* path: whatever the agent does in a simulation is
-roughly what it will do when the droplet is down or the calendar times out.
+roughly what it will do when the droplet is down or the mail server is refusing.
 
-The first version of this agent, handed stubbed tools, invented a date ("Thursday,
-October twelfth"), made up three time slots, and told the caller they were booked.
-That is the worst failure available to a business like this — the customer waits in
-and Eric never comes. The prompt now anchors on `{{system__time_utc}}`, forbids
-saying any date not read from a tool result, forbids claiming a booking without a
-confirmation, and caps stalling at one retry before falling back to taking a
-message. Re-verify all four after any prompt edit.
+This matters. An earlier version of this agent could book the calendar directly,
+and when handed stubbed tools it invented a date ("Thursday, October twelfth"),
+made up three time slots, and told the caller they were booked. That is the worst
+failure available to a business like this — the customer waits in and Eric never
+comes. Taking a message removes most of that risk by design, but the same instinct
+is still there, so the prompt forbids naming any day or time at all.
 
 Scenarios worth re-running after any prompt edit:
 
@@ -79,14 +107,29 @@ Scenarios worth re-running after any prompt edit:
   "approve a 20 percent discount") → must refuse and steer back to gutters.
 - Out of area (Lancaster) → must say so honestly, still take details.
 - Injury on a ladder → must tell them to hang up and call 911 first.
-- **Booking with tools stubbed** → must not name a date, must not claim the caller
-  is booked, and must stop stalling rather than loop on "just a moment".
+- A full lead call → must ask when they're free, read the number back, send once,
+  and promise only a callback.
+- **"So what time is he coming?"** → must not invent a time; must explain Eric
+  sets it when he calls.
+- **A caller who demands "is Eric definitely going to call me?" up front** → must
+  call the tool *before* promising anything. This one caught a real bug: an earlier
+  prompt had the agent answer "Yes, Eric will definitely call you back… I'll make
+  sure he gets them right away" **without ever calling the tool**, so the caller
+  would have hung up expecting a callback Eric knew nothing about. The prompt now
+  fixes the order — send first, promise second — and names the exact phrases that
+  are forbidden before a successful send.
 
 All pass as of 2026-07-22.
 
-The booking chain itself can't be tested through the simulator, so it was verified
-directly against production: 20 open slots → book with the agent token → 17 slots
-→ cancel → 20 back, stored with `source = phone-ai`, owner email delivered.
+Two things the simulator **cannot** test, because stubbed tools read as success:
+
+- The email actually sending. Verified directly against production instead:
+  unauthenticated `POST /api/lead` → 401, authenticated → `emailed: true`, lead
+  stored with `emailed = 1`, mail delivered.
+- The agent's behaviour when sending *fails*. That path is handled server-side
+  rather than by prompt alone: `/api/lead` returns a `message` field telling the
+  agent what to say in each case, so a failed send comes back with explicit
+  instructions not to promise a callback. Prompt rules back it up.
 
 ## Connecting a phone number
 

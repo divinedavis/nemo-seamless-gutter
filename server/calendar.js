@@ -229,6 +229,47 @@ function fmtWhen(booking) {
     .toFormat("cccc, LLL d 'at' h:mm a");
 }
 
+// A lead the phone assistant took. Eric works off his phone between jobs, so this
+// email is written to be actionable from a notification preview: who to call, on
+// what number, and when they said they're around — in that order, up top.
+async function sendLeadEmail(lead) {
+  const tx = transport();
+  if (!tx) {
+    console.warn('[lead] SMTP not configured — lead stored, no email sent.');
+    return { sent: false, reason: 'smtp-not-configured' };
+  }
+  const from = config.fromEmail || config.smtp.user;
+  const taken = DateTime.utc().setZone(config.timezone).toFormat("cccc, LLL d 'at' h:mm a");
+  const where = lead.address || 'address not given';
+
+  // Labelled lines rather than a sentence: the service text is whatever the caller
+  // said, so any phrasing has to read correctly without an article in front of it.
+  const lines = [
+    `${lead.name} called about gutters.`,
+    ``,
+    `CALL THEM BACK:  ${lead.phone}`,
+    `THEY'RE FREE:    ${lead.availability || 'not given — ask when you call'}`,
+    ``,
+    `Wants:    ${lead.service || 'not specified'}`,
+    `Address:  ${where}`,
+    `Job:      ${lead.notes || 'not described'}`,
+    ``,
+    `Taken by the phone assistant on ${taken}.`,
+    lead.caller_id && lead.caller_id !== lead.phone ? `Called from ${lead.caller_id}.` : null,
+    ``,
+    `Nothing is scheduled — they are expecting your call to set a time.`,
+  ].filter((l) => l !== null);
+
+  await tx.sendMail({
+    from: `${config.business.name} <${from}>`,
+    to: config.ownerEmails.join(', '),
+    replyTo: from,
+    subject: `New lead: ${lead.name} — ${lead.phone}${lead.address ? ` — ${lead.address}` : ''}`,
+    text: lines.join('\n'),
+  });
+  return { sent: true };
+}
+
 async function sendBookingEmails(booking) {
   const tx = transport();
   if (!tx) {
@@ -348,6 +389,7 @@ module.exports = {
   getExternalBusy,
   invalidateBusyCache,
   sendBookingEmails,
+  sendLeadEmail,
   sendCancellationEmail,
   icloudWriteback,
   buildICS,

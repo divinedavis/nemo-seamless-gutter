@@ -63,14 +63,26 @@ wrong, and a visit booked on the wrong morning is worse than no booking.
 
 Bookings carry a `source` of `web` or `phone-ai`. A request is only labelled
 `phone-ai` if it presents the `x-agent-token` header matching `AGENT_TOKEN`, so
-the label in Eric's inbox can be trusted; a spoofed body field can't claim it.
+the label can be trusted; a spoofed body field can't claim it.
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| POST | `/api/lead` | phone assistant hands a caller's details to Eric (agent token required) |
+| GET  | `/api/admin/leads?token=` | recent leads, including any whose email failed |
 
 ## Phone assistant
 
-An ElevenLabs voice agent answers the phone, answers questions, and books
-estimates on the call using the API above. It lives in [`agent/`](agent/) — see
-[`agent/README.md`](agent/README.md) for how to edit what it says, how to test it
-without a phone number, and how to attach a real number.
+An ElevenLabs voice agent answers the phone, answers questions about the business,
+and takes the caller's details so Eric can ring them back.
+
+**It does not schedule anything.** Eric has no fixed schedule — his days move with
+the weather and with how jobs run — so the assistant asks when the caller is
+generally free, emails Eric the details, and Eric calls them back and arranges the
+visit himself. Customers who do want to pick a specific slot can still do it on the
+website, which books the calendar as before.
+
+It lives in [`agent/`](agent/) — see [`agent/README.md`](agent/README.md) for how to
+edit what it says, how to test it without a phone number, and how to attach one.
 
 ### Configuration
 

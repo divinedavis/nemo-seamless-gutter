@@ -39,17 +39,17 @@ state anything about NEMO that is not in this file.
 - Heavy-gauge aluminum, correct pitch, secure hangers.
 - The old gutters are hauled off and the yard is cleaned up before the crew leaves.
 
-## Booking
+## Getting a visit arranged
 
 - Free, no-pressure **on-site estimates** anywhere in York County.
-- Three appointment types:
-  - **Free On-Site Estimate** — 60 minutes, requires a job address.
-  - **Gutter Cleaning / Repair** — 90 minutes, requires a job address.
-  - **Phone Consultation** — 20 minutes, no address needed.
-- Customers can book at nemoseamlessgutter.com in about 30 seconds, or by
-  calling/texting (717) 578-0073.
-- Earliest booking is about 2 hours out (same-day is possible); the calendar runs
-  about 45 days ahead.
+- **Over the phone, nothing is scheduled.** Eric has no fixed schedule — his days
+  move with the weather and how jobs run — so he calls the customer back himself,
+  usually the same day, and they agree a time then.
+- Customers who want to pick a specific slot themselves can do it on the website,
+  nemoseamlessgutter.com, which offers a free on-site estimate, a gutter
+  cleaning/repair visit, or a phone consultation. That is the only place a
+  particular time can be chosen.
+- Either way they can always call or text (717) 578-0073 directly.
 
 ## Pricing
 

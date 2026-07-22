@@ -92,106 +92,88 @@ def ensure_secret(key: str, value: str) -> str:
     return created["secret_id"]
 
 
+# Tool names this script owns. Anything listed here that is no longer in
+# tool_configs() gets deleted, so a retired tool doesn't linger in the workspace
+# still pointed at a live endpoint. Keep old names here until they're gone.
+MANAGED_TOOL_NAMES = {
+    "send_message_to_eric",
+    # Retired 2026-07-22: the assistant used to book Eric's calendar directly. He
+    # has no fixed schedule, so it now takes a message and he calls the customer
+    # back to agree a time in person.
+    "get_booking_info",
+    "check_availability",
+    "book_appointment",
+}
+
+
 def tool_configs(secret_id: str) -> list:
     return [
         {
             "type": "webhook",
-            "name": "get_booking_info",
+            "name": "send_message_to_eric",
             "description": (
-                "Get today's date, the next fourteen days with their weekday names and "
-                "whether NEMO is open each day, the bookable service types and their ids, "
-                "and the booking rules. Call this ONCE at the start of any conversation "
-                "that touches scheduling, before you say or accept any date. Never work "
-                "out yourself what date a weekday refers to — read it from this tool."
-            ),
-            "response_timeout_secs": 10,
-            "api_schema": {"url": f"{SITE}/api/services", "method": "GET"},
-        },
-        {
-            "type": "webhook",
-            "name": "check_availability",
-            "description": (
-                "List the real open appointment times on one day for one service. Returns "
-                "each open slot with a spoken label like '9:30 AM' and an exact 'start' "
-                "value. Offer the caller the labels; keep the matching 'start' value to "
-                "pass to book_appointment. An empty list means that day is full — offer "
-                "another day."
-            ),
-            "response_timeout_secs": 15,
-            "api_schema": {
-                "url": f"{SITE}/api/availability",
-                "method": "GET",
-                "query_params_schema": {
-                    "properties": {
-                        "service": {
-                            "type": "string",
-                            "description": "Service id: 'estimate', 'cleaning' or 'consult'.",
-                        },
-                        "date": {
-                            "type": "string",
-                            "description": "The day to check, as YYYY-MM-DD, from get_booking_info.",
-                        },
-                    },
-                    "required": ["service", "date"],
-                },
-            },
-        },
-        {
-            "type": "webhook",
-            "name": "book_appointment",
-            "description": (
-                "Actually book the appointment on NEMO's calendar and email Eric. Only "
-                "call this after the caller has confirmed the day and time back to you, "
-                "and you have read their phone number back correctly. This is real — it "
-                "puts a job on a working person's calendar, so never call it to test, to "
-                "hold a slot, or on a guess."
+                "Send the caller's details to Eric by email so he can call them back and "
+                "arrange a time to come out. This is the goal of almost every call. Only "
+                "send once you have their name, a callback number you have read back to "
+                "them, and roughly when they said they are free. Sending is real — Eric "
+                "reads these between jobs — so never send a test, never send twice for "
+                "the same caller, and never send for someone who did not ask to be "
+                "contacted."
             ),
             "response_timeout_secs": 30,
             "api_schema": {
-                "url": f"{SITE}/api/book",
+                "url": f"{SITE}/api/lead",
                 "method": "POST",
                 "content_type": "application/json",
                 "request_headers": {"x-agent-token": {"secret_id": secret_id}},
                 "request_body_schema": {
                     "type": "object",
                     "properties": {
-                        "service": {
-                            "type": "string",
-                            "description": "Service id: 'estimate', 'cleaning' or 'consult'.",
-                        },
-                        "start": {
-                            "type": "string",
-                            "description": "The exact 'start' value of the chosen slot from check_availability. Copy it verbatim; do not construct it.",
-                        },
                         "name": {"type": "string", "description": "Caller's full name."},
                         "phone": {
                             "type": "string",
-                            "description": "Callback number, digits only or as spoken, that you read back and they confirmed.",
+                            "description": "The callback number they confirmed when you read it back to them.",
                         },
                         "address": {
                             "type": "string",
-                            "description": "Street address and town of the job. Required for 'estimate' and 'cleaning'; omit for 'consult'.",
+                            "description": "Street address and town of the property. Needed for any on-site visit.",
                         },
-                        "email": {
+                        "service": {
                             "type": "string",
-                            "description": "Email address, only if they offer one. Leave out otherwise.",
+                            "description": "What they want, in a few words - e.g. 'free on-site estimate for new seamless gutters', 'gutter cleaning', 'repair, gutters pulling away from the house'.",
+                        },
+                        "availability": {
+                            "type": "string",
+                            "description": "When they said they are generally free, in their own words - e.g. 'weekday mornings before eleven, or any time Saturday'. Never convert this into a specific date or appointment time.",
                         },
                         "notes": {
                             "type": "string",
-                            "description": "What is going on with the gutters, in the caller's own words.",
+                            "description": "What is going on with the gutters in the caller's own words, plus anything Eric should know before he calls: two storeys, dog in the yard, renting rather than owning, urgency.",
+                        },
+                        "caller_id": {
+                            "type": "string",
+                            "description": "The number they are calling from, if you have it. May differ from the callback number they give you.",
                         },
                     },
-                    "required": ["service", "start", "name", "phone"],
+                    "required": ["name", "phone"],
                 },
             },
         },
     ]
 
 
-def ensure_tools(key: str, secret_id: str) -> list:
+def ensure_tools(key: str, secret_id: str) -> tuple:
+    """Create/update the tools we want. Returns (wanted_ids, retired_ids).
+
+    Retired tools are returned rather than deleted here: the API refuses to delete
+    a tool an agent still references, so the caller must update the agent first.
+    """
     existing = {t["tool_config"]["name"]: t["id"] for t in request("GET", "/convai/tools", key).get("tools", [])}
+    wanted = tool_configs(secret_id)
+    wanted_names = {cfg["name"] for cfg in wanted}
+
     ids = []
-    for cfg in tool_configs(secret_id):
+    for cfg in wanted:
         body = {"tool_config": cfg}
         if cfg["name"] in existing:
             tool_id = existing[cfg["name"]]
@@ -199,7 +181,14 @@ def ensure_tools(key: str, secret_id: str) -> list:
         else:
             tool_id = request("POST", "/convai/tools", key, body)["id"]
         ids.append(tool_id)
-    return ids
+
+    retired = [
+        (name, tid)
+        for name, tid in existing.items()
+        if name in MANAGED_TOOL_NAMES and name not in wanted_names
+    ]
+    return ids, retired
+
 
 
 def build_prompt() -> str:
@@ -282,7 +271,7 @@ def main() -> None:
             '-a "$USER" -s nemo-agent-token -w)'
         )
 
-    tool_ids = ensure_tools(key, ensure_secret(key, token))
+    tool_ids, retired = ensure_tools(key, ensure_secret(key, token))
     config = build_config(tool_ids)
     prompt_len = len(config["conversation_config"]["agent"]["prompt"]["prompt"])
     existing = find_existing(key)
@@ -295,6 +284,11 @@ def main() -> None:
         created = request("POST", "/convai/agents/create", key, config)
         agent_id = created.get("agent_id")
         action = "created"
+
+    # Only now that the agent no longer references them can retired tools go.
+    for name, tool_id in retired:
+        request("DELETE", f"/convai/tools/{tool_id}", key)
+        print(f"  removed retired tool {name}")
 
     ID_FILE.write_text(agent_id + "\n", encoding="utf-8")
     print(f"{action} agent {agent_id} ({prompt_len} char prompt, {len(tool_ids)} tools)")
