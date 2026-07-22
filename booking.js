@@ -110,7 +110,14 @@
         if (seq !== state._seq) return; // a newer load started; drop this one
         slotsEl.innerHTML = '';
         if (!data.slots || !data.slots.length) {
-          msgEl.textContent = 'No open times that day — try another date, or call (717) 578-0073.';
+          // A day closed by the forecast is not the same as a day that's full,
+          // and saying which is the difference between "they're busy, I'll look
+          // elsewhere" and "fair enough, I'll take Friday".
+          if (data.weather && data.weather.blocked) {
+            msgEl.textContent = 'Closed for outdoor work that day — ' + data.weather.reason + '. Try another date.';
+          } else {
+            msgEl.textContent = 'No open times that day — try another date, or call (717) 578-0073.';
+          }
           return;
         }
         msgEl.textContent = '';
@@ -139,7 +146,10 @@
     if (state.service && state.slot) {
       var d = new Date(state.date + 'T00:00:00');
       var ds = d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
-      summary.innerHTML = '<strong>' + svc.label + '</strong> · ' + ds + ' at ' + state.slot.label;
+      // "at 8:00 AM" for a phone call, "arriving 8:00–10:00 AM" for a crew — the
+      // window is the promise, so word it as one.
+      var at = svc.arrivalWindowMin ? ' arriving ' : ' at ';
+      summary.innerHTML = '<strong>' + svc.label + '</strong> · ' + ds + at + state.slot.label;
       submit.disabled = false;
     } else {
       summary.textContent = 'Select a service, date, and time.';
@@ -203,9 +213,15 @@
       el(
         '<div class="booking"><div class="booking-done">' +
           '<div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>' +
-          '<h3>You\'re booked!</h3>' +
+          '<h3>' + (j.holdState === 'tentative' ? 'Your slot is held!' : 'You\'re booked!') + '</h3>' +
           '<p class="when">' + (j.service || 'Appointment') + '</p>' +
           '<p class="when">' + (j.when || '') + '</p>' +
+          // Say plainly that a far-out outdoor booking is weather-dependent, and
+          // that we do the checking. Someone who finds out on the morning is a
+          // complaint; someone told up front is impressed.
+          (j.holdState === 'tentative'
+            ? '<p>That time is yours — but it\'s outdoor work, so we check the forecast the day before and email you either a confirmation or a new time. Nothing for you to do.</p>'
+            : '') +
           '<p>' + (j.emailed ? 'A confirmation and calendar invite are on the way to your email.' : 'We\'ll reach out to confirm. Need anything? Call or text (717) 578-0073.') + '</p>' +
         '</div></div>'
       )

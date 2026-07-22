@@ -306,23 +306,174 @@ async function sendBookingEmails(booking) {
     icalEvent,
   });
 
-  // To customer: confirmation + the same invite.
+  // To customer: confirmation + the same invite. A weather-sensitive booking made
+  // beyond the forecast horizon is described as what it actually is — a held
+  // slot — because the alternative is someone taking a morning off work for a
+  // job that rain was always going to cancel.
+  if (booking.email) {
+    const tentative = booking.hold_state === 'tentative';
+    await tx.sendMail({
+      from: `${config.business.name} <${from}>`,
+      to: booking.email,
+      subject: tentative
+        ? `Your slot is held — ${when} (${config.business.name})`
+        : `You're booked with ${config.business.name} — ${when}`,
+      text:
+        `Hi ${booking.name},\n\n` +
+        (tentative
+          ? `We've held this slot for you:\n\n  ${when}\n\n` +
+            `Gutter work depends on the weather, so here's exactly what happens next:\n` +
+            `we check the forecast the day before and email you either "confirmed" or a\n` +
+            `new time. You don't need to do anything — and the slot is genuinely yours,\n` +
+            `we won't give it to anyone else.\n`
+          : `Your ${svc ? svc.label.toLowerCase() : 'appointment'} with ${config.business.name} is confirmed for:\n\n  ${when}\n\n`) +
+        (booking.service === 'consult'
+          ? `We will call you at ${booking.phone}.\n`
+          : `We will come to ${booking.address || 'your address'}.\n`) +
+        `\nNeed a different time? ${rescheduleLink(booking.uid)}\n` +
+        `Or call/text (717) 578-0073.\n\n— ${config.business.name}`,
+      icalEvent,
+    });
+  }
+  return { sent: true };
+}
+
+function rescheduleLink(uid) {
+  return `${config.siteUrl}/booking/reschedule?uid=${encodeURIComponent(uid)}&sig=${signUid(uid)}`;
+}
+
+// Stable signed link to Eric's day-control page. Constant subject so the link in
+// an old email still works — he shouldn't have to hunt for today's message.
+const OWNER_SCHEDULE_KEY = 'owner-schedule';
+function ownerScheduleLink() {
+  return `${config.siteUrl}/owner/schedule?sig=${signUid(OWNER_SCHEDULE_KEY)}`;
+}
+
+/**
+ * The 6 AM message. Eric reads this standing next to the truck, so it is plain
+ * text, shortest-first: what's on today, what the sky is doing, and one link if
+ * he disagrees with it.
+ */
+async function sendOwnerDigest({ today, tomorrow, actions }) {
+  const tx = transport();
+  if (!tx) return { sent: false, reason: 'smtp-not-configured' };
+  const from = config.fromEmail || config.smtp.user;
+
+  const jobLines = (jobs) =>
+    jobs.length
+      ? jobs
+          .map((j) => {
+            const t = DateTime.fromISO(j.start_utc, { zone: 'utc' }).setZone(config.timezone).toFormat('h:mm a');
+            const svc = config.servicesById[j.service];
+            return `  ${t}  ${j.name} — ${svc ? svc.label : j.service}${j.address ? ` — ${j.address}` : ''} (${j.phone})${j.hold_state === 'tentative' ? '  [HOLD]' : ''}`;
+          })
+          .join('\n')
+      : '  nothing booked';
+
+  const lines = [
+    `TODAY — ${today.label}`,
+    `  Weather: ${today.weather}`,
+    jobLines(today.jobs),
+    ``,
+    `TOMORROW — ${tomorrow.label}`,
+    `  Weather: ${tomorrow.weather}`,
+    jobLines(tomorrow.jobs),
+    ``,
+  ];
+
+  if (actions.length) {
+    lines.push(`OVERNIGHT, THE SYSTEM:`, ...actions.map((a) => `  • ${a}`), ``);
+  }
+
+  lines.push(
+    `Sky looking different to the forecast? Open or close any day here:`,
+    ownerScheduleLink(),
+    ``,
+    `Closing a day moves its jobs and emails those customers for you.`
+  );
+
+  await tx.sendMail({
+    from: `${config.business.name} <${from}>`,
+    to: config.ownerEmails.join(', '),
+    subject: `${today.label}: ${today.jobs.length} job${today.jobs.length === 1 ? '' : 's'} · ${today.weather}`,
+    text: lines.join('\n'),
+  });
+  return { sent: true };
+}
+
+// "You're confirmed for tomorrow." Sent once the forecast close in says the job
+// is really happening — the moment a tentative hold becomes a promise.
+async function sendConfirmationEmail(booking) {
+  const tx = transport();
+  if (!tx) return { sent: false, reason: 'smtp-not-configured' };
+  if (!booking.email) return { sent: false, reason: 'no-customer-email' };
+  const svc = config.servicesById[booking.service];
+  const when = fmtWhen(booking);
+  const from = config.fromEmail || config.smtp.user;
+
+  await tx.sendMail({
+    from: `${config.business.name} <${from}>`,
+    to: booking.email,
+    subject: `Confirmed: ${svc ? svc.label : 'your appointment'} — ${when}`,
+    text:
+      `Hi ${booking.name},\n\n` +
+      `Good news — the forecast looks fine, so we're confirmed for:\n\n` +
+      `  ${when}\n\n` +
+      (booking.service === 'consult'
+        ? `We'll call you at ${booking.phone}.\n`
+        : `We'll be at ${booking.address || 'your address'}. No need to be home for the outside work, but if you'd like to walk through it with us, we're happy to.\n`) +
+      `\nNeed a different time? ${rescheduleLink(booking.uid)}\n` +
+      `Or call/text (717) 578-0073.\n\n— ${config.business.name}`,
+  });
+  return { sent: true };
+}
+
+// The weather moved someone (or they moved themselves). Lead with the new time —
+// this is read on a phone, and the first line has to answer "so when are you
+// coming?" without any scrolling.
+async function sendRescheduleEmails(booking, previousStartUtc, reason) {
+  const tx = transport();
+  if (!tx) return { sent: false, reason: 'smtp-not-configured' };
+  const svc = config.servicesById[booking.service];
+  const when = fmtWhen(booking);
+  const was = DateTime.fromISO(previousStartUtc, { zone: 'utc' })
+    .setZone(config.timezone)
+    .toFormat("cccc, LLL d 'at' h:mm a");
+  const from = config.fromEmail || config.smtp.user;
+  const byWeather = reason === 'weather-auto';
+
   if (booking.email) {
     await tx.sendMail({
       from: `${config.business.name} <${from}>`,
       to: booking.email,
-      subject: `You're booked with ${config.business.name} — ${when}`,
+      subject: `Moved to ${when} — ${config.business.name}`,
       text:
         `Hi ${booking.name},\n\n` +
-        `Your ${svc ? svc.label.toLowerCase() : 'appointment'} with ${config.business.name} is confirmed for:\n\n` +
+        `Your ${svc ? svc.label.toLowerCase() : 'appointment'} is now:\n\n` +
         `  ${when}\n\n` +
-        (booking.service === 'consult'
-          ? `We will call you at ${booking.phone}.\n`
-          : `We will come to ${booking.address || 'your address'}.\n`) +
-        `\nNeed to change it? Call or text (717) 578-0073.\n\n— ${config.business.name}`,
-      icalEvent,
+        (byWeather
+          ? `The forecast for ${was} turned wet, and gutter work in the rain is both unsafe and a poor job, so we moved you to the next clear slot.\n`
+          : `(Previously ${was}.)\n`) +
+        `\nDoesn't suit? Pick any other open time here — it takes one tap:\n${rescheduleLink(booking.uid)}\n` +
+        `Or call/text (717) 578-0073.\n\n` +
+        `Sorry for the shuffle — we'd rather move you than do the work badly.\n\n— ${config.business.name}`,
     });
   }
+
+  await tx.sendMail({
+    from: `${config.business.name} <${from}>`,
+    to: config.ownerEmails.join(', '),
+    subject: `${byWeather ? '[Weather] ' : ''}Moved: ${booking.name} — ${when}`,
+    text:
+      `${booking.name} (${booking.phone}) has been moved.\n\n` +
+      `Was:  ${was}\n` +
+      `Now:  ${when}\n` +
+      `What: ${svc ? svc.label : 'Appointment'}\n` +
+      (booking.address ? `Where: ${booking.address}\n` : '') +
+      `Why:  ${byWeather ? 'forecast ruled the original day out' : reason}\n\n` +
+      (booking.email ? `They have been emailed.\n` : `NO EMAIL ON FILE — please call ${booking.phone}.\n`) +
+      `\nCancel instead: ${manageLink(booking.uid)}\n`,
+  });
   return { sent: true };
 }
 
@@ -391,9 +542,15 @@ module.exports = {
   sendBookingEmails,
   sendLeadEmail,
   sendCancellationEmail,
+  sendConfirmationEmail,
+  sendRescheduleEmails,
+  sendOwnerDigest,
   icloudWriteback,
   buildICS,
   signUid,
   verifyManageSig,
   manageLink,
+  rescheduleLink,
+  ownerScheduleLink,
+  OWNER_SCHEDULE_KEY,
 };

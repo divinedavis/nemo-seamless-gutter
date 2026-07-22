@@ -51,10 +51,73 @@ const config = {
   // phone consults need none (back-to-back calls are fine).
   // NOTE: 'consult' is the only phone service — every other service is on-site
   // and requires a job address (see server.js + booking.js).
+  //
+  // weather: how much a wet/windy day matters to this service (see weather.js).
+  //   'none'  — happens regardless (phone call)
+  //   'light' — outdoor but brief; only a real downpour stops it
+  //   'hard'  — ladder work; called off well before it actually rains
+  // arrivalWindowMin: customers are given an ARRIVAL WINDOW, not a to-the-minute
+  //   time. A gutter crew that hits a hidden rotted fascia runs 90 minutes late
+  //   and every later "9:15" becomes a broken promise; a 2-hour window absorbs
+  //   that. 0 = quote the exact time (a phone call really does start on time).
   services: {
-    estimate: { id: 'estimate', label: 'Free On-Site Estimate', durationMin: int('DUR_ESTIMATE_MIN', 60), bufferMin: int('BUFFER_ESTIMATE_MIN', 20) },
-    cleaning: { id: 'cleaning', label: 'Gutter Cleaning / Repair', durationMin: int('DUR_CLEANING_MIN', 90), bufferMin: int('BUFFER_CLEANING_MIN', 20) },
-    consult: { id: 'consult', label: 'Phone Consultation', durationMin: int('DUR_CONSULT_MIN', 20), bufferMin: int('BUFFER_CONSULT_MIN', 0) },
+    estimate: {
+      id: 'estimate',
+      label: 'Free On-Site Estimate',
+      durationMin: int('DUR_ESTIMATE_MIN', 60),
+      bufferMin: int('BUFFER_ESTIMATE_MIN', 20),
+      weather: str('WEATHER_ESTIMATE', 'light'),
+      arrivalWindowMin: int('WINDOW_ESTIMATE_MIN', 120),
+    },
+    cleaning: {
+      id: 'cleaning',
+      label: 'Gutter Cleaning / Repair',
+      durationMin: int('DUR_CLEANING_MIN', 90),
+      bufferMin: int('BUFFER_CLEANING_MIN', 20),
+      weather: str('WEATHER_CLEANING', 'hard'),
+      arrivalWindowMin: int('WINDOW_CLEANING_MIN', 180),
+    },
+    consult: {
+      id: 'consult',
+      label: 'Phone Consultation',
+      durationMin: int('DUR_CONSULT_MIN', 20),
+      bufferMin: int('BUFFER_CONSULT_MIN', 0),
+      weather: str('WEATHER_CONSULT', 'none'),
+      arrivalWindowMin: int('WINDOW_CONSULT_MIN', 0),
+    },
+  },
+
+  // --- weather-aware scheduling ---------------------------------------------
+  // Eric's day is decided by the sky, so availability is COMPUTED at request time
+  // (capacity − bookings − forecast) instead of read out of a fixed calendar.
+  // Source is the US National Weather Service: free, no key, no quota.
+  weather: {
+    enabled: str('WEATHER_ENABLED', 'true') === 'true',
+    lat: str('WEATHER_LAT', '39.9626'), // York, PA
+    lon: str('WEATHER_LON', '-76.7277'),
+    // NWS asks that every caller identify itself with a contact address.
+    userAgent: str('WEATHER_UA', 'nemo-seamless-gutter/1.0 (enemo@nemoseamlessgutter.com)'),
+    cacheTtlSec: int('WEATHER_CACHE_TTL_SEC', 1800),
+    // Precipitation probability (%) at or above which the day is called off.
+    // 'hard' work stops well below certainty — nobody puts a ladder up on a
+    // coin-flip morning — while 'light' work only stops for a real soaking.
+    hardPop: int('WEATHER_HARD_POP', 50),
+    lightPop: int('WEATHER_LIGHT_POP', 75),
+    hardWindMph: int('WEATHER_HARD_WIND', 25),
+    lightWindMph: int('WEATHER_LIGHT_WIND', 32),
+    minTempF: int('WEATHER_MIN_TEMP_F', 20),
+  },
+
+  // The hold → confirm loop. A slot booked for next Thursday is a forecast, not a
+  // fact, so weather-sensitive bookings are held TENTATIVE and re-checked as the
+  // day approaches; only then does the customer get "you're confirmed".
+  holds: {
+    // Inside this horizon the forecast is trustworthy enough to commit.
+    confirmLeadHours: int('CONFIRM_LEAD_HOURS', 30),
+    // How far ahead to look for a replacement slot when weather kills one.
+    rebookSearchDays: int('REBOOK_SEARCH_DAYS', 21),
+    // How many auto-moves before we stop shuffling and have Eric phone them.
+    maxAutoReschedules: int('MAX_AUTO_RESCHEDULES', 2),
   },
 
   // Read-only ICS feed URLs for the owner's calendars (Google "secret iCal address",

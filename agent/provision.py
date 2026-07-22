@@ -97,17 +97,113 @@ def ensure_secret(key: str, value: str) -> str:
 # still pointed at a live endpoint. Keep old names here until they're gone.
 MANAGED_TOOL_NAMES = {
     "send_message_to_eric",
-    # Retired 2026-07-22: the assistant used to book Eric's calendar directly. He
-    # has no fixed schedule, so it now takes a message and he calls the customer
-    # back to agree a time in person.
+    "check_openings",
+    "book_appointment",
+    # Retired 2026-07-22, superseded by check_openings.
     "get_booking_info",
     "check_availability",
-    "book_appointment",
 }
 
 
 def tool_configs(secret_id: str) -> list:
     return [
+        {
+            "type": "webhook",
+            "name": "check_openings",
+            "description": (
+                "Get the real openings you are allowed to offer this caller. Call this "
+                "BEFORE mentioning any day or time. It returns a short list, each with a "
+                "'spoken' sentence written out for you — read those words exactly as "
+                "given. The list already accounts for Eric's existing jobs and for the "
+                "weather forecast, so a day it does not return is a day you cannot offer, "
+                "no matter what the caller asks for. It also returns 'weatherClosed', the "
+                "days rain has ruled out, which you may mention as the reason. Never "
+                "invent, calculate or guess a date."
+            ),
+            "response_timeout_secs": 30,
+            "api_schema": {
+                "url": f"{SITE}/api/next-openings",
+                "method": "GET",
+                "request_headers": {"x-agent-token": {"secret_id": secret_id}},
+                "query_params_schema": {
+                    "type": "object",
+                    "properties": {
+                        "service": {
+                            "type": "string",
+                            "description": (
+                                "One of exactly: 'estimate' for a free on-site estimate for new "
+                                "gutters or guards, 'cleaning' for gutter cleaning or repair, "
+                                "'consult' for a phone call with Eric rather than a visit."
+                            ),
+                        },
+                        "limit": {
+                            "type": "string",
+                            "description": "How many options to fetch. Use 3 — more than three choices on a phone call is confusing.",
+                        },
+                    },
+                    "required": ["service"],
+                },
+            },
+        },
+        {
+            "type": "webhook",
+            "name": "book_appointment",
+            "description": (
+                "Actually book one of the openings check_openings gave you. This is real: "
+                "it reserves the slot, emails the customer, and puts the job on Eric's "
+                "calendar. Only call it after the caller has clearly agreed to a specific "
+                "option, and only with a 'start' value copied exactly from that option — "
+                "never a time you composed yourself. It returns a 'spoken' sentence "
+                "confirming what was booked; read that back to the caller word for word, "
+                "because it says whether the slot is confirmed or weather-dependent."
+            ),
+            "response_timeout_secs": 30,
+            "api_schema": {
+                "url": f"{SITE}/api/book",
+                "method": "POST",
+                "content_type": "application/json",
+                "request_headers": {"x-agent-token": {"secret_id": secret_id}},
+                "request_body_schema": {
+                    "type": "object",
+                    "properties": {
+                        "service": {
+                            "type": "string",
+                            "description": "The same service id you passed to check_openings: 'estimate', 'cleaning' or 'consult'.",
+                        },
+                        "start": {
+                            "type": "string",
+                            "description": (
+                                "The 'start' field copied character for character from the "
+                                "opening the caller chose. Never type a date yourself and never "
+                                "modify this value."
+                            ),
+                        },
+                        "name": {"type": "string", "description": "Caller's full name."},
+                        "phone": {
+                            "type": "string",
+                            "description": "The callback number they confirmed when you read it back to them.",
+                        },
+                        "email": {
+                            "type": "string",
+                            "description": (
+                                "Their email, if they'll give it. Worth asking for: it is how "
+                                "they get the confirmation and any weather change. If they "
+                                "decline, leave it out."
+                            ),
+                        },
+                        "address": {
+                            "type": "string",
+                            "description": "Street address and town of the property. Required for anything except 'consult'.",
+                        },
+                        "notes": {
+                            "type": "string",
+                            "description": "What is going on with the gutters in the caller's own words, plus anything Eric should know before he arrives: two storeys, dog in the yard, gate code, renting rather than owning.",
+                        },
+                    },
+                    "required": ["service", "start", "name", "phone"],
+                },
+            },
+        },
         {
             "type": "webhook",
             "name": "send_message_to_eric",
