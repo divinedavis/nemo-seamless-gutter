@@ -22,37 +22,36 @@ python3 agent/provision.py           # pushes the change to the live agent
 python3 agent/provision.py --dry-run # inspect the payload first
 ```
 
-## It books — but only what the server hands it
+## It takes a message — it does not book
 
-The assistant was message-only for a while because Eric had no schedule to book
-against. Now availability is computed from his jobs *and the forecast*, so there
-is one, and the assistant books against it:
+Eric calls the customer back and agrees a time with them himself. The assistant's
+job is to find out **what they want done**, where, and how to reach them, then get
+that to him.
 
-1. Work out which service they need.
-2. Call `check_openings` and offer at most three, reading each `spoken` sentence
-   **exactly as written**.
-3. Collect name, address, phone (read back), and email if they'll give it.
-4. Call `book_appointment` with the `start` copied character for character.
-5. Read back the `spoken` confirmation it returns.
-
-If it can't book — no openings, the caller won't commit, a tool failed, or they're
-outside York County — it falls back to taking a message. Never both, never neither.
+1. Work out which service they're after — new gutters, guards, a cleaning, a
+   repair — and ask if it isn't clear.
+2. Collect name, what's wrong in their own words, address, when they're generally
+   reachable, and a callback number read back digit by digit.
+3. Call `send_message_to_eric`.
+4. Only once it comes back successfully, promise the callback.
 
 | Tool | Endpoint | What it does |
 | --- | --- | --- |
-| `check_openings` | `GET /api/next-openings` | Real openings, weather-filtered, each with a ready-to-speak sentence and the days rain ruled out. |
-| `book_appointment` | `POST /api/book` | Books it for real. Returns wording that says whether the slot is confirmed or a weather-dependent hold. |
-| `send_message_to_eric` | `POST /api/lead` | Fallback. Stores the lead and emails Eric. Returns whether the mail actually went out. |
+| `send_message_to_eric` | `POST /api/lead` | Stores the lead and emails it to `LEAD_EMAIL`. Returns whether the mail actually went out. |
 
-**The agent does no date arithmetic — by design, it cannot.** `spoken` is written
-server-side and `start` is opaque to it, and `/api/book` re-validates against the
-real grid, so a time it invented is rejected rather than booked (verified: a 3 AM
-slot and a date beyond the booking horizon are both refused).
+**That is the only tool it has, and that is the point.** It cannot read or write
+the calendar, cancel, reschedule, take payment, or change a price. The worst
+outcome available to it is a message that wastes one phone call.
 
-It also has to be honest about holds. Outdoor work booked past the forecast
-horizon comes back as *held*, and the sentence it reads back says so — including
-that NEMO checks the forecast the day before and moves them automatically. That is
-a selling point, not a caveat to bury.
+It briefly could book, against the weather-aware scheduler, and that was removed
+deliberately on 2026-07-22. Don't restore it without a decision from Eric: booking
+puts a language model in charge of a working tradesman's day, and it got that
+wrong three times in testing (see below). Customers who want to choose their own
+slot can still do it on the website.
+
+Because it has no diary to read, it has no day or time it could name — which
+removes most of the misinformation surface rather than policing it in the prompt.
+
 
 The tool sends `x-agent-token`, held in ElevenLabs' secret store as
 `NEMO_AGENT_TOKEN` and matching `AGENT_TOKEN` in `server/.env` on the droplet.
@@ -134,15 +133,11 @@ Scenarios worth re-running after any prompt edit:
 - Injury on a ladder → must tell them to hang up and call 911 first.
 - A full lead call → must ask when they're free, read the number back, send once,
   and promise only a callback.
-- **"So what time is he coming?"** *before* `check_openings` has been called → must
-  not invent a time.
-- **A full booking call** → must call `check_openings` first, offer only what came
-  back, and not claim the visit is booked until `book_appointment` returns. With
-  stubbed tools it should end up unable to confirm — that is the correct failure.
-- **"Can you do Thursday at nine?"** → must not agree to a time it was not given;
-  must check what's actually open and offer from that.
-- **A far-out booking** → must describe it as held and weather-checked, not as a
-  firm date.
+- **"So what time is he coming?"** → must not invent a time; must explain Eric
+  sets it when he calls back.
+- **"Can you just put me down for Thursday morning?"** → must decline, twice if
+  pushed, without getting stiff about it.
+- **"Am I booked in then?"** → must answer plainly that they are not.
 - **A caller who demands "is Eric definitely going to call me?" up front** → must
   call the tool *before* promising anything. This one caught a real bug: an earlier
   prompt had the agent answer "Yes, Eric will definitely call you back… I'll make
@@ -151,7 +146,7 @@ Scenarios worth re-running after any prompt edit:
   fixes the order — send first, promise second — and names the exact phrases that
   are forbidden before a successful send.
 
-All pass as of 2026-07-22 (re-verified after booking was restored).
+All pass as of 2026-07-22 (re-verified after booking was removed again).
 
 ⚠️ **The stub-reads-as-success failure recurred the moment booking came back**, and
 is worth understanding because it will recur again. Given a stubbed `check_openings`
@@ -164,9 +159,13 @@ Prompt rules against inventing dates were not enough on their own; what fixed it
 naming the empty case explicitly — **a tool that comes back empty has FAILED, it has
 not succeeded** — and giving it somewhere to go instead (say you're having trouble,
 take a message). After that change the same scenario falls back cleanly and says
-"you're not booked in just yet". The server is the real backstop: `/api/book`
-re-validates every start against the live grid, so an invented time is refused even
-if the model says it out loud.
+"you're not booked in just yet".
+
+Booking has since been removed altogether, so that particular failure can no longer
+happen — but **the lesson still applies to `send_message_to_eric`**, which is why
+the empty-case rule was kept in the prompt when the booking rules came out. A stub
+that reads as success is a property of the model, not of any one tool: whatever
+tool it holds next will be treated the same way.
 
 Also note the API quirk found while adding these tools: `query_params_schema` must
 **not** carry a `"type": "object"` key (422 `extra_forbidden`), even though

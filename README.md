@@ -105,13 +105,14 @@ login, no phone tag, and it never offers them the slot they're already in.
 | GET  | `/owner/schedule?sig=` | Eric opens/closes days for weather (signed link) |
 
 `/api/services` returns the resolved calendar (`today`, `upcomingDays` with weekday
-names and open/closed) because the phone assistant reads it — working out that
-"Thursday" means the 23rd is exactly the arithmetic a language model gets subtly
-wrong, and a visit booked on the wrong morning is worse than no booking.
+names and open/closed) so no client has to work out that "Thursday" means the 23rd.
+It was built for the phone assistant, which no longer books; the booking widget uses
+it now.
 
-Bookings carry a `source` of `web` or `phone-ai`. A request is only labelled
-`phone-ai` if it presents the `x-agent-token` header matching `AGENT_TOKEN`, so
-the label can be trusted; a spoofed body field can't claim it.
+Bookings carry a `source` of `web` or `phone-ai`. Nothing sets `phone-ai` any more —
+the assistant takes messages rather than booking — but the column and its
+`x-agent-token` check are kept so provenance is already trustworthy if that ever
+changes.
 
 | Method | Path | Purpose |
 | --- | --- | --- |
@@ -123,18 +124,18 @@ the label can be trusted; a spoofed body field can't claim it.
 An ElevenLabs voice agent answers the phone, answers questions about the business,
 and takes the caller's details so Eric can ring them back.
 
-**It books real appointments** — it was reduced to message-taking only because
-there was no schedule to book against, and now there is one.
+**It does not book, and it must not be given the ability to.** Eric calls the
+customer back and agrees a time with them directly. The assistant's job is to find
+out **which service they want**, where the house is, when they're generally
+reachable, and how to reach them — then email that over.
 
-It never reasons about dates. `check_openings` returns openings with a `spoken`
-sentence written out for it to read verbatim plus an opaque `start` to hand back to
-`book_appointment`, and the server refuses any time it did not offer (a 3 AM slot
-and a beyond-horizon date are both rejected). It also has to be honest about holds,
-because the confirmation wording it reads back is generated server-side.
+It therefore holds exactly one tool, `send_message_to_eric`, and no way to read or
+write the calendar. That is a deliberate ceiling on what a language model can do to
+a working tradesman's day, not a limitation waiting to be lifted: the assistant
+cannot name a day or a time, because there is no day or time it is able to know.
 
-When it can't book — no openings, the caller won't commit, a tool failed, or
-they're outside York County — it falls back to `send_message_to_eric` as before.
-Never both, never neither.
+The website still books real slots against the weather-aware scheduler above — a
+customer who wants to pick a time themselves does it there.
 
 It lives in [`agent/`](agent/) — see [`agent/README.md`](agent/README.md) for how to
 edit what it says, how to test it without a phone number, and how to attach one.
@@ -146,6 +147,10 @@ work without these, but **calendar sync and email need them**:
 
 - `OWNER_EMAIL` — address(es) that receive invites/alerts. Defaults to
   `enemo@nemoseamlessgutter.com`.
+- `LEAD_EMAIL` — who receives the phone assistant's lead emails. Separate from
+  `OWNER_EMAIL` so the developer can be copied on what the assistant produces
+  without also landing on every website booking confirmation. Falls back to
+  `OWNER_EMAIL`.
 - `ICS_FEEDS` — comma-separated read-only calendar feed URLs (Google secret iCal
   + iCloud published calendar) so the owner's manual blocks hide site slots.
 - `SMTP_*` / `FROM_EMAIL` — outbound email for invites + confirmations.
@@ -182,10 +187,10 @@ applies on top of this table — treat LLM06 as the entry point to it.
 | LLM03 | Supply chain | ElevenLabs Agents for voice, Anthropic for the SEO drafts. No third-party model weights, no LLM SDK in the server. Vet anything added. |
 | LLM04 | Data & model poisoning | No fine-tuning and no training on customer data. N/A unless that changes. |
 | LLM05 | Improper output handling | Assistant output is spoken, and its tool arguments land in SQLite and in Eric's email as **plain text** — never HTML, never SQL. The real exposure is the SEO cron: `gen_article.py --publish` writes model-generated **HTML straight to the live web root**. Keep it inside the fixed template and read the draft before a run that publishes. |
-| LLM06 | **Excessive agency** | The largest risk here. The assistant can book a real appointment on a real tradesman's day. Mitigations that must stay in place: the server re-validates every booking against the live grid so an invented time is refused; `start` is an opaque server-issued value the model can only echo back; `/api/lead` is token-gated; the assistant has **no** power to cancel, reschedule, take payment, or change a price. Any new tool needs a fresh review here. |
+| LLM06 | **Excessive agency** | Deliberately held to the floor: the assistant has **one** tool, which sends an email. It cannot book, cancel, reschedule, take payment, change a price, or read the calendar — so the worst it can do is send Eric a message that wastes a phone call. It briefly could book, and that capability was removed on purpose; do not restore it without a decision from Eric, because it puts a language model in charge of a working tradesman's day. Any new tool needs a fresh review here. |
 | LLM07 | System prompt leakage | The prompt holds no secrets by design — the agent token lives in ElevenLabs' secret store and is injected as a request header, never as prompt text. So a leak is embarrassing, not dangerous. Keep it that way, and keep refusing extraction attempts. |
 | LLM08 | Vector & embedding weaknesses | No RAG and no vector store; the knowledge base is spliced inline at provision time. N/A unless that changes. |
-| LLM09 | **Misinformation** | The other large risk, and the one with a track record: the assistant invented appointment dates and told callers they were booked **three separate times** during development. The fix is structural, not a plea in the prompt — the server hands it a `spoken` sentence to read verbatim, it performs no date arithmetic, and an empty tool result is defined as a *failure* rather than an empty diary. It also never quotes a price and never claims work NEMO doesn't do. A customer waiting in for a crew that never comes is the worst output this system can produce. |
+| LLM09 | **Misinformation** | The largest remaining risk, and the one with a track record: the assistant invented appointment dates and told callers they were booked **three separate times** during development. Removing the booking tools removes most of that surface — with no diary to read, there is no time it can plausibly invent. What remains is the prompt-level guarantee that it never offers a day, never says "you're booked", and treats an empty tool result as a *failure* rather than a silent yes. It also never quotes a price and never claims work NEMO doesn't do. A customer waiting in for a crew that never comes is still the worst output this system can produce. |
 | LLM10 | Unbounded consumption | Conversations are capped at 600s; `/api/next-openings`, `/api/book` and `/api/lead` each have their own rate-limit bucket, with the assistant separated from web traffic so one storm week can't throttle the other. **Known gap:** nothing caps concurrent calls or total monthly minutes, so a caller dialling repeatedly runs up ElevenLabs spend. Worth a cap before the number is ever published. |
 
 ## Deployment

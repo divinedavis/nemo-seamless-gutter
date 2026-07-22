@@ -262,7 +262,7 @@ async function sendLeadEmail(lead) {
 
   await tx.sendMail({
     from: `${config.business.name} <${from}>`,
-    to: config.ownerEmails.join(', '),
+    to: config.leadEmails.join(', '),
     replyTo: from,
     subject: `New lead: ${lead.name} — ${lead.phone}${lead.address ? ` — ${lead.address}` : ''}`,
     text: lines.join('\n'),

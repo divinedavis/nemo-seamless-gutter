@@ -142,6 +142,11 @@ const config = {
     : ['eric@nemoseamlessgutter.com'],
   ownerName: str('OWNER_NAME', 'NEMO Seamless Gutter'),
 
+  // Who gets the phone assistant's lead emails. Separate from ownerEmails so the
+  // developer can be copied on what the assistant is producing without also
+  // landing on every website booking confirmation. Falls back to the owner.
+  leadEmails: list('LEAD_EMAIL').length ? list('LEAD_EMAIL') : list('OWNER_EMAIL'),
+
   // Optional iCloud CalDAV write-back (app-specific password) for instant insertion
   // into the owner's Apple Calendar without them accepting the email invite.
   icloud: {
