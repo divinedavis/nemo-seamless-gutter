@@ -3,8 +3,7 @@
 
 The system prompt lives in prompt.md and the facts it is allowed to state live in
 knowledge.md; this script splices them together and pushes the result. It also
-registers the three webhook tools that let the assistant read the real calendar
-and book on the call. It is idempotent throughout: secrets, tools and the agent
+registers the one webhook tool it is allowed to use. It is idempotent throughout: secrets, tools and the agent
 are all matched by name and updated in place, so re-running after a prompt edit
 just updates what is already live.
 
@@ -14,7 +13,7 @@ just updates what is already live.
     python3 agent/provision.py --dry-run  # print the payload, touch nothing
 
 NEMO_AGENT_TOKEN must match AGENT_TOKEN in server/.env on the droplet; it is what
-lets the booking API prove a booking really came from the phone assistant.
+authenticates the assistant to the lead endpoint.
 
 Dependency-free (stdlib only), like the rest of the automation in this repo.
 """
@@ -115,12 +114,13 @@ def tool_configs(secret_id: str) -> list:
             "name": "send_message_to_eric",
             "description": (
                 "Send the caller's details to Eric by email so he can call them back and "
-                "arrange a time to come out. This is the goal of almost every call. Only "
-                "send once you have their name, a callback number you have read back to "
-                "them, and roughly when they said they are free. Sending is real — Eric "
-                "reads these between jobs — so never send a test, never send twice for "
-                "the same caller, and never send for someone who did not ask to be "
-                "contacted."
+                "arrange a time to come out. This is the goal of almost every call. The two "
+                "things Eric actually needs are a CALLBACK NUMBER, read back and confirmed, "
+                "and WHEN THEY ARE GENERALLY FREE — get both. Name, address and what is "
+                "wrong are useful but optional; Eric can ask once he has them on the phone, "
+                "so never lose a caller by holding out for them. Sending is real — Eric "
+                "reads these between jobs — so never send a test, never send twice for the "
+                "same caller, and never send for someone who did not ask to be contacted."
             ),
             "response_timeout_secs": 30,
             "api_schema": {
@@ -131,7 +131,10 @@ def tool_configs(secret_id: str) -> list:
                 "request_body_schema": {
                     "type": "object",
                     "properties": {
-                        "name": {"type": "string", "description": "Caller's full name."},
+                        "name": {
+                            "type": "string",
+                            "description": "Caller's name. Pass 'Not given' if they did not say it — never invent one.",
+                        },
                         "phone": {
                             "type": "string",
                             "description": "The callback number they confirmed when you read it back to them.",
@@ -146,7 +149,7 @@ def tool_configs(secret_id: str) -> list:
                         },
                         "availability": {
                             "type": "string",
-                            "description": "When they said they are generally free, in their own words - e.g. 'weekday mornings before eleven, or any time Saturday'. Never convert this into a specific date or appointment time.",
+                            "description": "REQUIRED. When they said they are generally free, in their own words - e.g. 'weekday mornings before eleven, or any time Saturday'. Eric needs this to avoid phone tag. Never convert it into a specific date or appointment time, and never invent it: if they truly would not say, pass 'Not given - ask when you call'.",
                         },
                         "notes": {
                             "type": "string",
@@ -157,7 +160,7 @@ def tool_configs(secret_id: str) -> list:
                             "description": "The number they are calling from, if you have it. May differ from the callback number they give you.",
                         },
                     },
-                    "required": ["name", "phone"],
+                    "required": ["phone", "availability"],
                 },
             },
         },
@@ -209,6 +212,19 @@ def build_config(tool_ids: list | None = None) -> dict:
                 "prompt": {
                     "prompt": build_prompt(),
                     "tool_ids": tool_ids or [],
+                    # Let the assistant hang up once Eric has the message. Without
+                    # this the line just sits open after goodbye and the caller is
+                    # left wondering whether to say something else — and every idle
+                    # second is billed. Enabling it is a matter of setting the key:
+                    # every built-in tool is present as null (disabled) by default.
+                    "built_in_tools": {
+                        "end_call": {
+                            "type": "system",
+                            "name": "end_call",
+                            "description": "",
+                            "params": {"system_tool_type": "end_call"},
+                        }
+                    },
                     # Low temperature: this agent quotes a small business's facts
                     # back to real customers. Creativity is a defect here.
                     "temperature": 0.15,

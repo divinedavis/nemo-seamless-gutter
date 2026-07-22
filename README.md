@@ -126,13 +126,19 @@ and takes the caller's details so Eric can ring them back.
 
 **It does not book, and it must not be given the ability to.** Eric calls the
 customer back and agrees a time with them directly. The assistant's job is to find
-out **which service they want**, where the house is, when they're generally
-reachable, and how to reach them — then email that over.
+out how to reach them and when — then email that over.
 
-It therefore holds exactly one tool, `send_message_to_eric`, and no way to read or
-write the calendar. That is a deliberate ceiling on what a language model can do to
-a working tradesman's day, not a limitation waiting to be lifted: the assistant
-cannot name a day or a time, because there is no day or time it is able to know.
+**Two things are required of every call: a callback number, and when the customer
+is generally free.** Name, service, address and the description of the problem are
+secondary — Eric gathers those in the first seconds of the call he's about to make,
+and they must never be the reason a caller rings off unrecorded. The tool schema
+enforces that split rather than leaving it to the prompt.
+
+It holds exactly one tool, `send_message_to_eric`, plus `end_call` so it can hang
+up once Eric has what he needs — and no way to read or write the calendar. That is
+a deliberate ceiling on what a language model can do to a working tradesman's day,
+not a limitation waiting to be lifted: the assistant cannot name a day or a time,
+because there is no day or time it is able to know.
 
 The website still books real slots against the weather-aware scheduler above — a
 customer who wants to pick a time themselves does it there.

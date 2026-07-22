@@ -6,7 +6,7 @@ have gone to voicemail turns into a lead instead.
 
 | File | What it is |
 | --- | --- |
-| `prompt.md` | System prompt — persona, hard rules, booking script. `{{KNOWLEDGE}}` is spliced out at provision time. |
+| `prompt.md` | System prompt — persona, hard rules, what to collect, when to hang up. `{{KNOWLEDGE}}` is spliced out at provision time. |
 | `knowledge.md` | The **only** facts the agent may state about NEMO. Verified against the live site. |
 | `provision.py` | Creates or updates the agent **and its tools** via the ElevenLabs API. Idempotent. |
 | `agent.id` | The live agent id, cached so re-runs update instead of duplicating. |
@@ -28,12 +28,25 @@ Eric calls the customer back and agrees a time with them himself. The assistant'
 job is to find out **what they want done**, where, and how to reach them, then get
 that to him.
 
-1. Work out which service they're after — new gutters, guards, a cleaning, a
-   repair — and ask if it isn't clear.
-2. Collect name, what's wrong in their own words, address, when they're generally
-   reachable, and a callback number read back digit by digit.
+**Two things are required, and they are the whole job:**
+
+1. **A callback number**, read back digit by digit and confirmed.
+2. **When the caller is generally free**, in their own words.
+
+Name, service, address and what's wrong are *secondary* — Eric asks about those in
+the first seconds of the call he's about to make. They must never be the reason a
+caller hangs up unrecorded. The tool schema enforces the split: `phone` and
+`availability` are required, everything else optional, and `/api/lead` rejects a
+lead with no number while quietly accepting one with no name. That last part is
+deliberate — rejecting a nameless lead only teaches the model to invent a name.
+
+So the call goes:
+
+1. Get the number and the best time to reach them.
+2. Pick up the extras if the call allows it.
 3. Call `send_message_to_eric`.
 4. Only once it comes back successfully, promise the callback.
+5. Ask if there's anything else, say goodbye, then `end_call`.
 
 | Tool | Endpoint | What it does |
 | --- | --- | --- |
@@ -83,9 +96,6 @@ Taken by the phone assistant on Wednesday, Jul 22 at 9:16 AM.
 Nothing is scheduled — they are expecting your call to set a time.
 ```
 
-(That is the *fallback* path. A successful booking instead sends the normal
-new-booking alert, prefixed `[Phone assistant]`, with the ICS invite attached.)
-
 **Anything the agent says about NEMO must be in `knowledge.md`.** The prompt tells
 it to refuse rather than guess, because a confident wrong answer on a customer
 call costs Eric a job. Prices are never quoted — the estimate is free, and every
@@ -116,12 +126,10 @@ made up three time slots, and told the caller they were booked. That is the wors
 failure available to a business like this — the customer waits in and Eric never
 comes.
 
-Booking is back, so that instinct is live again and the guard is now in two layers,
-not one. The prompt forbids saying any day or time that did not come back from a
-tool **in this call**; and independently, `/api/book` re-validates every start
-against the real grid, so an invented time is refused by the server even if the
-model does say it. Re-run the scenarios below after any prompt edit — the simulator
-is the only cheap way to catch the model promising ahead of its tools.
+Booking is gone again, so that specific failure can't recur — but the instinct
+behind it can. The simulator remains the only cheap way to catch the model
+promising ahead of its tools, or hanging up on a lead. Re-run the scenarios below
+after any prompt edit.
 
 Scenarios worth re-running after any prompt edit:
 
@@ -138,6 +146,17 @@ Scenarios worth re-running after any prompt edit:
 - **"Can you just put me down for Thursday morning?"** → must decline, twice if
   pushed, without getting stiff about it.
 - **"Am I booked in then?"** → must answer plainly that they are not.
+- **A caller in a rush**: "I need my gutters done, I have to run, bye!" → must ask
+  for the number and best time *before* letting them go, then send, then hang up.
+  This caught a real bug — the agent used to simply say "thanks for calling, take
+  care" and hang up on a customer who wanted work, sending nothing.
+- **A wrong number** ("sorry, I wanted the dentist") → *should* end the call
+  politely without taking a lead. There is nothing to lose here, so hanging up is
+  correct; don't over-correct this into interrogating people who misdialled.
+- **A caller who won't give a time** ("my shifts change every week") → must still
+  send the lead with the number and note that Eric should ask.
+- **Normal completion** → send, confirm the callback, ask if there's anything else,
+  say goodbye, *then* `end_call`. Never hang up before the message has gone.
 - **A caller who demands "is Eric definitely going to call me?" up front** → must
   call the tool *before* promising anything. This one caught a real bug: an earlier
   prompt had the agent answer "Yes, Eric will definitely call you back… I'll make

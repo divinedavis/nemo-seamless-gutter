@@ -310,10 +310,14 @@ app.post('/api/lead', async (req, res) => {
     created_at: DateTime.utc().toISO(),
   };
 
-  if (lead.name.length < 2) return res.status(400).json({ error: 'A name is required.' });
+  // A callback number is the one thing a lead cannot exist without. Everything
+  // else — including the name — is optional on purpose: rejecting a nameless lead
+  // would only teach the assistant to invent a name to get past the check, and Eric
+  // can ask for it in the first five seconds of the call he's about to make.
   if (lead.phone.replace(/\D/g, '').length < 10) {
     return res.status(400).json({ error: 'A valid 10-digit callback number is required.' });
   }
+  if (lead.name.length < 2) lead.name = 'Name not given';
 
   // Store first: if the mail server is having a bad day the lead is still not lost,
   // and `emailed` shows which ones need chasing.
@@ -328,13 +332,16 @@ app.post('/api/lead', async (req, res) => {
   }
 
   // Tell the agent plainly whether Eric was actually notified, so it can only
-  // promise a callback when the message really went out.
+  // promise a callback when the message really went out. The wording is read
+  // aloud, so address the caller directly rather than by a name we may not have —
+  // "tell Name not given that Eric will call" is exactly the sort of thing an
+  // assistant will happily say down the phone.
   res.json({
     ok: true,
     emailed: sent,
     message: sent
-      ? `Message delivered to Eric. Tell ${lead.name} that Eric will call them back on ${lead.phone} to set up a time.`
-      : `Saved, but the email did not go out. Tell ${lead.name} you have their details and Eric will call ${lead.phone}, then flag it.`,
+      ? `Message delivered to Eric. Tell the caller Eric will ring them back on ${lead.phone} to sort out a time.`
+      : `Saved, but the email did NOT go out — do not promise a callback. Tell the caller to reach Eric directly on ${config.business.phone}.`,
   });
 });
 
