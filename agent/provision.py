@@ -244,8 +244,17 @@ def build_config(tool_ids: list | None = None) -> dict:
                 "speed": 1.0,
             },
             "turn": {
-                # Callers on a cell in a truck pause a lot; don't talk over them.
-                "turn_timeout": 8,
+                # How long the agent sits through silence before deciding the
+                # caller has finished. This was 8s on the theory that callers on a
+                # cell pause a lot — but 8 seconds of dead air after every sentence
+                # reads as a broken line, and people start saying "hello?". Two is
+                # about the length of a natural conversational gap.
+                "turn_timeout": 2,
+                # Predict the end of the caller's turn from prosody rather than
+                # waiting out the timeout, and prefetch the reply. This is what
+                # buys responsiveness without having to get aggressive about
+                # cutting people off — the timeout above is only the backstop.
+                "speculative_turn": True,
             },
             "conversation": {
                 "text_only": False,
