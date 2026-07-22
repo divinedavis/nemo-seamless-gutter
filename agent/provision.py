@@ -125,8 +125,10 @@ def tool_configs(secret_id: str) -> list:
                 "url": f"{SITE}/api/next-openings",
                 "method": "GET",
                 "request_headers": {"x-agent-token": {"secret_id": secret_id}},
+                # NOTE: unlike request_body_schema, query_params_schema must NOT
+                # carry a "type" key — the API rejects it with 422
+                # extra_forbidden. Properties and required only.
                 "query_params_schema": {
-                    "type": "object",
                     "properties": {
                         "service": {
                             "type": "string",

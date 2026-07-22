@@ -1,0 +1,11 @@
+# NEMO Seamless Gutter — weather-aware booking automation.
+# This droplet keeps per-project crons in /etc/cron.d/ (never `crontab -`, which
+# would clobber the others). See server/jobs/confirm_run.js.
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Hourly: refresh the forecast, then confirm or move every hold coming up.
+15 * * * * root cd /var/www/nemo-seamless-gutter/server && /usr/bin/node jobs/confirm_run.js >> /var/log/nemo-confirm.log 2>&1
+
+# 6 AM: same pass, plus Eric's day summary with his open/close links.
+0 6 * * * root cd /var/www/nemo-seamless-gutter/server && /usr/bin/node jobs/confirm_run.js --digest >> /var/log/nemo-confirm.log 2>&1
