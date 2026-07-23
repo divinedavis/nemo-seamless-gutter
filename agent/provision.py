@@ -39,7 +39,7 @@ AGENT_NAME = "NEMO Seamless Gutter — Phone Assistant"
 VOICE_ID = "EXAVITQu4vr4xnSDxMaL"
 
 FIRST_MESSAGE = (
-    "Thanks for calling NEMO Seamless Gutter, this is the assistant. "
+    "Hi, thanks for calling NEMO Seamless Gutter, this is the assistant. "
     "How can I help you today?"
 )
 
@@ -239,7 +239,10 @@ def build_config(tool_ids: list | None = None) -> dict:
                 # rejects flash v2.5 here: English-language agents must use the
                 # English turbo/flash v2 models.
                 "model_id": "eleven_flash_v2",
-                "stability": 0.5,
+                # Higher stability keeps delivery even and calm. At 0.5 the voice
+                # swings into an excited, sometimes near-shouting read on upbeat
+                # lines; 0.75 flattens those swings without going robotic.
+                "stability": 0.75,
                 "similarity_boost": 0.8,
                 "speed": 1.0,
             },
