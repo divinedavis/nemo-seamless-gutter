@@ -350,7 +350,13 @@ app.post('/api/lead', async (req, res) => {
 
 // --- admin (token-protected) ---
 function requireAdmin(req, res) {
-  const token = req.query.token || req.headers['x-admin-token'];
+  // Read the admin token ONLY from a request header — never from req.query, so
+  // it can't leak via access logs, proxies, the Referer header, or browser
+  // history. Accept the dedicated x-admin-token header or a standard
+  // Authorization: Bearer <token>.
+  const auth = req.headers['authorization'] || '';
+  const bearer = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+  const token = req.headers['x-admin-token'] || bearer;
   if (!config.adminToken || token !== config.adminToken) {
     res.status(401).json({ error: 'unauthorized' });
     return false;

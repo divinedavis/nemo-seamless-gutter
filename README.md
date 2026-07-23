@@ -99,8 +99,8 @@ login, no phone tag, and it never offers them the slot they're already in.
 | GET  | `/api/availability?service=&date=` | open slots for a day, + why the weather closed it |
 | GET  | `/api/next-openings?service=&limit=` | next bookable windows, with ready-to-speak text |
 | POST | `/api/book` | create a booking |
-| GET  | `/api/admin/bookings?token=` | upcoming bookings (admin) |
-| POST | `/api/admin/cancel?token=` | cancel a booking (admin) |
+| GET  | `/api/admin/bookings` | upcoming bookings (admin — send `x-admin-token` header) |
+| POST | `/api/admin/cancel` | cancel a booking (admin — send `x-admin-token` header) |
 | GET  | `/booking/reschedule?uid=&sig=` | customer picks a new time (signed link) |
 | GET  | `/owner/schedule?sig=` | Eric opens/closes days for weather (signed link) |
 
@@ -117,7 +117,7 @@ changes.
 | Method | Path | Purpose |
 | --- | --- | --- |
 | POST | `/api/lead` | phone assistant hands a caller's details to Eric (agent token required) |
-| GET  | `/api/admin/leads?token=` | recent leads, including any whose email failed |
+| GET  | `/api/admin/leads` | recent leads, including any whose email failed (admin — send `x-admin-token` header) |
 
 ## Phone assistant
 
