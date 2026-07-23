@@ -46,7 +46,7 @@ FIRST_MESSAGE = (
 # Spoken when the call hits the duration cap.
 DURATION_MESSAGE = (
     "I'm sorry, I have to let you go — please call us back at "
-    "seven one seven, five seven eight, oh oh seven three."
+    "seven one seven, five seven eight, zero zero seven three."
 )
 
 
