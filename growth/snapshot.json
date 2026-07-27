@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-27T13:43:47+00:00",
+  "generated": "2026-07-27T16:57:31+00:00",
   "date": "2026-07-27",
   "site": "nemoseamlessgutter.com",
   "goal": {
@@ -511,7 +511,7 @@
       "slug": "gsc_connect",
       "name": "Connect Search Console",
       "kind": "indexing",
-      "status": "candidate",
+      "status": "retired",
       "hypothesis": "The >50% top-3 goal is not measurable without Search Console. Until it is connected the engine reports coverage as a proxy and cannot tell whether it is actually winning.",
       "evidence": "seo/weekly_digest.py already contains a working GSC client.",
       "prefixes": [],
@@ -519,9 +519,14 @@
       "source": "seed",
       "added": "2026-07-27",
       "activated": null,
-      "retired": null,
-      "notes": "first step: create a Google Cloud service account, grant it read access to the nemoseamlessgutter.com Search Console property, and drop the JSON at seo/gsc-service-account.json (chmod 600).",
-      "verdict": null,
+      "retired": "2026-07-27",
+      "notes": "first step: create a Google Cloud service account, grant it read access to the nemoseamlessgutter.com Search Console property, and drop the JSON at seo/gsc-service-account.json (chmod 600).\n[2026-07-27] candidate\u2192retired: completed 2026-07-27 \u2014 service account installed, rank data flowing",
+      "verdict": {
+        "decided": "2026-07-27",
+        "works": true,
+        "why": "Done. Search Console connected 2026-07-27; the >50% goal is now measured (0.0% top-3 baseline) instead of proxied by page coverage.",
+        "measured": {}
+      },
       "owned_visitors": null
     },
     {
@@ -634,7 +639,9 @@
     }
   ],
   "scoreboard": {
-    "works": [],
+    "works": [
+      "T010"
+    ],
     "does_not_work": [],
     "not_yet_judged": [
       "T001",
@@ -646,7 +653,6 @@
       "T007",
       "T008",
       "T009",
-      "T010",
       "T011",
       "T012",
       "T013",
