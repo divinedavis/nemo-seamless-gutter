@@ -3,11 +3,20 @@
 A self-improving daily loop aimed at one goal: **more than half of York County
 gutter searches landing on this business**, and the phone ringing because of it.
 
-Runs on the droplet at 06:00 America/New_York from `/etc/cron.d/nemo-growth`:
+There are two layers, and they run an hour apart:
 
-    growth_daily.py daily --email divinejdavis@gmail.com
+| | 06:00 ET — the engine (this droplet) | 07:00 ET — the review agent (cloud) |
+| --- | --- | --- |
+| Runs | `/etc/cron.d/nemo-growth` | a claude.ai routine |
+| Does | measure → review → build → scout → report, then publishes state to GitHub | reads the published state, judges whether prior changes worked, researches, writes the journal |
+| Can | write and deploy pages on the live site | read the repo and commit to it — **nothing it commits deploys** |
+| Sees | nginx logs, the bookings database, the ledger | only `growth/snapshot.json` and `growth/JOURNAL.md` |
 
-which is: **measure → review → build → scout → report**.
+The engine does the mechanical work; the agent is the judgment layer on top. The
+agent has no access to this machine, so `snapshot.py` publishes a PII-free state
+file and `publish_state.sh` pushes it — the repository is the bridge between them.
+
+The engine step is: **measure → review → build → scout → report**.
 
 ## The five steps
 
@@ -74,6 +83,29 @@ prints one where a reader would read the other. Connecting Search Console
   shared catch-all, which has no Host field, and traffic cannot be attributed.
 * `/growth/` is denied in nginx and disallowed in robots.txt — the ledger is
   internal business data, never web-served.
+
+## The bridge to the review agent
+
+`snapshot.py` writes two files that the cloud agent reads, and
+`publish_state.sh` pushes them straight after the 6am run:
+
+* **`snapshot.json`** — yesterday's metrics, the full ledger with hypotheses and
+  verdicts, keyword coverage, the uncovered-query build queue, and the last
+  build and scout results. **Aggregates only.** The bookings and leads tables
+  hold real customers, and `_assert_no_pii` refuses to write the file if
+  anything shaped like a phone number, email address or street address appears
+  in it. The business's own published contact details are allowed through.
+* **`JOURNAL.md`** — append-only. The engine writes what it did; the agent
+  writes what it concluded and why. Nothing is ever edited after the fact — a
+  decision log is only worth reading if it still shows what was believed at
+  the time.
+
+`publish_state.sh` keeps a **separate clone** at `/root/nemo-repo` and copies
+specific paths into it. The docroot is deliberately not a git repository: it
+holds `.env` files, the bookings database, and server-only auto-published
+guides, and a stray `git reset` or `git clean` in there would be destructive.
+Pushing uses a write-scoped deploy key (`/root/.ssh/nemo_deploy`, SSH host alias
+`github-nemo`).
 
 ## Running it by hand
 
