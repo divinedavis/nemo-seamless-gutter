@@ -77,7 +77,11 @@ class Context:
 
     def read(self, relpath):
         p = self.path(relpath)
-        if not os.path.exists(p):
+        # A keyword target of "/" resolves to the docroot itself. Read the
+        # index there rather than blowing up on a directory.
+        if os.path.isdir(p):
+            p = os.path.join(p, "index.html")
+        if not os.path.isfile(p):
             return None
         with open(p, errors="replace") as f:
             return f.read()
@@ -577,8 +581,238 @@ def ping_indexnow(ctx):
     return {"ok": code in (200, 202), "detail": f"submitted {len(urls)} URL(s), HTTP {code}"}
 
 
+
+
+
+# ------------------------------------------------------- strengthen existing
+
+# Where a query belongs when no target is declared. Order matters: the most
+# specific service wins, and the town only decides between area pages.
+SERVICE_HINTS = [
+    (("half round", "half-round", "copper"), "/services/half-round-gutters.html"),
+    (("guard", "leaf protection", "leafguard", "leaf guard"),
+     "/services/gutter-guards.html"),
+    (("clean", "repair", "downspout", "overflow", "clog", "sagging"),
+     "/services/gutter-cleaning-repair.html"),
+    (("install", "replace", "new gutters", "seamless"),
+     "/services/seamless-gutter-installation.html"),
+]
+
+STRENGTHEN_SYSTEM = """You write one focused section to add to an existing page on a real \
+seamless gutter contractor's website (NEMO Seamless Gutter, York County, Pennsylvania, \
+owner Eric).
+
+The page already exists and already ranks for related searches. Your section has to earn \
+the specific search below without repeating what the page already says. Write the section \
+a homeowner searching that exact phrase would want to find.
+
+Constraints:
+- The h2 must read naturally to a human AND contain the distinguishing words of the search. \
+Do not keyword-stuff; "Gutter Replacement in York, PA" is right, "Gutter Replacement York PA \
+Gutter Replacement" is not.
+- Never invent a review, testimonial, customer, job count, year founded, award, certification, \
+or a specific price. You may describe what drives cost.
+- No exclamation marks. Plain, competent tradesman's voice.
+- 2-3 paragraphs. Add bullets only if they genuinely help.
+- Do not repeat the page's existing headings, which are listed below.
+
+Return ONLY valid JSON:
+{"h2": "the section heading",
+ "paragraphs": ["...", "..."],
+ "bullets": ["optional"],
+ "faq": {"q": "a question this searcher would ask", "a": "2-4 sentences"}}"""
+
+
+def _host_page(ctx, kw):
+    """The page a query should live on, if one already exists."""
+    target = kw.get("target")
+    if target in ("/", ""):
+        target = "/index.html" if target == "/" else target
+    if target and ctx.read(target.lstrip("/")) is not None:
+        return target
+    q = kw["query"].lower()
+    # a town in the query points at that town's area page
+    for slug in sorted({t[0] for t in TOWN_QUEUE} |
+                       {re.sub(r"[^a-z]+", "-", t.strip()) for t in
+                        ("hanover", "dover", "red lion", "dallastown", "spring grove")}):
+        label = slug.replace("-", " ")
+        if label and label in q:
+            cand = f"/areas/seamless-gutters-{slug}-pa.html"
+            if ctx.read(cand.lstrip("/")) is not None:
+                return cand
+    for words, page in SERVICE_HINTS:
+        if any(w in q for w in words) and ctx.read(page.lstrip("/")) is not None:
+            return page
+    return "/index.html" if ctx.read("index.html") is not None else None
+
+
+def _existing_headings(src):
+    heads = re.findall(r"<h[123][^>]*>(.*?)</h[123]>", src or "", re.S)
+    return [re.sub(r"<[^>]+>", " ", h).strip()[:80] for h in heads]
+
+
+def strengthen_pages(ctx):
+    """Add a targeted section to a page that already exists but does not rank.
+
+    This is the technique that actually moves the goal. Most uncovered queries
+    are not missing a page — they are missing a heading. "gutter replacement
+    york pa" points at the installation page, which never uses the word
+    "replacement"; "gutter repair dover pa" belongs on the Dover area page,
+    which only talks about installation.
+
+    Writing a new page for those would split the site against itself, so this
+    strengthens the page that should already be winning instead. That also
+    concentrates authority rather than diluting it across near-duplicates.
+    """
+    from . import keywords
+    keywords.check_coverage(ctx.docroot)
+    kws = keywords.load()
+
+    order = {"hire": 0, "price": 1, "check": 2, "diy": 3}
+    todo = sorted((k for k in kws if not k.get("covered")),
+                  key=lambda k: order.get(k.get("intent"), 9))
+
+    done = set(ledger.get_state("strengthened", []))
+    for kw in todo:
+        if kw["query"] in done:
+            continue
+        host = _host_page(ctx, kw)
+        if not host:
+            continue
+        src = ctx.read(host.lstrip("/"))
+        if src is None or '<div class="cta-band">' not in src:
+            continue
+
+        try:
+            data = llm.call_json(STRENGTHEN_SYSTEM, (
+                f'The search to win: "{kw["query"]}"\n'
+                f'Search intent: {kw.get("intent")}\n'
+                f'The page: {host}\n'
+                f'Headings already on that page: '
+                f'{"; ".join(_existing_headings(src)[:12])}\n\n'
+                f"Phone {PHONE}. Free on-site estimates across York County."),
+                max_tokens=1600)
+        except Exception as e:
+            return {"ok": False, "detail": f"generation failed for '{kw['query']}': {e}"}
+        if not data.get("h2") or not data.get("paragraphs"):
+            return {"ok": False, "detail": f"model returned nothing usable for '{kw['query']}'"}
+
+        block = _render_sections([{
+            "h2": data["h2"], "paragraphs": data["paragraphs"],
+            "bullets": data.get("bullets")}])
+        faq = data.get("faq") or {}
+        if faq.get("q"):
+            block += (f'\n      <h3>{_esc(faq["q"])}</h3>'
+                      f'\n      <p>{_esc(faq.get("a", ""))}</p>')
+
+        marker = '      <div class="cta-band">'
+        idx = src.find(marker)
+        if idx < 0:
+            idx = src.find('<div class="cta-band">')
+        out = src[:idx] + block + "\n\n" + src[idx:]
+
+        ctx.backup(host.lstrip("/"))
+        ctx.write(host.lstrip("/"), out)
+
+        if not ctx.dry_run:
+            kw["target"] = host
+            keywords.save(kws)
+            ledger.set_state("strengthened", sorted(done | {kw["query"]}))
+        return {"ok": True,
+                "detail": f"added \"{data['h2'][:60]}\" to {host} for '{kw['query']}'"}
+
+    return {"ok": True, "detail": "no uncovered query has an existing page to strengthen"}
+
+
+# ----------------------------------------------------------- service pages
+
+# Services the site does not have a page for. Ordered by evidence: soffit and
+# fascia is first because Search Console already shows the site ranking 1.7 for
+# "gutter soffit and fascia replacement" with nothing to send that click to.
+SERVICE_QUEUE = [
+    ("gutter-soffit-fascia-replacement", "Soffit &amp; Fascia Replacement",
+     "gutter soffit and fascia replacement",
+     "Rotten fascia board is the most common reason a gutter pulls away from a "
+     "house, so this work is usually sold alongside a gutter replacement. Cover "
+     "what rotten fascia looks like from the ground, why gutters fail when the "
+     "board behind them fails, aluminum wrap versus replacing the board, and "
+     "how soffit ventilation matters for the roof."),
+    ("emergency-gutter-repair", "Emergency Gutter Repair",
+     "emergency gutter repair after storm york pa",
+     "Storm damage in York County: gutters torn loose by wind, downspouts "
+     "crushed by ice or a limb, water pouring behind the gutter into the "
+     "basement. Cover what to do immediately, what can wait, what a temporary "
+     "fix looks like, and how insurance claims usually treat gutter damage."),
+    ("commercial-gutters", "Commercial Gutters",
+     "commercial gutter installation york pa",
+     "Commercial and agricultural buildings in York County: box gutters on "
+     "warehouses, long runs on barns and pole buildings, heavier gauge and "
+     "larger downspouts, and why sizing matters far more on a big roof."),
+]
+
+
+def service_pages(ctx):
+    """One new service page per run, for work the site does but cannot be found for."""
+    todo = [s for s in SERVICE_QUEUE
+            if ctx.read(f"services/{s[0]}.html") is None]
+    if not todo:
+        return {"ok": True, "detail": "every queued service already has a page"}
+
+    slug, title, query, brief = todo[0]
+    filename = f"{slug}.html"
+    canonical = f"{SITE}/services/{filename}"
+
+    try:
+        data = llm.call_json(MONEY_SYSTEM, (
+            f'Write the service page that should rank for: "{query}".\n\n'
+            f"What this page must cover: {brief}\n\n"
+            f"This is a service page for the business, not a general guide — it "
+            f"should end with the reader wanting an estimate. Service area: York "
+            f"County, Pennsylvania. Phone {PHONE}."), max_tokens=4000)
+    except Exception as e:
+        return {"ok": False, "detail": f"generation failed for {title}: {e}"}
+    if not data.get("sections"):
+        return {"ok": False, "detail": f"model returned no sections for {title}"}
+
+    h1 = data.get("h1") or title
+    service_ld = json.dumps({
+        "@context": "https://schema.org", "@type": "Service",
+        "serviceType": title.replace("&amp;", "and"),
+        "name": h1, "description": (data.get("lede") or "")[:300],
+        "provider": _provider_ld(),
+        "areaServed": {"@type": "AdministrativeArea",
+                       "name": "York County, Pennsylvania"},
+        "url": canonical,
+        "offers": {"@type": "Offer", "priceCurrency": "USD",
+                   "description": "Free on-site estimate in York County, PA"},
+    }, indent=2)
+
+    body = _render_sections(data["sections"])
+    faqs = _render_faqs(data.get("faqs"))
+    if faqs:
+        body += "\n" + faqs
+
+    page = templates.HEAD.format(
+        ga=GA_ID, title=f"{data.get('title') or h1} | {BRAND}",
+        meta_desc=_attr((data.get("meta_desc") or "")[:158]),
+        canonical=canonical, geo="",
+        og_title=f"{h1} — {BRAND}", og_type="website",
+        primary_ld=service_ld, faq_ld=_faq_ld(data.get("faqs")),
+        crumb_href="/#services", crumb_label="Services", crumb_here=_esc(title),
+        eyebrow=f"{title} · York County, PA",
+        h1=_esc(h1), lede=_esc(data.get("lede", "")),
+        body=body, cta_heading="Get a free estimate",
+        nearby=_nearby_block(_all_area_pages(ctx), ""))
+
+    ctx.write(f"services/{filename}", page)
+    return {"ok": True, "detail": f"published /services/{filename} ({len(page):,} bytes; "
+                                  f"{len(todo) - 1} service(s) left in the queue)"}
+
+
 REGISTRY = {
     "area_pages": area_pages,
+    "service_pages": service_pages,
+    "strengthen_pages": strengthen_pages,
     "money_pages": money_pages,
     "internal_links": internal_links,
     "local_schema": local_schema,
@@ -587,5 +821,7 @@ REGISTRY = {
 }
 
 # Order matters: write pages, wire them together, then tell search engines.
-ORDER = ["area_pages", "money_pages", "internal_links", "local_schema",
-         "rebuild_sitemap", "ping_indexnow"]
+# Strengthening an existing page beats writing a new one, so it runs first and
+# gets the pick of the uncovered queries. New pages only get what is left.
+ORDER = ["strengthen_pages", "service_pages", "area_pages", "money_pages",
+         "internal_links", "local_schema", "rebuild_sitemap", "ping_indexnow"]

@@ -218,6 +218,61 @@ def cmd_daily(args):
 
 # ------------------------------------------------------------------ status
 
+def cmd_watchdog(args):
+    """Alert if the engine has stopped running.
+
+    Every other check here reports from inside a run. If cron breaks, python
+    fails to start, or the droplet reboots, there is no run and therefore no
+    report — and an inbox with nothing in it looks exactly like a quiet week.
+    This runs from a separate cron entry so it survives the engine failing.
+    """
+    import datetime
+    last = ledger.get_state("last_build") or {}
+    when = last.get("date")
+    stale_days = None
+    if when:
+        try:
+            stale_days = (datetime.date.today()
+                          - datetime.date.fromisoformat(when)).days
+        except Exception:
+            pass
+
+    problems = []
+    if not when:
+        problems.append("The growth engine has never recorded a completed build.")
+    elif stale_days is not None and stale_days >= 2:
+        problems.append(f"The last completed build was {when} — {stale_days} days "
+                        f"ago. The 06:00 cron is not producing runs.")
+
+    failed = [r for r in (last.get("log") or []) if not r.get("ok")]
+    if failed and stale_days == 0:
+        problems.append("Today's run completed but these steps failed: "
+                        + "; ".join(f"{r['slug']} — {r.get('detail', '')[:120]}"
+                                    for r in failed))
+    g = ledger.get_state("gsc_last") or {}
+    if g and not g.get("ok"):
+        problems.append(f"Search Console sync is failing: "
+                        f"{str(g.get('detail', ''))[:160]}")
+
+    if not problems:
+        log(f"watchdog: ok — last build {when}")
+        return 0
+
+    for p_ in problems:
+        log(f"watchdog: {p_}")
+    if args.email and not args.dry_run:
+        body = ("The NEMO growth engine needs attention.\n\n"
+                + "\n\n".join(f"* {p_}" for p_ in problems)
+                + "\n\nCheck /var/log/nemo-growth.log on 104.236.120.144.\n")
+        try:
+            report.email(body, args.email,
+                         subject=f"NEMO growth engine needs attention — {ledger.today()}")
+            log(f"watchdog: alerted {args.email}")
+        except Exception as e:
+            log(f"watchdog: alert email failed: {e}")
+    return 1
+
+
 def cmd_status(args):
     techs = ledger.load_techniques()
     s = keywords.summary()
@@ -271,7 +326,7 @@ def main():
     p = argparse.ArgumentParser(description="NEMO growth engine")
     p.add_argument("command", choices=["measure", "review", "build", "scout",
                                        "report", "daily", "status", "goal",
-                                       "snapshot"])
+                                       "snapshot", "watchdog"])
     p.add_argument("--docroot", default=DEFAULT_DOCROOT)
     p.add_argument("--days", type=int, default=1,
                    help="how many complete days to measure (default: yesterday)")
@@ -298,6 +353,7 @@ def main():
         "status": lambda: cmd_status(args),
         "goal": lambda: cmd_goal(args),
         "snapshot": lambda: cmd_snapshot(args),
+        "watchdog": lambda: cmd_watchdog(args),
     }[args.command]()
 
 

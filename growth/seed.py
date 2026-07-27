@@ -23,6 +23,25 @@ SEED_TECHNIQUES = [
              "spend months matching."),
          evidence="The five existing area pages are the site's only town-level coverage; "
                   "York County has 70+ municipalities."),
+    dict(slug="strengthen_pages", name="Strengthen pages that should already rank",
+         kind="content", status="active", prefixes=[], metric="organic_visitors",
+         hypothesis=(
+             "Most uncovered queries are not missing a page, they are missing a "
+             "heading. 'gutter replacement york pa' points at the installation page, "
+             "which never uses the word replacement; 'gutter repair dover pa' belongs "
+             "on the Dover page, which only talks about installation. Adding the "
+             "section to the page that should already be winning concentrates "
+             "authority instead of splitting the site against itself."),
+         evidence="Search Console: 5 hire-intent queries sit on pages missing only "
+                  "the distinguishing term; 27 more have a natural host page."),
+    dict(slug="service_pages", name="Pages for services we rank for but cannot sell",
+         kind="content", status="active", prefixes=["/services/"],
+         metric="owned_visitors",
+         hypothesis=(
+             "Search Console shows the site ranking 1.7 for 'gutter soffit and fascia "
+             "replacement' with no soffit or fascia page anywhere on it. Visibility "
+             "already exists for work with nowhere to send the click."),
+         evidence="GSC 28-day query report, 2026-07-27."),
     dict(slug="money_pages", name="Cost and buying guides", kind="content",
          status="active", prefixes=["/guides/"], metric="owned_visitors",
          hypothesis=(

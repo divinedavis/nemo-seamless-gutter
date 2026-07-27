@@ -29,3 +29,8 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # him, with none of the machinery — a report full of internals is a report
 # that stops getting read.
 0 6 * * * root cd /var/www/nemo-seamless-gutter && WEB_ROOT=/var/www/nemo-seamless-gutter /usr/bin/python3 growth_daily.py daily --email divinejdavis@gmail.com --owner-email eric@nemoseamlessgutter.com >> /var/log/nemo-growth.log 2>&1; cd /var/www/nemo-seamless-gutter && WEB_ROOT=/var/www/nemo-seamless-gutter /bin/bash growth/publish_state.sh >> /var/log/nemo-growth.log 2>&1
+
+# Watchdog — runs from its own entry so it survives the engine failing. If the
+# 06:00 run stops happening, the failure mode is an empty inbox, which looks
+# exactly like a quiet week. This makes silence loud.
+0 11 * * * root cd /var/www/nemo-seamless-gutter && WEB_ROOT=/var/www/nemo-seamless-gutter /usr/bin/python3 growth_daily.py watchdog --email divinejdavis@gmail.com >> /var/log/nemo-growth.log 2>&1
