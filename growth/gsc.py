@@ -49,6 +49,41 @@ def available():
     return os.path.exists(os.path.abspath(SA_KEY))
 
 
+def list_properties(token):
+    """Every property this service account can read."""
+    req = urllib.request.Request(
+        "https://www.googleapis.com/webmasters/v3/sites",
+        headers={"Authorization": f"Bearer {token}"})
+    with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
+        return json.loads(r.read()).get("siteEntry", [])
+
+
+def resolve_property(token):
+    """Pick the property to query instead of assuming its form.
+
+    A Domain property is `sc-domain:example.com`; a URL-prefix one is
+    `https://example.com/`. They are different strings for the same site, and
+    guessing wrong returns a 403 that reads like a permissions problem — which
+    sends you back to re-check the thing that was never broken. Ask Google
+    which properties the key can actually see, and prefer the Domain form
+    because it covers www and http as well.
+    """
+    entries = list_properties(token)
+    urls = [e.get("siteUrl", "") for e in entries]
+    if PROPERTY in urls:
+        return PROPERTY, urls
+    host = PROPERTY.split(":", 1)[-1].rstrip("/")
+    host = host.replace("https://", "").replace("http://", "").rstrip("/")
+    domain_form = f"sc-domain:{host}"
+    if domain_form in urls:
+        return domain_form, urls
+    for candidate in (f"https://{host}/", f"https://www.{host}/",
+                      f"http://{host}/"):
+        if candidate in urls:
+            return candidate, urls
+    return None, urls
+
+
 def _b64url(b):
     return base64.urlsafe_b64encode(b).rstrip(b"=")
 
@@ -92,9 +127,9 @@ def _token(sa):
         return json.loads(r.read())["access_token"]
 
 
-def _query(token, start, end, dimensions, limit=5000, start_row=0):
+def _query(token, start, end, dimensions, limit=5000, start_row=0, prop=None):
     url = ("https://www.googleapis.com/webmasters/v3/sites/"
-           f"{urllib.parse.quote(PROPERTY, safe='')}/searchAnalytics/query")
+           f"{urllib.parse.quote(prop or PROPERTY, safe='')}/searchAnalytics/query")
     payload = json.dumps({
         "startDate": start, "endDate": end, "dimensions": dimensions,
         "rowLimit": limit, "startRow": start_row,
@@ -124,13 +159,21 @@ def fetch_queries(days=WINDOW_DAYS):
         sa = json.load(f)
     token = _token(sa)
 
+    prop, seen = resolve_property(token)
+    if not prop:
+        raise RuntimeError(
+            "the service account can read no property matching "
+            f"{PROPERTY!r}. Properties it CAN see: {seen or '(none)'}. "
+            "If that list is empty, it has not been added under Search "
+            "Console > Settings > Users and permissions.")
+
     end = datetime.date.today() - datetime.timedelta(days=LAG_DAYS)
     start = end - datetime.timedelta(days=days - 1)
 
     rows, start_row = [], 0
     while True:
         batch = _query(token, start.isoformat(), end.isoformat(),
-                       ["query"], limit=5000, start_row=start_row)
+                       ["query"], limit=5000, start_row=start_row, prop=prop)
         rows.extend(batch)
         if len(batch) < 5000:
             break
@@ -147,9 +190,10 @@ def totals(days=WINDOW_DAYS):
     with open(os.path.abspath(SA_KEY)) as f:
         sa = json.load(f)
     token = _token(sa)
+    prop, _ = resolve_property(token)
     end = datetime.date.today() - datetime.timedelta(days=LAG_DAYS)
     start = end - datetime.timedelta(days=days - 1)
-    rows = _query(token, start.isoformat(), end.isoformat(), [], limit=1)
+    rows = _query(token, start.isoformat(), end.isoformat(), [], limit=1, prop=prop)
     if not rows:
         return {"clicks": 0, "impressions": 0, "position": None, "ctr": 0}
     r = rows[0]
