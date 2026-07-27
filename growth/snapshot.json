@@ -1,18 +1,18 @@
 {
-  "generated": "2026-07-27T11:57:41+00:00",
+  "generated": "2026-07-27T13:43:47+00:00",
   "date": "2026-07-27",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
     "target_pct": 50,
-    "share_pct": null,
-    "measured": false,
-    "why_unmeasured": "Google Search Console is not connected, so no true rank data exists. coverage_pct below is a proxy for whether a page exists, NOT for rank.",
-    "coverage_pct": 53.4,
-    "tracked_queries": 58,
+    "share_pct": 0.0,
+    "measured": true,
+    "why_unmeasured": null,
+    "coverage_pct": 50.0,
+    "tracked_queries": 64,
     "top3": 0,
-    "top10": 0,
-    "ranked_known": 0
+    "top10": 3,
+    "ranked_known": 6
   },
   "traffic": {
     "visitors": [
@@ -143,7 +143,7 @@
   "keywords": {
     "by_town": {
       "county": {
-        "total": 39,
+        "total": 41,
         "covered": 20,
         "top3": 0
       },
@@ -153,17 +153,17 @@
         "top3": 0
       },
       "dover": {
-        "total": 3,
+        "total": 4,
         "covered": 2,
         "top3": 0
       },
       "red-lion": {
-        "total": 3,
+        "total": 4,
         "covered": 2,
         "top3": 0
       },
       "dallastown": {
-        "total": 2,
+        "total": 3,
         "covered": 2,
         "top3": 0
       },
@@ -173,18 +173,18 @@
         "top3": 0
       },
       "york": {
-        "total": 4,
-        "covered": 0,
+        "total": 5,
+        "covered": 1,
         "top3": 0
       }
     },
     "by_intent": {
       "hire": {
-        "total": 38,
-        "covered": 26
+        "total": 41,
+        "covered": 27
       },
       "price": {
-        "total": 9,
+        "total": 11,
         "covered": 3
       },
       "diy": {
@@ -192,11 +192,12 @@
         "covered": 1
       },
       "check": {
-        "total": 4,
+        "total": 5,
         "covered": 1
       }
     },
     "uncovered": [
+      "best gutter company dallastown pa",
       "best gutter company york county pa",
       "best gutter company york pa",
       "copper gutters historic home york pa",
@@ -205,26 +206,138 @@
       "gutter contractor spring grove pa",
       "gutter contractors york pa",
       "gutter guard installation hanover pa",
-      "gutter installer near me",
       "gutter installers york pa",
       "gutter repair dover pa",
+      "gutter repair red lion pa",
       "gutter replacement york pa",
+      "half round copper gutters historic home york pa",
       "5 inch vs 6 inch gutters",
       "are gutter guards worth it",
       "cost to replace gutters on a house",
       "do i need gutters on my house",
+      "gutter cleaning cost dover pa",
       "gutter cleaning cost red lion pa",
       "gutter guard cost pa",
+      "gutter installation cost per foot pennsylvania",
       "gutter pulling away from house",
       "half round gutter cost per foot",
       "how much does a gutter guard cost per foot",
       "how often should gutters be cleaned in pa",
+      "ice dam gutter damage repair pa",
       "ice dams gutters pennsylvania",
       "seamless gutter installation cost york pa",
       "seamless gutters vs sectional gutters",
       "what size gutters do i need",
       "why do my gutters overflow when it rains"
+    ],
+    "discovered_untracked": [
+      {
+        "query": "gutter installer",
+        "position": 1,
+        "impressions": 104,
+        "clicks": 0
+      },
+      {
+        "query": "gutter contractor",
+        "position": 1,
+        "impressions": 20,
+        "clicks": 0
+      },
+      {
+        "query": "gutter replacement",
+        "position": 6.8,
+        "impressions": 13,
+        "clicks": 0
+      },
+      {
+        "query": "gutter guard installer",
+        "position": 1,
+        "impressions": 12,
+        "clicks": 0
+      },
+      {
+        "query": "gutter services near me",
+        "position": 1,
+        "impressions": 12,
+        "clicks": 0
+      },
+      {
+        "query": "gutters",
+        "position": 3.8,
+        "impressions": 12,
+        "clicks": 0
+      },
+      {
+        "query": "gutter replacement near me",
+        "position": 7.9,
+        "impressions": 10,
+        "clicks": 0
+      },
+      {
+        "query": "gutter soffit and fascia replacement",
+        "position": 1.7,
+        "impressions": 7,
+        "clicks": 0
+      },
+      {
+        "query": "seamless+gutters+perkasie+pa",
+        "position": 26.4,
+        "impressions": 7,
+        "clicks": 0
+      },
+      {
+        "query": "gutter installation near me",
+        "position": 12.8,
+        "impressions": 4,
+        "clicks": 0
+      },
+      {
+        "query": "gutter repair",
+        "position": 12,
+        "impressions": 4,
+        "clicks": 0
+      },
+      {
+        "query": "gutters dover",
+        "position": 40,
+        "impressions": 4,
+        "clicks": 0
+      },
+      {
+        "query": "gutters york pa",
+        "position": 5.5,
+        "impressions": 4,
+        "clicks": 0
+      },
+      {
+        "query": "gutter installation yorkville",
+        "position": 36,
+        "impressions": 3,
+        "clicks": 0
+      },
+      {
+        "query": "gutter repair near me",
+        "position": 7,
+        "impressions": 3,
+        "clicks": 0
+      },
+      {
+        "query": "seamless gutter installation in myerstown pa",
+        "position": 42.7,
+        "impressions": 3,
+        "clicks": 0
+      }
     ]
+  },
+  "gsc": {
+    "date": "2026-07-27",
+    "ok": true,
+    "connected": true,
+    "rows": 59,
+    "matched": 6,
+    "clicks": 3,
+    "impressions": 386,
+    "avg_position": 10.2
   },
   "techniques": [
     {
@@ -464,6 +577,60 @@
       "notes": "first step: Set a phone alert/checklist so Eric checks the AI phone agent's lead log every time he steps off a roof or between jobs, and calls back every captured lead within 5 minutes, logging the callback time against each lead\neffort: hours\ncost: free\nexpected: Callback-within-5-minutes rate goes from unmeasured to tracked and >90%; lead-to-booked-estimate conversion rate rises measurably from its current near-zero baseline",
       "verdict": null,
       "owned_visitors": null
+    },
+    {
+      "id": "T014",
+      "slug": "geo_answer_first_content_pass",
+      "name": "Answer-first / GEO rewrite of existing guides & service pages",
+      "kind": "content",
+      "status": "candidate",
+      "hypothesis": "NEMO already has three guides and four service pages but zero AI-answer-engine visitors. Homeowners are increasingly asking ChatGPT/Gemini/AI Overviews 'how much does seamless gutter cost in York PA' or 'best gutter company near me' before ever typing into classic Google \u2014 if the existing pages aren't structured to be lifted verbatim into an answer, NEMO is invisible in that channel even though the content already exists.",
+      "evidence": "Industry data shows <cite index=\"13-3\">ChatGPT-referred inbound calls produced a lead at 49%, six points higher than Google Business Profile at 43% and ten points higher than the seven-channel average</cite>, and <cite index=\"13-6,13-7,13-8\">ChatGPT-referred calls produced a lead at a 49% rate... Those leads convert at 40% on the call. AI-search visitors are converting three times better than any other channel in most home-services datasets.</cite> On the content-structure side, <cite index=\"13-1\">a 100-word direct-answer opening is 2.3x more likely to be cited; question-format queries trigger AIO 85.9% of the time</cite>, and <cite index=\"14-8\">a 40\u201360 word direct-answer block at the top of every major section, FAQPage schema with question-shaped headings, and named-entity density</cite> are the structural moves that separate cited pages from invisible ones.",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-07-27",
+      "added": "2026-07-27",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Rewrite the top of the cost/buying guide with a 40-60 word direct answer to 'How much does seamless gutter installation cost in York PA?' followed by FAQPage-schema Q&As, then check it against ChatGPT and Google AI Mode in an incognito window.\neffort: days\ncost: free\nexpected: Add a direct-answer block + FAQPage schema to the 3 guides and 4 service pages; success = appearing as a named source when tracked prompts like 'gutter cost york pa' or 'seamless vs sectional gutters' are run against Google AI Overviews/ChatGPT, and AI-engine-referred visitors moving off zero within 4-6 weeks.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T015",
+      "slug": "just_finished_job_neighbor_flyer",
+      "name": "Door-hanger flyer on the 6-10 houses next to every completed job",
+      "kind": "distribution",
+      "status": "candidate",
+      "hypothesis": "Eric's truck and ladder are already visible on a street every time a job finishes \u2014 that visible proof is wasted if it doesn't turn into a knock or a flyer on the door of the neighbors who just watched the work happen. This is the single fastest current-month path to a booked estimate that isn't already in the ledger.",
+      "evidence": "The proximity-plus-social-proof approach converts well in the trades: <cite index=\"28-12,28-13,28-14\">targeted outreach such as 'We just finished a roof for your neighbor at [redacted street address]. Many roofs in this area are 20+ years old' combines proximity and social proof, at a lead cost of $3-$5 since you're not paying for clicks.</cite> The same logic compounds afterward: <cite index=\"32-7,32-8\">homeowners who get a well-handled job refer 2-3 neighbors on average, and one well-handled job can generate 4-6 additional jobs in the same neighborhood through referrals alone.</cite>",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-07-27",
+      "added": "2026-07-27",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Design one single-page flyer (name, phone, QR to booking widget, 'currently working on your street') and hand-deliver it to the 6-10 nearest houses on the next 3 completed jobs.\neffort: hours\ncost: under $100/mo\nexpected: Print 100 simple flyers ('We're finishing seamless gutters on this street this week \u2014 free estimate if you'd like one while we're here') with the phone number and QR code to the booking widget; success = 2-4 extra estimate calls per month directly tied to jobs already on the schedule.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T016",
+      "slug": "gbp_category_and_qna_audit",
+      "name": "GBP primary/secondary category + Owner Q&A audit",
+      "kind": "indexing",
+      "status": "candidate",
+      "hypothesis": "This is a one-time, zero-cost check that guards against an invisible failure mode: picking a category one notch too broad can silently erase map-pack visibility even with good reviews and content, and NEMO's profile has never had this audited.",
+      "evidence": "<cite index=\"8-1,8-2\">Sterling Sky documented a case where an HVAC business dropped from position one to position 31 in the Local Pack after switching from 'Air Conditioning Repair Service' to the broader 'Air Conditioning Contractor.' One word changed. Thirty ranking positions lost.</cite> More broadly, <cite index=\"5-5,5-7\">choosing specific primary categories over broad ones controls a meaningful share of local pack rankings, since Google Business Profile signals control roughly 32% of local pack ranking.</cite>",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-07-27",
+      "added": "2026-07-27",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Open the GBP dashboard today, verify/adjust the primary and secondary categories, then post the first 3 owner Q&As under the Questions & Answers section.\neffort: hours\ncost: free\nexpected: Confirm primary category is the most specific match (e.g. 'Gutter Cleaning Service' or 'Gutter Contractor' rather than generic 'Contractor'), add secondary categories for gutter guards/repair, and seed 3-5 owner-answered Q&As (cost, half-round/copper for historic homes, service area) directly on the profile. Success = no ranking regression and Q&A section populated with accurate answers instead of sitting empty for a stranger to fill in wrong.",
+      "verdict": null,
+      "owned_visitors": null
     }
   ],
   "scoreboard": {
@@ -482,7 +649,10 @@
       "T010",
       "T011",
       "T012",
-      "T013"
+      "T013",
+      "T014",
+      "T015",
+      "T016"
     ]
   },
   "last_build": {
@@ -490,17 +660,17 @@
     "log": [
       {
         "ok": true,
-        "detail": "published Shrewsbury (17,112 bytes; 8 town(s) left in the queue)",
+        "detail": "published Stewartstown (17,809 bytes; 7 town(s) left in the queue)",
         "slug": "area_pages"
       },
       {
         "ok": true,
-        "detail": "published 'how much do seamless gutters cost' \u2192 /guides/how-much-do-seamless-gutters-cost.html",
+        "detail": "published 'gutter installer near me' \u2192 /guides/gutter-installer-near-me.html",
         "slug": "money_pages"
       },
       {
         "ok": true,
-        "detail": "refreshed nearby-links on 6 page(s)",
+        "detail": "refreshed nearby-links on 0 page(s)",
         "slug": "internal_links"
       },
       {
@@ -510,40 +680,35 @@
       },
       {
         "ok": true,
-        "detail": "[gen_sitemap] wrote 17 URLs to sitemap.xml",
+        "detail": "[gen_sitemap] wrote 19 URLs to sitemap.xml",
         "slug": "rebuild_sitemap"
       },
       {
         "ok": true,
-        "detail": "submitted 8 URL(s), HTTP 200",
+        "detail": "submitted 2 URL(s), HTTP 200",
         "slug": "ping_indexnow"
       }
     ],
     "new": 2,
-    "changed": 6
+    "changed": 0
   },
   "last_scout": {
     "date": "2026-07-27",
     "ok": true,
     "techniques_added": [
-      "google_local_services_ads",
-      "nextdoor_business_page_recommendations",
-      "speed_to_lead_callback_discipline"
+      "geo_answer_first_content_pass",
+      "just_finished_job_neighbor_flyer",
+      "gbp_category_and_qna_audit"
     ],
     "keywords_added": [
-      "seamless gutter installation cost york pa",
-      "gutter installer near me",
-      "copper gutters historic home york pa",
-      "gutter guard installation hanover pa",
-      "gutter repair dover pa",
-      "gutter cleaning cost red lion pa",
-      "half round gutter cost per foot",
-      "best gutter company york county pa",
-      "gutter contractor spring grove pa",
-      "seamless gutters vs sectional gutters",
-      "emergency gutter repair after storm york pa"
+      "half round copper gutters historic home york pa",
+      "gutter cleaning cost dover pa",
+      "ice dam gutter damage repair pa",
+      "gutter repair red lion pa",
+      "best gutter company dallastown pa",
+      "gutter installation cost per foot pennsylvania"
     ],
-    "notes": "Rejected: shared-lead marketplaces (Angi, HomeAdvisor, Thumbtack) \u2014 they sell the same lead to multiple contractors and push price competition, which conflicts with the 'exclusive, honest, phone-ringing-here' goal; a small agency retainer or Google/Facebook display ad buy \u2014 too costly and not owner-executable without a marketing department; buying backlinks or citation packages beyond honest directory listings \u2014 against the no-bought-links rule already noted in the ledger. LSA cost is variable and should be budget-capped weekly so it never becomes a five-figure spend; treat the first 30 days as a test at the low end of the budget range. Nextdoor recommendations must never be incentivized or gated \u2014 only ask, never offer anything in exchange, to stay compliant and honest. The speed-to-lead technique costs nothing but requires Eric's discipline; if AI-agent lead volume grows enough that it interferes with roof work, revisit whether a low-cost answering/dispatch helper is worth it later."
+    "notes": "Rejected: any bulk SMS/email blasting to non-customers (against unsolicited-messaging rule); door-to-door canvassing framed around chasing storm/insurance damage (legally gray in PA without care, and feels predatory) \u2014 kept the neighbor-flyer idea narrowly scoped to houses adjacent to jobs Eric is already doing, which is honest and low-risk. Rejected proposing a separate missed-call-text-back SaaS tool since the existing AI phone agent + the already-candidate 5-minute human callback effectively cover speed-to-lead; adding a second automation layer would be redundant spend before the first is even measured. Also held off on paid social ads \u2014 no evidence found that they outperform LSAs for a one-truck operation, and LSA is already a candidate in the ledger."
   },
   "pages": {
     "areas": [
@@ -553,10 +718,12 @@
       "seamless-gutters-hanover-pa.html",
       "seamless-gutters-red-lion-pa.html",
       "seamless-gutters-shrewsbury-pa.html",
-      "seamless-gutters-spring-grove-pa.html"
+      "seamless-gutters-spring-grove-pa.html",
+      "seamless-gutters-stewartstown-pa.html"
     ],
     "guides": [
       "gutter-cleaning-cost-york-pa.html",
+      "gutter-installer-near-me.html",
       "how-much-do-seamless-gutters-cost.html",
       "seamless-vs-sectional-gutters.html",
       "signs-your-gutters-need-replacing-york-county-pa.html"
@@ -572,5 +739,15 @@
       "privacy.html",
       "setup.html"
     ]
+  },
+  "redactions": {
+    "count": 1,
+    "items": [
+      {
+        "kind": "street address",
+        "sample": "123 Maple St"
+      }
+    ],
+    "note": "Anything shaped like a phone number, email or street address is removed before publishing. A non-zero count is usually an example quoted in scout research, not customer data \u2014 but a hit in a field fed by the bookings database would be a real bug worth chasing."
   }
 }
