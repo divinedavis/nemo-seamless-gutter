@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-27T16:57:31+00:00",
+  "generated": "2026-07-27T17:12:52+00:00",
   "date": "2026-07-27",
   "site": "nemoseamlessgutter.com",
   "goal": {
@@ -8,7 +8,7 @@
     "share_pct": 0.0,
     "measured": true,
     "why_unmeasured": null,
-    "coverage_pct": 50.0,
+    "coverage_pct": 53.1,
     "tracked_queries": 64,
     "top3": 0,
     "top10": 3,
@@ -144,7 +144,7 @@
     "by_town": {
       "county": {
         "total": 41,
-        "covered": 20,
+        "covered": 21,
         "top3": 0
       },
       "hanover": {
@@ -174,14 +174,14 @@
       },
       "york": {
         "total": 5,
-        "covered": 1,
+        "covered": 2,
         "top3": 0
       }
     },
     "by_intent": {
       "hire": {
         "total": 41,
-        "covered": 27
+        "covered": 29
       },
       "price": {
         "total": 11,
@@ -200,7 +200,6 @@
       "best gutter company dallastown pa",
       "best gutter company york county pa",
       "best gutter company york pa",
-      "copper gutters historic home york pa",
       "emergency gutter repair after storm york pa",
       "gutter company york pa",
       "gutter contractor spring grove pa",
@@ -209,7 +208,6 @@
       "gutter installers york pa",
       "gutter repair dover pa",
       "gutter repair red lion pa",
-      "gutter replacement york pa",
       "half round copper gutters historic home york pa",
       "5 inch vs 6 inch gutters",
       "are gutter guards worth it",
@@ -636,6 +634,44 @@
       "notes": "first step: Open the GBP dashboard today, verify/adjust the primary and secondary categories, then post the first 3 owner Q&As under the Questions & Answers section.\neffort: hours\ncost: free\nexpected: Confirm primary category is the most specific match (e.g. 'Gutter Cleaning Service' or 'Gutter Contractor' rather than generic 'Contractor'), add secondary categories for gutter guards/repair, and seed 3-5 owner-answered Q&As (cost, half-round/copper for historic homes, service area) directly on the profile. Success = no ranking regression and Q&A section populated with accurate answers instead of sitting empty for a stranger to fill in wrong.",
       "verdict": null,
       "owned_visitors": null
+    },
+    {
+      "id": "T017",
+      "slug": "strengthen_pages",
+      "name": "Strengthen pages that should already rank",
+      "kind": "content",
+      "status": "active",
+      "hypothesis": "Most uncovered queries are not missing a page, they are missing a heading. 'gutter replacement york pa' points at the installation page, which never uses the word replacement; 'gutter repair dover pa' belongs on the Dover page, which only talks about installation. Adding the section to the page that should already be winning concentrates authority instead of splitting the site against itself.",
+      "evidence": "Search Console: 5 hire-intent queries sit on pages missing only the distinguishing term; 27 more have a natural host page.",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "seed",
+      "added": "2026-07-27",
+      "activated": "2026-07-27",
+      "retired": null,
+      "notes": "",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T018",
+      "slug": "service_pages",
+      "name": "Pages for services we rank for but cannot sell",
+      "kind": "content",
+      "status": "active",
+      "hypothesis": "Search Console shows the site ranking 1.7 for 'gutter soffit and fascia replacement' with no soffit or fascia page anywhere on it. Visibility already exists for work with nowhere to send the click.",
+      "evidence": "GSC 28-day query report, 2026-07-27.",
+      "prefixes": [
+        "/services/"
+      ],
+      "metric": "owned_visitors",
+      "source": "seed",
+      "added": "2026-07-27",
+      "activated": "2026-07-27",
+      "retired": null,
+      "notes": "",
+      "verdict": null,
+      "owned_visitors": []
     }
   ],
   "scoreboard": {
@@ -658,7 +694,9 @@
       "T013",
       "T014",
       "T015",
-      "T016"
+      "T016",
+      "T017",
+      "T018"
     ]
   },
   "last_build": {
@@ -666,17 +704,27 @@
     "log": [
       {
         "ok": true,
-        "detail": "published Stewartstown (17,809 bytes; 7 town(s) left in the queue)",
+        "detail": "added \"When Gutter Replacement Makes More Sense Than Repair in York\" to /services/seamless-gutter-installation.html for 'gutter replacement york pa'",
+        "slug": "strengthen_pages"
+      },
+      {
+        "ok": true,
+        "detail": "published /services/gutter-soffit-fascia-replacement.html (18,827 bytes; 2 service(s) left in the queue)",
+        "slug": "service_pages"
+      },
+      {
+        "ok": true,
+        "detail": "published New Freedom (17,200 bytes; 6 town(s) left in the queue)",
         "slug": "area_pages"
       },
       {
         "ok": true,
-        "detail": "published 'gutter installer near me' \u2192 /guides/gutter-installer-near-me.html",
+        "detail": "published 'copper gutters historic home york pa' \u2192 /guides/copper-gutters-historic-home-york-pa.html",
         "slug": "money_pages"
       },
       {
         "ok": true,
-        "detail": "refreshed nearby-links on 0 page(s)",
+        "detail": "refreshed nearby-links on 8 page(s)",
         "slug": "internal_links"
       },
       {
@@ -686,17 +734,17 @@
       },
       {
         "ok": true,
-        "detail": "[gen_sitemap] wrote 19 URLs to sitemap.xml",
+        "detail": "[gen_sitemap] wrote 22 URLs to sitemap.xml",
         "slug": "rebuild_sitemap"
       },
       {
         "ok": true,
-        "detail": "submitted 2 URL(s), HTTP 200",
+        "detail": "submitted 12 URL(s), HTTP 200",
         "slug": "ping_indexnow"
       }
     ],
-    "new": 2,
-    "changed": 0
+    "new": 3,
+    "changed": 9
   },
   "last_scout": {
     "date": "2026-07-27",
@@ -722,12 +770,14 @@
       "seamless-gutters-dillsburg-pa.html",
       "seamless-gutters-dover-pa.html",
       "seamless-gutters-hanover-pa.html",
+      "seamless-gutters-new-freedom-pa.html",
       "seamless-gutters-red-lion-pa.html",
       "seamless-gutters-shrewsbury-pa.html",
       "seamless-gutters-spring-grove-pa.html",
       "seamless-gutters-stewartstown-pa.html"
     ],
     "guides": [
+      "copper-gutters-historic-home-york-pa.html",
       "gutter-cleaning-cost-york-pa.html",
       "gutter-installer-near-me.html",
       "how-much-do-seamless-gutters-cost.html",
@@ -737,6 +787,7 @@
     "services": [
       "gutter-cleaning-repair.html",
       "gutter-guards.html",
+      "gutter-soffit-fascia-replacement.html",
       "half-round-gutters.html",
       "seamless-gutter-installation.html"
     ],
