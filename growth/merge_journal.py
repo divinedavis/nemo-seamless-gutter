@@ -35,13 +35,32 @@ def split_entries(text):
     return preamble, entries
 
 
+DATE_RE = re.compile(r"^##\s*(\d{4}-\d{2}-\d{2})")
+
+
+def _date_of(entry):
+    """The entry's date, for ordering. Entries without a parseable date sort
+    last rather than being dropped — losing an entry is the failure this whole
+    script exists to prevent."""
+    m = DATE_RE.match(entry)
+    return m.group(1) if m else "9999-99-99"
+
+
 def merge(clone_text, docroot_text):
     preamble, clone_entries = split_entries(clone_text)
     _, docroot_entries = split_entries(docroot_text)
     have = set(clone_entries)
     new = [e for e in docroot_entries if e not in have]
+
+    # Appending the new entries at the end would scramble the order whenever
+    # the clone is missing an entry that predates one it already has — which
+    # is exactly the recovery case this script handles. Sort by date instead.
+    # The sort is stable, so entries sharing a date keep the order they had:
+    # the clone's first, then the docroot's.
+    combined = sorted(clone_entries + new, key=_date_of)
+
     out = preamble.rstrip("\n") + "\n"
-    for e in clone_entries + new:
+    for e in combined:
         out += "\n" + e.rstrip("\n") + "\n"
     return out
 
