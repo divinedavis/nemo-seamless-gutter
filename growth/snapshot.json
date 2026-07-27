@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-27T06:00:02+00:00",
+  "generated": "2026-07-27T11:57:41+00:00",
   "date": "2026-07-27",
   "site": "nemoseamlessgutter.com",
   "goal": {
@@ -8,8 +8,8 @@
     "share_pct": null,
     "measured": false,
     "why_unmeasured": "Google Search Console is not connected, so no true rank data exists. coverage_pct below is a proxy for whether a page exists, NOT for rank.",
-    "coverage_pct": 63.8,
-    "tracked_queries": 47,
+    "coverage_pct": 53.4,
+    "tracked_queries": 58,
     "top3": 0,
     "top10": 0,
     "ranked_known": 0
@@ -143,22 +143,22 @@
   "keywords": {
     "by_town": {
       "county": {
-        "total": 36,
-        "covered": 19,
+        "total": 39,
+        "covered": 20,
         "top3": 0
       },
       "hanover": {
-        "total": 3,
+        "total": 4,
         "covered": 3,
         "top3": 0
       },
       "dover": {
-        "total": 2,
+        "total": 3,
         "covered": 2,
         "top3": 0
       },
       "red-lion": {
-        "total": 2,
+        "total": 3,
         "covered": 2,
         "top3": 0
       },
@@ -168,22 +168,27 @@
         "top3": 0
       },
       "spring-grove": {
-        "total": 2,
+        "total": 3,
         "covered": 2,
+        "top3": 0
+      },
+      "york": {
+        "total": 4,
+        "covered": 0,
         "top3": 0
       }
     },
     "by_intent": {
       "hire": {
-        "total": 31,
+        "total": 38,
         "covered": 26
       },
       "price": {
-        "total": 6,
-        "covered": 2
+        "total": 9,
+        "covered": 3
       },
       "diy": {
-        "total": 6,
+        "total": 7,
         "covered": 1
       },
       "check": {
@@ -192,21 +197,31 @@
       }
     },
     "uncovered": [
+      "best gutter company york county pa",
       "best gutter company york pa",
+      "copper gutters historic home york pa",
+      "emergency gutter repair after storm york pa",
       "gutter company york pa",
+      "gutter contractor spring grove pa",
       "gutter contractors york pa",
+      "gutter guard installation hanover pa",
+      "gutter installer near me",
       "gutter installers york pa",
+      "gutter repair dover pa",
       "gutter replacement york pa",
       "5 inch vs 6 inch gutters",
       "are gutter guards worth it",
       "cost to replace gutters on a house",
       "do i need gutters on my house",
+      "gutter cleaning cost red lion pa",
       "gutter guard cost pa",
       "gutter pulling away from house",
-      "how much do seamless gutters cost",
+      "half round gutter cost per foot",
       "how much does a gutter guard cost per foot",
       "how often should gutters be cleaned in pa",
       "ice dams gutters pennsylvania",
+      "seamless gutter installation cost york pa",
+      "seamless gutters vs sectional gutters",
       "what size gutters do i need",
       "why do my gutters overflow when it rains"
     ]
@@ -395,6 +410,60 @@
       "notes": "first step: create a Google Cloud service account, grant it read access to the nemoseamlessgutter.com Search Console property, and drop the JSON at seo/gsc-service-account.json (chmod 600).",
       "verdict": null,
       "owned_visitors": null
+    },
+    {
+      "id": "T011",
+      "slug": "google_local_services_ads",
+      "name": "Google Local Services Ads (Google Verified badge)",
+      "kind": "distribution",
+      "status": "candidate",
+      "hypothesis": "LSAs sit above the map pack and organic results for 'gutter installer near me york pa' type searches, and you only pay when someone actually calls or messages \u2014 which puts NEMO's phone above every organic and directory listing exactly when a York County homeowner has an urgent leak or is ready to book, without needing an ad agency or five-figure PPC budget.",
+      "evidence": "Google Local Service Ads (LSAs) put your business at the very top of search results \u2014 above regular Google Ads, above the map pack, above everything \u2014 and you only pay when a real customer calls or messages. <cite index=\"26-3,26-5\">Google Local Service Ads (LSAs) put your business at the very top of search results \u2014 above regular Google Ads, above the map pack, above everything \u2014 and you only pay when a real customer calls or messages. The pay-per-lead model is intact and still works: home-service contractors pay roughly $25\u2013$80 per lead on average.</cite> Adoption among contractors is already high: <cite index=\"34-7\">Adoption has climbed from roughly 28% of contractors using LSA in 2022 to an estimated 70% by late 2025.</cite> https://pushleads.com/google-local-service-ads-verified-badge-2026/ and https://pipelineon.com/blog/google-local-service-ads-for-contractors/",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-07-27",
+      "added": "2026-07-27",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Apply for Google Local Services in the Google Ads dashboard, submit Eric's license, insurance, and pass the background check to get the blue Google Verified badge, then set a conservative weekly budget cap\neffort: days\ncost: more\nexpected: 5-15 verified phone/message leads per month at a controlled weekly budget (start ~$150-250/wk cap), booking 30-40% of them per industry benchmarks",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T012",
+      "slug": "nextdoor_business_page_recommendations",
+      "name": "Claim Nextdoor Business Page + ask finished jobs for a neighbor recommendation",
+      "kind": "distribution",
+      "status": "candidate",
+      "hypothesis": "York County neighborhoods (especially older/historic districts where half-round and copper gutters matter) run heavily on Nextdoor word-of-mouth; a free, verified Business Page collecting real recommendations from actual customers turns each finished job into visible proof for everyone in that neighborhood who searches 'gutter' or asks for a recommendation, at zero cost and with no review-gating risk since Nextdoor recommendations are a separate, opt-in feature from Google reviews.",
+      "evidence": "Nextdoor is explicitly built around word-of-mouth trust: <cite index=\"19-1,19-2\">People want to work with businesses that their neighbors work with and trust. Nextdoor provides a platform to facilitate that.</cite> Recommendations compound visibility \u2014 <cite index=\"20-8\">Business Pages with recommendations have up to 19X the page views compared to pages without.</cite> Nextdoor also suggests a simple, honest way to gather them: <cite index=\"20-10\">Share your Business Page link with customers after each job or transaction and ask them to leave you a recommendation.</cite> https://business.nextdoor.com/en-us/blog/nextdoor-insights-neighbors-value-recommendations",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-07-27",
+      "added": "2026-07-27",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Claim and verify the free NEMO Nextdoor Business Page with current NAP, then text/email the next 5 completed customers the Business Page link asking for an honest recommendation\neffort: hours\ncost: free\nexpected: Business Page claimed and verified within a week; 5-10 organic recommendations within 60 days; measurable referral calls citing 'saw you on Nextdoor'",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T013",
+      "slug": "speed_to_lead_callback_discipline",
+      "name": "5-minute human callback on every AI-phone-agent lead",
+      "kind": "conversion",
+      "status": "candidate",
+      "hypothesis": "The AI phone agent already captures leads while Eric is on a roof, but capturing isn't the same as closing \u2014 the booking rate collapses if the human follow-up call slips past the first few minutes, and this business's entire measured problem right now is 0 bookings/leads yesterday against 2 all-time bookings, meaning conversion of captured leads into estimates is the real bottleneck, not traffic.",
+      "evidence": "Response speed is decisive for home-service calls: <cite index=\"6-16\">The MIT and InsideSales lead-response study found you are 100 times more likely to reach a web lead and 21 times more likely to qualify it when you respond within 5 minutes versus 30.</cite> Contractors who win leads treat this as the whole game: <cite index=\"33-6,33-7\">The contractors who still get quality leads have figured out screening. They return calls within 5 minutes (first call back wins).</cite> And the cost of not doing it is real: <cite index=\"9-14,9-15,9-16\">85% never call back. 62% contact a competitor immediately. 78% of deals go to the first business that responds.</cite>",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-07-27",
+      "added": "2026-07-27",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Set a phone alert/checklist so Eric checks the AI phone agent's lead log every time he steps off a roof or between jobs, and calls back every captured lead within 5 minutes, logging the callback time against each lead\neffort: hours\ncost: free\nexpected: Callback-within-5-minutes rate goes from unmeasured to tracked and >90%; lead-to-booked-estimate conversion rate rises measurably from its current near-zero baseline",
+      "verdict": null,
+      "owned_visitors": null
     }
   ],
   "scoreboard": {
@@ -410,25 +479,28 @@
       "T007",
       "T008",
       "T009",
-      "T010"
+      "T010",
+      "T011",
+      "T012",
+      "T013"
     ]
   },
   "last_build": {
     "date": "2026-07-27",
     "log": [
       {
-        "ok": false,
-        "detail": "content generation failed for Shrewsbury: anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdS3x4PSB3Wtz7xUXJh6d\"}",
+        "ok": true,
+        "detail": "published Shrewsbury (17,112 bytes; 8 town(s) left in the queue)",
         "slug": "area_pages"
       },
       {
-        "ok": false,
-        "detail": "content generation failed for 'how much do seamless gutters cost': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdS3x5LjpLoFvfSFg5E3V\"}",
+        "ok": true,
+        "detail": "published 'how much do seamless gutters cost' \u2192 /guides/how-much-do-seamless-gutters-cost.html",
         "slug": "money_pages"
       },
       {
         "ok": true,
-        "detail": "refreshed nearby-links on 0 page(s)",
+        "detail": "refreshed nearby-links on 6 page(s)",
         "slug": "internal_links"
       },
       {
@@ -438,22 +510,40 @@
       },
       {
         "ok": true,
-        "detail": "[gen_sitemap] wrote 15 URLs to sitemap.xml",
+        "detail": "[gen_sitemap] wrote 17 URLs to sitemap.xml",
         "slug": "rebuild_sitemap"
       },
       {
         "ok": true,
-        "detail": "nothing new to submit",
+        "detail": "submitted 8 URL(s), HTTP 200",
         "slug": "ping_indexnow"
       }
     ],
-    "new": 0,
-    "changed": 0
+    "new": 2,
+    "changed": 6
   },
   "last_scout": {
     "date": "2026-07-27",
-    "ok": false,
-    "detail": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdS3x7VibNpoG43uaMqzT\"}"
+    "ok": true,
+    "techniques_added": [
+      "google_local_services_ads",
+      "nextdoor_business_page_recommendations",
+      "speed_to_lead_callback_discipline"
+    ],
+    "keywords_added": [
+      "seamless gutter installation cost york pa",
+      "gutter installer near me",
+      "copper gutters historic home york pa",
+      "gutter guard installation hanover pa",
+      "gutter repair dover pa",
+      "gutter cleaning cost red lion pa",
+      "half round gutter cost per foot",
+      "best gutter company york county pa",
+      "gutter contractor spring grove pa",
+      "seamless gutters vs sectional gutters",
+      "emergency gutter repair after storm york pa"
+    ],
+    "notes": "Rejected: shared-lead marketplaces (Angi, HomeAdvisor, Thumbtack) \u2014 they sell the same lead to multiple contractors and push price competition, which conflicts with the 'exclusive, honest, phone-ringing-here' goal; a small agency retainer or Google/Facebook display ad buy \u2014 too costly and not owner-executable without a marketing department; buying backlinks or citation packages beyond honest directory listings \u2014 against the no-bought-links rule already noted in the ledger. LSA cost is variable and should be budget-capped weekly so it never becomes a five-figure spend; treat the first 30 days as a test at the low end of the budget range. Nextdoor recommendations must never be incentivized or gated \u2014 only ask, never offer anything in exchange, to stay compliant and honest. The speed-to-lead technique costs nothing but requires Eric's discipline; if AI-agent lead volume grows enough that it interferes with roof work, revisit whether a low-cost answering/dispatch helper is worth it later."
   },
   "pages": {
     "areas": [
@@ -462,10 +552,12 @@
       "seamless-gutters-dover-pa.html",
       "seamless-gutters-hanover-pa.html",
       "seamless-gutters-red-lion-pa.html",
+      "seamless-gutters-shrewsbury-pa.html",
       "seamless-gutters-spring-grove-pa.html"
     ],
     "guides": [
       "gutter-cleaning-cost-york-pa.html",
+      "how-much-do-seamless-gutters-cost.html",
       "seamless-vs-sectional-gutters.html",
       "signs-your-gutters-need-replacing-york-county-pa.html"
     ],
