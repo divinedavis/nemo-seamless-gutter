@@ -38,6 +38,7 @@ Allow: /
 Disallow: /booking/
 Disallow: /api/
 Disallow: /seo/
+Disallow: /growth/
 Disallow: /setup.html
 
 Sitemap: https://nemoseamlessgutter.com/sitemap.xml

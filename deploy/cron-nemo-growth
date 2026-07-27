@@ -1,0 +1,20 @@
+# NEMO Seamless Gutter — daily growth engine.
+#
+# Installed at /etc/cron.d/nemo-growth. This droplet keeps per-project crons in
+# /etc/cron.d/, NOT in root's user crontab — never pipe to `crontab -` here, it
+# clobbers the other sites' jobs.
+#
+# 06:00 America/New_York: measure yesterday, judge what's running, build today's
+# page, tell search engines, scout for new techniques, and email the report.
+#
+# CRON_TZ matters: the droplet runs UTC, and without it the job would drift an
+# hour every daylight-saving change and stop being "6am" to the business.
+#
+# Credentials are NOT sourced here — growth_daily.py reads seo/.env and
+# server/.env itself, because server/.env holds unquoted values with spaces
+# that a shell `.` would try to execute.
+CRON_TZ=America/New_York
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+0 6 * * * root cd /var/www/nemo-seamless-gutter && WEB_ROOT=/var/www/nemo-seamless-gutter /usr/bin/python3 growth_daily.py daily --email divinejdavis@gmail.com >> /var/log/nemo-growth.log 2>&1

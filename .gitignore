@@ -25,3 +25,14 @@ seo/.env
 seo/drafts/
 seo/used_topics.json
 seo/gsc-service-account.json
+
+# Growth engine runtime state. The copy on the droplet is the source of truth —
+# it is the measurement history and the record of what was tried, and a stale
+# checkout overwriting it would erase the year's findings. seed.py and
+# keywords.py recreate the baseline on a fresh install.
+growth/techniques.json
+growth/keywords.json
+growth/results.jsonl
+growth/state.json
+growth/.anthropic_key
+*.growth-bak
