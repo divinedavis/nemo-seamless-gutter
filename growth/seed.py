@@ -50,6 +50,23 @@ SEED_TECHNIQUES = [
              "outrank them and then sell the lead back. Answering the price question "
              "honestly should win the click and the call."),
          evidence="Uncovered price-intent queries in the tracked universe."),
+    dict(slug="improve_ctr", name="Rewrite snippets on pages nobody clicks",
+         kind="conversion", status="active", prefixes=[], metric="gsc_clicks",
+         hypothesis=(
+             "The homepage sits at position 1 for 'gutter contractor' and 'gutter "
+             "guard installer' and collects almost no clicks. Ranking is the hard "
+             "part and it is already done, so a snippet that matches what people "
+             "actually typed is the cheapest win available. Caveat on record: much "
+             "of the gap is probably the local pack absorbing the tap, which a "
+             "better title cannot recover."),
+         evidence="GSC 28d: homepage 253 impressions, 1 click, average position 3.9."),
+    dict(slug="adopt_queries", name="Track the searches people really type",
+         kind="content", status="active", prefixes=[], metric="organic_visitors",
+         hypothesis=(
+             "Search Console reports real queries, which beats any list guessed at "
+             "a desk. Filtered to trade searches with service-area intent so the "
+             "goal's denominator does not fill with out-of-area junk."),
+         evidence="GSC surfaced 16 untracked queries the site already appears for."),
     dict(slug="internal_links", name="Area-page link mesh", kind="indexing",
          status="active", prefixes=[], metric="organic_visitors",
          hypothesis=(

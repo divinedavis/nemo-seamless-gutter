@@ -96,6 +96,11 @@ def cmd_measure(args):
         log(f"  gsc: FAILED — {g.get('detail', '')[:160]}")
 
     s = keywords.summary()
+    # Record the size of the tracked universe as a series. share_pct is a
+    # fraction of it, so a day that adopts new queries moves the percentage
+    # without any ranking having changed — and a jump that came from moving
+    # the measuring stick must never be reported as progress.
+    ledger.record_result(ledger.today(), "__site__", "tracked_queries", s["total"])
     if s["share_pct"] is not None:
         log(f"  goal: {s['share_pct']}% of {s['total']} tracked queries in the "
             f"top {keywords.TOP_N} (target 50%)")

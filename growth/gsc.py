@@ -283,3 +283,73 @@ def discover(min_impressions=3):
              "position": round(r["position"], 1) if r.get("position") else None,
              "impressions": int(r.get("impressions") or 0),
              "clicks": int(r.get("clicks") or 0)} for r in out[:40]]
+
+
+def fetch_pages(days=WINDOW_DAYS):
+    """Per-page clicks, impressions and position."""
+    path = os.path.abspath(SA_KEY)
+    if not os.path.exists(path):
+        raise FileNotFoundError("no Search Console key")
+    with open(path) as f:
+        sa = json.load(f)
+    token = _token(sa)
+    prop, seen = resolve_property(token)
+    if not prop:
+        raise RuntimeError(f"no readable property; key can see: {seen or '(none)'}")
+    end = datetime.date.today() - datetime.timedelta(days=LAG_DAYS)
+    start = end - datetime.timedelta(days=days - 1)
+    rows = _query(token, start.isoformat(), end.isoformat(), ["page"],
+                  limit=1000, prop=prop)
+    return [{"page": r["keys"][0], "position": r.get("position"),
+             "impressions": int(r.get("impressions") or 0),
+             "clicks": int(r.get("clicks") or 0),
+             "ctr": r.get("ctr") or 0.0} for r in rows if r.get("keys")]
+
+
+def underperformers(min_impressions=10, max_position=15.0, max_ctr=0.02):
+    """Pages Google shows people that nobody clicks.
+
+    A page at position 1 with a hundred impressions and no clicks is not a
+    ranking problem — it is a title and description problem, and it is the
+    cheapest fix available because the hard part (ranking) is already done.
+    Anything ranking below `max_position` is excluded: down there a low
+    click-through rate is just what page two looks like, and rewriting the
+    title would be treating the wrong cause.
+    """
+    try:
+        pages = fetch_pages()
+    except Exception:
+        return []
+    out = [p for p in pages
+           if p["impressions"] >= min_impressions
+           and (p["position"] or 99) <= max_position
+           and p["ctr"] <= max_ctr]
+    # biggest wasted audience first
+    out.sort(key=lambda p: -p["impressions"])
+    return out
+
+
+def queries_for_page(page_url, days=WINDOW_DAYS, limit=25):
+    """What people actually searched to reach one page — the raw material for
+    a title that matches intent instead of guessing at it."""
+    path = os.path.abspath(SA_KEY)
+    with open(path) as f:
+        sa = json.load(f)
+    token = _token(sa)
+    prop, _ = resolve_property(token)
+    end = datetime.date.today() - datetime.timedelta(days=LAG_DAYS)
+    start = end - datetime.timedelta(days=days - 1)
+    url = ("https://www.googleapis.com/webmasters/v3/sites/"
+           f"{urllib.parse.quote(prop, safe='')}/searchAnalytics/query")
+    payload = json.dumps({
+        "startDate": start.isoformat(), "endDate": end.isoformat(),
+        "dimensions": ["query"], "rowLimit": limit, "type": "web",
+        "dimensionFilterGroups": [{"filters": [
+            {"dimension": "page", "operator": "equals", "expression": page_url}]}],
+    }).encode()
+    req = urllib.request.Request(url, data=payload, headers={
+        "Authorization": f"Bearer {token}", "Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
+        rows = json.loads(r.read()).get("rows", [])
+    return [{"query": r["keys"][0], "impressions": int(r.get("impressions") or 0),
+             "position": r.get("position")} for r in rows if r.get("keys")]

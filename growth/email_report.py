@@ -145,8 +145,30 @@ def _goal_card():
         f'<div style="font:400 13px {FONT};color:{MUTED};line-height:1.5">'
         f'<strong style="color:{INK}">{kw["top3"]}</strong> queries in the top 3 · '
         f'<strong style="color:{INK}">{kw["top10"]}</strong> in the top 10 · '
-        f'rank known for {kw["ranked_known"]} of {kw["total"]} tracked</div>')
+        f'rank known for {kw["ranked_known"]} of {kw["total"]} tracked</div>'
+        + _universe_note())
     return _card(body)
+
+
+def _universe_note():
+    """Say so when the percentage moved because the list grew.
+
+    share_pct is a fraction of the tracked list. A morning that adopts new
+    searches changes the denominator, so the number can rise with no ranking
+    having improved. Unlabelled, that reads as progress and is the easiest way
+    for this report to start lying."""
+    s = ledger.series("__site__", "tracked_queries")
+    if len(s) < 2:
+        return ""
+    grew = s[-1][1] - s[-2][1]
+    if grew <= 0:
+        return ""
+    return (f'<div style="font:400 12px {FONT};color:{WARN};margin-top:10px;'
+            f'line-height:1.5;padding-top:10px;border-top:1px solid {LINE}">'
+            f'The tracked list grew by {grew} search'
+            f'{"" if grew == 1 else "es"} today, so this percentage moved partly '
+            f'because what is being measured changed — not only because rankings did.'
+            f'</div>')
 
 
 def _leads_card(audience="internal"):

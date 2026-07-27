@@ -48,8 +48,17 @@ def load_key():
         return None
 
 
+# Replies come back as a thinking block followed by a text block, and thinking
+# is billed against the same max_tokens budget. A request for 900 tokens spent
+# 721 of them thinking and returned an empty string — which surfaced as "no
+# JSON object in reply" and looked like a prompt bug rather than a budget one.
+# Anything below this floor is raised rather than silently truncated.
+MIN_MAX_TOKENS = 3000
+
+
 def call(system, prompt, max_tokens=4000, tools=None, timeout=240, key=None):
     """One message round-trip. Returns the concatenated text blocks."""
+    max_tokens = max(max_tokens, MIN_MAX_TOKENS)
     key = key or load_key()
     if not key:
         raise RuntimeError(

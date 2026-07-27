@@ -49,6 +49,14 @@ def _series_summary(metric, days=14):
     return f"{_fmt(vals[-1])} yesterday · {_fmt(recent)}/day median{arrow}"
 
 
+def _universe_change():
+    """How much the tracked-query list grew today, if at all."""
+    s = ledger.series("__site__", "tracked_queries")
+    if len(s) < 2:
+        return 0
+    return s[-1][1] - s[-2][1]
+
+
 def _sum_last(metric, days=30):
     return sum(v for _, v in ledger.series("__site__", metric)[-days:])
 
@@ -92,6 +100,11 @@ def build_text(run_log=None, review_out=None, scout_out=None):
     if kw["share_pct"] is not None:
         L.append(f"  Search share   {kw['share_pct']}% of {kw['total']} tracked queries "
                  f"hold a top-3 position  (target: 50%)")
+        grew = _universe_change()
+        if grew:
+            L.append(f"                 NOTE: the tracked list grew by {grew} quer"
+                     f"{'y' if grew == 1 else 'ies'} today, so this percentage moved")
+            L.append("                 partly because the denominator changed, not only rank.")
         L.append(f"                 {kw['top3']} in top 3 · {kw['top10']} in top 10 · "
                  f"{kw['ranked_known']} queries with known rank")
     else:

@@ -157,8 +157,40 @@ def find_redundant(techs):
     return out
 
 
+def auto_activate(apply=True):
+    """Switch on any candidate that has a working implementation.
+
+    The scout files ideas as candidates and cannot activate them, which is the
+    right default for ideas that need money, an OAuth grant, or someone to
+    knock on a door. But a candidate whose slug matches a function in
+    techniques.REGISTRY is different: the code exists, it was reviewed by a
+    human before it shipped, and leaving it switched off means the engine sits
+    on a capability it already has waiting to be told twice.
+
+    So the rule is narrow and mechanical — implementation exists, therefore it
+    runs. Anything without code stays a candidate no matter how good it sounds.
+    """
+    from . import techniques
+    out = []
+    for t in ledger.load_techniques():
+        if t.get("status") != "candidate":
+            continue
+        if t.get("slug") not in techniques.REGISTRY:
+            continue
+        # A previous verdict of "does not work" is a decision, not a gap.
+        v = t.get("verdict") or {}
+        if v and not v.get("works"):
+            continue
+        if apply:
+            ledger.set_status(t["id"], "active",
+                              "auto-activated: an implementation exists for this slug")
+        out.append(f"ACTIVATED {t['id']} {t['slug']} — implementation exists")
+    return out
+
+
 def run(apply=True):
     """Evaluate everything; optionally write the decisions back to the ledger."""
+    activated = auto_activate(apply=apply)
     techs = ledger.load_techniques()
     results = [evaluate(t) for t in techs]
     redundant = find_redundant(techs)
@@ -182,7 +214,8 @@ def run(apply=True):
             ledger.set_verdict(rr["weak"], False, why)
             actions.append(f"RETIRED {rr['weak']} — {why}")
 
-    return {"evaluated": results, "redundant": redundant, "actions": actions}
+    return {"evaluated": results, "redundant": redundant,
+            "actions": activated + actions}
 
 
 def scoreboard():

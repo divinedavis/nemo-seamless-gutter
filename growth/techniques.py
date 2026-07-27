@@ -357,13 +357,25 @@ def money_pages(ctx):
     # page competing with it — writing /guides/seamless-gutters-york-pa.html
     # when the homepage already targets that query splits the site against
     # itself for its single most valuable search.
-    gaps = [k for k in kws
-            if not k.get("covered")
-            and keywords._page_text(ctx.docroot, k.get("target")) is None]
+    def _needs_its_own_page(k):
+        if k.get("covered"):
+            return False
+        if keywords._page_text(ctx.docroot, k.get("target")) is not None:
+            return False
+        # If a specific page already exists that this query belongs on — the
+        # town's area page, the matching service page — then strengthen_pages
+        # will add a section there. Writing a separate guide as well puts two
+        # of our own pages in front of the same searcher and splits the
+        # authority between them. Only build where the homepage is the sole
+        # fallback, which means the query genuinely has nowhere to live.
+        host = _host_page(ctx, k)
+        return host in (None, "/index.html")
+
+    gaps = [k for k in kws if _needs_its_own_page(k)]
     if not gaps:
         return {"ok": True,
-                "detail": "no uncovered queries without an existing page — "
-                          "remaining gaps need their current page improved, not a new one"}
+                "detail": "no query needs its own page — the remaining gaps all "
+                          "belong on pages that exist, which strengthen_pages handles"}
 
     # hire converts hardest, then price, then the diagnostic and research queries
     # that earn links and AI citations.
@@ -809,7 +821,219 @@ def service_pages(ctx):
                                   f"{len(todo) - 1} service(s) left in the queue)"}
 
 
+# ------------------------------------------------------------ click-through
+
+CTR_SYSTEM = """You write the <title> and meta description for one page of a real seamless \
+gutter contractor's website (NEMO Seamless Gutter, York County, Pennsylvania).
+
+Google already shows this page to people. They are not clicking it. Your job is the snippet \
+that earns the click from the searches listed — not a prettier version of what is there now.
+
+Rules:
+- Title: 60 characters maximum, and it must fit the actual searches below. Lead with what \
+the searcher typed, then append " | NEMO Seamless Gutter" if it still fits in 60 — dropping \
+the business name entirely costs the branded searches, where someone already looking for \
+this company needs to recognise it in the results.
+- Description: 155 characters maximum, active voice, gives a concrete reason to click \
+(free on-site estimate, formed on site, same-week scheduling) and ends with the phone number.
+- Never invent a review count, star rating, years in business, award, certification, \
+guarantee, or price. You do not know them and a false claim in a search snippet is worse \
+than a dull one.
+- No exclamation marks, no ALL CAPS, no clickbait.
+- Plain American English, tradesman's voice.
+
+Return ONLY valid JSON: {"title": "...", "description": "...", "why": "one sentence on what \
+you changed and why"}"""
+
+# Long enough to see whether a rewrite moved anything before touching it again.
+# Rewriting a title every morning would make the effect unmeasurable and would
+# look to Google like a page that cannot decide what it is about.
+CTR_COOLDOWN_DAYS = 21
+
+
+def _url_to_relpath(url):
+    """Map a Search Console URL back to a file in the docroot."""
+    u = re.sub(r"^https?://", "", url or "").split("#")[0].split("?")[0]
+    if "/" not in u:
+        return "index.html"
+    path = u.split("/", 1)[1]
+    if not path or path.endswith("/"):
+        return os.path.join(path, "index.html") if path else "index.html"
+    return path
+
+
+def improve_ctr(ctx):
+    """Rewrite the title and description of a page Google shows but nobody clicks.
+
+    The cheapest win available: ranking is the hard part and it is already done.
+    The homepage sits at position 1 for "gutter contractor" and "gutter guard
+    installer" and collects almost no clicks.
+
+    One honest caveat, recorded here so nobody later reads a flat result as a
+    failed rewrite: much of that is probably the local pack absorbing the tap.
+    On a "near me" search the map listing offers a call button and directions
+    right there, and a searcher who calls from it never reaches the website at
+    all. A better snippet should still help, but it cannot recover a click that
+    was spent inside Google.
+    """
+    from . import gsc
+    if not gsc.available():
+        return {"ok": True, "detail": "no Search Console key — nothing to optimise against"}
+
+    history = ledger.get_state("ctr_rewrites", {})
+    today = ledger.today()
+
+    try:
+        candidates = gsc.underperformers()
+    except Exception as e:
+        return {"ok": False, "detail": f"could not read Search Console: {e}"}
+
+    for page in candidates:
+        rel = _url_to_relpath(page["page"])
+        src = ctx.read(rel)
+        if src is None or "<title>" not in src:
+            continue
+        last = history.get(rel)
+        if last:
+            try:
+                import datetime as _dt
+                age = (_dt.date.fromisoformat(today) - _dt.date.fromisoformat(last)).days
+                if age < CTR_COOLDOWN_DAYS:
+                    continue
+            except Exception:
+                pass
+
+        try:
+            queries = gsc.queries_for_page(page["page"])
+        except Exception:
+            queries = []
+        if not queries:
+            continue
+        qlist = "\n".join(f'- "{q["query"]}" — {q["impressions"]} impressions, '
+                           f'position {q["position"]:.1f}' for q in queries[:15])
+        current_title = re.search(r"<title>(.*?)</title>", src, re.S)
+        current_desc = re.search(r'<meta name="description" content="(.*?)"', src, re.S)
+
+        try:
+            data = llm.call_json(CTR_SYSTEM, (
+                f"Page: {page['page']}\n"
+                f"Over the last 28 days: {page['impressions']} impressions, "
+                f"{page['clicks']} clicks, average position {page['position']:.1f}.\n\n"
+                f"Current title: {current_title.group(1) if current_title else '(none)'}\n"
+                f"Current description: "
+                f"{current_desc.group(1)[:200] if current_desc else '(none)'}\n\n"
+                f"The searches Google shows this page for:\n{qlist}\n\n"
+                f"Phone {PHONE}."), max_tokens=900)
+        except Exception as e:
+            return {"ok": False, "detail": f"generation failed for {rel}: {e}"}
+
+        title = (data.get("title") or "").strip()
+        desc = (data.get("description") or "").strip()
+        if not title or not desc:
+            return {"ok": False, "detail": f"model returned no snippet for {rel}"}
+        # Google truncates past these; a title that gets cut mid-word reads as
+        # careless in the one place every searcher sees it.
+        if len(title) > 65 or len(desc) > 165:
+            return {"ok": False,
+                    "detail": f"rejected over-long snippet for {rel} "
+                              f"(title {len(title)}, desc {len(desc)})"}
+
+        out = src
+        if current_title:
+            out = out[:current_title.start(1)] + _esc(title) + out[current_title.end(1):]
+        if current_desc:
+            c = re.search(r'<meta name="description" content="(.*?)"', out, re.S)
+            out = out[:c.start(1)] + _attr(desc) + out[c.end(1):]
+        if out == src:
+            continue
+
+        ctx.backup(rel)
+        ctx.write(rel, out)
+        if not ctx.dry_run:
+            history[rel] = today
+            ledger.set_state("ctr_rewrites", history)
+        return {"ok": True,
+                "detail": f"rewrote title/description on /{rel} "
+                          f"({page['impressions']} impressions, {page['clicks']} clicks, "
+                          f"pos {page['position']:.1f}) — {data.get('why', '')[:110]}"}
+
+    return {"ok": True, "detail": "no page is due a snippet rewrite"}
+
+
+# --------------------------------------------------------- tracked universe
+
+# Only adopt a discovered query if it is plausibly this business's work in this
+# service area. Without this the denominator fills with "seamless gutters
+# perkasie pa" (90 miles away) and the 50% goal quietly becomes unreachable.
+SERVICE_AREA_WORDS = ("york", "hanover", "dover", "red lion", "dallastown",
+                      "spring grove", "dillsburg", "shrewsbury", "stewartstown",
+                      "new freedom", "glen rock", "manchester", "mount wolf",
+                      "wrightsville", "hallam", "jacobus", "seven valleys",
+                      "emigsville", "windsor", "yoe", "county")
+TRADE_WORDS = ("gutter", "downspout", "soffit", "fascia", "leaf guard",
+               "leafguard", "eavestrough")
+# Places that are emphatically not York County, seen in the real data.
+OUT_OF_AREA = ("perkasie", "yorkville", "york sc", "york ne", "york me",
+               "new york", "yorktown", "york uk", "york maine")
+
+
+def adopt_queries(ctx):
+    """Add real searches to the tracked universe, filtered to this business.
+
+    Search Console reports what people actually type, which beats anything
+    guessed at a desk. But the goal is a percentage, so its denominator is a
+    judgement — adopting everything would stuff it with out-of-area junk and
+    make 50% both harder and meaningless. Adopt only trade searches that carry
+    service-area intent, and leave the rest visible in the report for a human
+    to argue about.
+    """
+    from . import gsc, keywords
+    if not gsc.available():
+        return {"ok": True, "detail": "no Search Console key"}
+    try:
+        found = gsc.discover(min_impressions=2)
+    except Exception as e:
+        return {"ok": False, "detail": f"could not read Search Console: {e}"}
+
+    added = []
+    for d in found:
+        q = d["query"].lower()
+        if any(bad in q for bad in OUT_OF_AREA):
+            continue
+        if not any(w in q for w in TRADE_WORDS):
+            continue
+        # Either it names a place we serve, or it is an unmodified/near-me
+        # search which Google localises to the searcher anyway.
+        local = any(w in q for w in SERVICE_AREA_WORDS) or "near me" in q
+        if not local:
+            continue
+        town = "county"
+        for slug in ("hanover", "dover", "red-lion", "dallastown", "spring-grove"):
+            if slug.replace("-", " ") in q:
+                town = slug
+                break
+        intent = "hire"
+        if any(w in q for w in ("cost", "price", "how much", "per foot")):
+            intent = "price"
+        elif any(w in q for w in ("why", "how often", "vs", "worth it", "what size")):
+            intent = "diy"
+        if ctx.dry_run:
+            added.append(q)
+        elif keywords.add(q, town, intent, source=f"gsc:{ledger.today()}",
+                          note=f"{d['impressions']} impressions, position {d['position']}"):
+            added.append(q)
+
+    if not added:
+        return {"ok": True, "detail": "no new in-area searches worth tracking"}
+    return {"ok": True,
+            "detail": f"adopted {len(added)} real search(es) into the tracked "
+                      f"universe: {', '.join(added[:5])}"
+                      + ("…" if len(added) > 5 else "")}
+
+
 REGISTRY = {
+    "improve_ctr": improve_ctr,
+    "adopt_queries": adopt_queries,
     "area_pages": area_pages,
     "service_pages": service_pages,
     "strengthen_pages": strengthen_pages,
@@ -823,5 +1047,9 @@ REGISTRY = {
 # Order matters: write pages, wire them together, then tell search engines.
 # Strengthening an existing page beats writing a new one, so it runs first and
 # gets the pick of the uncovered queries. New pages only get what is left.
-ORDER = ["strengthen_pages", "service_pages", "area_pages", "money_pages",
-         "internal_links", "local_schema", "rebuild_sitemap", "ping_indexnow"]
+# adopt_queries runs first so the day's build queue reflects what people are
+# really searching. improve_ctr is next because fixing a page that already
+# ranks is worth more than writing one that does not exist yet.
+ORDER = ["adopt_queries", "improve_ctr", "strengthen_pages", "service_pages",
+         "area_pages", "money_pages", "internal_links", "local_schema",
+         "rebuild_sitemap", "ping_indexnow"]
