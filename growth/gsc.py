@@ -218,11 +218,21 @@ def sync(quiet=False):
         matched = keywords.apply_gsc(rows)
         t = totals()
     except urllib.error.HTTPError as e:
-        body = e.read()[:200].decode(errors="replace")
-        detail = f"HTTP {e.code}: {body}"
+        body = e.read()[:400].decode(errors="replace")
+        detail = f"HTTP {e.code}: {body[:200]}"
         if e.code == 403:
-            detail += (" — the service account is probably not added as a user "
-                       "on the Search Console property yet")
+            # Both failures return 403 and they need opposite fixes. Naming the
+            # wrong one sends you to re-check something that was never broken.
+            low = body.lower()
+            if "has not been used in project" in low or "accessnotconfigured" in low:
+                detail += (" — FIX: the Search Console API is not enabled in the "
+                           "Google Cloud project. Enable it at APIs & Services > "
+                           "Library > Google Search Console API.")
+            elif "billing" in low:
+                detail += (" — FIX: the Google Cloud project needs billing enabled.")
+            else:
+                detail += (" — FIX: the service account is probably not added under "
+                           "Search Console > Settings > Users and permissions.")
         ledger.set_state("gsc_last", {"date": ledger.today(), "ok": False,
                                       "detail": detail})
         return {"ok": False, "connected": True, "detail": detail}
