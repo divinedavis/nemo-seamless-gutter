@@ -1,11 +1,21 @@
 #!/usr/bin/env python3
 """The HTML version of the daily growth email.
 
-Eric reads this on a phone between jobs, so it is built for scanning: the
-number that matters is large and near the top, and everything below it is a
-short labelled row. `report.build_text()` is still the source of truth for
-content — this presents the same facts, and the plain-text version rides along
-as the multipart fallback.
+Read on a phone between jobs, so it is built for scanning: the number that
+matters is large and near the top, and everything below it is a short labelled
+row. `report.build_text()` is still the source of truth for content — this
+presents the same facts, and the plain-text version rides along as the
+multipart fallback.
+
+Two audiences, chosen with `audience=`:
+
+  "internal"  the developer's copy — adds the morning build log, scout
+              proposals, technique slugs and where the logs live.
+  "owner"     the business owner's copy. Leads, rank, and what needs him. No
+              technique slugs, no build log, no scout proposals, no file paths
+              — none of that is his job, and a report full of machinery is a
+              report that stops being read. It is also written TO him rather
+              than about him, which the internal copy is not.
 
 Email HTML is not web HTML. Rules followed here, all of them the boring kind:
 tables for layout (Outlook ignores flexbox and grid), styles inlined on the
@@ -17,6 +27,7 @@ Colours are the brand's: navy #243C94, orange #F16C27 for calls to action.
 Red is reserved for things that are actually broken, so it keeps its meaning.
 """
 import html
+import re
 import statistics
 
 from . import keywords, ledger, review
@@ -138,7 +149,7 @@ def _goal_card():
     return _card(body)
 
 
-def _leads_card():
+def _leads_card(audience="internal"):
     b_last, b_med, b_dir = _trend("bookings")
     p_last, p_med, p_dir = _trend("phone_leads")
     b30 = sum(v for _, v in ledger.series("__site__", "bookings")[-30:])
@@ -157,12 +168,17 @@ def _leads_card():
         ])
         + f'<div style="font:400 12px {FONT};color:{MUTED};margin-top:12px;'
           f'line-height:1.5;padding-top:10px;border-top:1px solid {LINE}">'
-          f'Direct dials from the page or the Business Profile are not counted '
-          f'here — those fire as GA4 events and need a separate service account.</div>')
+          + ("Someone tapping your number and calling straight through is not "
+             "counted here yet — this covers online bookings and calls the "
+             "answering service picked up."
+             if audience == "owner" else
+             "Direct dials from the page or the Business Profile are not counted "
+             "here — those fire as GA4 events and need a separate service account.")
+          + '</div>')
     return _card(body)
 
 
-def _traffic_card():
+def _traffic_card(audience="internal"):
     rows = []
     for metric, label in (("visitors", "All visitors"),
                           ("organic_visitors", "Organic search"),
@@ -177,12 +193,13 @@ def _traffic_card():
             rows.append((label,
                          f'{last} <span style="color:{MUTED};font-weight:400">'
                          f'· {med}/day median</span> {_arrow(direction)}'))
-    body = (_h("Traffic yesterday — bots and Eric's own visits excluded", NAVY)
+    whose = "your own visits" if audience == "owner" else "Eric's own visits"
+    body = (_h(f"Traffic yesterday — bots and {whose} excluded", NAVY)
             + _rows(rows))
     return _card(body)
 
 
-def _rank_card():
+def _rank_card(audience="internal"):
     """Where the tracked money queries actually sit. Only once rank is known."""
     kws = [k for k in keywords.load() if k.get("position")]
     if not kws:
@@ -211,10 +228,12 @@ def _rank_card():
     if len(kws) > 12:
         extra = (f'<div style="font:400 12px {FONT};color:{MUTED};margin-top:10px">'
                  f'+{len(kws) - 12} more with known rank</div>')
-    return _card(_h("Where the tracked queries rank", NAVY) + "".join(out) + extra)
+    heading = ("Where you rank for the searches that matter"
+               if audience == "owner" else "Where the tracked queries rank")
+    return _card(_h(heading, NAVY) + "".join(out) + extra)
 
 
-def _discovered_card(snapshot_data=None):
+def _discovered_card(audience="internal"):
     """Queries Google shows the site for that nobody chose to track."""
     from . import gsc
     try:
@@ -235,13 +254,21 @@ def _discovered_card(snapshot_data=None):
             f'<td style="border-top:1px solid {LINE};padding:7px 0;'
             f'font:400 13px {FONT};color:{MUTED};text-align:right">'
             f'{d["impressions"]}</td></tr>')
-    body = (_h("Showing up for these — but not tracking them", NAVY)
+    if audience == "owner":
+        heading = "Searches you are already showing up for"
+        note = ("These are real searches Google showed your site for. A low "
+                "number in the middle column is good — 1 means you came up "
+                "first. Some are outside York County and are not worth chasing.")
+    else:
+        heading = "Showing up for these — but not tracking them"
+        note = ("Not added automatically: the goal is a percentage, so padding "
+                "its denominator with out-of-area searches would make 50% both "
+                "harder and meaningless.")
+    body = (_h(heading, NAVY)
             + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
             + "".join(rows) + "</table>"
             + f'<div style="font:400 12px {FONT};color:{MUTED};margin-top:12px;'
-              f'line-height:1.5">Not added automatically: the goal is a percentage, '
-              f'so padding its denominator with out-of-area searches would make 50% '
-              f'both harder and meaningless.</div>')
+              f'line-height:1.5">{note}</div>')
     return _card(body)
 
 
@@ -265,6 +292,75 @@ def _ran_card(run_log):
     return _card(_h("What ran this morning", NAVY)
                  + '<table role="presentation" width="100%" cellpadding="0" '
                    'cellspacing="0">' + "".join(rows) + "</table>")
+
+
+def _new_pages_card(run_log):
+    """What went live, in the owner's terms.
+
+    The internal copy lists technique slugs and their raw detail strings. None
+    of that means anything to the person who owns the business — he wants to
+    know what is on his website today that was not there yesterday.
+    """
+    if not run_log:
+        return ""
+    published = []
+    for r in run_log:
+        if not r.get("ok"):
+            continue
+        d = r.get("detail", "")
+        m = re.search(r"published ([A-Z][A-Za-z .'-]+) \(", d)
+        if m:
+            published.append(f"A new page for <strong>{_e(m.group(1))}</strong>, "
+                             f"covering gutter work in that area")
+            continue
+        m = re.search(r"published '([^']+)'", d)
+        if m:
+            published.append(f"A new guide answering "
+                             f"<strong>&ldquo;{_e(m.group(1))}&rdquo;</strong>")
+    if not published:
+        return ""
+    items = "".join(
+        f'<div style="padding:8px 0;border-top:1px solid {LINE};font:400 14px {FONT};'
+        f'color:{INK};line-height:1.5">{p}</div>' for p in published)
+    return _card(
+        _h("New on your site today", NAVY) + items
+        + f'<div style="font:400 12px {FONT};color:{MUTED};margin-top:10px;'
+          f'line-height:1.5">Google usually takes a few weeks to rank a new '
+          f'page, so these will not show up in the numbers above straight away.</div>')
+
+
+# Candidates the owner can actually act on. The rest of the ledger's blocked
+# items are engineering chores (API keys, service accounts) and would be noise
+# in his inbox.
+OWNER_ACTIONABLE = {"review_engine", "gbp_posts", "citations",
+                    "google_local_services_ads",
+                    "nextdoor_business_page_recommendations",
+                    "speed_to_lead_callback_discipline",
+                    "just_finished_job_neighbor_flyer",
+                    "gbp_category_and_qna_audit"}
+
+
+def _owner_actions_card():
+    """Only the things the owner himself can move, addressed to him."""
+    cands = [t for t in ledger.load_techniques()
+             if t.get("status") == "candidate"
+             and t.get("slug") in OWNER_ACTIONABLE and t.get("notes")]
+    if not cands:
+        return ""
+    rows = []
+    for t in cands:
+        first = (t.get("notes") or "").strip().split("\n")[0]
+        first = first.replace("first step:", "").strip()
+        # written for a developer; make it address the owner
+        first = re.sub(r"\bconfirm with Eric that\b", "confirm that", first)
+        first = re.sub(r"\bEric\b", "you", first)
+        first = re.sub(r"\bthe engine\b", "the website", first)
+        rows.append(
+            f'<div style="padding:10px 0;border-top:1px solid {LINE}">'
+            f'<div style="font:600 14px {FONT};color:{INK}">{_e(t["name"])}</div>'
+            f'<div style="font:400 13px {FONT};color:{MUTED};margin-top:3px;'
+            f'line-height:1.5">{_e(first)[:260]}</div></div>')
+    return _card(_h("Worth your time", ORANGE) + "".join(rows))
 
 
 def _waiting_card():
@@ -337,7 +433,13 @@ def _scout_card(scout_out):
           f'Nothing here changes the site until it is switched on deliberately.</div>')
 
 
-def _footer():
+def _footer(audience="internal"):
+    if audience == "owner":
+        return (f'<tr><td style="padding:6px 4px 0 4px;font:400 12px {FONT};'
+                f'color:{MUTED};line-height:1.6">'
+                f'Automatic daily summary for nemoseamlessgutter.com.<br>'
+                f'Numbers cover yesterday; search rankings cover the last 28 days.'
+                f'</td></tr>')
     return (f'<tr><td style="padding:6px 4px 0 4px;font:400 12px {FONT};'
             f'color:{MUTED};line-height:1.6">'
             f'NEMO Seamless Gutter growth engine · runs 06:00 ET daily<br>'
@@ -346,31 +448,45 @@ def _footer():
             f'</td></tr>')
 
 
-def build_html(run_log=None, review_out=None, scout_out=None):
+def build_html(run_log=None, review_out=None, scout_out=None, audience="internal"):
     techs = ledger.load_techniques()
     active = sum(1 for t in techs if t.get("status") == "active")
+    owner = audience == "owner"
 
-    sections = [
-        _blocked_banner(run_log, scout_out),
-        _goal_card(),
-        _leads_card(),
-        _traffic_card(),
-        _rank_card(),
-        _discovered_card(),
-        _ran_card(run_log),
-        _scout_card(scout_out),
-        _waiting_card(),
-    ]
+    if owner:
+        # Leads, rank, what is new, what needs him. Nothing about how the
+        # machine works — no build log, no scout proposals, no slugs, no paths.
+        sections = [
+            _goal_card(),
+            _leads_card("owner"),
+            _rank_card("owner"),
+            _discovered_card("owner"),
+            _new_pages_card(run_log),
+            _traffic_card("owner"),
+            _owner_actions_card(),
+        ]
+        decisions = ""
+    else:
+        sections = [
+            _blocked_banner(run_log, scout_out),
+            _goal_card(),
+            _leads_card("internal"),
+            _traffic_card("internal"),
+            _rank_card("internal"),
+            _discovered_card("internal"),
+            _ran_card(run_log),
+            _scout_card(scout_out),
+            _waiting_card(),
+        ]
+        decisions = ""
+        if review_out and review_out.get("actions"):
+            items = "".join(
+                f'<div style="font:400 13px {FONT};color:{INK};padding:4px 0;'
+                f'line-height:1.5">&bull; {_e(a)}</div>'
+                for a in review_out["actions"])
+            decisions = _card(_h("Review decisions today", NAVY) + items)
 
-    decisions = ""
-    if review_out and review_out.get("actions"):
-        items = "".join(
-            f'<div style="font:400 13px {FONT};color:{INK};padding:4px 0;'
-            f'line-height:1.5">&bull; {_e(a)}</div>'
-            for a in review_out["actions"])
-        decisions = _card(_h("Review decisions today", NAVY) + items)
-
-    body = "".join(s for s in sections if s) + decisions + _footer()
+    body = "".join(s for s in sections if s) + decisions + _footer(audience)
 
     return f"""<!DOCTYPE html>
 <html><head><meta charset="utf-8">
@@ -387,15 +503,13 @@ def build_html(run_log=None, review_out=None, scout_out=None):
     <div style="font:700 17px {FONT};color:#ffffff;letter-spacing:-.01em">
       NEMO Seamless Gutter</div>
     <div style="font:400 13px {FONT};color:#c7d0f0;margin-top:3px">
-      Daily growth report &middot; {ledger.today()}</div>
+      {"Your website &amp; search summary" if owner else "Daily growth report"} &middot; {ledger.today()}</div>
   </td></tr>
   <tr><td style="height:14px;font-size:0;line-height:0">&nbsp;</td></tr>
 
   {body}
 
-  <tr><td style="padding:14px 4px 0 4px;font:400 12px {FONT};color:{MUTED}">
-    Ledger: {len(techs)} techniques &middot; {active} active
-  </td></tr>
+  {"" if owner else f'<tr><td style="padding:14px 4px 0 4px;font:400 12px {FONT};color:{MUTED}">Ledger: {len(techs)} techniques &middot; {active} active</td></tr>'}
 
 </table>
 </td></tr></table>

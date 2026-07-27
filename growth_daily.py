@@ -163,23 +163,29 @@ def cmd_scout(args):
 
 # ------------------------------------------------------------------ report
 
+def _send(args, to, audience, text, run_log, review_out, scout_out):
+    """One recipient, one audience. Kept separate so a failure sending the
+    owner's copy cannot stop the developer's copy going out, or vice versa."""
+    try:
+        html = email_report.build_html(run_log=run_log, review_out=review_out,
+                                       scout_out=scout_out, audience=audience)
+    except Exception as e:
+        log(f"  html report failed for {audience} ({e}); sending plain text")
+        html = None
+    try:
+        report.email(text, to, html=html)
+        log(f"  emailed {audience} copy to {to}")
+    except Exception as e:
+        log(f"  email to {to} failed: {e}")
+
+
 def cmd_report(args, run_log=None, review_out=None, scout_out=None):
     text = report.build_text(run_log=run_log, review_out=review_out, scout_out=scout_out)
     print(text)
+    if args.owner_email and not args.dry_run:
+        _send(args, args.owner_email, "owner", text, run_log, review_out, scout_out)
     if args.email and not args.dry_run:
-        try:
-            html = email_report.build_html(run_log=run_log, review_out=review_out,
-                                           scout_out=scout_out)
-        except Exception as e:
-            # A formatting bug must not cost the day's report — fall back to
-            # the plain text, which is the same facts without the styling.
-            log(f"\n  html report failed ({e}); sending plain text")
-            html = None
-        try:
-            report.email(text, args.email, html=html)
-            log(f"\n  emailed to {args.email}")
-        except Exception as e:
-            log(f"\n  email failed: {e}")
+        _send(args, args.email, "internal", text, run_log, review_out, scout_out)
     return text
 
 
@@ -269,7 +275,11 @@ def main():
     p.add_argument("--docroot", default=DEFAULT_DOCROOT)
     p.add_argument("--days", type=int, default=1,
                    help="how many complete days to measure (default: yesterday)")
-    p.add_argument("--email", default=None, help="send the report here")
+    p.add_argument("--email", default=None,
+                   help="send the full developer report here")
+    p.add_argument("--owner-email", default=None,
+                   help="send the business-owner report here — leads, rank and "
+                        "what needs him, with none of the engine's internals")
     p.add_argument("--dry-run", action="store_true",
                    help="read-only: measure and judge, but write nothing")
     args = p.parse_args()
