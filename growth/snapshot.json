@@ -1,18 +1,18 @@
 {
-  "generated": "2026-07-27T17:12:52+00:00",
+  "generated": "2026-07-27T20:02:40+00:00",
   "date": "2026-07-27",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
     "target_pct": 50,
-    "share_pct": 0.0,
+    "share_pct": 2.7,
     "measured": true,
     "why_unmeasured": null,
-    "coverage_pct": 53.1,
-    "tracked_queries": 64,
-    "top3": 0,
-    "top10": 3,
-    "ranked_known": 6
+    "coverage_pct": 46.7,
+    "tracked_queries": 75,
+    "top3": 2,
+    "top10": 9,
+    "ranked_known": 17
   },
   "traffic": {
     "visitors": [
@@ -143,17 +143,17 @@
   "keywords": {
     "by_town": {
       "county": {
-        "total": 41,
+        "total": 49,
         "covered": 21,
-        "top3": 0
+        "top3": 2
       },
       "hanover": {
         "total": 4,
-        "covered": 3,
+        "covered": 4,
         "top3": 0
       },
       "dover": {
-        "total": 4,
+        "total": 7,
         "covered": 2,
         "top3": 0
       },
@@ -180,8 +180,8 @@
     },
     "by_intent": {
       "hire": {
-        "total": 41,
-        "covered": 29
+        "total": 52,
+        "covered": 30
       },
       "price": {
         "total": 11,
@@ -201,14 +201,24 @@
       "best gutter company york county pa",
       "best gutter company york pa",
       "emergency gutter repair after storm york pa",
+      "gutter cleaning near me",
       "gutter company york pa",
       "gutter contractor spring grove pa",
       "gutter contractors york pa",
-      "gutter guard installation hanover pa",
+      "gutter guys near me",
+      "gutter installation dover",
+      "gutter installation near me",
       "gutter installers york pa",
       "gutter repair dover pa",
+      "gutter repair near me",
       "gutter repair red lion pa",
+      "gutter replacement near me",
+      "gutter services near me",
+      "gutters dover",
+      "gutters dover pa",
+      "gutters york pa",
       "half round copper gutters historic home york pa",
+      "schuylkill county seamless gutter",
       "5 inch vs 6 inch gutters",
       "are gutter guards worth it",
       "cost to replace gutters on a house",
@@ -254,21 +264,9 @@
         "clicks": 0
       },
       {
-        "query": "gutter services near me",
-        "position": 1,
-        "impressions": 12,
-        "clicks": 0
-      },
-      {
         "query": "gutters",
         "position": 3.8,
         "impressions": 12,
-        "clicks": 0
-      },
-      {
-        "query": "gutter replacement near me",
-        "position": 7.9,
-        "impressions": 10,
         "clicks": 0
       },
       {
@@ -284,38 +282,14 @@
         "clicks": 0
       },
       {
-        "query": "gutter installation near me",
-        "position": 12.8,
-        "impressions": 4,
-        "clicks": 0
-      },
-      {
         "query": "gutter repair",
         "position": 12,
         "impressions": 4,
         "clicks": 0
       },
       {
-        "query": "gutters dover",
-        "position": 40,
-        "impressions": 4,
-        "clicks": 0
-      },
-      {
-        "query": "gutters york pa",
-        "position": 5.5,
-        "impressions": 4,
-        "clicks": 0
-      },
-      {
         "query": "gutter installation yorkville",
         "position": 36,
-        "impressions": 3,
-        "clicks": 0
-      },
-      {
-        "query": "gutter repair near me",
-        "position": 7,
         "impressions": 3,
         "clicks": 0
       },
@@ -332,7 +306,7 @@
     "ok": true,
     "connected": true,
     "rows": 59,
-    "matched": 6,
+    "matched": 17,
     "clicks": 3,
     "impressions": 386,
     "avg_position": 10.2
@@ -672,6 +646,42 @@
       "notes": "",
       "verdict": null,
       "owned_visitors": []
+    },
+    {
+      "id": "T019",
+      "slug": "improve_ctr",
+      "name": "Rewrite snippets on pages nobody clicks",
+      "kind": "conversion",
+      "status": "active",
+      "hypothesis": "The homepage sits at position 1 for 'gutter contractor' and 'gutter guard installer' and collects almost no clicks. Ranking is the hard part and it is already done, so a snippet that matches what people actually typed is the cheapest win available. Caveat on record: much of the gap is probably the local pack absorbing the tap, which a better title cannot recover.",
+      "evidence": "GSC 28d: homepage 253 impressions, 1 click, average position 3.9.",
+      "prefixes": [],
+      "metric": "gsc_clicks",
+      "source": "seed",
+      "added": "2026-07-27",
+      "activated": "2026-07-27",
+      "retired": null,
+      "notes": "",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T020",
+      "slug": "adopt_queries",
+      "name": "Track the searches people really type",
+      "kind": "content",
+      "status": "active",
+      "hypothesis": "Search Console reports real queries, which beats any list guessed at a desk. Filtered to trade searches with service-area intent so the goal's denominator does not fill with out-of-area junk.",
+      "evidence": "GSC surfaced 16 untracked queries the site already appears for.",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "seed",
+      "added": "2026-07-27",
+      "activated": "2026-07-27",
+      "retired": null,
+      "notes": "",
+      "verdict": null,
+      "owned_visitors": null
     }
   ],
   "scoreboard": {
@@ -696,7 +706,9 @@
       "T015",
       "T016",
       "T017",
-      "T018"
+      "T018",
+      "T019",
+      "T020"
     ]
   },
   "last_build": {
@@ -704,27 +716,37 @@
     "log": [
       {
         "ok": true,
-        "detail": "added \"When Gutter Replacement Makes More Sense Than Repair in York\" to /services/seamless-gutter-installation.html for 'gutter replacement york pa'",
+        "detail": "adopted 11 real search(es) into the tracked universe: gutter services near me, gutter replacement near me, gutter installation near me, gutters dover, gutters york pa\u2026",
+        "slug": "adopt_queries"
+      },
+      {
+        "ok": true,
+        "detail": "rewrote title/description on /index.html (253 impressions, 1 clicks, pos 3.9) \u2014 Led the title with the exact high-volume queries (gutter installer/contractor) driving 130+ impressions at pos",
+        "slug": "improve_ctr"
+      },
+      {
+        "ok": true,
+        "detail": "added \"Gutter Guard Installation in Hanover, PA\" to /areas/seamless-gutters-hanover-pa.html for 'gutter guard installation hanover pa'",
         "slug": "strengthen_pages"
       },
       {
         "ok": true,
-        "detail": "published /services/gutter-soffit-fascia-replacement.html (18,827 bytes; 2 service(s) left in the queue)",
+        "detail": "published /services/emergency-gutter-repair.html (18,973 bytes; 1 service(s) left in the queue)",
         "slug": "service_pages"
       },
       {
         "ok": true,
-        "detail": "published New Freedom (17,200 bytes; 6 town(s) left in the queue)",
+        "detail": "published Glen Rock (18,176 bytes; 5 town(s) left in the queue)",
         "slug": "area_pages"
       },
       {
         "ok": true,
-        "detail": "published 'copper gutters historic home york pa' \u2192 /guides/copper-gutters-historic-home-york-pa.html",
+        "detail": "published 'gutter repair dover pa' \u2192 /guides/gutter-repair-dover-pa.html",
         "slug": "money_pages"
       },
       {
         "ok": true,
-        "detail": "refreshed nearby-links on 8 page(s)",
+        "detail": "refreshed nearby-links on 9 page(s)",
         "slug": "internal_links"
       },
       {
@@ -734,17 +756,17 @@
       },
       {
         "ok": true,
-        "detail": "[gen_sitemap] wrote 22 URLs to sitemap.xml",
+        "detail": "[gen_sitemap] wrote 25 URLs to sitemap.xml",
         "slug": "rebuild_sitemap"
       },
       {
         "ok": true,
-        "detail": "submitted 12 URL(s), HTTP 200",
+        "detail": "submitted 13 URL(s), HTTP 200",
         "slug": "ping_indexnow"
       }
     ],
     "new": 3,
-    "changed": 9
+    "changed": 11
   },
   "last_scout": {
     "date": "2026-07-27",
@@ -769,6 +791,7 @@
       "seamless-gutters-dallastown-pa.html",
       "seamless-gutters-dillsburg-pa.html",
       "seamless-gutters-dover-pa.html",
+      "seamless-gutters-glen-rock-pa.html",
       "seamless-gutters-hanover-pa.html",
       "seamless-gutters-new-freedom-pa.html",
       "seamless-gutters-red-lion-pa.html",
@@ -785,6 +808,7 @@
       "signs-your-gutters-need-replacing-york-county-pa.html"
     ],
     "services": [
+      "emergency-gutter-repair.html",
       "gutter-cleaning-repair.html",
       "gutter-guards.html",
       "gutter-soffit-fascia-replacement.html",
