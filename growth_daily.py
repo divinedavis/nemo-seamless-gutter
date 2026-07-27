@@ -29,7 +29,7 @@ import traceback
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from growth import (keywords, ledger, metrics, report,  # noqa: E402
-                    review, scout, seed, techniques)
+                    review, scout, seed, snapshot, techniques)
 
 DEFAULT_DOCROOT = os.environ.get("WEB_ROOT", "/var/www/nemo-seamless-gutter")
 
@@ -172,6 +172,17 @@ def cmd_daily(args):
     # written this morning rather than yesterday's picture.
     keywords.check_coverage(args.docroot)
     scout_out = cmd_scout(args)
+
+    # Publish state for the cloud review agent, which cannot reach this machine.
+    if not args.dry_run:
+        try:
+            snapshot.write(args.docroot)
+            snapshot.append_journal(
+                snapshot.engine_entry(run_log, review_out, scout_out))
+            log("\nsnapshot: wrote growth/snapshot.json and appended growth/JOURNAL.md")
+        except Exception as e:
+            log(f"\nsnapshot: FAILED — {e}")
+
     print()
     cmd_report(args, run_log=run_log, review_out=review_out, scout_out=scout_out)
     return 0
@@ -214,10 +225,25 @@ def cmd_goal(args):
     return 0 if met else 1
 
 
+def cmd_snapshot(args):
+    """Write the state snapshot without running anything else — useful for
+    checking what the review agent will see."""
+    seed.run()
+    keywords.check_coverage(args.docroot)
+    snap = snapshot.write(args.docroot)
+    g = snap["goal"]
+    log(f"wrote growth/snapshot.json — goal "
+        f"{g['share_pct'] if g['measured'] else 'UNMEASURED'} "
+        f"(coverage {g['coverage_pct']}% of {g['tracked_queries']} queries), "
+        f"{len(snap['techniques'])} techniques")
+    return 0
+
+
 def main():
     p = argparse.ArgumentParser(description="NEMO growth engine")
     p.add_argument("command", choices=["measure", "review", "build", "scout",
-                                       "report", "daily", "status", "goal"])
+                                       "report", "daily", "status", "goal",
+                                       "snapshot"])
     p.add_argument("--docroot", default=DEFAULT_DOCROOT)
     p.add_argument("--days", type=int, default=1,
                    help="how many complete days to measure (default: yesterday)")
@@ -239,6 +265,7 @@ def main():
         "daily": lambda: cmd_daily(args),
         "status": lambda: cmd_status(args),
         "goal": lambda: cmd_goal(args),
+        "snapshot": lambda: cmd_snapshot(args),
     }[args.command]()
 
 

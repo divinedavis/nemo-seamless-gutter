@@ -17,4 +17,9 @@ CRON_TZ=America/New_York
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-0 6 * * * root cd /var/www/nemo-seamless-gutter && WEB_ROOT=/var/www/nemo-seamless-gutter /usr/bin/python3 growth_daily.py daily --email divinejdavis@gmail.com >> /var/log/nemo-growth.log 2>&1
+# The publish step pushes the metrics snapshot, the journal and any pages
+# written this morning to GitHub. The daily review agent runs in Anthropic's
+# cloud and cannot reach this droplet, so the repository is how it sees the
+# numbers. It runs even if the engine failed — a snapshot showing a failed run
+# is exactly what the agent needs in order to notice.
+0 6 * * * root cd /var/www/nemo-seamless-gutter && WEB_ROOT=/var/www/nemo-seamless-gutter /usr/bin/python3 growth_daily.py daily --email divinejdavis@gmail.com >> /var/log/nemo-growth.log 2>&1; cd /var/www/nemo-seamless-gutter && WEB_ROOT=/var/www/nemo-seamless-gutter /bin/bash growth/publish_state.sh >> /var/log/nemo-growth.log 2>&1
