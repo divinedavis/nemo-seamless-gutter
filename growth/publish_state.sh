@@ -43,9 +43,24 @@ copy() {  # copy <relative path> if it exists in the docroot
 }
 
 copy growth/snapshot.json
-copy growth/JOURNAL.md
 copy sitemap.xml
 copy index.html
+
+# JOURNAL.md is NOT a plain copy like the files above. The docroot's local
+# copy only ever grows with this engine's own entries — the cloud review
+# agent commits its entries straight to GitHub and never touches this
+# machine, so the two files diverge every day. A blind copy here overwrites
+# the clone (and then the remote) with the docroot's version and silently
+# deletes every review-agent entry since the last publish. Merge instead: keep
+# the clone's current content (the trusted full history) and append only the
+# docroot entries not already present in it.
+if [ -e "$DOCROOT/growth/JOURNAL.md" ]; then
+  mkdir -p "$CLONE/growth"
+  python3 "$DOCROOT/growth/merge_journal.py" \
+    "$CLONE/growth/JOURNAL.md" "$DOCROOT/growth/JOURNAL.md" \
+    > "$CLONE/growth/JOURNAL.md.tmp"
+  mv "$CLONE/growth/JOURNAL.md.tmp" "$CLONE/growth/JOURNAL.md"
+fi
 
 # Pages the engine wrote overnight. rsync rather than cp so a directory that
 # gained a file is picked up, and --exclude keeps the engine's backup copies
