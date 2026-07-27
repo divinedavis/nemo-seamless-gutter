@@ -28,7 +28,7 @@ import traceback
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from growth import (keywords, ledger, metrics, report,  # noqa: E402
+from growth import (gsc, keywords, ledger, metrics, report,  # noqa: E402
                     review, scout, seed, snapshot, techniques)
 
 DEFAULT_DOCROOT = os.environ.get("WEB_ROOT", "/var/www/nemo-seamless-gutter")
@@ -84,7 +84,20 @@ def cmd_measure(args):
     log(f"  all time: {totals.get('bookings_all_time', 0)} bookings, "
         f"{totals.get('phone_leads_all_time', 0)} phone leads")
     kws, changed = keywords.check_coverage(args.docroot)
+
+    # Rank data. This is what turns the goal from a proxy into a measurement,
+    # so its absence is reported rather than passed over in silence.
+    g = gsc.sync()
+    if not g.get("connected"):
+        log("  gsc: NOT CONNECTED — the >50% goal stays unmeasured "
+            "(coverage below is only a proxy)")
+    elif not g.get("ok"):
+        log(f"  gsc: FAILED — {g.get('detail', '')[:160]}")
+
     s = keywords.summary()
+    if s["share_pct"] is not None:
+        log(f"  goal: {s['share_pct']}% of {s['total']} tracked queries in the "
+            f"top {keywords.TOP_N} (target 50%)")
     log(f"  keywords: {s['covered']}/{s['total']} covered ({s['coverage_pct']}%), "
         f"{changed} changed today")
     return data
