@@ -28,8 +28,9 @@ import traceback
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from growth import (gsc, keywords, ledger, metrics, report,  # noqa: E402
-                    review, scout, seed, snapshot, techniques)
+from growth import (email_report, gsc, keywords, ledger,  # noqa: E402
+                    metrics, report, review, scout, seed, snapshot,
+                    techniques)
 
 DEFAULT_DOCROOT = os.environ.get("WEB_ROOT", "/var/www/nemo-seamless-gutter")
 
@@ -167,7 +168,15 @@ def cmd_report(args, run_log=None, review_out=None, scout_out=None):
     print(text)
     if args.email and not args.dry_run:
         try:
-            report.email(text, args.email)
+            html = email_report.build_html(run_log=run_log, review_out=review_out,
+                                           scout_out=scout_out)
+        except Exception as e:
+            # A formatting bug must not cost the day's report — fall back to
+            # the plain text, which is the same facts without the styling.
+            log(f"\n  html report failed ({e}); sending plain text")
+            html = None
+        try:
+            report.email(text, args.email, html=html)
             log(f"\n  emailed to {args.email}")
         except Exception as e:
             log(f"\n  email failed: {e}")

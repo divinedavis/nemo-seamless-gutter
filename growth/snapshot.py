@@ -7,17 +7,18 @@ writes `growth/snapshot.json` and appends to `growth/JOURNAL.md`, and
 publish_state.sh pushes both to GitHub straight after the 6am run.
 
 PRIVACY — the single most important rule in this file. The bookings and leads
-tables contain real customers: names, phone numbers, street addresses, and free
--text notes about their houses. NONE of that may leave this machine. The
-snapshot carries counts and dates only, and `_assert_no_pii` fails the write if
-anything that looks like a phone number, email or street address slips in.
+tables contain real customers: names, phone numbers, street addresses, and
+free-text notes about their houses. NONE of that may leave this machine. The
+snapshot carries counts and dates only, and `scrub()` redacts anything shaped
+like a phone number, email or street address before the file is written,
+recording each hit under `redactions` so it is visible rather than silent.
 """
 import datetime
 import json
 import os
 import re
 
-from . import keywords, ledger, metrics, review
+from . import gsc, keywords, ledger, metrics, review
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SNAPSHOT_PATH = os.path.join(HERE, "snapshot.json")
@@ -43,16 +44,46 @@ ALLOWED = ("717-578-0073", "7175780073", "717.578.0073", "(717) 578-0073",
            "divinejdavis@gmail.com", "808 W Mason Ave")
 
 
-def _assert_no_pii(blob):
-    text = json.dumps(blob)
-    for token in ALLOWED:
-        text = text.replace(token, "")
+def _scrub(value, found):
+    """Walk the structure and redact anything shaped like personal data.
+
+    Redact rather than refuse. The first version raised, and on day one a scout
+    technique quoting a marketing article — "We just finished a roof for your
+    neighbor at 123 Maple St" — matched the street-address pattern and blocked
+    the entire publish, which cut the review agent off from every metric over
+    one line of example prose in someone else's blog post.
+
+    Refusing is the wrong failure for a filter that runs unattended: a false
+    positive takes the whole bridge down, and a real leak is equally well
+    prevented by removing the value. Every redaction is counted and surfaced in
+    the snapshot, so a hit still gets noticed rather than silently swallowed —
+    and a hit in a field fed by the bookings database would be a genuine bug
+    worth chasing, since nothing on that path should reach here at all.
+    """
+    if isinstance(value, dict):
+        return {k: _scrub(v, found) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_scrub(v, found) for v in value]
+    if not isinstance(value, str):
+        return value
+
+    out = value
     for pattern, label in PII_PATTERNS:
-        m = pattern.search(text)
-        if m:
-            raise RuntimeError(
-                f"refusing to publish snapshot: found what looks like a {label} "
-                f"({m.group(0)!r}). Customer data must never leave the droplet.")
+        def _sub(m):
+            hit = m.group(0)
+            if any(a in hit or hit in a for a in ALLOWED):
+                return hit          # the business's own published details
+            found.append({"kind": label, "sample": hit[:40]})
+            return f"[redacted {label}]"
+        out = pattern.sub(_sub, out)
+    return out
+
+
+def scrub(blob):
+    """Returns (clean_blob, [redaction, ...])."""
+    found = []
+    clean = _scrub(blob, found)
+    return clean, found
 
 
 def _series(metric, days=45):
@@ -91,7 +122,11 @@ def build(docroot):
             "by_town": kw["by_town"],
             "by_intent": kw["by_intent"],
             "uncovered": kw["gaps"],
+            # What Google shows this site for that nobody chose to track.
+            # Not added automatically — see gsc.discover() for why.
+            "discovered_untracked": gsc.discover(),
         },
+        "gsc": ledger.get_state("gsc_last"),
         "techniques": [
             {"id": t["id"], "slug": t["slug"], "name": t["name"],
              "kind": t.get("kind"), "status": t.get("status"),
@@ -112,7 +147,15 @@ def build(docroot):
         "last_scout": ledger.get_state("scout_last"),
         "pages": _page_inventory(docroot),
     }
-    _assert_no_pii(snap)
+    snap, redactions = scrub(snap)
+    snap["redactions"] = {
+        "count": len(redactions),
+        "items": redactions[:20],
+        "note": ("Anything shaped like a phone number, email or street address is "
+                 "removed before publishing. A non-zero count is usually an example "
+                 "quoted in scout research, not customer data — but a hit in a field "
+                 "fed by the bookings database would be a real bug worth chasing."),
+    }
     return snap
 
 

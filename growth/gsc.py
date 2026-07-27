@@ -254,3 +254,32 @@ def sync(quiet=False):
               f"{matched} matched the tracked universe · "
               f"{t['clicks']} clicks / {t['impressions']} impressions")
     return out
+
+
+def discover(min_impressions=3):
+    """Queries Google actually showed this site for that we are NOT tracking.
+
+    Deliberately does not add them to the universe. The goal is a percentage,
+    so its denominator is a judgement about which searches this business wants
+    to win — auto-adding every query Google reports would quietly stuff it with
+    things like "seamless gutters perkasie pa" (90 miles away) and make 50%
+    both harder and meaningless. Surfacing them in the snapshot lets the review
+    agent argue for the ones worth adopting, which is the right place for that
+    decision.
+    """
+    from . import keywords
+    if not available():
+        return []
+    try:
+        rows = fetch_queries()
+    except Exception:
+        return []
+    tracked = {k["query"] for k in keywords.load()}
+    out = [r for r in rows
+           if r["query"] not in tracked
+           and (r.get("impressions") or 0) >= min_impressions]
+    out.sort(key=lambda r: -(r.get("impressions") or 0))
+    return [{"query": r["query"],
+             "position": round(r["position"], 1) if r.get("position") else None,
+             "impressions": int(r.get("impressions") or 0),
+             "clicks": int(r.get("clicks") or 0)} for r in out[:40]]

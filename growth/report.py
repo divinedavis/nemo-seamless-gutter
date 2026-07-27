@@ -15,6 +15,7 @@ Two honesty rules this file enforces:
 import os
 import smtplib
 import statistics
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 from . import keywords, ledger, review
@@ -224,17 +225,47 @@ def _smtp_from_env():
     return host, port, user, pw
 
 
-def email(text, to, subject=None):
+def subject_line():
+    """Lead with the number being chased, so the inbox list is already useful."""
+    kw = keywords.summary()
+    if kw["share_pct"] is not None:
+        head = f"{kw['share_pct']}% top-3"
+    else:
+        head = "rank unmeasured"
+    leads = ledger.series("__site__", "total_leads")
+    y = leads[-1][1] if leads else 0
+    tail = f"{y} lead{'s' if y != 1 else ''} yesterday" if y else "no leads yesterday"
+    return f"NEMO growth · {head} · {tail} · {ledger.today()}"
+
+
+def email(text, to, subject=None, html=None):
+    """Send the report as multipart/alternative.
+
+    The HTML part is what Eric sees on his phone; the plain-text part is the
+    same content and is what shows up in clients that block HTML, in search
+    results, and in notification previews. Sending only HTML would make the
+    report unreadable in exactly the places it gets skimmed.
+    """
     host, port, user, pw = _smtp_from_env()
     if not (host and user and pw):
         raise RuntimeError("SMTP_HOST/SMTP_USER/SMTP_PASS not set — source server/.env")
-    msg = MIMEText(text, "plain", "utf-8")
-    msg["Subject"] = subject or f"NEMO growth — {ledger.today()}"
-    msg["From"] = os.environ.get("FROM_EMAIL", user)
+
+    sender = os.environ.get("FROM_EMAIL", user)
+    recipients = [a.strip() for a in to.split(",") if a.strip()]
+
+    if html:
+        msg = MIMEMultipart("alternative")
+        msg.attach(MIMEText(text, "plain", "utf-8"))
+        # Last part wins in multipart/alternative, so HTML must come second.
+        msg.attach(MIMEText(html, "html", "utf-8"))
+    else:
+        msg = MIMEText(text, "plain", "utf-8")
+
+    msg["Subject"] = subject or subject_line()
+    msg["From"] = f"NEMO Growth <{sender}>"
     msg["To"] = to
     with smtplib.SMTP(host, port, timeout=30) as s:
         s.starttls()
         s.login(user, pw)
-        s.sendmail(msg["From"], [a.strip() for a in to.split(",") if a.strip()],
-                   msg.as_string())
+        s.sendmail(sender, recipients, msg.as_string())
     return True
