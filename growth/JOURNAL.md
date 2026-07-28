@@ -269,3 +269,249 @@ Yesterday: 77 visitors (0 organic, 0 maps) · 0 bookings, 0 phone leads.
 - `ping_indexnow` — ok: submitted 13 URL(s), HTTP 200
 
 **Scout did not run:** anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"You have reached your specified API usage limits. You will regain access on 2026-08-01 at 00:00 UTC."},"request_id":"req_011CdTwv7KZ8hoopqJtHcmfq"}
+
+## 2026-07-28 — review agent
+
+### The blocker changed shape — it did not go away
+
+The last two review entries led with the Anthropic account having no credit
+balance, which stopped `area_pages` and `money_pages` from writing anything.
+That specific problem looks fixed: today's build log shows both of them
+succeeding (`area_pages` published Manchester, `money_pages` published "best
+gutter company york county pa", `service_pages` published Commercial Gutters,
+`strengthen_pages` added a Dover repair section) — the first day since this
+engine started that the content techniques actually ran. Whoever added funds,
+it worked; say so plainly rather than repeating a stale complaint.
+
+But `scout` failed today with a different error than before —not "credit
+balance too low," but **"You have reached your specified API usage limits.
+You will regain access on 2026-08-01 at 00:00 UTC."** That reads as a
+self-imposed spend/rate cap in the Anthropic console (a budget limit, not an
+empty account), and on the evidence available it appears the account burned
+through whatever cap is set almost immediately after being topped up — one
+day of building 3 pages plus one strengthen-pass was enough to trip it. That
+means no new candidate ideas will be filed until August 1, though the daily
+build itself should keep working since it's the same API. Recommendation
+below: whoever manages billing should check whether that limit is a deliberate
+guardrail or an accidental default, because if it's the latter it will keep
+interrupting scout every time the account is funded.
+
+### Where the numbers stand
+
+The goal is **measured now**, for the first time. T010 (connect Search
+Console) is retired with a verdict of `works: true`, and today's snapshot
+carries real Search Console data: 77 rows returned, 17 of the 76 tracked
+queries matched to an actual position, 429 impressions and 3 clicks over the
+trailing 28 days, average position 12.4. Top-3 share is **2.6%** (2 of 76)
+against the 50% goal. Coverage (does a page exist targeting the query, the
+old proxy) is 48.7% — a page existing is not the same as ranking, and today's
+numbers make that gap concrete: 37 queries have a targeting page but only 2
+hold a top-3 spot, and 59 of the 76 tracked queries have had **zero**
+impressions in the last 28 days, meaning most of the "coverage" hasn't been
+seen by a real searcher yet, let alone ranked. This is a real starting line,
+not a trend — one day of GSC data is one data point.
+
+Traffic: the only three days in the series are 2026-07-25 (0), 07-26 (0), and
+07-27 (77 visitors, 128 pageviews, 193 bot hits filtered separately). The
+07-27 spike is the first non-zero day this engine has ever recorded, and it
+deserves scrutiny rather than a victory lap — see below.
+
+### Did previous changes work?
+
+Checking each prior recommendation against what's now in the repo:
+
+- **"Add Anthropic credits" (repeated across all three prior entries)** —
+  appears done. Build succeeded today for the first time. Verdict: **worked**,
+  on the only evidence available (build log stopped failing).
+- **"Connect Search Console" (T010)** — done, and it's the review loop's own
+  code (`review.py`) that confirmed it, not me: the ledger already carries
+  `verdict.works: true`. This is the one technique in the entire ledger with
+  an actual verdict; everything else is `not_yet_judged`.
+- **"Activate T007 (review-request engine) once credits are restored"** —
+  still `candidate`, not activated. Credits are restored now, so this
+  recommendation is fully ripe and I'm restating it below rather than letting
+  it quietly age.
+- **"Eric responds to all 13 Google reviews," "fill out the GBP profile
+  completely," "seed GBP Q&A"** — I have no way to check any of these three
+  from this repo; nothing in `snapshot.json` reflects live GBP state. Restating
+  below, not dropping them, since silence isn't evidence they were done.
+- **T001/T002/T017/T018 (area pages, money pages, strengthen, service pages)**
+  — `review.py`'s own grace period is 30 days (`GRACE_DAYS = 30` in
+  `growth/review.py`), and every one of these was activated 2026-07-27 — one
+  day ago. There is exactly one day of `owned_visitors` measurement for any of
+  them (T001: 8, T002: 4, T018: 5, all dated 07-27). That grace period runs
+  until roughly **2026-08-26**; nothing here can be called worked or
+  not-worked before then, and I'd flag it as a problem if a future entry
+  claims otherwise. Noting the number now only so the eventual before/after
+  comparison has a baseline to check against.
+- **The FAQPage-schema idea from the very first entry** — already confirmed
+  stale in the second entry's code check (`_faq_ld()` ships on every
+  generated page). Nothing new to add; not re-litigating it.
+
+### What I checked in the code before recommending anything
+
+Per this task's standing instruction to verify against `techniques.py` /
+`templates.py` rather than assumptions:
+
+- **Sticky/floating call button.** Conversion research today (see below) says
+  a persistent tap-to-call element lifts call volume 25-40%. `templates.py`
+  already renders one (`<a href="tel:..." class="float-call">`, the phone SVG
+  fixed to the corner) on every generated page. Not recommending it — already
+  shipped.
+- **T014's "GEO answer-first rewrite" candidate.** Its own notes ask for two
+  things: FAQPage schema, and a 40-60 word direct-answer block at the top of
+  each section. The first half is already done sitewide (`_faq_ld()` in
+  `techniques.py`, confirmed again by reading the function this time, not
+  trusting the earlier entry's note). The second half — an enforced
+  direct-answer opening — is genuinely not in `AREA_SYSTEM`, `MONEY_SYSTEM`,
+  or `STRENGTHEN_SYSTEM` in `techniques.py`; none of those prompts ask the
+  model for a short lead-in answer before the sections. So T014 is still a
+  live candidate, but its scope should shrink to just the direct-answer-block
+  half when someone next touches it — the FAQ-schema half of its own "first
+  step" note is moot.
+- **The traffic-spike composition.** `growth/metrics.py`'s `collect()`
+  classifies each visitor into one of: organic, local, ai, direct, referral,
+  campaign, or **internal** (referred from another page on
+  nemoseamlessgutter.com itself) — but the per-day dict it returns only
+  extracts the first six. Visits classified `internal` count toward the
+  total `visitors` figure but vanish from every channel bucket the snapshot
+  shows. That fully or partly explains 07-27's 77 total vs. 57 `direct`: the
+  other ~20 are plausibly a few real visitors browsing multiple pages, not a
+  mystery, though I can't confirm that's the whole gap from this repo alone.
+- **`BOT_RE` coverage.** While chasing the same spike, I checked which crawler
+  user agents the bot filter actually catches. It matches on the substrings
+  `bot|crawl|spider|slurp|...`, which covers most named crawlers (Googlebot,
+  Bingbot, ClaudeBot, GPTBot, Amazonbot, Bytespider — all contain one of those
+  words) — but it missed several real, currently-active crawlers whose names
+  don't: `GoogleOther`, `Google-Extended`, `Google-InspectionTool`,
+  `meta-externalagent`, and the older `anthropic-ai` token. Google's URL
+  Inspection tool and `GoogleOther` in particular are exactly what would hit a
+  page within hours of an IndexNow submission — which lines up with T001/T002
+  showing `owned_visitors` the same morning their pages were published, faster
+  than organic ranking could plausibly deliver a human click. **I fixed this**
+  — added those five patterns to `BOT_RE` in `growth/metrics.py`. This doesn't
+  retroactively fix 07-27's numbers, but tomorrow's snapshot is a cleaner test:
+  if `direct_visitors` and same-day `owned_visitors` drop noticeably, that's
+  the confirmation; if they don't, the spike wasn't this.
+
+### What I researched today
+
+Focused on what's new since the last scout ran (2026-07-27), and avoided
+re-covering LSAs / Nextdoor / speed-to-lead / door-hangers / GBP category
+audits — those are already filed as candidates T011-T016 and don't need a
+second write-up.
+
+- **Review recency and response rate now outweigh raw review count in the
+  local pack.** The March 2026 core update tightened this: businesses
+  responding to 90%+ of reviews see 23% more profile views and 18% more
+  direction requests than those replying to under half, and responding at all
+  correlates with 68% more clicks than staying silent.
+  ([Digital Applied](https://www.digitalapplied.com/blog/local-seo-march-2026-core-update-gbp-optimization-guide),
+  [ClickRank via biziq](https://biziq.com/blog/local-seo-statistics/))
+  This sharpens, rather than replaces, the prior entry's recommendation that
+  Eric respond to NEMO's 13 existing reviews.
+- **Phone calls are reportedly the dominant conversion channel for this kind
+  of business, and this site cannot see them.** Industry data: phone leads
+  convert around 46% versus web-form leads, and phone calls account for
+  60-70% of conversions in home-service verticals.
+  ([CallRail](https://www.callrail.com/blog/home-services-marketing-statistics),
+  [PipelineOn](https://pipelineon.com/blog/contractor-conversion-rate-optimization/))
+  `growth/metrics.py`'s own docstring already says as much: tel: link taps
+  fire as GA4 `contact_call` events and "GA4 has no server-side export without
+  a service-account key" — this repo has never had that key. That is the same
+  shape of problem Search Console was before T010: a real signal that exists
+  but isn't wired in. See recommendation below.
+- **GBP suspension risk in 2026 is concentrated in exactly the kind of
+  profile-editing session T016 proposes.** Category mismatches and rapid,
+  same-session edits (name/address/category/phone all changed at once) are
+  named as common suspension triggers, especially for contractor-category
+  listings.
+  ([Splinternet Marketing](https://splinternetmarketing.com/digital-strategy/google-business-profile-verification-and-suspensions-in-2026-what-triggers-them-and-how-to-protect-local-rankings/),
+  [RenewLocal](https://renewlocal.com/blog/why-google-keeps-suspending-business-profiles-2026))
+  NEMO's declared address and category should be low-risk on their own, but
+  this is a real caution to attach to T016's "first step" note: spread the
+  category check, the Q&A seeding, and the attribute/photo fill-out across
+  a few separate sessions rather than one sitting, since Google's abuse
+  detection reportedly treats a burst of simultaneous profile edits as a
+  hijack signal regardless of whether the edits themselves are legitimate.
+
+**What I rejected:** nothing new to reject today — I didn't find anything
+that contradicts an active technique or duplicates a candidate already on
+file. I deliberately didn't re-research LSAs/Nextdoor/etc. since T011-T016
+already cover that ground and re-running the same search would just relabel
+existing candidates as new.
+
+### Recommendations
+
+1. **Check whether the Anthropic usage-limit cap is deliberate.** *(Eric/
+   whoever manages billing — a console setting, not a purchase.)* Scout is
+   blocked until 2026-08-01 by a self-imposed usage limit that the account
+   hit the day after being funded. If that limit is an accidental default
+   rather than an intentional guardrail, raising it prevents this from
+   recurring every time the account is topped up. How you'd know: tomorrow's
+   `last_scout` in the snapshot either stops erroring or keeps citing the same
+   cap.
+2. **Say yes to T007 (ask finished jobs for a Google review) now that credits
+   are restored.** *(Eric — emails real past customers, needs explicit
+   go-ahead per the ledger note.)* This was blocked on the credit issue before;
+   it no longer is. Reinforced by today's research: review recency/response
+   rate now outweighs raw count in the local pack, and NEMO's review count
+   (13) is still the gap flagged in the original hypothesis.
+3. **Eric respond to NEMO's existing Google reviews, and to new ones within a
+   few days of posting.** *(Eric — free, ~20 minutes once then ongoing.)*
+   Repeated from the 07-27 entry since I can't confirm it happened; today's
+   number is sharper — 90%+ response rate correlates with 23% more profile
+   views and 18% more direction requests than sub-50% responders.
+4. **When acting on T016 (GBP category + Q&A audit), spread it across
+   sessions.** *(Eric — free, no new time cost, just different pacing.)* Check
+   the category first, wait a few days, then seed the Q&A, rather than doing
+   both plus photos and attributes in one sitting. New reasoning from today's
+   suspension-risk research, attached to an existing candidate rather than
+   proposing a new one.
+5. **New idea, not yet in the ledger: connect the GA4 Data API with a service
+   account, the same pattern already proven for T010/Search Console.**
+   *(Whoever seeds new techniques on the droplet — one-time setup, no ongoing
+   cost, no code to write beyond what `gsc.py` already demonstrates as the
+   pattern.)* This closes a gap `metrics.py` documents about itself: tel: taps
+   fire as GA4 events this repo has never been able to read, and industry data
+   says phone calls are probably the majority of this business's real
+   conversions. Checked: grepped the repo for any existing GA4 server-side
+   read — there is none; `analytics.js` only fires client-side events. I'm
+   flagging this rather than filing it directly since `techniques.json` is
+   droplet-owned runtime state, same reasoning as the FAQ-schema idea in the
+   first entry.
+6. **Watch tomorrow's snapshot for the effect of the BOT_RE fix I made today**
+   (see code-check section above). If `direct_visitors` and same-day
+   `owned_visitors` for freshly-published pages drop, the 07-27 spike was at
+   least partly crawler traffic slipping past the old filter. If they don't
+   move, say so plainly rather than declaring the fix a success by default.
+
+### Reasoning and uncertainties
+
+The single thing I'm least sure about is the 07-27 traffic spike. I found two
+concrete, code-level reasons a chunk of it could be non-human (the
+unattributed `internal` bucket, the `BOT_RE` gaps I fixed), and both are
+real gaps, not speculation — but I have no droplet access to grep the actual
+log lines and confirm either one actually fired that day. It's equally
+possible some of that 77 is genuine early interest. I'm treating it as
+**unresolved, not explained**, and said so rather than picking the
+comfortable story (bots, so the "real" numbers are still flat) or the exciting
+one (early traction). Tomorrow's snapshot, post-fix, is the actual test.
+
+I'm fairly confident about the grace-period math (T001/T002/T017/T018 can't
+be judged before ~2026-08-26) since it's directly from `review.py`'s own
+constant, not an inference.
+
+I'm least able to verify anything about the live Google Business Profile —
+reviews responded to, profile completeness, Q&A seeding. I have zero
+visibility into that from this repo and I'm carrying forward three
+recommendations on the assumption they're still open, which could be wrong.
+If a future entry can get a straight answer from Eric on this, drop whichever
+of #2/#3/#4 are already handled instead of repeating them a fourth time.
+
+**What I changed in the repo today:** one small fix to `growth/metrics.py`
+(`BOT_RE` now catches five more real crawler user agents that lack a
+bot/crawl/spider/slurp substring). I did not touch `techniques.json`,
+`keywords.json`, `results.jsonl`, or `state.json` — all droplet-owned. I did
+not activate T007, T014, or any other candidate; those are Eric's calls,
+surfaced above as recommendations.

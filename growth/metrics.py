@@ -59,7 +59,13 @@ LOCAL_HOSTS = ("google.com/maps", "maps.google", "yelp.com", "angi.com",
 BOT_RE = re.compile(
     r"bot|crawl|spider|slurp|bingpreview|semrush|ahrefs|mj12|dotbot|petalbot|"
     r"yandex|baidu|facebookexternalhit|headlesschrome|python-requests|curl/|"
-    r"wget|scrapy|go-http-client|okhttp|uptime|pingdom|monitor|lighthouse",
+    r"wget|scrapy|go-http-client|okhttp|uptime|pingdom|monitor|lighthouse|"
+    # Crawlers with no "bot"/"crawl"/"spider"/"slurp" substring, so the
+    # pattern above misses them outright — seen hitting pages within hours
+    # of a same-morning IndexNow submission, which is exactly when a
+    # fresh page's owned_visitors should be zero.
+    r"googleother|google-extended|google-inspectiontool|"
+    r"meta-externalagent|anthropic-ai",
     re.I)
 
 # Assets are requests, not visits. Counting them makes every page view look
