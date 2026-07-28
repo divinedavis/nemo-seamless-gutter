@@ -1031,7 +1031,175 @@ def adopt_queries(ctx):
                       + ("…" if len(added) > 5 else "")}
 
 
+# ------------------------------------------------- answer-first / GEO pass
+
+# An HTML comment, not a new CSS class, is what makes this idempotent. The
+# visible markup reuses p.lead, which styles.css already defines (.prose .lead)
+# and the area pages already use — inventing an .answer-first class would
+# render unstyled, which is the mistake the area templates were built to avoid.
+GEO_MARKER = "<!-- geo:answer-first -->"
+
+# Answers shorter than this are not answers; longer than this and the extract
+# stops being quotable, which is the entire point of the block.
+GEO_MIN_WORDS, GEO_MAX_WORDS = 35, 75
+
+GEO_SYSTEM = """You write the opening answer for one page of a real seamless gutter \
+contractor's website: NEMO Seamless Gutter, serving York County, Pennsylvania.
+
+The page already ranks for the search below but opens with a section heading, so a \
+reader — or an AI answer engine summarising the page — has to work to find the \
+actual answer. Your job is the direct answer that should sit at the very top.
+
+Return ONLY valid JSON with keys:
+  answer  — 40-60 words. A complete, self-contained answer to the search, written so
+            it still makes sense quoted on its own with no surrounding page. Lead with
+            the answer itself, not with a restatement of the question. Plain sentences.
+  faqs    — 3 to 5 objects with keys q and a. Each q is a real follow-up question a
+            York County homeowner would ask next; each a is 30-60 words.
+
+Hard rules. Do NOT invent prices, dollar figures, ranges, reviews, ratings, star \
+counts, years in business, licence numbers, certifications or warranty terms. Cost \
+questions are answered by explaining what drives the price and pointing to a free \
+written on-site estimate. Do not claim awards or "best in York County" status. No \
+marketing superlatives. Write the way an experienced installer explains something \
+standing in a driveway. Phone is (717) 578-0073."""
+
+
+def geo_answer_first_content_pass(ctx):
+    """Put a quotable direct answer at the top of pages that already rank.
+
+    This is the one tactic from the AI-search playbook that fits a local
+    contractor. It is not a volume play — nothing new is published, and no
+    near-duplicate page is created. It rewrites the opening of a page that is
+    already earning impressions so the answer is extractable.
+
+    Why the top of the page specifically: the guides currently open straight
+    into an <h2>, so the first thing a summariser meets is a section heading
+    rather than a claim it can lift. 386 impressions against 3 clicks says most
+    of this audience never reaches the page at all, which makes being quoted
+    inside the answer worth more than being clicked through to.
+
+    One honest limitation, recorded so a flat result is not misread later:
+    Google restricted FAQ rich results to a narrow set of site types, so the
+    FAQPage block added here is very unlikely to produce visible rich snippets.
+    It is here because it marks question/answer pairs unambiguously for the
+    engines that do parse it, not because it will decorate the SERP.
+    """
+    from . import gsc
+
+    done = set(ledger.get_state("geo_answered", []))
+
+    # Highest-impression pages first: the block is only worth writing where
+    # there is already an audience to be quoted in front of.
+    candidates = []
+    if gsc.available():
+        try:
+            for p in sorted(gsc.fetch_pages(), key=lambda p: -p["impressions"]):
+                if p["impressions"] >= 5:
+                    candidates.append((_url_to_relpath(p["page"]), p["page"],
+                                       p["impressions"]))
+        except Exception as e:
+            ctx.log(f"    geo: Search Console unavailable ({e}); using page order")
+
+    # Without GSC there is still useful work — the money pages are the ones an
+    # AI answer would be asked to summarise.
+    if not candidates:
+        for rel in ("guides/how-much-do-seamless-gutters-cost.html",
+                    "guides/gutter-installer-near-me.html",
+                    "index.html"):
+            candidates.append((rel, f"{SITE}/{rel}", 0))
+
+    for rel, url, impressions in candidates:
+        if rel in done:
+            continue
+        src = ctx.read(rel)
+        if src is None or GEO_MARKER in src:
+            continue
+        anchor = src.find('<div class="container prose">')
+        if anchor < 0:
+            continue
+
+        queries = []
+        if gsc.available():
+            try:
+                queries = gsc.queries_for_page(url)
+            except Exception:
+                queries = []
+        headline = queries[0]["query"] if queries else None
+        if not headline:
+            # Fall back to the page's own <h1>, which is what it is about.
+            m = re.search(r"<h1[^>]*>(.*?)</h1>", src, re.S)
+            headline = re.sub(r"<[^>]+>", " ", m.group(1)).strip() if m else None
+        if not headline:
+            continue
+
+        qlist = "\n".join(f'- "{q["query"]}" — {q["impressions"]} impressions, '
+                          f'position {q["position"]:.1f}' for q in queries[:10])
+        has_faq = "FAQPage" in src
+        try:
+            data = llm.call_json(GEO_SYSTEM, (
+                f"Page: {url}\n"
+                f"The search to answer: \"{headline}\"\n"
+                + (f"Everything Google shows this page for:\n{qlist}\n" if qlist else "")
+                + (f"\nThis page already has FAQ markup, so the faqs you return will "
+                   f"be used as visible copy only.\n" if has_faq else "")),
+                max_tokens=2000)
+        except Exception as e:
+            return {"ok": False, "detail": f"generation failed for /{rel}: {e}"}
+
+        answer = (data.get("answer") or "").strip()
+        words = len(answer.split())
+        if not answer or not (GEO_MIN_WORDS <= words <= GEO_MAX_WORDS):
+            return {"ok": False,
+                    "detail": f"rejected answer for /{rel}: {words} words "
+                              f"(want {GEO_MIN_WORDS}-{GEO_MAX_WORDS})"}
+
+        block = (f"\n      {GEO_MARKER}"
+                 f'\n      <p class="lead">{_esc(answer)}</p>')
+        cut = anchor + len('<div class="container prose">')
+        head, tail = src[:cut], src[cut:]
+
+        # Most area pages already open with their own p.lead. Two stacked lead
+        # paragraphs read as a formatting mistake — same oversized muted type
+        # twice before the first heading. The answer becomes the lead and the
+        # page's original intro stays as ordinary body copy directly under it.
+        demoted = re.match(r'(\s*)<p class="lead">', tail)
+        if demoted:
+            tail = tail[:demoted.start()] + demoted.group(1) + "<p>" + \
+                tail[demoted.end():]
+        out = head + block + tail
+
+        # Only add FAQ markup where the page has none. Two FAQPage blocks on one
+        # page is worse than none — the engines pick one and the other is noise.
+        faqs = [f for f in (data.get("faqs") or []) if f.get("q") and f.get("a")]
+        added_faq = False
+        if faqs and not has_faq:
+            cta = out.find('      <div class="cta-band">')
+            if cta < 0:
+                cta = out.find('<div class="cta-band">')
+            if cta >= 0:
+                out = (out[:cta] + _render_faqs(faqs) + "\n\n" + out[cta:])
+                ld = f'<script type="application/ld+json">\n{_faq_ld(faqs)}\n</script>'
+                body_end = out.rfind("</body>")
+                if body_end >= 0:
+                    out = out[:body_end] + "  " + ld + "\n" + out[body_end:]
+                added_faq = True
+
+        ctx.backup(rel)
+        ctx.write(rel, out)
+        if not ctx.dry_run:
+            ledger.set_state("geo_answered", sorted(done | {rel}))
+        return {"ok": True,
+                "detail": f"answer-first opening on /{rel} for '{headline}' "
+                          f"({words} words{', + FAQ schema' if added_faq else ''}"
+                          + (f", {impressions} impressions" if impressions else "")
+                          + ")"}
+
+    return {"ok": True, "detail": "every ranking page already opens with a direct answer"}
+
+
 REGISTRY = {
+    "geo_answer_first_content_pass": geo_answer_first_content_pass,
     "improve_ctr": improve_ctr,
     "adopt_queries": adopt_queries,
     "area_pages": area_pages,
@@ -1050,6 +1218,10 @@ REGISTRY = {
 # adopt_queries runs first so the day's build queue reflects what people are
 # really searching. improve_ctr is next because fixing a page that already
 # ranks is worth more than writing one that does not exist yet.
-ORDER = ["adopt_queries", "improve_ctr", "strengthen_pages", "service_pages",
-         "area_pages", "money_pages", "internal_links", "local_schema",
-         "rebuild_sitemap", "ping_indexnow"]
+# geo_answer_first_content_pass sits with improve_ctr, not with the builders:
+# both make a page that ALREADY ranks work harder, which beats publishing
+# another one. It runs second because a page is worth more answering the
+# question well than being clicked into and disappointing the reader.
+ORDER = ["adopt_queries", "improve_ctr", "geo_answer_first_content_pass",
+         "strengthen_pages", "service_pages", "area_pages", "money_pages",
+         "internal_links", "local_schema", "rebuild_sitemap", "ping_indexnow"]
