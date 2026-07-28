@@ -22,7 +22,7 @@ import urllib.error
 
 WEB_ROOT = os.environ.get("WEB_ROOT", "/var/www/nemo-seamless-gutter")
 BASE = "https://nemoseamlessgutter.com"
-MODEL = os.environ.get("NEMO_CONTENT_MODEL", "claude-sonnet-4-6")
+MODEL = os.environ.get("NEMO_CONTENT_MODEL", "claude-opus-5")
 DRAFTS = os.path.join(WEB_ROOT, "seo", "drafts")
 USED_PATH = os.path.join(WEB_ROOT, "seo", "used_topics.json")
 CHROME_PAGE = os.path.join(WEB_ROOT, "guides", "seamless-vs-sectional-gutters.html")
@@ -122,7 +122,9 @@ def claude(topic):
         "https://api.anthropic.com/v1/messages",
         data=json.dumps({
             "model": MODEL,
-            "max_tokens": 2500,
+            # Opus 5 thinks by default and bills thinking against the same
+            # budget, so 2500 no longer leaves room for a 600-900 word guide.
+            "max_tokens": 6000,
             "messages": [{"role": "user", "content": prompt}],
         }).encode(),
         headers={
@@ -133,7 +135,9 @@ def claude(topic):
     )
     with urllib.request.urlopen(req, timeout=120) as r:
         data = json.loads(r.read())
-    text = data["content"][0]["text"]
+    # content[0] is a thinking block on Opus 5 — take the text blocks only.
+    text = "".join(b.get("text", "") for b in data.get("content", [])
+                   if b.get("type") == "text")
     text = re.sub(r"^```(?:json)?|```$", "", text.strip(), flags=re.M).strip()
     return json.loads(text)
 

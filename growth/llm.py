@@ -13,10 +13,10 @@ import urllib.request
 HERE = os.path.dirname(os.path.abspath(__file__))
 API_URL = "https://api.anthropic.com/v1/messages"
 
-# Sonnet for prose and research: this content goes on a real business's site
+# Opus for prose and research: this content goes on a real business's site
 # under its own name, so the floor on quality matters more than the token cost
 # of a few pages a week.
-MODEL = os.environ.get("NEMO_GROWTH_MODEL", "claude-sonnet-5")
+MODEL = os.environ.get("NEMO_GROWTH_MODEL", "claude-opus-5")
 
 WEB_SEARCH = [{"type": "web_search_20250305", "name": "web_search", "max_uses": 8}]
 
