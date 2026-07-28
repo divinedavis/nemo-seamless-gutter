@@ -128,14 +128,25 @@ def build_text(run_log=None, review_out=None, scout_out=None):
     L.append("")
 
     # ---- traffic -----------------------------------------------------------
-    L.append("TRAFFIC (bots and Eric's own visits excluded)")
-    for m, label in (("visitors", "All visitors"),
-                     ("organic_visitors", "Organic search"),
-                     ("local_visitors", "Maps / directories"),
-                     ("ai_visitors", "AI answer engines"),
-                     ("direct_visitors", "Direct"),
-                     ("referral_visitors", "Referral")):
-        L.append(f"  {label:<21} {_series_summary(m)}")
+    # Only search traffic is reported. The other channels were dropped on
+    # 2026-07-28: "direct" is not a channel, it is every visit that arrived
+    # with no Referer header — app taps, QR scans, AI engines that strip the
+    # header, and any bot that got past the filter. On this site it was 57 of
+    # 77 visits and the log behind it was almost entirely scrapers hitting
+    # dead Wix URLs. Reporting it daily implied demand that was not there.
+    L.append("SEARCH TRAFFIC")
+    clicks = _last("gsc_clicks")
+    L.append(f"  Clicks from Google   {_fmt(clicks)} over the last 28 days"
+             if clicks is not None else
+             "  Clicks from Google   no data — Search Console has not synced")
+    L.append(f"  Organic visits       {_series_summary('organic_visitors')}"
+             "  (server-side)")
+    L.append("  Note: the two disagree on purpose. Search Console is the honest")
+    L.append("        count of people arriving from Google; the server-side")
+    L.append("        number only sees visits that still carry a search")
+    L.append("        referrer, so it under-reports and can read 0 on a day")
+    L.append("        Search Console recorded clicks. Bots and Eric's own")
+    L.append("        visits are excluded from the server-side number.")
     L.append("")
 
     # ---- what ran ----------------------------------------------------------

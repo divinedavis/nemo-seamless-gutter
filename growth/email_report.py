@@ -201,23 +201,56 @@ def _leads_card(audience="internal"):
 
 
 def _traffic_card(audience="internal"):
+    """Search traffic only.
+
+    The all-visitors / direct / referral / maps / AI rows were dropped on
+    2026-07-28. "Direct" was never a channel — it is the bucket for every
+    visit that arrived with no Referer header, which on this site meant
+    scrapers crawling dead Wix URLs far more often than it meant a customer
+    typing the address. Showing 57 of them next to 0 organic read as traffic
+    when it was noise.
+    """
     rows = []
-    for metric, label in (("visitors", "All visitors"),
-                          ("organic_visitors", "Organic search"),
-                          ("local_visitors", "Maps &amp; directories"),
-                          ("ai_visitors", "AI answer engines"),
-                          ("direct_visitors", "Direct"),
-                          ("referral_visitors", "Referral")):
-        last, med, direction = _trend(metric)
+
+    # Search Console is the number to trust: it counts the click on Google's
+    # side, before any referrer can be stripped. It is a 28-day rolling
+    # total, NOT a daily figure, so it gets no "/day median".
+    clicks = _last("gsc_clicks")
+    label = "Found you on Google" if audience == "owner" else "Clicks from Google (GSC)"
+    if clicks is None:
+        rows.append((label, '<span style="color:%s">no data</span>' % MUTED))
+    else:
+        rows.append((label,
+                     f'{clicks} <span style="color:{MUTED};font-weight:400">'
+                     f'· clicks in the last 28 days</span>'))
+
+    # The server-side count is diagnostic, not a headline: it only sees the
+    # visits that still carry a search referrer. Eric does not need to see a
+    # number that reads 0 on a day Google recorded clicks.
+    if audience != "owner":
+        last, med, direction = _trend("organic_visitors")
         if last is None:
-            rows.append((label, '<span style="color:%s">no data</span>' % MUTED))
+            rows.append(("Organic visits (server)",
+                         '<span style="color:%s">no data</span>' % MUTED))
         else:
-            rows.append((label,
+            rows.append(("Organic visits (server)",
                          f'{last} <span style="color:{MUTED};font-weight:400">'
                          f'· {med}/day median</span> {_arrow(direction)}'))
-    whose = "your own visits" if audience == "owner" else "Eric's own visits"
-    body = (_h(f"Traffic yesterday — bots and {whose} excluded", NAVY)
-            + _rows(rows))
+
+    note = ("This counts people who clicked through to you from a Google "
+            "search. Calls that come straight from your Business Profile "
+            "listing are not in here."
+            if audience == "owner" else
+            "The two rows disagree by design. GSC counts the click on "
+            "Google's side; the server-side row only sees visits that still "
+            "carry a search referrer, so it under-reports and can read 0 on "
+            "a day GSC recorded clicks. Bots and Eric's own visits are "
+            "excluded from the server-side row.")
+    body = (_h("Search traffic", NAVY)
+            + _rows(rows)
+            + f'<div style="font:400 12px {FONT};color:{MUTED};margin-top:12px;'
+              f'line-height:1.5;padding-top:10px;border-top:1px solid {LINE}">'
+              + note + '</div>')
     return _card(body)
 
 
