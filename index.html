@@ -157,6 +157,14 @@
   }
   </script>
 
+  <!-- Google showed a generic globe next to this site in search results: the
+       only icon declared was an SVG and /favicon.ico 404'd. Google's docs give
+       .ico at the root as the canonical example and never name SVG as
+       supported, so the raster files lead and the SVG stays for browsers,
+       which render it crisply at any size. Don't move these URLs — Google
+       wants a favicon URL that stays put. -->
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" href="/assets/favicon-96.png" type="image/png" sizes="96x96" />
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
   <link rel="manifest" href="/site.webmanifest" />
