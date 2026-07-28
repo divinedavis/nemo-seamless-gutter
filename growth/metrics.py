@@ -65,8 +65,24 @@ BOT_RE = re.compile(
     # of a same-morning IndexNow submission, which is exactly when a
     # fresh page's owned_visitors should be zero.
     r"googleother|google-extended|google-inspectiontool|"
-    r"meta-externalagent|anthropic-ai",
+    r"meta-externalagent|anthropic-ai|"
+    # Internet-wide scanners and HTTP libraries found in the 2026-07-28 audit,
+    # all of which were being counted as visitors. NemoHealthCheck is ours —
+    # the site monitoring its own uptime is not an audience.
+    r"zgrab|libredtail|masscan|nuclei|censys|expanse|internet-measurement|"
+    r"python-httpx|httpx/|aiohttp|java/|libwww|perl|ruby|axios|node-fetch|"
+    r"nemohealthcheck",
     re.I)
+
+# Chrome shipped v70 in 2018 and Firefox v60 the same year. A UA claiming
+# something older is not a York County homeowner on an old laptop — those still
+# auto-update. In the audit these were single IPs making hundreds of requests
+# behind Firefox/13.0 and Firefox/47.0 strings: scrapers picking a stale UA.
+ANCIENT_UA_RE = re.compile(r"Chrome/([1-9]|[1-6]\d)\.|Firefox/([1-9]|[1-5]\d)\.")
+
+# A real visitor to a gutter contractor's site reads a few pages. Anything past
+# this in one day from one address is automation, whatever its UA claims.
+MAX_HUMAN_PAGES_PER_DAY = 30
 
 # Assets are requests, not visits. Counting them makes every page view look
 # like fifteen.
@@ -198,6 +214,24 @@ def collect(days=1, end=None, log_path=None):
     techs = ledger.load_techniques()
     prefixed = [(t["slug"], t.get("prefixes") or []) for t in techs if t.get("prefixes")]
 
+    # Pass 1: shape of each address's day. A browser loading a page also loads
+    # its stylesheet and script; a scraper takes the HTML and leaves. That
+    # difference identifies automation that lies about its user agent, which a
+    # UA blocklist can never catch up with — in the 2026-07-28 audit 232 of 272
+    # addresses fetched pages and never once fetched an asset, and they were
+    # 63% of all "visits". Volume is the second tell.
+    wanted = set(dates)
+    shape = {}
+    for m in matches:
+        d = _parse_ts(m.group("ts"))
+        if d not in wanted:
+            continue
+        s = shape.setdefault((d, m.group("ip")), {"assets": 0, "pages": 0})
+        if ASSET_RE.search(m.group("path").split("?")[0]):
+            s["assets"] += 1
+        else:
+            s["pages"] += 1
+
     per_day = {d: {"visitors": {}, "pages": 0, "bots": 0} for d in dates}
     for m in matches:
         d = _parse_ts(m.group("ts"))
@@ -205,7 +239,15 @@ def collect(days=1, end=None, log_path=None):
             continue
         ua, ip = m.group("ua"), m.group("ip")
         path = m.group("path")
-        if BOT_RE.search(ua or ""):
+        # An empty user agent is not a browser. Every browser sends one.
+        if not (ua or "").strip() or ua.strip() == "-":
+            per_day[d]["bots"] += 1
+            continue
+        if BOT_RE.search(ua) or ANCIENT_UA_RE.search(ua):
+            per_day[d]["bots"] += 1
+            continue
+        s = shape.get((d, ip), {"assets": 0, "pages": 0})
+        if s["assets"] == 0 or s["pages"] > MAX_HUMAN_PAGES_PER_DAY:
             per_day[d]["bots"] += 1
             continue
         if ip in skip_ips:
