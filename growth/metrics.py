@@ -34,6 +34,7 @@ touch the booking form.
 """
 import datetime
 import gzip
+import ipaddress
 import os
 import re
 import sqlite3
@@ -102,11 +103,47 @@ MONTHS = {m: i + 1 for i, m in enumerate(
 
 def owner_ips():
     """IPs to exclude. Learned over time and stored in the ledger, seeded from
-    NEMO_OWNER_IPS so the first run is not polluted either."""
+    NEMO_OWNER_IPS so the first run is not polluted either.
+
+    Entries may be a plain address or a CIDR block. A block matters here because
+    the developer's traffic has come from a corporate proxy whose egress address
+    moves around a /16 — pinning single addresses would exclude yesterday's
+    testing and count today's.
+    """
     ips = set(ledger.get_state("owner_ips", []))
     env = os.environ.get("NEMO_OWNER_IPS", "")
     ips |= {i.strip() for i in env.split(",") if i.strip()}
     return ips
+
+
+def ip_skipper(entries=None):
+    """Build `skip(ip) -> bool` from owner_ips(), understanding CIDR blocks.
+
+    Anything unparseable is kept as an exact string match, so a typo excludes
+    nothing rather than silently excluding a whole range.
+    """
+    exact, nets = set(), []
+    for e in (owner_ips() if entries is None else entries):
+        if "/" in e:
+            try:
+                nets.append(ipaddress.ip_network(e, strict=False))
+                continue
+            except ValueError:
+                pass
+        exact.add(e)
+
+    def skip(ip):
+        if ip in exact:
+            return True
+        if not nets:
+            return False
+        try:
+            addr = ipaddress.ip_address(ip)
+        except ValueError:
+            return False
+        return any(addr in net for net in nets)
+
+    return skip
 
 
 def _parse_ts(ts):
@@ -209,7 +246,7 @@ def collect(days=1, end=None, log_path=None):
     dates = [(start + datetime.timedelta(days=i)).isoformat() for i in range(days)]
 
     matches = read_log(dates, log_path)
-    skip_ips = owner_ips()
+    skip_owner = ip_skipper()
 
     techs = ledger.load_techniques()
     prefixed = [(t["slug"], t.get("prefixes") or []) for t in techs if t.get("prefixes")]
@@ -250,7 +287,7 @@ def collect(days=1, end=None, log_path=None):
         if s["assets"] == 0 or s["pages"] > MAX_HUMAN_PAGES_PER_DAY:
             per_day[d]["bots"] += 1
             continue
-        if ip in skip_ips:
+        if skip_owner(ip):
             continue
         if m.group("method") != "GET" or ASSET_RE.search(path.split("?")[0]):
             continue
@@ -297,12 +334,55 @@ def collect(days=1, end=None, log_path=None):
     return out
 
 
+# Rows the developer created while wiring up the booking form and the phone
+# assistant. Every one of them landed in the same tables a paying customer
+# would, so "10 phone leads" read as demand when it was one person testing.
+# Three tells, checked in order of how sure they are:
+TEST_RE = re.compile(r"\btest\b|please ignore|do not book|no real customer", re.I)
+
+
+def _digits(s):
+    return re.sub(r"\D", "", s or "")
+
+
+def owner_phones():
+    """Phone numbers whose bookings and leads are ours, not customers'.
+
+    Kept in the ledger's state file (or NEMO_OWNER_PHONES), which is never
+    published to the repo or served by nginx — the number itself is personal
+    data and does not belong in a public tree.
+    """
+    raw = set(ledger.get_state("owner_phones", []))
+    raw |= {p.strip() for p in os.environ.get("NEMO_OWNER_PHONES", "").split(",") if p.strip()}
+    return {_digits(p)[-10:] for p in raw if _digits(p)}
+
+
+def is_own_row(row, phones=None):
+    """True if this booking/lead is the developer's testing, not a customer."""
+    phones = owner_phones() if phones is None else phones
+    text = " ".join(str(row.get(k) or "") for k in ("name", "notes", "service", "address"))
+    if TEST_RE.search(text):
+        return True
+    d = _digits(row.get("phone"))[-10:]
+    if not d:
+        return False
+    if d in phones:
+        return True
+    # 555 is the reserved fictional exchange — nothing real ever dials it, so a
+    # future test that forgets to say "test" in the name is still caught.
+    return len(d) == 10 and d[3:6] == "555"
+
+
 def read_leads(dates, db=None):
     """Bookings and phone-agent leads created on each date.
 
     created_at is written by the booking server in its configured TZ (Eastern),
     which is the business's day — so a booking taken at 8pm counts today, which
     is what Eric would say if you asked him.
+
+    Our own test rows are not counted. A growth engine that judges techniques on
+    lead volume must not be able to score itself by the developer submitting the
+    form again.
     """
     db = db or BOOKINGS_DB
     out = {d: {"bookings": 0, "phone_leads": 0, "total_leads": 0} for d in dates}
@@ -312,18 +392,22 @@ def read_leads(dates, db=None):
         con = sqlite3.connect(f"file:{db}?mode=ro", uri=True, timeout=10)
     except Exception:
         return out
+    phones = owner_phones()
     try:
+        con.row_factory = sqlite3.Row
         for table, key in (("bookings", "bookings"), ("leads", "phone_leads")):
             try:
                 rows = con.execute(
-                    f"select substr(created_at,1,10) d, count(*) n from {table} "
-                    f"where substr(created_at,1,10) in ({','.join('?' * len(dates))}) "
-                    f"group by d", dates).fetchall()
+                    f"select * from {table} "
+                    f"where substr(created_at,1,10) in ({','.join('?' * len(dates))})",
+                    dates).fetchall()
             except sqlite3.Error:
                 continue
-            for d, n in rows:
-                if d in out:
-                    out[d][key] = n
+            for r in rows:
+                row = dict(r)
+                d = str(row.get("created_at") or "")[:10]
+                if d in out and not is_own_row(row, phones):
+                    out[d][key] += 1
     finally:
         con.close()
     for d in out:
@@ -332,22 +416,34 @@ def read_leads(dates, db=None):
 
 
 def lead_totals(db=None):
-    """All-time counts, for the goal panel in the report."""
+    """All-time counts, for the goal panel in the report.
+
+    Our own test rows are excluded and counted separately, so a zero here reads
+    as "no customer has called yet" instead of being hidden behind a dozen rows
+    the developer created.
+    """
     db = db or BOOKINGS_DB
-    totals = {"bookings_all_time": 0, "phone_leads_all_time": 0}
+    totals = {"bookings_all_time": 0, "phone_leads_all_time": 0, "own_rows_excluded": 0}
     if not os.path.exists(db):
         return totals
     try:
         con = sqlite3.connect(f"file:{db}?mode=ro", uri=True, timeout=10)
     except Exception:
         return totals
+    phones = owner_phones()
     try:
+        con.row_factory = sqlite3.Row
         for table, key in (("bookings", "bookings_all_time"),
                            ("leads", "phone_leads_all_time")):
             try:
-                totals[key] = con.execute(f"select count(*) from {table}").fetchone()[0]
+                rows = con.execute(f"select * from {table}").fetchall()
             except sqlite3.Error:
-                pass
+                continue
+            for r in rows:
+                if is_own_row(dict(r), phones):
+                    totals["own_rows_excluded"] += 1
+                else:
+                    totals[key] += 1
     finally:
         con.close()
     return totals
