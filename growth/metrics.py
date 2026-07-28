@@ -94,7 +94,11 @@ LOG_RE = re.compile(
     r'^(?P<ip>\S+) \S+ \S+ \[(?P<ts>[^\]]+)\] '
     r'"(?P<method>\S+) (?P<path>\S+) [^"]*" '
     r'(?P<status>\d{3}) (?P<bytes>\S+) '
-    r'"(?P<ref>[^"]*)" "(?P<ua>[^"]*)"')
+    r'"(?P<ref>[^"]*)" "(?P<ua>[^"]*)"'
+    # Trailing owner-opt-out cookie, added to the log format on 2026-07-28.
+    # Optional: every line written before that date ends after the user agent,
+    # and those days must keep parsing or the history disappears.
+    r'(?: "(?P<owner>[^"]*)")?')
 
 MONTHS = {m: i + 1 for i, m in enumerate(
     ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -258,10 +262,23 @@ def collect(days=1, end=None, log_path=None):
     # addresses fetched pages and never once fetched an asset, and they were
     # 63% of all "visits". Volume is the second tell.
     wanted = set(dates)
+    # Addresses seen carrying the owner-opt-out cookie. The cookie is the
+    # reliable signal — it follows the device — but the first request of a
+    # session can arrive before it is set, and a page load fans out into asset
+    # requests that carry it. Learning the address for that day catches the
+    # stragglers, and it is scoped per day so a rotating consumer IP never
+    # excludes a stranger tomorrow.
+    owner_seen = set()
+    for m in matches:
+        if (m.group("owner") or "-").strip() not in ("", "-"):
+            owner_seen.add((_parse_ts(m.group("ts")), m.group("ip")))
+
     shape = {}
     for m in matches:
         d = _parse_ts(m.group("ts"))
         if d not in wanted:
+            continue
+        if (d, m.group("ip")) in owner_seen:
             continue
         s = shape.setdefault((d, m.group("ip")), {"assets": 0, "pages": 0})
         if ASSET_RE.search(m.group("path").split("?")[0]):
@@ -276,6 +293,11 @@ def collect(days=1, end=None, log_path=None):
             continue
         ua, ip = m.group("ua"), m.group("ip")
         path = m.group("path")
+        # Ours: this browser opted out at /?owner=1. Not counted as a visit and
+        # not counted as a bot either — it simply never happened, which is the
+        # point of the opt-out.
+        if (d, ip) in owner_seen:
+            continue
         # An empty user agent is not a browser. Every browser sends one.
         if not (ua or "").strip() or ua.strip() == "-":
             per_day[d]["bots"] += 1
