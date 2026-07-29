@@ -85,6 +85,88 @@ ANCIENT_UA_RE = re.compile(r"Chrome/([1-9]|[1-6]\d)\.|Firefox/([1-9]|[1-5]\d)\."
 # this in one day from one address is automation, whatever its UA claims.
 MAX_HUMAN_PAGES_PER_DAY = 30
 
+# One address presenting many different browsers in a single day is a scraping
+# farm rotating its user agent, not a household. A family behind one NAT shows
+# a handful of devices; the 2026-07-29 audit found single addresses claiming
+# Windows Chrome, Linux Chrome and macOS Safari within minutes of each other,
+# and they were the largest "visitors" in the set. Three is deliberately
+# generous — a phone, a laptop and a tablet on one router all still count.
+#
+# This catches what a UA blocklist cannot: the UAs themselves are perfectly
+# ordinary, and it is only their number from one source that gives it away.
+MAX_UAS_PER_IP_PER_DAY = 3
+
+# Reverse DNS of the addresses that survive every rule above. A gutter customer
+# in York County browses from Comcast, Verizon or a phone carrier; nobody reads
+# about half-round gutters from an EC2 instance. In the 2026-07-29 audit this
+# was the whole remaining set — Shodan, BinaryEdge, Shadowserver, AWS,
+# DigitalOcean, Linode and DataPacket, each fetching "/" once with an ordinary
+# Chrome UA and one asset, which is exactly the shape of a real visit.
+#
+# Matched against the PTR record, not the address, so it needs no CIDR feed to
+# stay current: providers rename ranges constantly but keep their rDNS suffix.
+HOSTING_RE = re.compile(
+    r"(amazonaws\.com|compute\.internal|googleusercontent|googlebot|"
+    r"digitalocean|linode|akamai|cloudflare|azure|msn\.com|oracle(cloud)?|"
+    r"ovh\.net|hetzner|scaleway|vultr|contabo|leaseweb|datapacket|"
+    r"binaryedge|shodan|censys|shadowserver|rwth-aachen|internet-census|"
+    r"stretchoid|alphastrike|driftnet|netsystemsresearch|securitytrails|"
+    r"bufferover|onyphe|intrinsec|recyber|palo-?alto|expanse)", re.I)
+
+# PTR lookups are network calls, and `collect()` runs behind a live dashboard
+# endpoint as well as the 6am job. Results are cached in the ledger forever
+# (an address's owner effectively never changes) and each run does a bounded
+# number of new lookups, so a slow resolver degrades accuracy rather than
+# hanging the request.
+MAX_NEW_PTR_LOOKUPS = 60
+PTR_TIMEOUT = 1.5
+
+
+def _ptr_cache():
+    return dict(ledger.get_state("ptr_cache", {}) or {})
+
+
+def hosting_skipper(resolver=None):
+    """Build `is_hosting(ip) -> bool`, memoised across runs via the ledger.
+
+    `resolver` is injectable so the tests never touch DNS. A lookup that fails
+    caches an empty string: unresolvable is not evidence of hosting, and
+    retrying it every morning would spend the whole budget on the same dead
+    addresses.
+    """
+    import socket
+    cache = _ptr_cache()
+    budget = [MAX_NEW_PTR_LOOKUPS]
+    dirty = []
+
+    def lookup(ip):
+        # Any failure resolves to "", which keeps the visitor. A resolver
+        # outage must degrade toward counting real people, never toward
+        # silently zeroing a day's traffic.
+        try:
+            if resolver is not None:
+                return resolver(ip)
+            socket.setdefaulttimeout(PTR_TIMEOUT)
+            return socket.gethostbyaddr(ip)[0]
+        except Exception:
+            return ""
+
+    def is_hosting(ip):
+        if ip not in cache:
+            if budget[0] <= 0:
+                return False
+            budget[0] -= 1
+            cache[ip] = lookup(ip) or ""
+            dirty.append(ip)
+        return bool(cache[ip]) and bool(HOSTING_RE.search(cache[ip]))
+
+    def flush():
+        if dirty:
+            ledger.set_state("ptr_cache", cache)
+
+    is_hosting.flush = flush
+    return is_hosting
+
 # Assets are requests, not visits. Counting them makes every page view look
 # like fifteen.
 ASSET_RE = re.compile(
@@ -239,7 +321,7 @@ def read_log(dates, path=None):
     return hits
 
 
-def collect(days=1, end=None, log_path=None):
+def collect(days=1, end=None, log_path=None, resolver=None):
     """Measure the last `days` complete days. Returns {date: {metric: value}}.
 
     Default is yesterday only — today is still in progress, and a partial day
@@ -251,6 +333,7 @@ def collect(days=1, end=None, log_path=None):
 
     matches = read_log(dates, log_path)
     skip_owner = ip_skipper()
+    is_hosting = hosting_skipper(resolver)
 
     techs = ledger.load_techniques()
     prefixed = [(t["slug"], t.get("prefixes") or []) for t in techs if t.get("prefixes")]
@@ -280,11 +363,18 @@ def collect(days=1, end=None, log_path=None):
             continue
         if (d, m.group("ip")) in owner_seen:
             continue
-        s = shape.setdefault((d, m.group("ip")), {"assets": 0, "pages": 0})
+        s = shape.setdefault((d, m.group("ip")),
+                             {"assets": 0, "pages": 0, "uas": set()})
         if ASSET_RE.search(m.group("path").split("?")[0]):
             s["assets"] += 1
         else:
             s["pages"] += 1
+        ua = (m.group("ua") or "").strip()
+        # Only real-looking UAs count toward the rotation tally. Bots that
+        # announce themselves are already excluded below, and letting them
+        # inflate the count here would tar an address a bot merely shares.
+        if ua and ua != "-" and not BOT_RE.search(ua):
+            s["uas"].add(ua)
 
     per_day = {d: {"visitors": {}, "pages": 0, "bots": 0} for d in dates}
     for m in matches:
@@ -305,8 +395,11 @@ def collect(days=1, end=None, log_path=None):
         if BOT_RE.search(ua) or ANCIENT_UA_RE.search(ua):
             per_day[d]["bots"] += 1
             continue
-        s = shape.get((d, ip), {"assets": 0, "pages": 0})
-        if s["assets"] == 0 or s["pages"] > MAX_HUMAN_PAGES_PER_DAY:
+        s = shape.get((d, ip), {"assets": 0, "pages": 0, "uas": set()})
+        if (s["assets"] == 0
+                or s["pages"] > MAX_HUMAN_PAGES_PER_DAY
+                or len(s["uas"]) > MAX_UAS_PER_IP_PER_DAY
+                or is_hosting(ip)):
             per_day[d]["bots"] += 1
             continue
         if skip_owner(ip):
@@ -353,6 +446,9 @@ def collect(days=1, end=None, log_path=None):
     lead_rows = read_leads(dates)
     for d in dates:
         out[d].update(lead_rows.get(d, {"bookings": 0, "phone_leads": 0, "total_leads": 0}))
+    # Persist any PTR records looked up this run so tomorrow starts warm and
+    # the lookup budget goes to addresses genuinely seen for the first time.
+    is_hosting.flush()
     return out
 
 

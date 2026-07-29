@@ -47,14 +47,17 @@ class LogParsing(unittest.TestCase):
 
 
 class OwnerExclusion(unittest.TestCase):
-    def collect(self, log_text, state=None):
+    # resolver is injected everywhere so the suite never makes a DNS call:
+    # the fixtures use TEST-NET addresses, whose lookups would hang on the
+    # resolver timeout and make a fast unit suite take seconds.
+    def collect(self, log_text, state=None, resolver=lambda ip: ""):
         fd, path = tempfile.mkstemp()
         with os.fdopen(fd, "w") as f:
             f.write(log_text)
         try:
             return metrics.collect(days=1,
                                    end=datetime.date.fromisoformat(DATE),
-                                   log_path=path)[DATE]
+                                   log_path=path, resolver=resolver)[DATE]
         finally:
             os.unlink(path)
 
@@ -75,6 +78,86 @@ class OwnerExclusion(unittest.TestCase):
 
     def test_old_format_lines_are_counted(self):
         self.assertEqual(self.collect(visit("198.51.100.10"))["visitors"], 1)
+
+
+class UaRotation(unittest.TestCase):
+    """One address, many browsers in a day — a scraping farm, not a household.
+
+    The 2026-07-29 audit found this was most of NEMO's reported traffic: single
+    addresses claiming Windows Chrome, Linux Chrome and macOS Safari at once,
+    each UA ordinary enough that no blocklist would ever catch it.
+    """
+    collect = OwnerExclusion.collect
+
+    def ua(self, n):
+        return f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/14{n}.0.0.0 Safari/537.36"
+
+    def test_rotating_uas_from_one_address_are_bots(self):
+        log = "".join(visit("203.0.113.9").replace(BROWSER, self.ua(i))
+                      for i in range(metrics.MAX_UAS_PER_IP_PER_DAY + 1))
+        m = self.collect(log)
+        self.assertEqual(m["visitors"], 0,
+                         "an address presenting more browsers than a household has is automation")
+        self.assertEqual(m["pageviews"], 0)
+
+    def test_a_household_of_devices_still_counts(self):
+        # A phone, a laptop and a tablet behind one router must survive.
+        log = "".join(visit("203.0.113.9").replace(BROWSER, self.ua(i))
+                      for i in range(metrics.MAX_UAS_PER_IP_PER_DAY))
+        self.assertEqual(self.collect(log)["visitors"], metrics.MAX_UAS_PER_IP_PER_DAY)
+
+    def test_one_person_reloading_is_untouched(self):
+        log = visit("203.0.113.9") * 4
+        self.assertEqual(self.collect(log)["visitors"], 1)
+
+    def test_declared_bots_do_not_taint_a_shared_address(self):
+        # A crawler and a person can share an office/NAT address. The crawler is
+        # excluded on its own merits; it must not push the human over the limit.
+        crawler = "Mozilla/5.0 (compatible; SemrushBot/7~bl; +http://www.semrush.com/bot.html)"
+        log = visit("203.0.113.9")
+        for i in range(5):
+            log += visit("203.0.113.9").replace(BROWSER, crawler + str(i))
+        self.assertEqual(self.collect(log)["visitors"], 1,
+                         "self-declared bots must not count toward UA rotation")
+
+
+class HostingExclusion(unittest.TestCase):
+    """Datacenter traffic wearing an ordinary browser's user agent.
+
+    This was the bulk of NEMO's reported traffic in the 2026-07-29 audit: one
+    "/" fetch plus one asset, a current Chrome UA, one address — the exact
+    shape of a real visit. Only the PTR record gives it away.
+    """
+    collect = OwnerExclusion.collect
+
+    def test_ec2_visitor_is_not_a_customer(self):
+        log = visit("203.0.113.20")
+        m = self.collect(log, resolver=lambda ip: "ec2-3-81-75-163.compute-1.amazonaws.com")
+        self.assertEqual(m["visitors"], 0)
+
+    def test_scanner_ptr_is_excluded(self):
+        log = visit("203.0.113.21")
+        m = self.collect(log, resolver=lambda ip: "prod-boron-us-central-25.li.binaryedge.ninja")
+        self.assertEqual(m["visitors"], 0)
+
+    def test_residential_isp_is_kept(self):
+        # The customer this site exists for. Comcast/Verizon PTRs must survive.
+        log = visit("203.0.113.22")
+        m = self.collect(log, resolver=lambda ip: "c-73-45-12-9.hsd1.pa.comcast.net")
+        self.assertEqual(m["visitors"], 1)
+
+    def test_unresolvable_address_is_kept(self):
+        # Plenty of real mobile carriers have no PTR. Absence of evidence must
+        # not exclude a visitor, or a resolver outage would zero the numbers.
+        self.assertEqual(self.collect(visit("203.0.113.23"),
+                                      resolver=lambda ip: "")["visitors"], 1)
+
+    def test_resolver_failure_does_not_drop_traffic(self):
+        # A broken resolver must fail toward counting people, not toward a
+        # day that silently reads as zero traffic.
+        def boom(ip):
+            raise RuntimeError("DNS down")
+        self.assertEqual(self.collect(visit("203.0.113.24"), resolver=boom)["visitors"], 1)
 
 
 class IpSkipper(unittest.TestCase):
