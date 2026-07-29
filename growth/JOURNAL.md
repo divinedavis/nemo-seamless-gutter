@@ -515,3 +515,26 @@ bot/crawl/spider/slurp substring). I did not touch `techniques.json`,
 `keywords.json`, `results.jsonl`, or `state.json` — all droplet-owned. I did
 not activate T007, T014, or any other candidate; those are Eric's calls,
 surfaced above as recommendations.
+
+## 2026-07-29 — engine run
+
+Goal: **2.3%** top-3 share of 87 tracked queries (target 50%).
+Yesterday: 0 visitors (0 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: adopted 2 real search(es) into the tracked universe: gutter installers york, gutter installation york
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: answer-first opening on /services/gutter-guards.html for 'gutter guards in akron pa' (51 words, + FAQ schema, 6 impressions)
+- `strengthen_pages` — ok: added "Hiring a Gutter Contractor in Spring Grove, PA: What to Expe" to /areas/seamless-gutters-spring-grove-pa.html for 'gutter contractor spring grove pa'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: published Mount Wolf (13,364 bytes; 3 town(s) left in the queue)
+- `money_pages` — ok: published 'gutter services near me' → /guides/gutter-services-near-me.html
+- `internal_links` — ok: refreshed nearby-links on 6 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 29 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 10 URL(s), HTTP 200
+
+**Scout proposed (as candidates, not running):**
+- T021 Home inspector + realtor referral loop — Every home inspection report in York County flags gutter defects — pitch, seams, missing downspout extensions, rotted fascia — and the buyer or seller has a 10-to-30-day window to fix it before settle
+- T022 Itemised GBP Services + weekly job photo — The profile gets ~300 views a month and produces zero calls, which means it is being seen and skipped. Two fixable causes: the Services section is probably thin or generic, so Google has nothing to ma
+- T023 Call-first mechanics on every page — The site is built around a booking widget, but homeowners with a gutter overflowing down a wall do not book a slot — they call, and if the number is not thumb-reachable on a phone they call whoever's 
