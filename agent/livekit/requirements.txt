@@ -1,0 +1,5 @@
+# NEMO phone assistant — LiveKit worker.
+# Python 3.12 on the droplet (104.236.120.144). Install into a venv, never system-wide:
+#   python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+livekit-agents[deepgram,anthropic,speechify,silero]~=1.5
+python-dotenv~=1.0
