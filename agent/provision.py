@@ -228,6 +228,13 @@ def build_config(tool_ids: list | None = None) -> dict:
                     # Low temperature: this agent quotes a small business's facts
                     # back to real customers. Creativity is a defect here.
                     "temperature": 0.15,
+                    # Set 2026-07-29. Was unset, which the dashboard flags with a
+                    # warning: the prompt hands the model {{system__time_utc}} and
+                    # asks it to reason about Eastern time itself. Low stakes while
+                    # the assistant refuses to schedule anything, but inventing
+                    # times is exactly the failure this agent has had before, so
+                    # don't leave it guessing the offset.
+                    "timezone": "America/New_York",
                 },
                 "first_message": FIRST_MESSAGE,
                 "language": "en",
