@@ -225,6 +225,13 @@ def build_config(tool_ids: list | None = None) -> dict:
                             "params": {"system_tool_type": "end_call"},
                         }
                     },
+                    # Upgraded 2026-07-29 from gemini-2.5-flash. Stays in the Flash
+                    # family deliberately: the Anthropic and Gemini Pro options on
+                    # this platform run 1.25-3.54s to first token, which is dead air
+                    # on a phone call. Claude Opus 4.8 is also $0.396/min against
+                    # Haiku 4.5's $0.072 — a lot to pay for slot-filling a phone
+                    # number. Note claude-opus-5 is not offered here at all.
+                    "llm": "gemini-3.5-flash",
                     # Low temperature: this agent quotes a small business's facts
                     # back to real customers. Creativity is a defect here.
                     "temperature": 0.15,
