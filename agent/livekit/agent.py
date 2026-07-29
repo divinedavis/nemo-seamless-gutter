@@ -21,7 +21,7 @@ import urllib.request
 from pathlib import Path
 
 from livekit.agents import Agent, AgentSession, JobContext, WorkerOptions, cli, function_tool
-from livekit.plugins import anthropic, deepgram, silero, speechify
+from livekit.plugins import anthropic, elevenlabs, silero, speechify
 
 log = logging.getLogger("nemo-agent")
 
@@ -120,7 +120,11 @@ async def entrypoint(ctx: JobContext) -> None:
     await ctx.connect()
 
     session = AgentSession(
-        stt=deepgram.STT(model="nova-3", language="en-US"),
+        # ElevenLabs Scribe, not Deepgram: the ELEVENLABS_API_KEY already exists
+        # (keychain nemo-elevenlabs) and already has a bill, so listening costs no
+        # new vendor and no new credential. scribe_v2_realtime is the streaming
+        # model — scribe_v1/v2 are batch and would add a turn of latency.
+        stt=elevenlabs.STT(model="scribe_v2_realtime", language_code="en"),
         # Haiku 4.5, not Opus 5: this is slot-filling plus one tool call, and it
         # has to answer inside a second. Opus 5 thinks by default (latency + cost),
         # and with thinking disabled it can emit tool calls as plain text — the

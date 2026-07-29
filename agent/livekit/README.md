@@ -12,7 +12,7 @@ because English agents reject flash_v2_5. LiveKit is the only path to that voice
 
 | Layer | Choice | Why |
 |---|---|---|
-| STT | Deepgram `nova-3` | ~$0.0048/min |
+| STT | ElevenLabs `scribe_v2_realtime` | reuses the existing key — no new vendor |
 | LLM | **Claude Haiku 4.5** | see below |
 | TTS | Speechify `simba-3.2` / `beatrice_32` | voice chosen 2026-07-29 |
 | Transport | self-hosted LiveKit + SIP ← Twilio | no LiveKit Cloud account needed |
@@ -43,7 +43,6 @@ name field teaches the model to invent one.
 
 ## Still to do
 
-1. **Deepgram API key** → keychain `nemo-deepgram`, then `DEEPGRAM_API_KEY` in the env.
 2. `apt install redis-server` on the droplet — `livekit-sip` requires it. Not currently
    installed.
 3. Install + configure `livekit-server` and `livekit-sip`; generate your own API
@@ -68,7 +67,7 @@ swapfile is the cheapest mitigation and is not yet in place.
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 export AGENT_TOKEN=...          # mirrors server/.env on the droplet
 export SPEECHIFY_API_KEY=...    # keychain: nemo-speechify
-export DEEPGRAM_API_KEY=...     # keychain: nemo-deepgram (not yet created)
+export ELEVENLABS_API_KEY=...   # keychain: nemo-elevenlabs (already exists)
 export ANTHROPIC_API_KEY=...
 .venv/bin/python agent.py dev
 ```
