@@ -268,8 +268,16 @@ def build_config(tool_ids: list | None = None) -> dict:
                 "model_id": "eleven_turbo_v2",
                 # Higher stability keeps delivery even and calm. At 0.5 the voice
                 # swings into an excited, sometimes near-shouting read on upbeat
-                # lines; 0.75 flattens those swings without going robotic.
-                "stability": 0.75,
+                # lines; 0.75 flattened those swings without going robotic.
+                #
+                # Raised to 0.9 on 2026-07-29: 0.75 was tuned against flash v2, and
+                # turbo v2 is the more expressive model, so the same value
+                # under-damps it. Eric heard it shout "move downspout". Note the
+                # prompt already bans exclamation marks outright, so this is the
+                # engine being livelier, not punctuation leaking through. If 0.9
+                # reads flat, the clean fallback is model_id back to
+                # eleven_flash_v2 with stability 0.75 — a known-calm pairing.
+                "stability": 0.9,
                 "similarity_boost": 0.8,
                 "speed": 1.0,
             },

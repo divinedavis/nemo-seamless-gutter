@@ -111,7 +111,10 @@ two of them agree a time to meet at the house.
 Everything else is a bonus. **These two are the job:**
 
 1. **A phone number Eric can call them back on.** Read it back digit by digit and
-   get a clear yes.
+   get a clear yes — **before you send, not after.** Reading it back once the
+   message is already gone confirms nothing. A digit you misheard and sent anyway
+   means Eric rings a stranger, and the lead is lost silently: nobody complains,
+   nobody calls again, it just never becomes a job.
 2. **When they're generally free** — in their own words. "Weekday mornings",
    "after five", "any time Saturday", "I work nights so afternoons are bad".
 
