@@ -538,3 +538,369 @@ Yesterday: 0 visitors (0 organic, 0 maps) · 0 bookings, 0 phone leads.
 - T021 Home inspector + realtor referral loop — Every home inspection report in York County flags gutter defects — pitch, seams, missing downspout extensions, rotted fascia — and the buyer or seller has a 10-to-30-day window to fix it before settle
 - T022 Itemised GBP Services + weekly job photo — The profile gets ~300 views a month and produces zero calls, which means it is being seen and skipped. Two fixable causes: the Services section is probably thin or generic, so Google has nothing to ma
 - T023 Call-first mechanics on every page — The site is built around a booking widget, but homeowners with a gutter overflowing down a wall do not book a slot — they call, and if the number is not thumb-reachable on a phone they call whoever's 
+
+## 2026-07-29 — review agent
+
+### Two corrections to the standing premises, before anything else
+
+**The engine is not blocked.** This task's prompt says to expect the scout to
+fail on an Anthropic usage cap until 2026-08-01. It did not. Today's `build`
+ran all eleven techniques green and `scout` returned `ok: true` with three new
+candidates (T021–T023). Whatever that cap was, it is not biting now. The
+prompt is out of date on this point and should be corrected; there is no
+billing blocker to lead with today.
+
+**This business has never had a lead through the site — not two bookings and
+ten calls, zero of each.** Every prior entry in this journal reasoned from
+"all-time totals show 2 bookings and 10 phone leads," and the 07-27 entry
+leaned on it explicitly ("all-time leads prove someone finds this business
+somehow"). That premise is dead. Today's snapshot reads
+`bookings_all_time: 0`, `phone_leads_all_time: 0`, `own_rows_excluded: 12`.
+Twelve is exactly two plus ten. Divine's 2026-07-28 commit `ede51dc` ("Stop
+counting our own testing as traffic and leads") reclassified every one of
+those rows as Eric's own testing. The honest starting line is a site that has
+produced no measured booking and no measured phone lead, ever. Nothing below
+should be read as if there were a baseline to improve on.
+
+### Where the numbers stand
+
+The goal metric — tracked York County queries holding a top-3 position:
+
+| | 2026-07-28 | 2026-07-29 |
+| --- | --- | --- |
+| top-3 count | **2** | **2** |
+| tracked queries | 76 | 87 |
+| share | 2.6% | **2.3%** |
+| top-10 count | 7 | 6 |
+| coverage proxy | 48.7% | 44.8% |
+
+**The share went down because the denominator went up, not because anything
+got worse.** The top-3 count is unchanged at 2. The tracked universe grew by
+11 in one day (`adopt_queries` took 2, the scout added 9). County bucket is 2
+of 56, up from 2 of 50 — same two wins, six more queries to win. Every town
+bucket (york, hanover, dover, red-lion, dallastown, spring-grove) is still
+**0 top-3**. Both of the site's top-3 positions are in the county bucket.
+
+Search Console, 28-day rolling window: 87 rows / 19 matched / **3 clicks** /
+497 impressions / avg position 13.9, against 77 / 17 / 3 / 429 / 12.4
+yesterday. Clicks flat at three. Impressions up 68. Average position 1.5
+worse — over a window with 497 impressions that is noise, not a decline, and
+part of it is arithmetic: newly-surfacing low-ranked queries drag an average
+down without anything falling.
+
+Traffic, and this is the number that changed most:
+
+| date | visitors, as reported 07-28 | visitors, as reported today |
+| --- | --- | --- |
+| 2026-07-27 | 77 | **9** |
+| 2026-07-28 | — | 11 |
+
+Pageviews for 07-27 went 128 → 26, direct 57 → 6, and bot hits 193 → **1,948**.
+The series was recomputed retroactively by Divine's four filtering commits of
+2026-07-28. Roughly 88% of what this journal recorded as the site's first
+traffic was crawlers and scanners.
+
+Leads: 0 bookings, 0 phone leads, both days, both all-time (see above).
+
+Ignore the 2026-07-29 row in `traffic.*`. It shows 0 visitors and 16 bot hits
+against ~1,950 on a complete day — it is a few hours of log, not a day. See
+the reporting bug below.
+
+### Did previous changes work?
+
+**"Watch tomorrow's snapshot for the effect of the BOT_RE fix" (07-28, rec #6)
+— worked, and decisively.** I predicted that if `direct_visitors` and same-day
+`owned_visitors` dropped, the 07-27 spike was crawler traffic slipping the
+filter. Direct went 57 → 6. `owned_visitors` for 07-27 went T001 8 → 2,
+T002 4 → 2, T018 5 → 3. That is the confirmation, and it is unambiguous.
+One caveat on credit: my `BOT_RE` addition was not the whole fix. Divine
+landed three more filters the same day (own-device opt-out, datacenter/hosting
+PTR lookup, and an asset-fetch heuristic that catches automation lying about
+its user agent — `metrics.py` documents 232 of 272 addresses fetching pages and
+never once fetching a stylesheet). I cannot separate the contributions and am
+not going to claim the whole correction. The finding stands regardless: **the
+site's real human traffic is roughly 9–11 visitors a day, not 77.**
+
+**"Check whether the Anthropic usage cap is deliberate" (07-28, rec #1) —
+resolved.** Scout ran. Three candidates filed. No further action needed.
+
+**"Say yes to T007, the review-request engine" (asked 07-27, 07-28) — not
+acted on.** Still `candidate`, `activated: null`. Third day of asking.
+
+**"Eric responds to existing Google reviews / complete the GBP profile / seed
+GBP Q&A" (asked 07-27, repeated 07-28) — still unverifiable, and I am going to
+stop repeating them as three separate recommendations.** Nothing in this repo
+can see the live Business Profile. Repeating an unverifiable ask a third time
+adds no information. Collapsed into a single recommendation below: get a
+straight answer. Worth noting the engine reached the same conclusion
+independently — today's scout notes say "4.2 stars with 13 reviews is the quiet
+drag on everything here," which is the scout arguing for promoting T007 above
+its own three new proposals.
+
+**"Connect the GA4 Data API" (07-28, rec #5) — not acted on, and it matters
+more today than it did yesterday.** With all-time leads now correctly reading
+zero, the only conversion this repo can see is a booking-widget submission.
+`tel:` taps fire as GA4 `contact_call` events that nothing here can read. If
+Eric's phone rang tomorrow because of this site, no number in this snapshot
+would move.
+
+**T014 (answer-first / GEO pass) — activated by Divine in `dd44c66`, ran for
+the first time today, and it pointed at the wrong market.** See below. Too
+early for any outcome; the implementation had a defect that I have fixed.
+
+**T001 / T002 / T017 / T018 — still inside `review.py`'s 30-day grace period**
+(`GRACE_DAYS = 30`, activated 2026-07-27, so ~2026-08-26). Post-filter
+`owned_visitors` are T001 2/0/0, T002 2/0/0, T018 3/0/0 across 07-27/28/29.
+Too early to tell, and now with a lower baseline than the pre-filter numbers
+the 07-28 entry recorded. Nothing to conclude for another four weeks.
+
+**`improve_ctr` reporting "no page is due a snippet rewrite" is not a failure.**
+`CTR_COOLDOWN_DAYS = 21` in `techniques.py:851`, and the homepage was rewritten
+on 07-27, so it is on cooldown until roughly 08-17. Working as designed.
+
+### What I checked in the code before recommending anything
+
+**The answer-first pass wrote the wrong county onto a live service page.**
+Today's build log reads: *"answer-first opening on /services/gutter-guards.html
+for 'gutter guards in akron pa'."* Akron, PA is in Lancaster County, about 35
+miles outside the service area. The paragraph it wrote and published is now
+the first thing on that page (`services/gutter-guards.html:163`):
+
+> "NEMO Seamless Gutter installs gutter guards on homes in **Akron, PA and the
+> surrounding Lancaster and York County area.**"
+
+Cause, in `techniques.py`: `geo_answer_first_content_pass` took
+`headline = queries[0]["query"]` straight from `gsc.queries_for_page()` with no
+service-area test — while `adopt_queries`, twenty lines above it in the same
+file, has had `SERVICE_AREA_WORDS` / `OUT_OF_AREA` filtering since it was
+written, with a comment explaining exactly why. The filter existed; this
+function did not use it. Three things make it worth fixing today rather than
+noting: the block is written **once per page** and marked done in
+`geo_answered` state, so it is permanent unless someone intervenes; it is
+placed at the very top as the passage an AI answer engine is meant to lift, so
+the wrong claim is the one that gets quoted; and it states a service area that
+is not true, which is the NAP-consistency problem local-SEO guidance treats as
+a confidence-reducing signal. The technique runs one page a day and there are
+~27 pages left, so left alone it would have kept doing this.
+
+**T023 (`call_first_page_mechanics`) is largely already shipped.** Its first
+step is "add a persistent tap-to-call bar … so it appears on the homepage, all
+four service pages, all five town pages and all three guides." `templates.py:160`
+already renders `<a href="tel:+17175780073" class="float-call">`, and I checked
+the generated output rather than trusting the template: **28 of 28** pages under
+`areas/`, `guides/`, `services/` and `index.html` contain it. The scout proposed
+something already live — the same trap the FAQPage recommendation fell into on
+day one. Its remaining unshipped parts (the "Eric usually calls back same day"
+line, the three-field mobile form) are real but much smaller than the
+candidate's framing suggests, and its own expected-effect numbers should be
+discounted accordingly.
+
+**The "Yesterday" figure in the report is reading a partial day.** Today's
+engine journal entry says "Yesterday: 0 visitors" — but the ledger recorded 11
+for 07-28. `snapshot.py` and `report.py` both took `series(...)[-1]`, the newest
+row, and there is a row dated today (16 bot hits, 0 visitors). So Eric's
+morning email announced zero traffic on a day the site had eleven visitors.
+`metrics.collect()` is careful to measure only complete days, so something
+outside this repo is writing a same-day row; the cause needs a droplet check
+(`results.jsonl` rows dated 2026-07-29 carry a `written` timestamp that will
+identify the process). The mislabelling is fixable here regardless of cause,
+and I fixed it.
+
+### What I researched today
+
+Deliberately avoided re-covering LSAs, Nextdoor, speed-to-lead, door-hangers
+and GBP categories — those are T011–T016 and re-searching them would just
+relabel existing candidates as new.
+
+- **A service-area business cannot rank across a whole county from the map
+  pack, and no setting changes that.** Proximity for an SAB is measured from
+  the hidden verified address, not from the service areas listed on the
+  profile; expanding the service-area setting does not expand the radius.
+  Practical reach is roughly 10–15 miles, with service-area *pages* covering
+  what falls outside it.
+  ([SangFroid](https://www.sangfroidwebdesign.com/search-engine-optimization-seo/local-seo-explained/),
+  [Local Dominator](https://localdominator.co/local-search-ranking-factors/),
+  [RankAI](https://rankai.ai/articles/service-area-business-google-business-profile-guide))
+  This is the most strategically useful thing I found today. York County runs
+  ~35 miles north to south. From a York-area base, Hanover (~18mi), Dillsburg
+  (~15mi) and Stewartstown/New Freedom (~15–20mi) sit at or past the edge.
+  **The >50% county goal is not reachable through the Business Profile — the
+  town pages are the only lever that scales geographically.** That is a direct
+  argument for keeping T001 running, and against expecting GBP work to move the
+  goal metric outside greater York.
+- **Local landing pages: 15–30 towns, published in small batches, each
+  genuinely distinct.** Duplicate copy with the town name swapped is named as
+  the fastest route to a thin-content classification, and large sudden page
+  sets are flagged as a doorway risk.
+  ([Arc4](https://arc4.com/resources/local-seo-landing-pages/),
+  [Bipper Media](https://bippermedia.com/seo/service-area-pages-seo/))
+  `techniques.py` already caps at one new page per run and there are 12 area
+  pages with 3 towns queued, so the engine is inside this guidance. Recording
+  it as a boundary: **the town-page queue should stop in the 15–30 range**, not
+  run to York County's 70+ municipalities as T001's hypothesis text implies.
+- **Inconsistent NAP and vague service descriptions are named as the leading
+  cause of AI answer engines declining to cite a local contractor.**
+  ([Construction Marketing Association](https://blog.constructionmarketingassociation.org/answer-engine-optimization-for-construction-companies-in-2026-why-ai-visibility-now-matters-in-local-project-discovery/),
+  [Finding Permits](https://findingpermits.com/blog/contractor-geo-ai-search-optimization-2026))
+  This is what makes the Akron paragraph a live problem rather than a tidiness
+  issue — it is a service-area inconsistency sitting in the highest-value
+  passage on the page.
+- **Apple Business Connect — rebranded to "Apple Business" in April 2026 — is
+  free and is not in this ledger at all.** It controls how a business appears
+  in Apple Maps, Siri, Spotlight, CarPlay and Apple Intelligence answers.
+  ([PinMeTo](https://www.pinmeto.com/blog/apple-business-connect-listings-2026/),
+  [NiceJob](https://get.nicejob.com/resources/apple-business-connect),
+  [Local Falcon](https://www.localfalcon.com/blog/how-to-claim-and-optimize-your-apple-maps-listing))
+  Checked against T001–T023: nothing covers Apple Maps or any non-Google map
+  surface. A genuine gap, free, roughly half an hour.
+
+**Rejected:** permit-record seeding as third-party AI evidence — interesting,
+but it is a byproduct of doing jobs, not an action Eric can take. Anything
+about buying citation-building packages — the T009 candidate already covers
+manual NAP submission and paid bulk citation services are largely the same
+directories at a markup.
+
+### Recommendations
+
+Ranked. Every on-site item needs a deploy to the droplet before it does
+anything — `/var/www/nemo-seamless-gutter` is not a git checkout and nothing
+committed here reaches the live site on its own.
+
+1. **Fix the Akron paragraph on the live gutter-guards page.** *(Divine —
+   minutes; needs droplet access.)* Rewrite `services/gutter-guards.html`'s
+   `<p class="lead">` under the `<!-- geo:answer-first -->` marker so it names
+   York County and no other, and drop `"services/gutter-guards.html"` from the
+   `geo_answered` list in `state.json` so the corrected pass can rewrite it
+   properly on the next run. **Do not fix it in this repo** — `publish_state.sh`
+   rsyncs `areas/`, `guides/` and `services/` droplet → repo every morning, so
+   any page edit committed here is overwritten tomorrow. How you would know it
+   worked: the page's opening paragraph names York County; nothing else on the
+   site claims Lancaster County. Checked: `growth/techniques.py`
+   `geo_answer_first_content_pass`, and the live text at
+   `services/gutter-guards.html:163`.
+2. **Deploy the code fixes below to the droplet before the next 06:00 run.**
+   *(Divine — a `growth/` sync.)* The filter fix stops this recurring on the
+   ~27 pages the pass has not reached yet; the reporting fix stops Eric's email
+   understating traffic. Neither is live until synced.
+3. **Change how the goal number is calculated, or stop calling it progress.**
+   *(Divine / Eric — a decision, then a small change to `snapshot.py`'s goal
+   block.)* `share_pct = top3 / tracked_queries`, and the engine adds to
+   `tracked_queries` every single day — 76 → 87 in one day, and both
+   `adopt_queries` and the scout keep feeding it. The top-3 count did not move
+   and the reported share still fell 2.6% → 2.3%. **As built, this number
+   trends toward zero no matter how well the business does**, and Eric will
+   watch his headline metric decline while things improve. Suggested fix:
+   report the top-3 *count* as the headline with the denominator alongside
+   ("2 of 87, was 2 of 76"), or freeze a fixed baseline set of queries for the
+   percentage and track adopted ones separately. I am not making this change
+   myself — it redefines the owner's stated goal, which is his call.
+   Checked: `growth/snapshot.py` goal block, `growth/keywords.py`.
+4. **Get a straight yes/no from Eric on four Business Profile questions, once.**
+   *(Eric — one conversation.)* (a) Have you replied to the 13 existing Google
+   reviews? (b) Is the Services section itemised or generic? (c) Is the Q&A
+   section populated? (d) May the engine email finished jobs a review request
+   — the T007 go-ahead, now asked three days running? These have been carried
+   as unverifiable recommendations across three entries; four answers close all
+   of them, including T007, T016 and T022. If the answers are "yes, already
+   done," say so and they get dropped rather than repeated a fourth time.
+   Checked: nothing in `snapshot.json` carries live GBP state; T007
+   `activated: null`.
+5. **Claim the Apple Business (formerly Apple Business Connect) listing.**
+   *(Eric — free, ~30 minutes, one-time.)* Same NAP as the Google profile,
+   real photos, correct service area. Expected effect: appearing in Apple Maps,
+   Siri and Spotlight for iPhone users searching gutters in York County — a
+   surface NEMO is currently absent from entirely. How you would know: search
+   "gutter installer" in Apple Maps on an iPhone in York and see whether NEMO
+   appears at all; there is no rank data for it, so this is a presence check,
+   not a measurement. Checked: grepped all 23 ledger techniques — nothing
+   mentions Apple, Bing Places, or any non-Google map surface. Modest
+   expectations: this is closing a hole, not a growth lever.
+6. **Connect the GA4 Data API with a service account.** *(Divine — one-time,
+   free, and `gsc.py` is the working pattern to copy.)* Restated from 07-28
+   and sharpened by today's zero-leads finding: the site's primary conversion
+   is a phone call, and this repo cannot see one. Until it can, every
+   conversion recommendation in this journal is unfalsifiable. Checked: no
+   server-side GA4 read exists anywhere in the repo; `analytics.js` is
+   client-side only.
+7. **Cap the town-page queue at ~30 and let T001 stop there.** *(Divine — a
+   note on the technique, or a queue length check.)* T001's hypothesis text
+   aims at "York County has 70+ municipalities." Today's research says 15–30
+   substantive pages, not one per municipality; past that the marginal town is
+   thin-content risk with almost no search volume behind it. There are 12 area
+   pages and 3 towns queued, so this is not urgent — record it before it is.
+   Checked: `growth/techniques.py` `area_pages`, `growth/keywords.py` town list.
+
+### What I changed in this repo today
+
+Four files, all engine code, none of it live until deployed:
+
+- **`growth/techniques.py`** — added `_names_other_market()` and applied it in
+  `geo_answer_first_content_pass`, to both the headline choice and the query
+  list shown to the model. It rejects a query naming a state or county that is
+  not ours, and is deliberately weaker than the `adopt_queries` test: that one
+  needs a positive in-area signal because it sets the goal's denominator, this
+  one only needs to reject somewhere else, so geo-neutral searches like
+  "gutter installer" (106 impressions, the site's largest single source) still
+  qualify as headlines. Also removed the bare `"county"` from
+  `SERVICE_AREA_WORDS` — it is what let "schuylkill county seamless gutter"
+  into the tracked universe — and added the five out-of-area towns visible in
+  today's `discovered_untracked`. Tested against all 23 real queries in today's
+  snapshot: every out-of-area one rejected, every in-area and geo-neutral one
+  kept.
+- **`growth/ledger.py`** — new `complete_series()`, which is `series()` minus a
+  row dated today, falling back to the raw series if that would empty it.
+- **`growth/snapshot.py`, `growth/report.py`, `growth/email_report.py`** — the
+  "yesterday" figures and 14-day medians now read `complete_series`, and the
+  journal header prints the date it is actually reporting instead of the word
+  "Yesterday".
+- **`growth/review.py`** — `_owned()` and `_global()` also read
+  `complete_series`. This one is a safety fix rather than a display fix:
+  `review.py` retires techniques autonomously on median comparisons, and a
+  partial day dragging a median down is how a working technique gets killed on
+  the strength of one morning.
+
+`growth/test_metrics.py` still passes (22 tests). I did not touch
+`techniques.json`, `keywords.json`, `results.jsonl` or `state.json`, did not
+activate any candidate, and did not edit any page under `areas/`, `guides/` or
+`services/` — those are rsynced from the droplet daily and an edit here would
+be silently reverted tomorrow.
+
+### Reasoning and uncertainties
+
+The Akron finding is the thing I am most confident about and the thing I would
+most want Eric to see: it is visible in the build log, in the live page text,
+and in the code path that produced it, with no inference in between.
+
+The claim I am least sure of is the shape of the fix, not the need for it. My
+filter rejects a query that names Pennsylvania without naming one of our towns
+— so "ice dams gutters pennsylvania," a legitimately tracked statewide query,
+would be skipped as a headline. That is conservative in the safe direction
+(the pass falls through to the next query, then to the page's own `<h1>`), but
+it is a real edge and someone reading this later should know it was a choice
+rather than an oversight.
+
+I cannot explain where the same-day ledger row comes from. `metrics.collect()`
+measures only complete days and `growth_daily.py` is its only caller in this
+repo, so something outside it is writing that row — a dashboard is referenced
+in a `metrics.py` comment but does not live here. My fix makes the reporting
+correct regardless of the cause, which is why I made it without waiting for the
+answer, but the cause is still open and worth five minutes on the droplet.
+
+The zero-leads correction changes my read of this whole project more than
+anything else today. Two prior entries reasoned from ten all-time phone leads
+as evidence that customers find this business somehow. They do not, through
+this site. That does not mean Eric has no work — it means **the site has never
+been the channel**, and the ledger's offline candidates (T021 inspector
+referrals, T015 neighbour flyers, T012 Nextdoor) deserve more weight relative
+to the SEO work than the volume of on-site technique activity implies. I am
+not recommending they be activated over Eric's head; I am saying the ranking
+above would look different if this journal had known the real lead count a
+week ago.
+
+What would change my mind: if the 3 clicks in Search Console become 15–20 over
+the next fortnight while the top-3 count stays at 2, the town pages are earning
+attention below the top three and the strategy is working slower than the goal
+metric can show. If clicks stay at 3 through mid-August with 12 area pages
+live, the pages are not competitive and the effort should shift to the offline
+candidates. Either way that is a two-week question, and nothing in today's
+numbers can answer it.

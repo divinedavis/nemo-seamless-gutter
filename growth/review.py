@@ -45,12 +45,17 @@ def _days_active(t):
         return 0
 
 
+# complete_series, not series: a technique is judged on finished days only. A
+# row dated today is a few hours of log, and this is the code that retires
+# things autonomously — a partial day dragging a median down is how a working
+# technique gets killed on the strength of one morning.
 def _owned(t):
-    return ledger.series(t["slug"], "owned_visitors", since=t.get("activated"))
+    return ledger.complete_series(t["slug"], "owned_visitors",
+                                  since=t.get("activated"))
 
 
 def _global(metric, since=None):
-    return ledger.series("__site__", metric, since=since)
+    return ledger.complete_series("__site__", metric, since=since)
 
 
 def _trend(pairs, window=WINDOW):

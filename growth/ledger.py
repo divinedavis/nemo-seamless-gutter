@@ -197,6 +197,24 @@ def series(technique, metric, since=None):
     return [(r["date"], r["value"]) for r in read_results(technique, metric, since)]
 
 
+def complete_series(technique, metric, since=None):
+    """`series` without a row dated today — the day in progress is not a day.
+
+    `metrics.collect()` is careful to measure only finished days, but a row
+    dated today reaches the ledger by other routes, and anything that reports
+    "yesterday" or takes a median has to leave it out. On 2026-07-29 it did
+    not: a today-row holding 16 bot hits and 0 visitors (against ~1,950 bot
+    hits on a full day) was the newest row, so the engine's own journal entry
+    and Eric's morning email both announced 0 visitors yesterday on a day the
+    ledger had recorded 11.
+
+    Falls back to the raw series when every row is today's, so a first run on a
+    fresh install still reports something rather than a dash.
+    """
+    s = series(technique, metric, since)
+    return [p for p in s if p[0] < today()] or s
+
+
 # -------------------------------------------------------------------- state
 
 def load_state():

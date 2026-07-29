@@ -32,12 +32,12 @@ def _fmt(v):
 
 
 def _last(metric):
-    s = ledger.series("__site__", metric)
+    s = ledger.complete_series("__site__", metric)
     return s[-1][1] if s else None
 
 
 def _series_summary(metric, days=14):
-    pairs = ledger.series("__site__", metric)[-days:]
+    pairs = ledger.complete_series("__site__", metric)[-days:]
     if not pairs:
         return "no data yet"
     vals = [v for _, v in pairs]

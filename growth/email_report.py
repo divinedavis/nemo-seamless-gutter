@@ -52,13 +52,13 @@ def _e(s):
 
 
 def _last(metric):
-    s = ledger.series("__site__", metric)
+    s = ledger.complete_series("__site__", metric)
     return s[-1][1] if s else None
 
 
 def _trend(metric, days=14):
     """(latest, median_recent, direction) for a metric."""
-    pairs = ledger.series("__site__", metric)[-days:]
+    pairs = ledger.complete_series("__site__", metric)[-days:]
     if not pairs:
         return None, None, ""
     vals = [v for _, v in pairs]

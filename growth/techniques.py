@@ -969,12 +969,39 @@ SERVICE_AREA_WORDS = ("york", "hanover", "dover", "red lion", "dallastown",
                       "spring grove", "dillsburg", "shrewsbury", "stewartstown",
                       "new freedom", "glen rock", "manchester", "mount wolf",
                       "wrightsville", "hallam", "jacobus", "seven valleys",
-                      "emigsville", "windsor", "yoe", "county")
+                      "emigsville", "windsor", "yoe")
 TRADE_WORDS = ("gutter", "downspout", "soffit", "fascia", "leaf guard",
                "leafguard", "eavestrough")
 # Places that are emphatically not York County, seen in the real data.
 OUT_OF_AREA = ("perkasie", "yorkville", "york sc", "york ne", "york me",
-               "new york", "yorktown", "york uk", "york maine")
+               "new york", "yorktown", "york uk", "york maine",
+               "akron", "essington", "crum lynne", "myerstown", "newmanstown")
+
+
+def _names_other_market(query):
+    """True if a search explicitly names somewhere this business does not serve.
+
+    Deliberately weaker than the test `adopt_queries` applies. That one needs a
+    positive in-area signal because it decides the goal's denominator; this one
+    only needs to reject searches that name somewhere else, so a geo-neutral
+    search like "gutter installer" — the site's single largest source of
+    impressions — still counts as usable.
+
+    Rather than maintain a list of every Pennsylvania town that is not ours,
+    read the shape of the query. One that bothers to name a state or a county
+    is location-qualified, so if it names none of ours it names someone else's.
+    """
+    q = query.lower()
+    if any(bad in q for bad in OUT_OF_AREA):
+        return True
+    ours = any(w in q for w in SERVICE_AREA_WORDS)
+    if not ours and re.search(r"\b(pa|penna|pennsylvania)\b", q):
+        return True
+    # "county" alone used to count as in-area, which let "schuylkill county
+    # seamless gutter" into the tracked universe and the goal's denominator.
+    if "county" in q and "york county" not in q:
+        return True
+    return False
 
 
 def adopt_queries(ctx):
@@ -1125,6 +1152,17 @@ def geo_answer_first_content_pass(ctx):
                 queries = gsc.queries_for_page(url)
             except Exception:
                 queries = []
+
+        # A page picks up impressions from well outside York County, and the
+        # top row is whichever of those Google sent most of. Answering one of
+        # those puts the wrong county at the top of the page — on 2026-07-29
+        # /services/gutter-guards.html was given an opening that told readers
+        # NEMO serves "Akron, PA and the surrounding Lancaster and York County
+        # area", written once and permanent, and it is the exact passage an AI
+        # answer engine lifts. Drop them before choosing, and before showing
+        # the model what the page ranks for.
+        queries = [q for q in queries if not _names_other_market(q["query"])]
+
         headline = queries[0]["query"] if queries else None
         if not headline:
             # Fall back to the page's own <h1>, which is what it is about.

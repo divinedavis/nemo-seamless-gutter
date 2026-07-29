@@ -215,9 +215,11 @@ def engine_entry(run_log=None, review_out=None, scout_out=None):
                  f"{kw['coverage_pct']}% of {kw['total']} tracked queries.")
 
     def last(m):
-        s = ledger.series("__site__", m)
+        s = ledger.complete_series("__site__", m)
         return s[-1][1] if s else "—"
-    L.append(f"Yesterday: {last('visitors')} visitors "
+    day = ledger.complete_series("__site__", "visitors")
+    when = day[-1][0] if day else "yesterday"
+    L.append(f"{when}: {last('visitors')} visitors "
              f"({last('organic_visitors')} organic, {last('local_visitors')} maps) · "
              f"{last('bookings')} bookings, {last('phone_leads')} phone leads.")
     L.append("")
