@@ -234,11 +234,24 @@ def build_config(tool_ids: list | None = None) -> dict:
             },
             "tts": {
                 "voice_id": VOICE_ID,
-                # Flash keeps time-to-first-word low, which matters a lot on a
-                # phone call — the caller hears dead air otherwise. Note the API
-                # rejects flash v2.5 here: English-language agents must use the
-                # English turbo/flash v2 models.
-                "model_id": "eleven_flash_v2",
+                # Turbo v2, upgraded from flash v2 on 2026-07-29. Flash is the
+                # distilled speed model and the weakest voice ElevenLabs makes;
+                # turbo is the balanced one. Measured from the droplet, the whole
+                # upgrade costs 67ms of time-to-first-byte (.249s -> .316s), which
+                # no caller can perceive.
+                #
+                # This is the best model the platform will actually accept — the
+                # other two were tried against the live agent and refused:
+                #   eleven_v3         -> 400 expressive_tts_not_allowed
+                #                        ("Expressive TTS is not allowed" — an
+                #                        entitlement/plan limit, not a technical
+                #                        one; may unlock on a higher tier. Also
+                #                        rejects optimize_streaming_latency and
+                #                        costs +373ms, so it is not obviously
+                #                        right for a phone call even if unlocked.)
+                #   eleven_turbo_v2_5 -> 400 "English Agents must use turbo or
+                #                        flash v2" (same rule that blocks flash v2.5)
+                "model_id": "eleven_turbo_v2",
                 # Higher stability keeps delivery even and calm. At 0.5 the voice
                 # swings into an excited, sometimes near-shouting read on upbeat
                 # lines; 0.75 flattens those swings without going robotic.
