@@ -80,7 +80,7 @@ def _arrow(direction):
     return ""
 
 
-def _card(inner, pad="18px 20px"):
+def _card(inner, pad="18px 16px"):
     return (f'<tr><td style="padding:0 0 14px 0">'
             f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
             f'style="background:{CARD};border:1px solid {LINE};border-radius:10px">'
@@ -88,7 +88,7 @@ def _card(inner, pad="18px 20px"):
 
 
 def _h(text, colour=None):
-    return (f'<div style="font:600 11px {FONT};letter-spacing:.08em;'
+    return (f'<div style="font:600 14px {FONT};letter-spacing:.08em;'
             f'text-transform:uppercase;color:{colour or MUTED};'
             f'margin:0 0 12px 0">{_e(text)}</div>')
 
@@ -99,9 +99,9 @@ def _rows(pairs):
     for i, (label, value) in enumerate(pairs):
         border = f"border-top:1px solid {LINE};" if i else ""
         out.append(
-            f'<tr><td style="{border}padding:8px 0;font:400 14px {FONT};'
+            f'<tr><td style="{border}padding:11px 0;font:400 17px {FONT};'
             f'color:{MUTED};width:52%">{label}</td>'
-            f'<td style="{border}padding:8px 0;font:600 14px {FONT};'
+            f'<td style="{border}padding:11px 0;font:600 17px {FONT};'
             f'color:{INK};text-align:right">{value}</td></tr>')
     out.append("</table>")
     return "".join(out)
@@ -114,9 +114,9 @@ def _goal_card():
     if kw["share_pct"] is None:
         body = (
             f'{_h("The goal", NAVY)}'
-            f'<div style="font:700 30px {FONT};color:{WARN};line-height:1.1">'
+            f'<div style="font:700 34px {FONT};color:{WARN};line-height:1.1">'
             f'Unmeasured</div>'
-            f'<div style="font:400 13px {FONT};color:{MUTED};margin-top:8px;'
+            f'<div style="font:400 16px {FONT};color:{MUTED};margin-top:8px;'
             f'line-height:1.5">Search Console is not connected, so nothing here '
             f'knows where the site actually ranks.<br>'
             f'<strong style="color:{INK}">{kw["coverage_pct"]}%</strong> of '
@@ -132,8 +132,8 @@ def _goal_card():
     body = (
         f'{_h("The goal — top-3 share of York County gutter searches", NAVY)}'
         f'<table role="presentation" cellpadding="0" cellspacing="0"><tr>'
-        f'<td style="font:700 38px {FONT};color:{colour};line-height:1">{pct}%</td>'
-        f'<td style="padding-left:12px;font:400 13px {FONT};color:{MUTED};'
+        f'<td style="font:700 44px {FONT};color:{colour};line-height:1">{pct}%</td>'
+        f'<td style="padding-left:12px;font:400 16px {FONT};color:{MUTED};'
         f'vertical-align:bottom;padding-bottom:6px">of a {target}% target</td>'
         f'</tr></table>'
         # progress bar: two nested tables, the only thing every client renders
@@ -142,7 +142,7 @@ def _goal_card():
         f'<tr><td style="width:{fill}%;background:{colour};height:8px;'
         f'border-radius:5px;font-size:0;line-height:0">&nbsp;</td>'
         f'<td style="font-size:0;line-height:0">&nbsp;</td></tr></table>'
-        f'<div style="font:400 13px {FONT};color:{MUTED};line-height:1.5">'
+        f'<div style="font:400 16px {FONT};color:{MUTED};line-height:1.5">'
         f'<strong style="color:{INK}">{kw["top3"]}</strong> queries in the top 3 · '
         f'<strong style="color:{INK}">{kw["top10"]}</strong> in the top 10 · '
         f'rank known for {kw["ranked_known"]} of {kw["total"]} tracked</div>'
@@ -163,7 +163,7 @@ def _universe_note():
     grew = s[-1][1] - s[-2][1]
     if grew <= 0:
         return ""
-    return (f'<div style="font:400 12px {FONT};color:{WARN};margin-top:10px;'
+    return (f'<div style="font:400 15px {FONT};color:{WARN};margin-top:10px;'
             f'line-height:1.5;padding-top:10px;border-top:1px solid {LINE}">'
             f'The tracked list grew by {grew} search'
             f'{"" if grew == 1 else "es"} today, so this percentage moved partly '
@@ -188,7 +188,7 @@ def _leads_card(audience="internal"):
             ("All time", f'{_last("bookings_all_time") or 0} booked · '
                          f'{_last("phone_leads_all_time") or 0} phoned'),
         ])
-        + f'<div style="font:400 12px {FONT};color:{MUTED};margin-top:12px;'
+        + f'<div style="font:400 15px {FONT};color:{MUTED};margin-top:12px;'
           f'line-height:1.5;padding-top:10px;border-top:1px solid {LINE}">'
           + ("Someone tapping your number and calling straight through is not "
              "counted here yet — this covers online bookings and calls the "
@@ -248,7 +248,7 @@ def _traffic_card(audience="internal"):
             "excluded from the server-side row.")
     body = (_h("Search traffic", NAVY)
             + _rows(rows)
-            + f'<div style="font:400 12px {FONT};color:{MUTED};margin-top:12px;'
+            + f'<div style="font:400 15px {FONT};color:{MUTED};margin-top:12px;'
               f'line-height:1.5;padding-top:10px;border-top:1px solid {LINE}">'
               + note + '</div>')
     return _card(body)
@@ -261,27 +261,27 @@ def _rank_card(audience="internal"):
         return ""
     kws.sort(key=lambda k: k["position"])
     out = ['<table role="presentation" width="100%" cellpadding="0" cellspacing="0">',
-           f'<tr><td style="font:600 11px {FONT};color:{MUTED};padding:0 0 6px 0">'
+           f'<tr><td style="font:600 14px {FONT};color:{MUTED};padding:0 0 6px 0">'
            f'QUERY</td>'
-           f'<td style="font:600 11px {FONT};color:{MUTED};text-align:right;'
+           f'<td style="font:600 14px {FONT};color:{MUTED};text-align:right;'
            f'padding:0 0 6px 0">POS</td>'
-           f'<td style="font:600 11px {FONT};color:{MUTED};text-align:right;'
+           f'<td style="font:600 14px {FONT};color:{MUTED};text-align:right;'
            f'padding:0 0 6px 0">IMPR</td></tr>']
     for k in kws[:12]:
         pos = k["position"]
         colour = GOOD if pos <= 3 else (ORANGE if pos <= 10 else MUTED)
         out.append(
             f'<tr><td style="border-top:1px solid {LINE};padding:7px 0;'
-            f'font:400 13px {FONT};color:{INK}">{_e(k["query"])}</td>'
+            f'font:400 16px {FONT};color:{INK}">{_e(k["query"])}</td>'
             f'<td style="border-top:1px solid {LINE};padding:7px 0;'
-            f'font:600 13px {FONT};color:{colour};text-align:right">{pos}</td>'
+            f'font:600 16px {FONT};color:{colour};text-align:right">{pos}</td>'
             f'<td style="border-top:1px solid {LINE};padding:7px 0;'
-            f'font:400 13px {FONT};color:{MUTED};text-align:right">'
+            f'font:400 16px {FONT};color:{MUTED};text-align:right">'
             f'{int(k.get("impressions") or 0)}</td></tr>')
     out.append("</table>")
     extra = ""
     if len(kws) > 12:
-        extra = (f'<div style="font:400 12px {FONT};color:{MUTED};margin-top:10px">'
+        extra = (f'<div style="font:400 15px {FONT};color:{MUTED};margin-top:10px">'
                  f'+{len(kws) - 12} more with known rank</div>')
     heading = ("Where you rank for the searches that matter"
                if audience == "owner" else "Where the tracked queries rank")
@@ -303,11 +303,11 @@ def _discovered_card(audience="internal"):
         colour = GOOD if pos and pos <= 3 else MUTED
         rows.append(
             f'<tr><td style="border-top:1px solid {LINE};padding:7px 0;'
-            f'font:400 13px {FONT};color:{INK}">{_e(d["query"])}</td>'
+            f'font:400 16px {FONT};color:{INK}">{_e(d["query"])}</td>'
             f'<td style="border-top:1px solid {LINE};padding:7px 0;'
-            f'font:600 13px {FONT};color:{colour};text-align:right">{pos}</td>'
+            f'font:600 16px {FONT};color:{colour};text-align:right">{pos}</td>'
             f'<td style="border-top:1px solid {LINE};padding:7px 0;'
-            f'font:400 13px {FONT};color:{MUTED};text-align:right">'
+            f'font:400 16px {FONT};color:{MUTED};text-align:right">'
             f'{d["impressions"]}</td></tr>')
     if audience == "owner":
         heading = "Searches you are already showing up for"
@@ -322,7 +322,7 @@ def _discovered_card(audience="internal"):
     body = (_h(heading, NAVY)
             + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
             + "".join(rows) + "</table>"
-            + f'<div style="font:400 12px {FONT};color:{MUTED};margin-top:12px;'
+            + f'<div style="font:400 15px {FONT};color:{MUTED};margin-top:12px;'
               f'line-height:1.5">{note}</div>')
     return _card(body)
 
@@ -334,13 +334,13 @@ def _ran_card(run_log):
     for r in run_log:
         ok = r.get("ok")
         chip = (f'<span style="background:{"#dcfce7" if ok else "#fee2e2"};'
-                f'color:{GOOD if ok else BAD};font:600 10px {FONT};'
+                f'color:{GOOD if ok else BAD};font:600 13px {FONT};'
                 f'padding:2px 7px;border-radius:9px;letter-spacing:.04em">'
                 f'{"OK" if ok else "FAIL"}</span>')
         rows.append(
             f'<tr><td style="padding:8px 10px 8px 0;vertical-align:top;'
             f'white-space:nowrap">{chip}</td>'
-            f'<td style="padding:8px 0;font:400 13px {FONT};color:{INK};'
+            f'<td style="padding:8px 0;font:400 16px {FONT};color:{INK};'
             f'line-height:1.5"><strong>{_e(r["slug"])}</strong><br>'
             f'<span style="color:{MUTED}">{_e(r.get("detail", ""))[:300]}</span>'
             f'</td></tr>')
@@ -375,11 +375,11 @@ def _new_pages_card(run_log):
     if not published:
         return ""
     items = "".join(
-        f'<div style="padding:8px 0;border-top:1px solid {LINE};font:400 14px {FONT};'
+        f'<div style="padding:8px 0;border-top:1px solid {LINE};font:400 17px {FONT};'
         f'color:{INK};line-height:1.5">{p}</div>' for p in published)
     return _card(
         _h("New on your site today", NAVY) + items
-        + f'<div style="font:400 12px {FONT};color:{MUTED};margin-top:10px;'
+        + f'<div style="font:400 15px {FONT};color:{MUTED};margin-top:10px;'
           f'line-height:1.5">Google usually takes a few weeks to rank a new '
           f'page, so these will not show up in the numbers above straight away.</div>')
 
@@ -412,8 +412,8 @@ def _owner_actions_card():
         first = re.sub(r"\bthe engine\b", "the website", first)
         rows.append(
             f'<div style="padding:10px 0;border-top:1px solid {LINE}">'
-            f'<div style="font:600 14px {FONT};color:{INK}">{_e(t["name"])}</div>'
-            f'<div style="font:400 13px {FONT};color:{MUTED};margin-top:3px;'
+            f'<div style="font:600 17px {FONT};color:{INK}">{_e(t["name"])}</div>'
+            f'<div style="font:400 16px {FONT};color:{MUTED};margin-top:3px;'
             f'line-height:1.5">{_e(first)[:260]}</div></div>')
     return _card(_h("Worth your time", ORANGE) + "".join(rows))
 
@@ -429,8 +429,8 @@ def _waiting_card():
         first = first.replace("first step:", "").strip()
         rows.append(
             f'<div style="padding:10px 0;border-top:1px solid {LINE}">'
-            f'<div style="font:600 14px {FONT};color:{INK}">{_e(t["name"])}</div>'
-            f'<div style="font:400 13px {FONT};color:{MUTED};margin-top:3px;'
+            f'<div style="font:600 17px {FONT};color:{INK}">{_e(t["name"])}</div>'
+            f'<div style="font:400 16px {FONT};color:{MUTED};margin-top:3px;'
             f'line-height:1.5">{_e(first)[:260]}</div></div>')
     return _card(
         _h("Waiting on you — these cannot run until someone acts", ORANGE)
@@ -453,13 +453,13 @@ def _blocked_banner(run_log, scout_out):
     if not msgs:
         return ""
     items = "".join(
-        f'<div style="font:400 13px {FONT};color:#7f1d1d;line-height:1.55;'
+        f'<div style="font:400 16px {FONT};color:#7f1d1d;line-height:1.55;'
         f'padding:3px 0">&bull; {_e(m)}</div>' for m in msgs)
     return (f'<tr><td style="padding:0 0 14px 0">'
             f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
             f'style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px">'
             f'<tr><td style="padding:16px 20px">'
-            f'<div style="font:700 12px {FONT};letter-spacing:.08em;color:{BAD};'
+            f'<div style="font:700 15px {FONT};letter-spacing:.08em;color:{BAD};'
             f'margin-bottom:8px">BLOCKED</div>{items}</td></tr></table></td></tr>')
 
 
@@ -476,30 +476,30 @@ def _scout_card(scout_out):
             continue
         rows.append(
             f'<div style="padding:10px 0;border-top:1px solid {LINE}">'
-            f'<div style="font:600 14px {FONT};color:{INK}">{_e(t["name"])}</div>'
-            f'<div style="font:400 13px {FONT};color:{MUTED};margin-top:3px;'
+            f'<div style="font:600 17px {FONT};color:{INK}">{_e(t["name"])}</div>'
+            f'<div style="font:400 16px {FONT};color:{MUTED};margin-top:3px;'
             f'line-height:1.5">{_e((t.get("hypothesis") or "")[:220])}</div></div>')
     if not rows:
         return ""
     return _card(
         _h("Scout proposed — candidates only, not running", NAVY)
         + "".join(rows)
-        + f'<div style="font:400 12px {FONT};color:{MUTED};margin-top:10px">'
+        + f'<div style="font:400 15px {FONT};color:{MUTED};margin-top:10px">'
           f'Nothing here changes the site until it is switched on deliberately.</div>')
 
 
 def _footer(audience="internal"):
     if audience == "owner":
-        return (f'<tr><td style="padding:6px 4px 0 4px;font:400 12px {FONT};'
+        return (f'<tr><td style="padding:6px 4px 0 4px;font:400 15px {FONT};'
                 f'color:{MUTED};line-height:1.6">'
                 f'Automatic daily summary for nemoseamlessgutter.com.<br>'
                 f'Numbers cover yesterday; search rankings cover the last 28 days.'
                 f'</td></tr>')
-    return (f'<tr><td style="padding:6px 4px 0 4px;font:400 12px {FONT};'
+    return (f'<tr><td style="padding:6px 4px 0 4px;font:400 15px {FONT};'
             f'color:{MUTED};line-height:1.6">'
             f'NEMO Seamless Gutter growth engine · runs 06:00 ET daily<br>'
-            f'Detail: <code style="font-size:11px">growth_daily.py status</code> · '
-            f'logs: <code style="font-size:11px">/var/log/nemo-growth.log</code>'
+            f'Detail: <code style="font-size:14px">growth_daily.py status</code> · '
+            f'logs: <code style="font-size:14px">/var/log/nemo-growth.log</code>'
             f'</td></tr>')
 
 
@@ -536,7 +536,7 @@ def build_html(run_log=None, review_out=None, scout_out=None, audience="internal
         decisions = ""
         if review_out and review_out.get("actions"):
             items = "".join(
-                f'<div style="font:400 13px {FONT};color:{INK};padding:4px 0;'
+                f'<div style="font:400 16px {FONT};color:{INK};padding:4px 0;'
                 f'line-height:1.5">&bull; {_e(a)}</div>'
                 for a in review_out["actions"])
             decisions = _card(_h("Review decisions today", NAVY) + items)
@@ -549,23 +549,26 @@ def build_html(run_log=None, review_out=None, scout_out=None, audience="internal
 <title>NEMO growth report</title></head>
 <body style="margin:0;padding:0;background:{BG}">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
-       style="background:{BG};padding:20px 12px">
+       style="background:{BG};padding:18px 8px;table-layout:fixed">
 <tr><td align="center">
-<table role="presentation" width="600" cellpadding="0" cellspacing="0"
+<!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0"><tr><td><![endif]-->
+<table role="presentation" cellpadding="0" cellspacing="0"
        style="max-width:600px;width:100%">
 
   <tr><td style="background:{NAVY};border-radius:10px;padding:20px 22px">
-    <div style="font:700 17px {FONT};color:#ffffff;letter-spacing:-.01em">
+    <div style="font:700 21px {FONT};color:#ffffff;letter-spacing:-.01em">
       NEMO Seamless Gutter</div>
-    <div style="font:400 13px {FONT};color:#c7d0f0;margin-top:3px">
-      {"Your website &amp; search summary" if owner else "Daily growth report"} &middot; {ledger.today()}</div>
+    <div style="font:400 16px {FONT};color:#c7d0f0;margin-top:3px">
+      {"Your website &amp; search summary" if owner else "Daily growth report"}
+      <span style="white-space:nowrap">&middot; {ledger.today()}</span></div>
   </td></tr>
   <tr><td style="height:14px;font-size:0;line-height:0">&nbsp;</td></tr>
 
   {body}
 
-  {"" if owner else f'<tr><td style="padding:14px 4px 0 4px;font:400 12px {FONT};color:{MUTED}">Ledger: {len(techs)} techniques &middot; {active} active</td></tr>'}
+  {"" if owner else f'<tr><td style="padding:14px 4px 0 4px;font:400 15px {FONT};color:{MUTED}">Ledger: {len(techs)} techniques &middot; {active} active</td></tr>'}
 
 </table>
+<!--[if mso]></td></tr></table><![endif]-->
 </td></tr></table>
 </body></html>"""
