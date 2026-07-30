@@ -6,6 +6,7 @@ since June). Nothing here invents a second place to put credentials.
 """
 import json
 import os
+import random
 import re
 import subprocess
 import time
@@ -57,24 +58,40 @@ def load_key():
 # Anything below this floor is raised rather than silently truncated.
 MIN_MAX_TOKENS = 3000
 
-
-# Transient server-side conditions. A 529 ("Overloaded") means the API was busy
-# for a moment and says nothing about this account — on 2026-07-30 three of the
-# day's eleven techniques, including the scout, died on one apiece and the run
-# produced a single page. Retrying these is not the unbounded retry BUDGET.md
-# rule 4 forbids, and it does not raise spend: a 529 bills nothing, so the only
-# call that costs anything is the one that finally succeeds — the same one unit
-# of work the run was always going to pay for.
+# 529 (overloaded) killed three of eleven steps on 2026-07-30 — the api was busy
+# for a few seconds and a whole morning's content went unwritten. These statuses
+# are the API saying "not now", not "never": rate limits, gateway hiccups, and
+# capacity. Retrying is also free, since an overloaded/limited request bills no
+# tokens — only the attempt that succeeds costs anything, and that is the one
+# unit of work the run was always going to pay for.
 #
-# Deliberately NOT retried: 400 (both billing failures — an empty balance and a
-# self-imposed cap are answers, not hiccups, and hammering a cap is how the cap
-# gets worse) and 401/403/404.
-RETRY_STATUS = {408, 429, 500, 502, 503, 504, 529}
-RETRY_BACKOFF = (5, 20)  # seconds before attempt 2 and attempt 3
+# 400 is deliberately absent, per the review agent's reasoning in ab7592e: both
+# billing failures arrive as 400, and an empty balance or a self-imposed spend
+# cap is an answer rather than a hiccup. Hammering a cap is how the cap gets
+# worse. 401/403/404 are permanent for the same reason and raise immediately.
+RETRY_STATUS = {408, 409, 425, 429, 500, 502, 503, 504, 529}
+RETRIES = int(os.environ.get("NEMO_LLM_RETRIES", "5"))
+BACKOFF = (2, 6, 15, 40, 75)  # seconds before attempt 2..6, plus jitter
 
 
-def call(system, prompt, max_tokens=4000, tools=None, timeout=240, key=None):
-    """One message round-trip. Returns the concatenated text blocks."""
+def _sleep_for(attempt, retry_after=None):
+    """Wait before the next attempt. Honours Retry-After when the API sends it."""
+    if retry_after:
+        try:
+            return min(float(retry_after), 120.0)
+        except (TypeError, ValueError):
+            pass
+    base = BACKOFF[min(attempt, len(BACKOFF) - 1)]
+    return base + random.uniform(0, base * 0.25)
+
+
+def call(system, prompt, max_tokens=4000, tools=None, timeout=240, key=None,
+         retries=None):
+    """One message round-trip. Returns the concatenated text blocks.
+
+    Transient API failures are retried with exponential backoff; the error that
+    finally escapes is the last one seen, so the report still names the cause.
+    """
     max_tokens = max(max_tokens, MIN_MAX_TOKENS)
     key = key or load_key()
     if not key:
@@ -86,26 +103,35 @@ def call(system, prompt, max_tokens=4000, tools=None, timeout=240, key=None):
     if tools:
         body["tools"] = tools
     data = json.dumps(body).encode()
-    headers = {"content-type": "application/json", "x-api-key": key,
-               "anthropic-version": "2023-06-01"}
+    attempts = (RETRIES if retries is None else retries) + 1
 
-    for attempt, pause in enumerate((None,) + RETRY_BACKOFF):
-        if pause is not None:
-            time.sleep(pause)
-        req = urllib.request.Request(API_URL, data=data, headers=headers)
+    last = None
+    for attempt in range(attempts):
+        req = urllib.request.Request(
+            API_URL, data=data,
+            headers={"content-type": "application/json", "x-api-key": key,
+                     "anthropic-version": "2023-06-01"})
         try:
             with urllib.request.urlopen(req, timeout=timeout) as r:
                 resp = json.loads(r.read().decode())
-            break
+            return "".join(b.get("text", "") for b in resp.get("content", [])
+                           if b.get("type") == "text")
         except urllib.error.HTTPError as e:
-            detail = f"anthropic {e.code}: {e.read()[:300].decode(errors='replace')}"
-            if e.code not in RETRY_STATUS or attempt == len(RETRY_BACKOFF):
-                raise RuntimeError(detail)
-        except (urllib.error.URLError, TimeoutError) as e:
-            if attempt == len(RETRY_BACKOFF):
-                raise RuntimeError(f"anthropic unreachable: {e}")
-    return "".join(b.get("text", "") for b in resp.get("content", [])
-                   if b.get("type") == "text")
+            detail = e.read()[:300].decode(errors="replace")
+            last = RuntimeError(f"anthropic {e.code}: {detail}")
+            if e.code not in RETRY_STATUS:
+                raise last
+            wait = _sleep_for(attempt, (e.headers or {}).get("retry-after"))
+        except (urllib.error.URLError, TimeoutError, OSError) as e:
+            # Connection reset / DNS blip / read timeout — same class of problem
+            # as a 529 from the caller's point of view.
+            last = RuntimeError(f"anthropic request failed: {e}")
+            wait = _sleep_for(attempt)
+
+        if attempt == attempts - 1:
+            break
+        time.sleep(wait)
+    raise last
 
 
 def _salvage(blob):
@@ -147,41 +173,57 @@ def _salvage(blob):
     return None
 
 
-def _escape_inner_quotes(blob):
-    """Escape literal double quotes that appear inside a JSON string value.
+# Whitespace, then one of the characters that may legally follow a string.
+_AFTER_STRING = re.compile(r'\s*(?:[,:}\]]|$)')
 
-    This trade writes 6" and 5" constantly, and a model asked for JSON will
-    happily emit {"h2": "5" vs 6" Gutters"} — valid English, invalid JSON. It
-    surfaces as `Expecting ',' delimiter` partway through line 1, which is what
-    killed strengthen_pages on 2026-07-30 at char 771 and looks like a prompt
-    bug rather than a punctuation one.
 
-    _salvage cannot help: it only closes truncated structures, and this blob is
-    corrupt in the middle rather than cut off at the end.
+def _repair(blob):
+    """Escape the characters a model leaves raw inside a JSON string.
 
-    The rule: inside a string, a quote is a closing quote only if the next
-    non-space character is one of ,:}] — otherwise it is someone's inch mark.
+    Prose about gutters quotes things — a 5" K-style profile, a homeowner
+    saying "my gutters overflow" — and the model periodically writes that quote
+    unescaped. The string ends early, the parser meets a word where it wanted a
+    comma, and a whole page goes unwritten over one inch mark. ("Expecting ','
+    delimiter: line 1 column 772" is exactly this, and _salvage cannot help:
+    truncating back to the last closer throws away the object, not the typo.)
+
+    Walks the text once and escapes any quote that is not followed by a
+    delimiter, plus raw control characters, which are illegal in JSON strings.
     """
-    out, in_str, esc = [], False, False
-    for i, ch in enumerate(blob):
-        if esc:
+    out, in_str, i, n = [], False, 0, len(blob)
+    while i < n:
+        ch = blob[i]
+        if not in_str:
             out.append(ch)
-            esc = False
+            if ch == '"':
+                in_str = True
+            i += 1
             continue
         if ch == "\\":
-            out.append(ch)
-            esc = in_str
+            # Keep valid escapes intact; a trailing lone backslash is dropped
+            # rather than left to swallow the closing quote.
+            if i + 1 < n:
+                out.append(ch)
+                out.append(blob[i + 1])
+                i += 2
+            else:
+                i += 1
             continue
         if ch == '"':
-            if not in_str:
-                in_str = True
+            if _AFTER_STRING.match(blob, i + 1):
+                out.append(ch)
+                in_str = False
             else:
-                nxt = re.match(r"\s*(.)", blob[i + 1:])
-                if nxt and nxt.group(1) not in ",:}]":
-                    out.append("\\")   # an inch mark, not the end of the string
-                else:
-                    in_str = False
-        out.append(ch)
+                out.append('\\"')
+            i += 1
+            continue
+        if ch in "\n\r\t":
+            out.append({"\n": "\\n", "\r": "\\r", "\t": "\\t"}[ch])
+        elif ord(ch) < 0x20:
+            out.append("\\u%04x" % ord(ch))
+        else:
+            out.append(ch)
+        i += 1
     return "".join(out)
 
 
@@ -195,18 +237,22 @@ def call_json(system, prompt, **kw):
     try:
         return json.loads(blob)
     except json.JSONDecodeError:
-        import re
         m = re.search(r"```(?:json)?\s*(\{.*\})\s*```", text, re.S)
         if m:
             try:
                 return json.loads(m.group(1))
             except json.JSONDecodeError:
                 pass
-        try:
-            return json.loads(_escape_inner_quotes(blob))
-        except json.JSONDecodeError:
-            pass
-        rescued = _salvage(text[start:])
-        if rescued is not None:
-            return rescued
+        # Repair first (a stray quote mid-object), then salvage (a reply cut
+        # off at max_tokens), then both — truncation and a bad quote co-occur
+        # in the same long research replies.
+        for candidate in (_repair(blob), _repair(text[start:])):
+            try:
+                return json.loads(candidate)
+            except json.JSONDecodeError:
+                pass
+        for source in (text[start:], _repair(text[start:])):
+            rescued = _salvage(source)
+            if rescued is not None:
+                return rescued
         raise

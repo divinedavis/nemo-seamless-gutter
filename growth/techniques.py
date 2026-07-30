@@ -35,6 +35,12 @@ PHONE_E164 = "+1-717-578-0073"
 BRAND = "NEMO Seamless Gutter"
 GA_ID = "G-JWSK5E1ZRZ"
 
+# A step that generates per item moves to the next candidate when one fails,
+# instead of losing the morning to a single bad reply. Bounded so a broken key
+# or an exhausted balance cannot turn one step into a whole queue of paid
+# retries — after this many failures the step gives up and reports.
+MAX_ITEM_FAILURES = 3
+
 # York County municipalities not yet covered by an area page, with the
 # coordinates used for the geo meta tags. Ordered roughly by size, since a
 # bigger town is a bigger query. `angle` is the honest local hook the page gets
@@ -249,22 +255,38 @@ def area_pages(ctx):
     if not todo:
         return {"ok": True, "detail": "every queued town already has a page"}
 
-    slug, town, lat, lon, angle = todo[0]
+    # A town that fails to generate should cost that town, not the day — the
+    # next one in the queue is just as worth publishing, and the one skipped
+    # stays queued for tomorrow.
+    data = slug = town = lat = lon = None
+    errors = []
+    for cand in todo[:MAX_ITEM_FAILURES]:
+        c_slug, c_town, c_lat, c_lon, angle = cand
+        try:
+            data = llm.call_json(AREA_SYSTEM, (
+                f"Write the service-area page for {c_town}, Pennsylvania (York County).\n\n"
+                f"What makes this town's gutter work distinctive: {angle}.\n\n"
+                f"The company installs seamless aluminum gutter formed on site, plus "
+                f"half-round aluminum and copper for historic homes, gutter guards, and "
+                f"cleaning and repair. Free on-site estimates. Phone {PHONE}."),
+                max_tokens=3000)
+        except Exception as e:
+            errors.append(f"content generation failed for {c_town}: {e}")
+            data = None
+            continue
+        if not data.get("sections"):
+            errors.append(f"model returned no sections for {c_town}")
+            data = None
+            continue
+        slug, town, lat, lon = c_slug, c_town, c_lat, c_lon
+        break
+
+    if data is None:
+        return {"ok": False,
+                "detail": f"{len(errors)} town(s) failed, last: {errors[-1]}"}
+
     filename = f"seamless-gutters-{slug}-pa.html"
     canonical = f"{SITE}/areas/{filename}"
-
-    try:
-        data = llm.call_json(AREA_SYSTEM, (
-            f"Write the service-area page for {town}, Pennsylvania (York County).\n\n"
-            f"What makes this town's gutter work distinctive: {angle}.\n\n"
-            f"The company installs seamless aluminum gutter formed on site, plus "
-            f"half-round aluminum and copper for historic homes, gutter guards, and "
-            f"cleaning and repair. Free on-site estimates. Phone {PHONE}."),
-            max_tokens=3000)
-    except Exception as e:
-        return {"ok": False, "detail": f"content generation failed for {town}: {e}"}
-    if not data.get("sections"):
-        return {"ok": False, "detail": f"model returned no sections for {town}"}
 
     service_ld = json.dumps({
         "@context": "https://schema.org", "@type": "Service",
@@ -685,21 +707,13 @@ def strengthen_pages(ctx):
                   key=lambda k: order.get(k.get("intent"), 9))
 
     done = set(ledger.get_state("strengthened", []))
-    # A model reply that will not parse is not a reason to write nothing today.
-    # `todo` is sorted deterministically and a failure never marks the query
-    # done, so the old behaviour — return on the first bad reply — retried the
-    # same query first every morning and stalled the technique indefinitely.
-    # That is what happened on 2026-07-30 to 'emergency gutter repair after
-    # storm york pa'. Move on to the next query instead, but keep BUDGET.md
-    # rule 2 intact: at most three attempts, and still at most one section
-    # published per run.
-    MAX_ATTEMPTS = 3
-    attempts, first_error = 0, None
+    # One unusable reply used to end the step for the day. The queue is 47
+    # queries deep and any of them is worth writing, so a failure moves to the
+    # next candidate and only the last one is reported if none succeed.
+    errors = []
     for kw in todo:
         if kw["query"] in done:
             continue
-        if attempts >= MAX_ATTEMPTS:
-            break
         host = _host_page(ctx, kw)
         if not host:
             continue
@@ -707,7 +721,6 @@ def strengthen_pages(ctx):
         if src is None or '<div class="cta-band">' not in src:
             continue
 
-        attempts += 1
         try:
             data = llm.call_json(STRENGTHEN_SYSTEM, (
                 f'The search to win: "{kw["query"]}"\n'
@@ -718,11 +731,14 @@ def strengthen_pages(ctx):
                 f"Phone {PHONE}. Free on-site estimates across York County."),
                 max_tokens=1600)
         except Exception as e:
-            first_error = first_error or f"generation failed for '{kw['query']}': {e}"
+            errors.append(f"generation failed for '{kw['query']}': {e}")
+            if len(errors) >= MAX_ITEM_FAILURES:
+                break
             continue
         if not data.get("h2") or not data.get("paragraphs"):
-            first_error = first_error or (
-                f"model returned nothing usable for '{kw['query']}'")
+            errors.append(f"model returned nothing usable for '{kw['query']}'")
+            if len(errors) >= MAX_ITEM_FAILURES:
+                break
             continue
 
         block = _render_sections([{
@@ -749,10 +765,9 @@ def strengthen_pages(ctx):
         return {"ok": True,
                 "detail": f"added \"{data['h2'][:60]}\" to {host} for '{kw['query']}'"}
 
-    if first_error:
-        # BUDGET.md rule 6: a failure must not be reported as a quiet success.
+    if errors:
         return {"ok": False,
-                "detail": f"{attempts} attempt(s), none usable — {first_error}"}
+                "detail": f"{len(errors)} candidate(s) failed, last: {errors[-1]}"}
     return {"ok": True, "detail": "no uncovered query has an existing page to strengthen"}
 
 
@@ -1156,6 +1171,7 @@ def geo_answer_first_content_pass(ctx):
                     "index.html"):
             candidates.append((rel, f"{SITE}/{rel}", 0))
 
+    errors = []
     for rel, url, impressions in candidates:
         if rel in done:
             continue
@@ -1203,14 +1219,19 @@ def geo_answer_first_content_pass(ctx):
                    f"be used as visible copy only.\n" if has_faq else "")),
                 max_tokens=2000)
         except Exception as e:
-            return {"ok": False, "detail": f"generation failed for /{rel}: {e}"}
+            errors.append(f"generation failed for /{rel}: {e}")
+            if len(errors) >= MAX_ITEM_FAILURES:
+                break
+            continue
 
         answer = (data.get("answer") or "").strip()
         words = len(answer.split())
         if not answer or not (GEO_MIN_WORDS <= words <= GEO_MAX_WORDS):
-            return {"ok": False,
-                    "detail": f"rejected answer for /{rel}: {words} words "
-                              f"(want {GEO_MIN_WORDS}-{GEO_MAX_WORDS})"}
+            errors.append(f"rejected answer for /{rel}: {words} words "
+                          f"(want {GEO_MIN_WORDS}-{GEO_MAX_WORDS})")
+            if len(errors) >= MAX_ITEM_FAILURES:
+                break
+            continue
 
         block = (f"\n      {GEO_MARKER}"
                  f'\n      <p class="lead">{_esc(answer)}</p>')
@@ -1253,6 +1274,9 @@ def geo_answer_first_content_pass(ctx):
                           + (f", {impressions} impressions" if impressions else "")
                           + ")"}
 
+    if errors:
+        return {"ok": False,
+                "detail": f"{len(errors)} page(s) failed, last: {errors[-1]}"}
     return {"ok": True, "detail": "every ranking page already opens with a direct answer"}
 
 
