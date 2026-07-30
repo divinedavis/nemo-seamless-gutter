@@ -35,4 +35,8 @@ growth/keywords.json
 growth/results.jsonl
 growth/state.json
 growth/.anthropic_key
+growth/.elevenlabs_key
+# Caller numbers for calls already identified — personal data, and rebuildable
+# from the ElevenLabs API, so it stays on the droplet.
+growth/calls_cache.json
 *.growth-bak

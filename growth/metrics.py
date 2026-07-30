@@ -584,4 +584,13 @@ def collect_and_record(days=1, log_path=None):
     today = ledger.today()
     for k, v in totals.items():
         ledger.record_result(today, "__site__", k, v)
+    # Calls into the AI assistant. Written into the same ledger so the history
+    # outlives the local cache of ElevenLabs' conversation list, and imported
+    # here rather than at module scope because it reaches the network — nothing
+    # else in this module does, and metrics must stay importable offline.
+    try:
+        from . import calls
+        totals.update(calls.record(sorted(data)))
+    except Exception:
+        pass
     return data, totals
