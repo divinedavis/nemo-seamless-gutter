@@ -1,6 +1,6 @@
 {
-  "generated": "2026-07-29T06:04:25+00:00",
-  "date": "2026-07-29",
+  "generated": "2026-07-30T06:02:46+00:00",
+  "date": "2026-07-30",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
@@ -8,11 +8,11 @@
     "share_pct": 2.3,
     "measured": true,
     "why_unmeasured": null,
-    "coverage_pct": 44.8,
+    "coverage_pct": 46.0,
     "tracked_queries": 87,
     "top3": 2,
     "top10": 6,
-    "ranked_known": 19
+    "ranked_known": 21
   },
   "traffic": {
     "visitors": [
@@ -34,7 +34,7 @@
       },
       {
         "date": "2026-07-29",
-        "value": 0
+        "value": 14
       }
     ],
     "pageviews": [
@@ -56,7 +56,7 @@
       },
       {
         "date": "2026-07-29",
-        "value": 0
+        "value": 37
       }
     ],
     "organic_visitors": [
@@ -78,7 +78,7 @@
       },
       {
         "date": "2026-07-29",
-        "value": 0
+        "value": 3
       }
     ],
     "local_visitors": [
@@ -144,7 +144,7 @@
       },
       {
         "date": "2026-07-29",
-        "value": 0
+        "value": 8
       }
     ],
     "referral_visitors": [
@@ -210,7 +210,7 @@
       },
       {
         "date": "2026-07-29",
-        "value": 16
+        "value": 2374
       }
     ],
     "bookings": [
@@ -281,15 +281,15 @@
     ]
   },
   "lead_totals": {
-    "bookings_all_time": 0,
+    "bookings_all_time": 1,
     "phone_leads_all_time": 0,
-    "own_rows_excluded": 12
+    "own_rows_excluded": 13
   },
   "keywords": {
     "by_town": {
       "county": {
         "total": 56,
-        "covered": 23,
+        "covered": 24,
         "top3": 2
       },
       "hanover": {
@@ -326,7 +326,7 @@
     "by_intent": {
       "hire": {
         "total": 60,
-        "covered": 34
+        "covered": 35
       },
       "price": {
         "total": 13,
@@ -362,7 +362,6 @@
       "gutter replacement near me",
       "gutters dover",
       "gutters dover pa",
-      "gutters york pa",
       "half round copper gutters historic home york pa",
       "half round gutter installation york county",
       "schuylkill county seamless gutter",
@@ -395,42 +394,42 @@
       {
         "query": "gutter installer",
         "position": 1,
-        "impressions": 106,
+        "impressions": 212,
         "clicks": 0
       },
       {
         "query": "gutter contractor",
         "position": 1,
-        "impressions": 20,
+        "impressions": 46,
         "clicks": 0
       },
       {
         "query": "gutters",
-        "position": 5.9,
-        "impressions": 17,
+        "position": 5.8,
+        "impressions": 20,
         "clicks": 0
       },
       {
         "query": "gutter replacement",
-        "position": 7.7,
-        "impressions": 14,
+        "position": 10.3,
+        "impressions": 17,
         "clicks": 0
       },
       {
         "query": "gutter guard installer",
         "position": 1,
-        "impressions": 12,
+        "impressions": 14,
+        "clicks": 0
+      },
+      {
+        "query": "seamless+gutters+perkasie+pa",
+        "position": 26.4,
+        "impressions": 9,
         "clicks": 0
       },
       {
         "query": "seamless gutter company crum lynne pa",
         "position": 24.4,
-        "impressions": 8,
-        "clicks": 0
-      },
-      {
-        "query": "seamless+gutters+perkasie+pa",
-        "position": 26.6,
         "impressions": 8,
         "clicks": 0
       },
@@ -448,14 +447,20 @@
       },
       {
         "query": "gutter replacement services",
-        "position": 12.4,
-        "impressions": 5,
+        "position": 13.7,
+        "impressions": 6,
         "clicks": 0
       },
       {
         "query": "seamless gutter installation in myerstown pa",
         "position": 43.2,
         "impressions": 5,
+        "clicks": 0
+      },
+      {
+        "query": "gutter cleaning",
+        "position": 14.8,
+        "impressions": 4,
         "clicks": 0
       },
       {
@@ -467,6 +472,12 @@
       {
         "query": "gutter repair",
         "position": 12,
+        "impressions": 4,
+        "clicks": 0
+      },
+      {
+        "query": "seamless gutter installation in newmanstown pa",
+        "position": 47.8,
         "impressions": 4,
         "clicks": 0
       },
@@ -483,6 +494,18 @@
         "clicks": 0
       },
       {
+        "query": "gutter contractor in yorkville",
+        "position": 58,
+        "impressions": 3,
+        "clicks": 0
+      },
+      {
+        "query": "gutter installation",
+        "position": 23,
+        "impressions": 3,
+        "clicks": 0
+      },
+      {
         "query": "seamless gutter contractors crum lynne pa",
         "position": 43.3,
         "impressions": 3,
@@ -495,12 +518,6 @@
         "clicks": 0
       },
       {
-        "query": "seamless gutter installation in newmanstown pa",
-        "position": 31.7,
-        "impressions": 3,
-        "clicks": 0
-      },
-      {
         "query": "seamless gutter services essington pa",
         "position": 27.3,
         "impressions": 3,
@@ -509,14 +526,14 @@
     ]
   },
   "gsc": {
-    "date": "2026-07-29",
+    "date": "2026-07-30",
     "ok": true,
     "connected": true,
-    "rows": 87,
-    "matched": 19,
+    "rows": 97,
+    "matched": 21,
     "clicks": 3,
-    "impressions": 497,
-    "avg_position": 13.9
+    "impressions": 686,
+    "avg_position": 12.5
   },
   "techniques": [
     {
@@ -548,7 +565,7 @@
         },
         {
           "date": "2026-07-29",
-          "value": 0
+          "value": 3
         }
       ]
     },
@@ -581,7 +598,7 @@
         },
         {
           "date": "2026-07-29",
-          "value": 0
+          "value": 2
         }
       ]
     },
@@ -889,7 +906,7 @@
         },
         {
           "date": "2026-07-29",
-          "value": 0
+          "value": 3
         }
       ]
     },
@@ -1015,11 +1032,11 @@
     ]
   },
   "last_build": {
-    "date": "2026-07-29",
+    "date": "2026-07-30",
     "log": [
       {
         "ok": true,
-        "detail": "adopted 2 real search(es) into the tracked universe: gutter installers york, gutter installation york",
+        "detail": "no new in-area searches worth tracking",
         "slug": "adopt_queries"
       },
       {
@@ -1028,13 +1045,13 @@
         "slug": "improve_ctr"
       },
       {
-        "ok": true,
-        "detail": "answer-first opening on /services/gutter-guards.html for 'gutter guards in akron pa' (51 words, + FAQ schema, 6 impressions)",
+        "ok": false,
+        "detail": "generation failed for /services/gutter-cleaning-repair.html: anthropic 529: {\"type\":\"error\",\"error\":{\"type\":\"overloaded_error\",\"message\":\"Overloaded\"},\"request_id\":\"req_011CdXjQqEyfMeLcPgVybGhk\"}",
         "slug": "geo_answer_first_content_pass"
       },
       {
-        "ok": true,
-        "detail": "added \"Hiring a Gutter Contractor in Spring Grove, PA: What to Expe\" to /areas/seamless-gutters-spring-grove-pa.html for 'gutter contractor spring grove pa'",
+        "ok": false,
+        "detail": "generation failed for 'emergency gutter repair after storm york pa': Expecting ',' delimiter: line 1 column 772 (char 771)",
         "slug": "strengthen_pages"
       },
       {
@@ -1043,18 +1060,18 @@
         "slug": "service_pages"
       },
       {
-        "ok": true,
-        "detail": "published Mount Wolf (13,364 bytes; 3 town(s) left in the queue)",
+        "ok": false,
+        "detail": "content generation failed for Wrightsville: anthropic 529: {\"type\":\"error\",\"error\":{\"type\":\"overloaded_error\",\"message\":\"Overloaded\"},\"request_id\":\"req_011CdXjSjgfbzC9Vrmz6j1Ab\"}",
         "slug": "area_pages"
       },
       {
         "ok": true,
-        "detail": "published 'gutter services near me' \u2192 /guides/gutter-services-near-me.html",
+        "detail": "published 'gutters york pa' \u2192 /guides/gutters-york-pa.html",
         "slug": "money_pages"
       },
       {
         "ok": true,
-        "detail": "refreshed nearby-links on 6 page(s)",
+        "detail": "refreshed nearby-links on 0 page(s)",
         "slug": "internal_links"
       },
       {
@@ -1064,38 +1081,22 @@
       },
       {
         "ok": true,
-        "detail": "[gen_sitemap] wrote 29 URLs to sitemap.xml",
+        "detail": "[gen_sitemap] wrote 30 URLs to sitemap.xml",
         "slug": "rebuild_sitemap"
       },
       {
         "ok": true,
-        "detail": "submitted 10 URL(s), HTTP 200",
+        "detail": "submitted 1 URL(s), HTTP 200",
         "slug": "ping_indexnow"
       }
     ],
-    "new": 2,
-    "changed": 8
+    "new": 1,
+    "changed": 0
   },
   "last_scout": {
-    "date": "2026-07-29",
-    "ok": true,
-    "techniques_added": [
-      "inspector_realtor_referral_loop",
-      "gbp_services_list_and_job_photo_cadence",
-      "call_first_page_mechanics"
-    ],
-    "keywords_added": [
-      "gutter replacement cost york pa",
-      "half round gutter installation york county",
-      "gutter cleaning dallastown pa",
-      "gutter installers dover pa",
-      "seamless gutter company spring grove pa",
-      "cost to replace gutters on a ranch house",
-      "5 inch vs 6 inch gutters which is better",
-      "soffit and fascia repair york pa",
-      "gutters overflowing in heavy rain"
-    ],
-    "notes": "Priority order: the referral loop first (it is the only proposal that can produce a call before the site is even indexed), then GBP Services, then site call mechanics. Two hard constraints on the referral loop: pay no cash kickbacks to agents or inspectors \u2014 keep it a plain reciprocal referral so there is no question about it, and never let an inspector imply NEMO endorsed their report. Timing: it is 29 July. Gutter-guard and cleaning demand in York County starts climbing late August and peaks October-November, so anything written or posted for guards should be live by mid-August, not October. Ice-dam repair queries are worth staging in January, not now. Considered and rejected: (1) buying Angi/HomeAdvisor shared leads \u2014 resold three ways, price-shopped, and it trains the business to compete on price rather than on the brake in the truck; (2) any review platform that filters or pre-screens sentiment before the Google link \u2014 that is review gating and risks the profile; (3) an incentive or discount for reviews \u2014 prohibited and Google's April 2026 enforcement now fingerprints review origin; (4) mass door-to-door canvassing beyond streets with a finished job \u2014 low yield, and PA municipal solicitation permits vary by borough; (5) buying local 'best gutter contractor in York' listicle placements to game AI citations \u2014 that is a paid link and misrepresents an editorial pick; (6) more town pages before the existing five earn a single click, since the ledger already covers town pages and thin duplicates of them are the exact pattern that gets sites filtered. One honest caveat on the third technique: with zero visitors, conversion work has no immediate payoff \u2014 it is worth doing now only because it takes hours, not weeks, and because arriving traffic is unrecoverable once it bounces. Finally, 4.2 stars with 13 reviews is the quiet drag on everything here: AI recommendation engines and LSA ranking both lean on rating and review recency, so the existing review-ask candidate probably deserves promoting above anything new."
+    "date": "2026-07-30",
+    "ok": false,
+    "detail": "anthropic 529: {\"type\":\"error\",\"error\":{\"type\":\"overloaded_error\",\"message\":\"Overloaded\"},\"request_id\":\"req_011CdXjYApQ2PKaX1cZA7z7n\"}"
   },
   "pages": {
     "areas": [
@@ -1118,6 +1119,7 @@
       "gutter-cleaning-cost-york-pa.html",
       "gutter-installer-near-me.html",
       "gutter-services-near-me.html",
+      "gutters-york-pa.html",
       "how-much-do-seamless-gutters-cost.html",
       "seamless-vs-sectional-gutters.html",
       "signs-your-gutters-need-replacing-york-county-pa.html"

@@ -904,3 +904,23 @@ metric can show. If clicks stay at 3 through mid-August with 12 area pages
 live, the pages are not competitive and the effort should shift to the offline
 candidates. Either way that is a two-week question, and nothing in today's
 numbers can answer it.
+
+## 2026-07-30 — engine run
+
+Goal: **2.3%** top-3 share of 87 tracked queries (target 50%).
+Yesterday: 14 visitors (3 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — FAILED: generation failed for /services/gutter-cleaning-repair.html: anthropic 529: {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CdXjQqEyfMeLcPgVybGhk"}
+- `strengthen_pages` — FAILED: generation failed for 'emergency gutter repair after storm york pa': Expecting ',' delimiter: line 1 column 772 (char 771)
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — FAILED: content generation failed for Wrightsville: anthropic 529: {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CdXjSjgfbzC9Vrmz6j1Ab"}
+- `money_pages` — ok: published 'gutters york pa' → /guides/gutters-york-pa.html
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 30 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 1 URL(s), HTTP 200
+
+**Scout did not run:** anthropic 529: {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CdXjYApQ2PKaX1cZA7z7n"}
