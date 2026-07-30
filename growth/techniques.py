@@ -685,9 +685,21 @@ def strengthen_pages(ctx):
                   key=lambda k: order.get(k.get("intent"), 9))
 
     done = set(ledger.get_state("strengthened", []))
+    # A model reply that will not parse is not a reason to write nothing today.
+    # `todo` is sorted deterministically and a failure never marks the query
+    # done, so the old behaviour — return on the first bad reply — retried the
+    # same query first every morning and stalled the technique indefinitely.
+    # That is what happened on 2026-07-30 to 'emergency gutter repair after
+    # storm york pa'. Move on to the next query instead, but keep BUDGET.md
+    # rule 2 intact: at most three attempts, and still at most one section
+    # published per run.
+    MAX_ATTEMPTS = 3
+    attempts, first_error = 0, None
     for kw in todo:
         if kw["query"] in done:
             continue
+        if attempts >= MAX_ATTEMPTS:
+            break
         host = _host_page(ctx, kw)
         if not host:
             continue
@@ -695,6 +707,7 @@ def strengthen_pages(ctx):
         if src is None or '<div class="cta-band">' not in src:
             continue
 
+        attempts += 1
         try:
             data = llm.call_json(STRENGTHEN_SYSTEM, (
                 f'The search to win: "{kw["query"]}"\n'
@@ -705,9 +718,12 @@ def strengthen_pages(ctx):
                 f"Phone {PHONE}. Free on-site estimates across York County."),
                 max_tokens=1600)
         except Exception as e:
-            return {"ok": False, "detail": f"generation failed for '{kw['query']}': {e}"}
+            first_error = first_error or f"generation failed for '{kw['query']}': {e}"
+            continue
         if not data.get("h2") or not data.get("paragraphs"):
-            return {"ok": False, "detail": f"model returned nothing usable for '{kw['query']}'"}
+            first_error = first_error or (
+                f"model returned nothing usable for '{kw['query']}'")
+            continue
 
         block = _render_sections([{
             "h2": data["h2"], "paragraphs": data["paragraphs"],
@@ -733,6 +749,10 @@ def strengthen_pages(ctx):
         return {"ok": True,
                 "detail": f"added \"{data['h2'][:60]}\" to {host} for '{kw['query']}'"}
 
+    if first_error:
+        # BUDGET.md rule 6: a failure must not be reported as a quiet success.
+        return {"ok": False,
+                "detail": f"{attempts} attempt(s), none usable — {first_error}"}
     return {"ok": True, "detail": "no uncovered query has an existing page to strengthen"}
 
 

@@ -924,3 +924,382 @@ Yesterday: 14 visitors (3 organic, 0 maps) · 0 bookings, 0 phone leads.
 - `ping_indexnow` — ok: submitted 1 URL(s), HTTP 200
 
 **Scout did not run:** anthropic 529: {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_011CdXjYApQ2PKaX1cZA7z7n"}
+
+## 2026-07-30 — review agent
+
+### Lead: a third of the run failed, and the prompt's stated blocker is not the reason
+
+Three of today's eleven build steps failed, plus the scout. Two distinct
+causes, and **neither is the API usage cap this task's prompt says to expect
+until 2026-08-01**. That premise is now wrong for the second day running and
+should be deleted from the prompt rather than re-checked a third time.
+
+The actual errors:
+
+| step | error |
+| --- | --- |
+| `geo_answer_first_content_pass` | `anthropic 529 … "Overloaded"` |
+| `area_pages` (Wrightsville) | `anthropic 529 … "Overloaded"` |
+| `scout` | `anthropic 529 … "Overloaded"` |
+| `strengthen_pages` | `Expecting ',' delimiter: line 1 column 772 (char 771)` |
+
+A 529 is Anthropic's servers being busy for a moment. It says nothing about
+this account, it bills nothing, and it is the textbook retryable error.
+**`growth/llm.py` had no retry of any kind** — I grepped the whole engine for
+`retry|backoff|sleep|attempt` and the only hit was a comment in `metrics.py`.
+Every one of those three techniques threw away its whole day's work on a
+hiccup that a five-second pause would have cleared. Today's output was one
+page instead of four.
+
+The fourth failure is not an API problem and is the more serious of the two.
+See below — left alone it stalls `strengthen_pages` permanently, not for a day.
+
+### Where the numbers stand
+
+The goal metric — tracked York County queries holding a top-3 position:
+
+| | 07-28 | 07-29 | 07-30 |
+| --- | --- | --- | --- |
+| **top-3 count** | 2 | 2 | **2** |
+| tracked queries | 76 | 87 | 87 |
+| share | 2.6% | 2.3% | **2.3%** |
+| top-10 count | 7 | 6 | 6 |
+| coverage proxy | 48.7% | 44.8% | 46.0% |
+
+**Fourth consecutive day at two.** The county bucket is 2 of 56, unchanged from
+yesterday. Every town bucket — york, hanover, dover, red-lion, dallastown,
+spring-grove — is still **0 top-3**, as it has been every day since the goal
+became measurable. Both of the site's top-3 positions are county-level. The
+share held flat at 2.3% today only because `adopt_queries` found nothing to
+add; the denominator problem from yesterday's entry is unchanged, just dormant
+for a day.
+
+Search Console, 28-day rolling: 97 rows / 21 matched / **3 clicks** / 686
+impressions / avg position 12.5, against 87 / 19 / 3 / 497 / 13.9 yesterday.
+Impressions up 189 (+38%) in a day and up 60% since 07-28. **Clicks have been
+exactly 3 for four days running.** Average position improved 13.9 → 12.5, which
+at these volumes is noise and partly arithmetic.
+
+Traffic, and this is the one genuinely encouraging line in today's data:
+
+| | 07-27 | 07-28 | 07-29 |
+| --- | --- | --- | --- |
+| visitors | 9 | 11 | 14 |
+| organic | 0 | 1 | **3** |
+| direct | 6 | 10 | 8 |
+| bot hits | 1,948 | 1,954 | 2,374 |
+
+Organic visitors moved off zero for the first time and have risen three days
+running. Three visitors is three visitors — I am recording the direction, not
+claiming a trend. Local (maps), AI-referred, referral and campaign are all
+still flat zero.
+
+Leads: **0 bookings, 0 phone leads, 0 all-time.** `own_rows_excluded` went 12 →
+13, so one more of Eric's own test rows was correctly filtered out.
+
+**The measurement-is-broken watch is not triggered.** The prompt says to call
+the measurement suspect if `visitors` sits at zero for about a week while the
+site is live. It does not: 9 / 11 / 14 with organic rising. The filtering work
+of 07-28 looks like it landed correctly rather than over-broadly.
+
+### Did previous changes work?
+
+**"Fix the Akron paragraph on the live gutter-guards page" (07-29, rec #1) —
+not acted on. It is still live.** `services/gutter-guards.html:163` still opens
+"NEMO Seamless Gutter installs gutter guards on homes in Akron, PA and the
+surrounding Lancaster and York County area." `publish_state.sh` rsyncs
+`services/` droplet → repo every morning, so the copy in this repo after
+today's publish *is* the live page. The highest-value passage on that page has
+now been advertising the wrong county for two days.
+
+**"Deploy the code fixes to the droplet before the next 06:00 run" (07-29,
+rec #2) — not acted on, and I can prove it.** Today's engine entry opens
+`Yesterday: 14 visitors`. The string `Yesterday` does not appear anywhere in
+this repo's `growth/*.py` — I replaced that literal on 07-29 with the actual
+date of the row being reported. `publish_state.sh` copies only
+`snapshot.json`, `sitemap.xml`, `index.html`, the merged journal, and
+`areas/ guides/ services/`; it never syncs `growth/*.py` in either direction,
+so **the repo's engine code is not evidence of what the droplet is running.**
+The droplet is running code older than this repo. Consequences:
+
+- `_names_other_market()` — the out-of-area filter I added on 07-29 — **is not
+  live.** The answer-first pass can still write another wrong-county paragraph
+  onto any of the ~26 pages it has not reached. It only failed to do so today
+  because it 529'd.
+- The `complete_series` fix in `review.py` is not live either. That one is a
+  safety fix: `review.py` retires techniques autonomously on median
+  comparisons, and a partial day dragging a median down is how a working
+  technique gets killed on one morning's data.
+
+This is not a criticism of Divine, whose last seven commits are all real work
+on the phone assistant. It is a statement that a repo commit and a deployed fix
+are different things, and this journal has now twice written up a fix as done
+when nothing changed on the live machine.
+
+**"Connect the GA4 Data API" (07-28 rec #5, 07-29 rec #6) — superseded by
+something better, and half-finished.** Divine's `14449f9` added
+`growth/calls.py`, which counts inbound calls to the AI phone assistant from
+ElevenLabs' conversation history, excluding the owner's own numbers. That is a
+better answer than GA4 — it counts calls that actually connected rather than
+`tel:` taps, and it counts the caller who hung up before leaving a message.
+`metrics.py` records it into the ledger. **But `snapshot.py` never surfaces it**
+— I grepped, there is no reference to `calls` in `snapshot.py`, `report.py` or
+today's `snapshot.json`. So the number Divine just built still does not reach
+this review, and the honest current state remains "the phone is not measured
+from here." Small fix, flagged below.
+
+**"Change how the goal share is calculated" (07-29, rec #3) — not acted on.**
+`share_pct` is still `top3 / tracked_queries`. Dormant today only because the
+denominator happened not to grow.
+
+**T007 (ask finished jobs for a Google review) — still `candidate`,
+`activated: null`. Fourth day of asking.**
+
+**The four GBP questions (07-29, rec #4), Apple Business (rec #5), the
+town-queue cap (rec #7)** — no way to verify any of these from this repo. Not
+dropping them; not repeating them at length either.
+
+**My 07-29 two-week prediction on clicks** — "if 3 clicks becomes 15–20 while
+top-3 stays at 2, the pages are earning attention below the top three." One day
+in: clicks 3, top-3 still 2, impressions up 38%. Far too early. The check date
+is mid-August and I am leaving it there.
+
+**T001 / T002 / T017 / T018** — still inside `review.py`'s 30-day grace period
+(`GRACE_DAYS = 30`, activated 2026-07-27, so ~2026-08-26). Today's
+`owned_visitors`: T001 2/0/3, T002 2/0/2, T018 3/0/3 across 07-27/28/29. Too
+early to tell, as it will be for another four weeks.
+
+### What I checked in the code before recommending anything
+
+**The `strengthen_pages` JSON failure is an unescaped inch mark, and the
+failure mode is a permanent stall, not a lost day.** `Expecting ','
+delimiter` partway through a single-line JSON blob is the signature of a
+literal `"` inside a string value. This trade writes `6"` and `5"` constantly —
+I counted **44 raw inch marks** in the pages already published under `areas/`,
+`guides/` and `services/`. A model asked for JSON will emit
+`{"h2": "5" vs 6" Gutters"}`, which is fine English and invalid JSON.
+`llm._salvage()` cannot rescue it: salvage only closes structures that were
+*truncated*, and this blob is corrupt in the middle.
+
+Worse than the parse error is what the loop did with it. `strengthen_pages`
+**`return`ed** on the first exception rather than trying the next query, and a
+failure never adds the query to the `strengthened` state list. `todo` is sorted
+deterministically. So tomorrow the engine would have picked the identical query
+first, hit the identical inch mark, and returned nothing — every morning,
+indefinitely. `strengthen_pages` is described in its own hypothesis as "the
+technique that actually moves the goal," and it was one bad sentence away from
+being dead for the rest of the summer with `ok: false` scrolling past in a log.
+
+**Seasonality is now the binding constraint, and the build queue does not know
+it.** Research below puts new-page ranking lead time at 8–12 weeks and the
+gutter demand peak at leaf-fall. From 30 July that is late September to late
+October, against a York County leaf-fall peak of mid-October to mid-November —
+pages written today land just in time, pages written in September miss the
+front of the season. Meanwhile `strengthen_pages` sorts its queue by
+`order = {"hire": 0, "price": 1, "check": 2, "diy": 3}` with no seasonal
+weighting at all, and the uncovered list is full of exactly the fall-demand
+terms sitting at the back of that ordering: "gutter cleaning near me",
+"gutter cleaning cost dover pa", "gutter cleaning cost red lion pa",
+"how often should gutters be cleaned in pa", "are gutter guards worth it",
+"gutter guard cost pa", "how much does a gutter guard cost per foot",
+"gutters overflowing in heavy rain", "why do my gutters overflow when it rains".
+Most are `price`, `check` or `diy` intent, so they queue behind every
+installation query.
+
+**Checked and NOT recommending, because it is already shipped:** FAQPage schema
+(`_faq_ld()`, every generated page); the sticky tap-to-call bar
+(`templates.py:160`, verified present in all generated pages, per 07-29);
+IndexNow (T006, active, submitted 1 URL today).
+
+### What I researched today
+
+Deliberately skipped LSAs, Nextdoor, speed-to-lead, door-hangers, GBP
+categories, GBP services/photos, call-first mechanics and inspector referrals —
+those are T011–T023 and re-searching them just relabels existing candidates.
+
+- **New-page ranking lead time is 8–12 weeks and fall is the demand spike.**
+  "Build gutter cleaning and guard pages and earn their rankings before autumn,
+  because demand spikes when leaves fall and a new page takes 8 to 12 weeks to
+  rank"; map-pack movement typically 60–90 days.
+  ([Kelly WM](https://kellywm.com/blog/gutters-seo),
+  [Frizerly](https://blog.frizerly.com/18919/gutter_installation_seo_seasonal_content_that_wins_spring_and_fall_demand),
+  [Elev8](https://www.elev8operations.com/guides/how-to-get-more-gutter-leads-2026))
+  This is the most decision-relevant thing I found today and it converts a
+  vague "keep publishing" into a dated deadline.
+- **Rising impressions with flat clicks is the expected 2026 pattern, not
+  necessarily a fault.** ~60% of Google searches now end without a click and AI
+  Overviews appear in ~58% of queries; informational queries are hit hardest
+  while commercial/transactional ones hold up better.
+  ([Digital Applied](https://www.digitalapplied.com/blog/60-percent-searches-zero-click-crisis-2026-seo-strategy),
+  [Semrush](https://www.semrush.com/blog/zero-click-searches/),
+  [The Digital Bloom](https://thedigitalbloom.com/learn/organic-traffic-crisis-report-2026-update/))
+  Relevant because impressions here rose 38% in a day against flat clicks. At
+  686 impressions that is still too thin to diagnose, but it argues against
+  reading flat clicks as proof the pages are bad.
+- **Bing Places is free, ~15 minutes, imports from the Google profile, and
+  feeds Copilot.** Modest traffic on its own (Copilot ≈3.5% of AI referral
+  traffic) but the audience skews desktop, older and homeowning, and most
+  competitors never claim it.
+  ([Osprey](https://osprey.solutions/blog/bing-places-for-business-2026),
+  [Thestacc](https://thestacc.com/blog/bing-places-guide/))
+  Checked against all 23 ledger techniques: nothing covers Bing Places. Same
+  category as the Apple Business gap flagged yesterday — closing a hole, not a
+  growth lever.
+- **Consistency across site, profile and listings is now an explicit ranking
+  input.** Search engines compare the website, the Google listing and other
+  local mentions and treat mismatches as weakened trust.
+  ([Footbridge](https://www.footbridgemedia.com/marketing-tips/home-services-local-seo-2026),
+  [EarlySEO](https://www.earlyseo.com/blogs/seo-for-home-service-businesses))
+  This is a second, independent reason the Akron/Lancaster paragraph is a live
+  problem rather than a tidiness one.
+
+**Rejected:**
+- **`llms.txt`.** Tempting, trivially cheap, and it does not work. No major
+  consumer AI search engine has confirmed consuming it — not ChatGPT search,
+  Perplexity, AI Overviews, Gemini or Copilot — and Google's John Mueller
+  stated outright that Google does not use it.
+  ([Layer3Labs](https://www.layer3labs.io/guides/llms-txt-explained),
+  [Live Go Digital](https://livegodigital.com/the-great-llms-txt-confusion-of-2026/))
+  Recording the rejection so a future scout does not file it as a free win.
+- **Paid "AEO"/"AI Search Sync" packages aimed at contractors.** Vendor
+  offerings around getting recommended by ChatGPT/Gemini; the underlying work
+  is schema, NAP consistency and honest answers, all of which this engine
+  already does or T014 covers.
+- **Meta/paid social for volume.** Suggested by one gutter-leads source. Out of
+  scope — it spends money and this review does not.
+
+### Recommendations
+
+Ranked. **Every on-site or engine item below needs a deploy to the droplet
+before it does anything** — `/var/www/nemo-seamless-gutter` is not a git
+checkout, and nothing committed here reaches the live site or the 06:00 cron on
+its own.
+
+1. **Deploy `growth/` to the droplet.** *(Divine — a sync, minutes.)* This is
+   first because four separate fixes are now sitting in this repo doing nothing:
+   today's retry and JSON-repair work, today's `strengthen_pages` stall fix,
+   yesterday's out-of-area filter, and yesterday's `complete_series` safety fix
+   for `review.py`. The retry fix alone would have turned today's one published
+   page into four. How you would know: tomorrow's engine entry begins with a
+   date rather than the word "Yesterday", and a 529 no longer appears as a
+   technique failure. Checked: `publish_state.sh` copy list — it never syncs
+   `growth/*.py`, so this cannot happen automatically.
+2. **Fix the Akron paragraph on the live gutter-guards page.** *(Divine —
+   minutes, needs droplet access.)* Second day of asking. Rewrite the
+   `<p class="lead">` under the `<!-- geo:answer-first -->` marker in
+   `services/gutter-guards.html` so it names York County and nothing else, and
+   drop that path from the `geo_answered` list in `state.json` so the corrected
+   pass can redo it. **Do not fix it in this repo** — `services/` is rsynced
+   droplet → repo every morning and an edit here is silently reverted tomorrow.
+   Checked: the text is still live at `services/gutter-guards.html:163` in
+   today's post-publish tree.
+3. **Reorder the content queue for leaf-fall season, now.** *(Divine — a small
+   change to the sort in `strengthen_pages` and the money-page queue; the engine
+   then does the rest itself.)* Pages need 8–12 weeks to rank and York County's
+   leaf-fall peak is mid-October to mid-November, so the deadline for a page
+   that earns its place in the season is roughly **now to mid-August**. Today
+   the cleaning and gutter-guard queries sit at the back of the queue because
+   they are `price`/`check`/`diy` intent. Suggested change: add a seasonal boost
+   ahead of the intent sort for queries matching cleaning / guard / leaf /
+   overflow / clog terms, until about 1 November. Expected effect: the pages
+   that can actually catch the annual demand spike get written in the window
+   where writing them still helps. How you would know: `impressions` on
+   cleaning and guard queries in `keywords.discovered_untracked` and `by_intent`
+   rising through September, versus flat. Checked: `growth/techniques.py`
+   `strengthen_pages` — `order = {"hire": 0, "price": 1, "check": 2, "diy": 3}`,
+   no date or season term anywhere in the function; nothing in the ledger's 23
+   techniques mentions seasonality.
+4. **Surface the call count in `snapshot.json`.** *(Divine — a few lines in
+   `snapshot.py`, then deploy.)* `calls.py` already counts inbound calls to the
+   AI assistant and `metrics.py` already records them into the ledger, but the
+   snapshot does not carry them, so this review still cannot see whether the
+   phone rang. It is the single number the owner's goal actually cares about.
+   A count is an aggregate and passes `_assert_no_pii` — the caller numbers stay
+   in the gitignored cache. Checked: no `calls` reference in `snapshot.py`,
+   `report.py`, or today's `snapshot.json`.
+5. **Answer T007 — yes or no.** *(Eric — one decision.)* Fourth day as a
+   `candidate`. Review recency is the lever with the most evidence behind it in
+   this whole journal, and the engine cannot email a single customer until Eric
+   says the word. A "no" is a fine answer and closes it; silence just keeps it
+   on the list.
+6. **Claim Bing Places.** *(Eric — free, ~15 minutes, imports from the Google
+   profile.)* Feeds Copilot and ChatGPT's local answers. Modest expectations —
+   this is closing a hole, like yesterday's Apple Business item, and the two
+   should be done in the same sitting. Checked: grepped all 23 ledger techniques;
+   nothing mentions Bing Places, Copilot, or any non-Google listing surface.
+7. **Carried forward, unverifiable from here:** the four Business Profile
+   questions (07-29 rec #4), Apple Business (rec #5), the goal-share calculation
+   (rec #3), the ~30-page town cap (rec #7). Not restating them at length; they
+   are open until someone says otherwise.
+
+### What I changed in this repo today
+
+Two files, both engine code, neither live until deployed:
+
+- **`growth/llm.py`** — a bounded retry on transient statuses
+  (408/429/500/502/503/504/529) with 5s and 20s backoff, three attempts
+  maximum. This respects BUDGET.md rule 4 ("never add an *unbounded* retry")
+  and does not raise spend: a 529 bills nothing, so the only billed call is the
+  one that succeeds — the same single unit of work the run was already paying
+  for. Billing 400s are explicitly **not** retried, because an empty balance and
+  a self-imposed cap are answers rather than hiccups, which is the distinction
+  BUDGET.md draws. Also added `_escape_inner_quotes()`, tried in `call_json`
+  before `_salvage`, which escapes a `"` inside a string value when the next
+  non-space character is not one of `,:}]`.
+- **`growth/techniques.py`** — `strengthen_pages` now continues to the next
+  query instead of returning on a bad reply, capped at **three attempts**, still
+  publishing at most one section per run so BUDGET.md rule 2 holds. If all
+  attempts fail it now returns `ok: false` with the first error rather than the
+  cheerful "no uncovered query has an existing page to strengthen", which would
+  have been precisely the quiet-partial-success failure BUDGET.md rule 6 warns
+  about.
+
+Verified rather than eyeballed: the existing suite passes (33 tests), and I
+drove `llm.call` against a stubbed urlopen to confirm all four behaviours — a
+529 followed by success recovers on attempt 2; a persistent 529 raises after
+exactly 3; a billing 400 makes exactly 1 attempt; and the real failing blob
+shape `{"h2": "6" gutters", …}` parses correctly end-to-end through the 529
+retry. `_escape_inner_quotes` is byte-identical on already-valid JSON,
+including JSON containing correctly escaped inch marks and strings containing
+`,:}]`.
+
+I did not touch `techniques.json`, `keywords.json`, `results.jsonl` or
+`state.json`; did not activate any candidate; did not edit any page under
+`areas/`, `guides/` or `services/`.
+
+### Reasoning and uncertainties
+
+The inch-mark diagnosis is the one thing today where I am reasoning from a
+signature rather than from the failing string itself. I never saw the model's
+reply — only `Expecting ',' delimiter: line 1 column 772`. That error at that
+position in a single-line blob is characteristic of an unescaped quote, and 44
+raw inch marks in the published corpus make this trade an obvious candidate,
+but I cannot rule out some other stray character. It matters less than it
+sounds: the loop fix means the technique survives *any* unparseable reply, and
+the quote repair is a no-op on JSON that was already valid, so both changes are
+correct even if my specific cause is wrong.
+
+The one real edge in `_escape_inner_quotes`: a string whose literal inch mark is
+immediately followed by a comma — `"...6", inch stock"` — is genuinely
+ambiguous, and the heuristic will read it as the end of the string. That is
+inherent to repairing invalid JSON rather than a flaw I can engineer out, and
+it fails toward the old behaviour, which is a parse error and now a retry on
+the next query.
+
+I am most confident about the deploy gap, because it rests on a literal string
+that exists on the droplet and does not exist in this repo, with no inference in
+between. It also changes how I read the last two entries of this journal: both
+described code fixes in a tone that implied the problem was handled. It was
+written down, which is not the same thing, and any future entry that "fixes"
+something in `growth/` should say plainly that it is inert until synced.
+
+What would change my mind about the current strategy: organic visitors are 0 →
+1 → 3 and impressions are up 60% in two days while clicks sit at 3. If by
+mid-August impressions keep climbing and clicks are still 3, the honest read is
+that this site's visibility is landing on queries whose clicks are being taken
+by the map pack and AI Overviews, and the answer is the offline channels
+(T021 inspector referrals, T015 neighbour flyers, T012 Nextdoor) rather than
+more pages. If clicks start tracking impressions, the content engine is working
+and the correct move is to feed it — which is what recommendation 3 is really
+about, because after mid-August the seasonal window closes and that question
+gets answered a year late.
