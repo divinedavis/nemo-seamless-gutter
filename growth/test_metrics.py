@@ -31,6 +31,13 @@ def visit(ip, owner=None):
     return line(ip, "/", owner=owner) + line(ip, "/styles.css", owner=owner)
 
 
+
+def tap(ip, ua=BROWSER, method="POST", status=204, owner=None):
+    """The call beacon analytics.js fires when a tel: link is tapped."""
+    base = (f'{ip} - - [{DAY}] "{method} /e/call-tap?p=/ HTTP/1.1" {status} 0 '
+            f'"-" "{ua}"')
+    return base + (f' "{owner}"' if owner is not None else "") + "\n"
+
 class LogParsing(unittest.TestCase):
     def test_old_format_still_parses(self):
         m = metrics.LOG_RE.match(line("198.51.100.1", "/"))
@@ -46,10 +53,13 @@ class LogParsing(unittest.TestCase):
         self.assertEqual(m.group("owner"), "-")
 
 
-class OwnerExclusion(unittest.TestCase):
-    # resolver is injected everywhere so the suite never makes a DNS call:
-    # the fixtures use TEST-NET addresses, whose lookups would hang on the
-    # resolver timeout and make a fast unit suite take seconds.
+class BaseCollect(unittest.TestCase):
+    """Runs metrics.collect() against a throwaway log file.
+
+    resolver is injected everywhere so the suite never makes a DNS call: the
+    fixtures use TEST-NET addresses, whose lookups would hang on the resolver
+    timeout and make a fast unit suite take seconds.
+    """
     def collect(self, log_text, state=None, resolver=lambda ip: ""):
         fd, path = tempfile.mkstemp()
         with os.fdopen(fd, "w") as f:
@@ -61,6 +71,7 @@ class OwnerExclusion(unittest.TestCase):
         finally:
             os.unlink(path)
 
+class OwnerExclusion(BaseCollect):
     def test_cookie_visit_is_not_counted(self):
         log = visit("198.51.100.10") + visit("203.0.113.55", owner="1")
         m = self.collect(log)
@@ -186,6 +197,51 @@ class OwnRows(unittest.TestCase):
         row = {"name": "Sandra Whitcomb", "phone": "717-848-2211",
                "service": "gutter cleaning", "notes": "two-story, back of house"}
         self.assertFalse(metrics.is_own_row(row, {"7176599999"}))
+
+
+class CallTaps(BaseCollect):
+    """The tel: beacon — the site's only first-party call signal."""
+
+    def test_a_tap_is_counted(self):
+        m = self.collect(visit("192.0.2.10") + tap("192.0.2.10"))
+        self.assertEqual(m["call_taps"], 1)
+
+    def test_a_tap_is_not_a_pageview_or_a_visit(self):
+        base = self.collect(visit("192.0.2.11"))
+        with_tap = self.collect(visit("192.0.2.11") + tap("192.0.2.11"))
+        self.assertEqual(with_tap["pageviews"], base["pageviews"])
+        self.assertEqual(with_tap["visitors"], base["visitors"])
+        self.assertEqual(with_tap["bot_hits"], base["bot_hits"])
+
+    def test_tapping_twice_is_still_one_caller(self):
+        m = self.collect(visit("192.0.2.12") + tap("192.0.2.12") + tap("192.0.2.12"))
+        self.assertEqual(m["call_taps"], 1)
+
+    def test_two_people_are_two_taps(self):
+        m = self.collect(visit("192.0.2.13") + tap("192.0.2.13")
+                         + visit("192.0.2.14") + tap("192.0.2.14"))
+        self.assertEqual(m["call_taps"], 2)
+
+    def test_the_get_fallback_counts_too(self):
+        m = self.collect(visit("192.0.2.15") + tap("192.0.2.15", method="GET"))
+        self.assertEqual(m["call_taps"], 1)
+
+    def test_a_bot_tap_is_not_a_caller(self):
+        m = self.collect(visit("192.0.2.16")
+                         + tap("192.0.2.16", ua="SemrushBot/7.0"))
+        self.assertEqual(m["call_taps"], 0)
+
+    def test_the_owner_tapping_his_own_number_is_not_a_lead(self):
+        m = self.collect(visit("192.0.2.17", owner="1") + tap("192.0.2.17", owner="1"))
+        self.assertEqual(m["call_taps"], 0)
+
+    def test_a_failed_beacon_is_not_a_tap(self):
+        m = self.collect(visit("192.0.2.18") + tap("192.0.2.18", status=500))
+        self.assertEqual(m["call_taps"], 0)
+
+    def test_no_taps_reads_zero_not_missing(self):
+        m = self.collect(visit("192.0.2.19"))
+        self.assertEqual(m["call_taps"], 0)
 
 
 if __name__ == "__main__":

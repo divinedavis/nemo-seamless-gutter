@@ -26,11 +26,18 @@ Three rules keep the year-end "what worked" list honest:
      declares. Site-wide techniques are judged on a global series instead, and
      the ledger says which.
 
-Deliberately NOT measured here: tel: link taps. Those fire as GA4 `contact_call`
-events and GA4 has no server-side export without a service-account key. The
-report names that gap rather than pretending `leads` is the whole call volume —
-most callers dial the number off the page or the Business Profile and never
-touch the booking form.
+Call taps ARE measured here as of 2026-07-30, first-party. They used to be
+GA4-only (`contact_call`), and GA4 has no server-side export without a
+service-account key, so the one action that turns a visitor into a customer on
+a contractor site was the one action invisible to this engine. The site now
+pings `/e/call-tap` when a tel: link is tapped, nginx answers 204, and that
+line in the access log is the measurement — same log, same bot and owner
+filters, no third party and no cookie.
+
+What this is NOT: proof a call connected. It is intent — the dialer opened.
+Someone can tap and hang up, and calls dialled off the Business Profile or a
+saved contact never touch the site at all, so this is a floor on call volume,
+never a total.
 """
 import datetime
 import gzip
@@ -171,6 +178,12 @@ def hosting_skipper(resolver=None):
 # like fifteen.
 ASSET_RE = re.compile(
     r"\.(css|js|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|eot|map|txt|xml|webmanifest)$", re.I)
+
+# The beacon the site pings when a tel: link is tapped. nginx answers 204, so
+# it costs a log line and nothing else. It is not a page, not an asset and not
+# a visit on its own — a request here only ever means "someone already on the
+# site opened the dialer".
+CALL_TAP_PATH = "/e/call-tap"
 
 LOG_RE = re.compile(
     r'^(?P<ip>\S+) \S+ \S+ \[(?P<ts>[^\]]+)\] '
@@ -363,6 +376,8 @@ def collect(days=1, end=None, log_path=None, resolver=None):
             continue
         if (d, m.group("ip")) in owner_seen:
             continue
+        if m.group("path").split("?")[0] == CALL_TAP_PATH:
+            continue
         s = shape.setdefault((d, m.group("ip")),
                              {"assets": 0, "pages": 0, "uas": set()})
         if ASSET_RE.search(m.group("path").split("?")[0]):
@@ -376,7 +391,7 @@ def collect(days=1, end=None, log_path=None, resolver=None):
         if ua and ua != "-" and not BOT_RE.search(ua):
             s["uas"].add(ua)
 
-    per_day = {d: {"visitors": {}, "pages": 0, "bots": 0} for d in dates}
+    per_day = {d: {"visitors": {}, "pages": 0, "bots": 0, "taps": set()} for d in dates}
     for m in matches:
         d = _parse_ts(m.group("ts"))
         if d not in per_day:
@@ -404,6 +419,12 @@ def collect(days=1, end=None, log_path=None, resolver=None):
             continue
         if skip_owner(ip):
             continue
+        if path.split("?")[0] == CALL_TAP_PATH:
+            # Unique tappers, not taps: two taps from one person is one person
+            # who decided to call, and a rate over 100% would be nonsense.
+            if m.group("status").startswith("2"):
+                per_day[d]["taps"].add(f"{ip}|{ua[:60]}")
+            continue
         if m.group("method") != "GET" or ASSET_RE.search(path.split("?")[0]):
             continue
         if not m.group("status").startswith("2"):
@@ -429,6 +450,7 @@ def collect(days=1, end=None, log_path=None, resolver=None):
             "visitors": len(vis),
             "pageviews": per_day[d]["pages"],
             "bot_hits": per_day[d]["bots"],
+            "call_taps": len(per_day[d]["taps"]),
             "organic_visitors": len(chan.get("organic", ())),
             "local_visitors": len(chan.get("local", ())),
             "ai_visitors": len(chan.get("ai", ())),
