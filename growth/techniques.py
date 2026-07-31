@@ -626,6 +626,11 @@ SERVICE_HINTS = [
     (("half round", "half-round", "copper"), "/services/half-round-gutters.html"),
     (("guard", "leaf protection", "leafguard", "leaf guard"),
      "/services/gutter-guards.html"),
+    # Ahead of the repair/replace lines below, which would otherwise swallow
+    # "soffit and fascia repair york pa" onto the cleaning page and
+    # "gutter soffit and fascia replacement" onto the installation page —
+    # away from the dedicated page the site already ranks 1.8 for.
+    (("soffit", "fascia"), "/services/gutter-soffit-fascia-replacement.html"),
     (("clean", "repair", "downspout", "overflow", "clog", "sagging"),
      "/services/gutter-cleaning-repair.html"),
     (("install", "replace", "new gutters", "seamless"),
@@ -677,7 +682,39 @@ def _host_page(ctx, kw):
     for words, page in SERVICE_HINTS:
         if any(w in q for w in words) and ctx.read(page.lstrip("/")) is not None:
             return page
+    guide = _provider_guide(ctx, q)
+    if guide:
+        return guide
     return "/index.html" if ctx.read("index.html") is not None else None
+
+
+# Words that name a *firm* rather than a *job*. A query built out of these and
+# nothing else — "gutter company york pa", "gutter contractors york pa" — has no
+# town and no service to route on, so it used to fall through to /index.html,
+# which money_pages reads as "nowhere to live, write it a guide". Five guides
+# went up in five days that way: gutter-guys-near-me, gutter-installer-near-me,
+# gutter-services-near-me, gutters-york-pa and best-gutter-company-york-county-pa,
+# each 1,100-1,600 words answering the same question, and three more of the same
+# shape are queued behind them. Routing them at the guide that already exists is
+# what strengthen_pages' own docstring says the engine is supposed to do:
+# concentrate authority instead of splitting it across near-duplicates.
+PROVIDER_WORDS = ("company", "companies", "contractor", "contractors",
+                  "gutter guys", "crew")
+
+# Most general first — whichever of these exists is the one such a query joins.
+PROVIDER_GUIDES = ("/guides/best-gutter-company-york-county-pa.html",
+                   "/guides/gutters-york-pa.html",
+                   "/guides/gutter-installer-near-me.html")
+
+
+def _provider_guide(ctx, q):
+    """The existing 'who should I hire' guide, for queries that only ask that."""
+    if not any(w in q for w in PROVIDER_WORDS):
+        return None
+    for page in PROVIDER_GUIDES:
+        if ctx.read(page.lstrip("/")) is not None:
+            return page
+    return None
 
 
 def _existing_headings(src):

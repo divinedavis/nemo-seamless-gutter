@@ -1326,3 +1326,407 @@ Goal: **2.0%** top-3 share of 98 tracked queries (target 50%).
 - T024 "Text a photo, get a price range today" — 300 GBP views and 7 site visits a day are producing 0 calls because the only asks on the profile and site are 'book a slot' or 'call a contractor and hope he answers'. A homeowner staring at a gutter 
 - T025 Brave submission + FAQPage schema for Claude/Perplexity citations — The site has zero AI-answer-engine visitors, and the ledger's GEO work is content-side only — it assumes the engines can see the pages. They partly can't: the same-morning IndexNow push covers Bing (s
 - T026 Six real York County authority links (chamber, suppliers, historic groups) — The site's ranking problem is prominence, not pages: it already sits top-3 for almost nothing across 87 tracked queries while thin national aggregators outrank it. A handful of genuinely local, hand-v
+
+## 2026-07-31 — review agent
+
+### Lead: the engine ran clean for the first time, and it published a duplicate
+
+Every one of the eleven build steps returned `ok` today and the scout ran. That
+has not happened before. The deploy asked for yesterday clearly landed — proof
+below — and the retry and stall fixes are live.
+
+The engine used that health to publish `/guides/gutter-guys-near-me.html`, the
+**fifth** county-level "which gutter company should I hire" guide in five days,
+and there are three more of the same shape queued behind it. That is the one
+thing in today's data that gets worse the better the engine works, so it is
+first.
+
+Also: **the first booking in the project's history was recorded on 2026-07-30.**
+One booking, no attribution, `own_rows_excluded` unchanged at 13 so it was not
+one of Eric's test rows. It is real and it is one.
+
+### Where the numbers stand
+
+The goal metric — tracked York County queries holding a top-3 position:
+
+| | 07-28 | 07-29 | 07-30 | 07-31 |
+| --- | --- | --- | --- | --- |
+| **top-3 count** | 2 | 2 | 2 | **2** |
+| tracked queries | 76 | 87 | 87 | **98** |
+| share | 2.6% | 2.3% | 2.3% | **2.0%** |
+| top-10 count | 7 | 6 | 6 | 6 |
+| coverage proxy | 48.7% | 44.8% | 46.0% | 42.9% |
+
+**Fifth consecutive day at two.** The county bucket is 2 of 61 (was 2 of 56);
+york, hanover, dover, red-lion, dallastown and spring-grove are all still **0
+top-3**, as they have been every single day since the goal became measurable.
+Both top-3 positions remain county-level.
+
+The share fell today and **nothing on the site got worse**. The scout added 11
+keywords, so the denominator went 87 → 98 while the numerator sat still. This
+is the third time this journal has flagged `share_pct = top3 / total` and the
+first time it has visibly moved the headline number in the wrong direction on
+its own. Of the 98 tracked queries, Search Console has a position for **21**
+(`ranked_known`). The other 77 are in the denominator on the strength of
+somebody having typed them into a list.
+
+Search Console, 28-day rolling:
+
+| | 07-28 | 07-29 | 07-30 | 07-31 |
+| --- | --- | --- | --- | --- |
+| rows | 77 | 87 | 97 | **189** |
+| matched | 17 | 19 | 21 | 21 |
+| clicks | 3 | 3 | 3 | **5** |
+| impressions | 429 | 497 | 686 | **975** |
+| avg position | 12.4 | 13.9 | 12.5 | **17.0** |
+
+Clicks moved for the first time in five days: 3 → 5. Two clicks. I am recording
+it, not celebrating it.
+
+**The impression growth is mostly not York County, and that is the finding of
+the day.** Rows nearly doubled (97 → 189) and average position fell from 12.5 to
+17.0, which is what happens when a pile of new low-position queries enters the
+set. Reading `discovered_untracked`: 24 of the 36 entries name a town NEMO does
+not serve — Finleyville, Donora, Morgan, Burgettstown, Bulger, Belle Vernon and
+Waynesburg (Washington/Greene counties, ~200 miles west), Crum Lynne, Essington
+(Delaware County), Myerstown, Newmanstown (Lebanon County), Perkasie (Bucks),
+Yorkville (not York), and "alamo heights seamless gutter installation", which is
+Texas. Those 24 account for roughly **132 impressions**, about 14% of the
+window, all at positions 22–99, none of them a customer Eric can drive to.
+
+Set against that, the site's genuinely strong showings are geo-agnostic head
+terms where Google decides the location itself: **"gutter installer" position 1,
+212 impressions, 0 clicks** and **"gutter contractor" position 1, 46
+impressions, 0 clicks**. 258 impressions at position 1 across a week and not one
+click. `improve_ctr` looked at the site today and reported "no page is due a
+snippet rewrite". At position 1 a title is rarely the problem; the local pack
+and the AI Overview taking the tap is the likelier answer, which is the caveat
+already written into T019's own hypothesis.
+
+Traffic:
+
+| | 07-27 | 07-28 | 07-29 | 07-30 |
+| --- | --- | --- | --- | --- |
+| visitors | 9 | 11 | 14 | **7** |
+| organic | 0 | 1 | 3 | **3** |
+| direct | 6 | 10 | 8 | **3** |
+| bot hits | 1,948 | 1,954 | 2,374 | 1,200 |
+
+Visitors halved. The whole drop is **direct** (8 → 3); organic held at 3 for a
+second day. Direct on a site with no offline campaign running is mostly people
+who already know the URL, so a fall there is closer to "Eric's phone was busy"
+than to anything the engine did. Local (maps), AI-referred, referral and
+campaign are all still flat zero — thirty days of zeros between them.
+
+Leads: **1 booking (07-30), 0 phone leads, 1 all-time.** `phone_leads` has been
+zero every day, and I now believe that number is close to meaningless: Divine's
+`fc4985b` added first-party `tel:` tap counting on 07-30 and it writes
+`call_taps` into the ledger (`metrics.py:453`), but `snapshot.py` was not
+carrying it, so this review still cannot see whether anybody tried to ring.
+Fixed below.
+
+**The measurement-is-broken watch is not triggered** — 9/11/14/7 with organic at
+3 is a small site, not a broken filter.
+
+### Did previous changes work?
+
+**"Deploy `growth/` to the droplet" (07-30 rec #1) — DONE, and it is the reason
+today looks the way it does.** The test I set was that today's engine entry would
+open with a date rather than the literal word "Yesterday". It opens
+`2026-07-30: 7 visitors`, and the string `Yesterday` does not appear anywhere in
+this repo's `growth/*.py`. That is the droplet running code it did not have
+yesterday. Build steps that failed yesterday and succeeded today: 3 of 3
+(`geo_answer_first_content_pass`, `area_pages`, `strengthen_pages`), plus the
+scout. Yesterday's entry predicted the retry work "would have turned today's one
+published page into four" — today four content steps published. **Honest
+caveat:** a green day proves the code is not broken; it does not prove a retry
+fired. Anthropic may simply not have been overloaded this morning. What is
+genuinely proven is the absence of a permanent stall (below).
+
+**The `strengthen_pages` stall fix (my 07-30 change) — worked, and on the
+identical input.** Yesterday it died on `'emergency gutter repair after storm
+york pa'` with `Expecting ',' delimiter: line 1 column 772`, and because the old
+loop `return`ed rather than continuing, that same query would have been picked
+first every morning forever. Today: `added "Emergency Gutter Repair After a
+Storm in York, PA" to /services/gutter-cleaning-repair.html` for that exact
+query. I cannot tell whether `_escape_inner_quotes` repaired the reply or the
+model simply returned valid JSON this time, and it does not matter much — the
+technique is un-stalled either way.
+
+**"Fix the Akron paragraph on the live gutter-guards page" (07-29 rec #1, 07-30
+rec #2) — NOT acted on. Third day.** `services/gutter-guards.html:163` still
+reads "installs gutter guards on homes in **Akron, PA** and the surrounding
+**Lancaster** and York County area." Today it stopped being a tidiness item:
+Google is showing this site for gutter queries in Lebanon, Bucks, Delaware,
+Washington and Greene counties, and the site's single most-read guard page tells
+it the business works out of a town in Lancaster County. I cannot prove the
+paragraph caused those impressions — one page cannot produce a Texas query — but
+"we serve Akron and Lancaster" plus 24 out-of-area queries is not a coincidence I
+want to leave sitting there for a fourth day.
+
+**"Surface the call count in `snapshot.json`" (07-30 rec #4) — not acted on by
+anyone else, so I did it today.** See the changes section.
+
+**"Reorder the content queue for leaf-fall season" (07-30 rec #3) — not acted
+on.** `growth/techniques.py` still has `order = {"hire": 0, "price": 1,
+"check": 2, "diy": 3}` in both `money_pages` (line 404) and `strengthen_pages`
+(line 705), with no date or season term anywhere near either.
+
+**"Change how the goal share is calculated" (07-29 rec #3) — not acted on, and
+today it cost 0.3 points of headline number for no real-world reason.**
+
+**T007 (ask finished jobs for a Google review) — still `candidate`,
+`activated: null`. Fifth day of asking.** Today's research makes this the most
+expensive unanswered question in the ledger; see below.
+
+**My 07-29 prediction — "3 clicks becomes 15–20 by mid-August while top-3 stays
+at 2"** — two days in: clicks 5, top-3 still 2, impressions up 96% since 07-28.
+Check date stays mid-August.
+
+**T001 / T002 / T017 / T018** — inside `review.py`'s 30-day grace to ~2026-08-26.
+`owned_visitors` 07-27→07-30: T001 2/0/3/0, T002 2/0/2/0, T018 3/0/3/0. Alternating
+zeros on a site with 7–14 visitors a day is noise, not a pattern. Too early, and
+it will be too early for another four weeks.
+
+**The prompt's stated blocker is wrong for the third day running.** It says to
+expect the scout to fail on a self-imposed API cap until 2026-08-01. The scout
+ran today, `ok: true`, and filed T024–T026 plus 11 keywords. That premise should
+be deleted from the task prompt rather than re-checked a fourth time.
+
+### What I checked in the code before recommending anything
+
+**`money_pages` is building a doorway cluster, and its own guard does not see
+it.** Five guides now answer the same question — who should I hire for gutters in
+York County:
+
+| page | words |
+| --- | --- |
+| `gutter-guys-near-me.html` (published today) | 1,517 |
+| `gutter-services-near-me.html` | 1,533 |
+| `gutters-york-pa.html` | 1,598 |
+| `gutter-installer-near-me.html` | 1,080 |
+| `best-gutter-company-york-county-pa.html` | 1,078 |
+
+The prose is not duplicated — I measured word-level `SequenceMatcher` ratios
+between all ten pairs and they run 0.17–0.22, so each was written fresh. The
+*topics* are the problem: four of the five carry a "what gutter work costs in
+York County" section and three carry a "5-inch or 6-inch" section. These pages
+compete with each other for one query cluster, which is precisely what
+`strengthen_pages`' docstring says the engine exists to avoid — "writing a new
+page for those would split the site against itself".
+
+`money_pages` does have a guard: `_needs_its_own_page()` refuses to build when
+`_host_page()` finds a page the query belongs on, and only builds when the
+homepage is the sole fallback. But `_host_page()` (line 660) checks the declared
+target, then town area pages, then `SERVICE_HINTS` — and **never looks at
+`/guides/`**. So a query with no town and no service verb — "gutter company york
+pa", "gutter contractors york pa", "best gutter company york pa", all three
+sitting in today's uncovered list — falls through to `/index.html` and reads as
+"nowhere to live". I ran `_host_page` against the live docroot for 16 queued
+queries to confirm rather than assume: those three returned `/index.html`, i.e.
+three more near-identical guides queued at one a day.
+
+This matters more than housekeeping. Today's research: the March 2026 core
+update hit home-services hardest, "especially sites built on templated location
+pages that swap in city names but don't offer anything unique", with programmatic
+city/location pages reported down 32% in visibility and scaled-content cases
+losing 60–90%.
+
+So I checked whether this site is on the wrong side of that line, and **it is
+not, for the town pages.** I read Wrightsville (published today) and Manchester
+in full: Wrightsville is about wind coming off the Susquehanna, hidden hangers at
+16" centres instead of 24" on exposed elevations, and spike-and-ferrule systems
+working loose in swelling fascia; Manchester is about borough rowhomes where
+there are only one or two places a downspout can land without hitting a
+neighbour's walk. That is a tradesman's knowledge of two specific places, not a
+find-and-replace. The guides were the exposure, and that is what I changed.
+
+**Checked and NOT recommending, because it is already shipped:** FAQPage schema
+(`_faq_ld()`, emitted on every generated page); the sticky tap-to-call bar
+(`templates.py`); IndexNow (T006 active, 4 URLs submitted today); `tel:` tap
+measurement (`metrics.py:453`, landed 07-30).
+
+**Checked against the ledger and NOT filing as new:** everything today's
+research points at is already T007, T016 or T022. Ask Maps changes their
+*ranking*, not their existence — see below.
+
+### What I researched today
+
+- **Google Business Profile signals are now ~32% of local pack weight, and the
+  March 2026 core update re-weighted reviews toward recency.** "A business
+  picking up two or three real reviews every month regularly outranks a
+  competitor sitting on 300 stale reviews", and the update "tightened proximity
+  signals in competitive categories".
+  ([Scorpion](https://www.scorpion.co/articles/news/industry-trends-news/googles-march-2026-core-update-what-local-servic/),
+  [Digital Applied](https://www.digitalapplied.com/blog/local-seo-march-2026-core-update-gbp-optimization-guide),
+  [The Valley Marketing Group](https://thevalleymarketinggroup.com/blog/google-business-profile-2026-service-businesses/))
+  NEMO has 13 reviews at 4.2 and is asking nobody. This is T007, unanswered for
+  five days, and the evidence behind it got stronger today.
+- **"Ask Maps" — Gemini-powered conversational search inside Google Maps,
+  launched March 2026 — decides whether a business fits a question by reading
+  its Business Profile: reviews, photos, listed services and hours.** Consumers
+  increasingly finish the decision inside Maps without visiting the site.
+  ([SEO.com](https://www.seo.com/blog/google-ask-maps/),
+  [Pluspoint](https://www.pluspoint.io/blog/how-google-maps-ask-maps-is-changing-local-seo),
+  [E2M](https://www.e2msolutions.com/blog/local-seo-playbook-agency/))
+  I am deliberately **not** filing this as a new technique. Its entire
+  actionable content is already T022 (itemise the Services list, post real job
+  photos) and T007 (reviews). What it does is re-rank them: a thin Services
+  section is no longer just a missed keyword match, it is the input an AI uses
+  to decide whether to name NEMO at all. That moves T022 above T016.
+- **Fall gutter campaigns should launch in early September, and pre-season
+  bookers are less price-sensitive.** ([NeverMiss](https://nevermisshq.com/blog/gutter-seasonal-marketing-automation),
+  [Elev8](https://www.elev8operations.com/guides/how-to-get-more-gutter-leads-2026))
+  Combined with yesterday's 8–12 week ranking lead time, the deadline for a
+  leaf-season page that actually ranks in leaf season is **now**, and the queue
+  still does not know it.
+- **March 2026 core update vs programmatic pages** — sources above under the
+  code section. ([NEURONwriter](https://neuronwriter.com/march-2026-core-update-aftermath-seo/),
+  [Digital Applied](https://www.digitalapplied.com/blog/programmatic-seo-after-march-2026-surviving-scaled-content-ban))
+- **Zero-click: a page can hold position 1 and take no clicks**, and the advice
+  is to filter for high-impression/low-CTR pages and to track Business Profile
+  actions ahead of raw site traffic.
+  ([WebNet](https://www.webnetinnovation.com/blog/getting-impressions-in-google-search-console-but-no-clicks-heres-why/),
+  [Surmado](https://www.surmado.com/blog/local-ai-search-zero-click-survival))
+  Directly explains "gutter installer", position 1, 212 impressions, 0 clicks.
+
+**Rejected:**
+- **Search Console's new Generative AI performance reports** (announced 3 June
+  2026) — I went looking for these specifically, because they would answer this
+  journal's biggest open question: whether AI Overviews are eating the clicks.
+  They will not, yet. They report **impressions only — no clicks, no CTR, no
+  query data** — and rollout began with a subset of **UK-based** site owners.
+  I found no confirmed Search Console API dimension for them, so there is
+  nothing for `gsc.py` to call. Worth re-checking in a month; not worth
+  Divine's afternoon today.
+  ([PinMeTo](https://www.pinmeto.com/news/google-search-console-generative-ai-reports-2026/),
+  [PikaSEO](https://pikaseo.com/articles/google-search-console-ai-performance-reports-2026))
+- **Re-searching LSAs, Nextdoor, speed-to-lead, door-hangers, GBP categories,
+  call-first mechanics, inspector referrals, photo-texting, Brave, local links.**
+  Those are T011–T026. Re-searching a candidate and filing it again is how a
+  ledger turns into noise.
+
+### Recommendations
+
+**Everything below needs a deploy to the droplet before it does anything.**
+`/var/www/nemo-seamless-gutter` is not a git checkout and `publish_state.sh`
+copies droplet → repo only.
+
+1. **Fix the Akron/Lancaster paragraph on the live gutter-guards page.**
+   *(Divine — minutes, needs droplet access. Third day of asking.)* Rewrite the
+   `<p class="lead">` under the `<!-- geo:answer-first -->` marker in
+   `services/gutter-guards.html` so it names York County and nothing else, and
+   drop that path from `geo_answered` in `state.json` so the corrected pass can
+   redo it. **Do not fix it in this repo** — `services/` is rsynced droplet →
+   repo every morning and an edit here is reverted tomorrow. Expected effect:
+   one fewer signal telling Google this business works in Lancaster County. How
+   you would know: the out-of-area share of `discovered_untracked` falling from
+   today's 24-of-36 over the next month. Checked: still live at
+   `services/gutter-guards.html:163` in today's post-publish tree.
+2. **Deploy today's two engine changes.** *(Divine — a sync.)* The
+   duplicate-guide guard stops three near-identical guides being published over
+   the next three mornings, starting tomorrow; the snapshot change makes call
+   taps visible to this review for the first time. Both are inert until synced.
+   Checked: `publish_state.sh` never copies `growth/*.py` in either direction.
+3. **Answer T007 — yes or no.** *(Eric — one decision. Fifth day.)* Today's
+   research raised the stakes: review **recency** now outweighs volume in the
+   pack, and Ask Maps reads reviews to decide whether to recommend a business at
+   all. 13 reviews at 4.2, nobody being asked. A "no" closes it honestly;
+   silence just keeps it on the list. Checked: `activated: null` in today's
+   snapshot.
+4. **T022 before T016 — itemise the GBP Services list and start a weekly job
+   photo.** *(Eric — free, an hour, then five minutes a week.)* Ask Maps reads
+   the Services list, the photos and the reviews to decide fit. Every distinct
+   thing sold as its own entry with an honest one-line description: 5" and 6"
+   K-style, half-round aluminium, half-round copper, guards, cleaning, repair,
+   downspout extension, soffit and fascia. This is the cheapest thing on the
+   list that touches the 300-views/0-calls problem. Checked: T022 already in the
+   ledger as a candidate — I am re-ranking it, not re-proposing it.
+5. **Reorder the content queue for leaf-fall, now.** *(Divine — a small change
+   to the sort; the engine does the rest.)* Carried from 07-30, unactioned, and
+   the window is narrower today than it was yesterday: pages take 8–12 weeks,
+   York County leaf-fall peaks mid-October to mid-November, campaigns should be
+   live in early September. Cleaning and guard queries still sort behind every
+   `hire` query because they are `price`/`check`/`diy` intent. Checked:
+   `growth/techniques.py:404` and `:705`, both unchanged.
+6. **Fix the goal-share denominator.** *(Divine — a few lines in
+   `keywords.summary()`.)* Report top-3 against `ranked_known` (21) as the
+   honest measured number, keeping top-3-against-all as the ambition. Today the
+   scout lowered the headline goal metric by adding keywords, which is a
+   measurement artefact reporting as a regression. Checked:
+   `growth/keywords.py:296`, still `top3 / total`.
+7. **Carried, unverifiable from this repo:** Bing Places (07-30 rec #6), Apple
+   Business Connect, the four GBP owner Q&As, the ~30-page town cap. Open until
+   someone says otherwise.
+
+### What I changed in this repo today
+
+Three edits, all engine code, none live until deployed. 56 tests pass.
+
+- **`growth/techniques.py` — `_provider_guide()` + `PROVIDER_WORDS`.**
+  `_host_page()` now routes a query whose distinguishing words only name a
+  *firm* ("company", "companies", "contractor", "contractors", "gutter guys",
+  "crew") at the guide that already answers it, instead of falling through to
+  `/index.html`. `money_pages` then declines to write a sixth duplicate and
+  `strengthen_pages` adds the section to the existing guide, which is the
+  behaviour both functions' docstrings already describe. The check runs *after*
+  the town and service lookups, so nothing that routes correctly today changes.
+  Verified against the live docroot: the three queued duplicates
+  ("best gutter company york pa", "gutter company york pa", "gutter contractors
+  york pa") now resolve to `/guides/best-gutter-company-york-county-pa.html`,
+  while "best gutter company dallastown pa" still goes to the Dallastown area
+  page and "gutter installers york pa" still goes to the installation service
+  page.
+- **`growth/techniques.py` — a `soffit`/`fascia` entry in `SERVICE_HINTS`,
+  placed above the repair and install lines.** Found while testing the above:
+  "soffit and fascia repair york pa" was routing to the cleaning/repair page and
+  "gutter soffit and fascia replacement" to the installation page — away from
+  `/services/gutter-soffit-fascia-replacement.html`, the dedicated page the site
+  already ranks 1.8 for and which T018 exists to have built.
+- **`growth/snapshot.py` — `call_taps` and `ai_calls` added to `SERIES`.**
+  Both were already being written into the ledger and read by nobody, because
+  the review agent sees only this file. Counts are aggregates; caller numbers
+  stay in the gitignored cache, so `_assert_no_pii` is unaffected. This is
+  07-30 rec #4, done rather than asked for a second time.
+
+I did not touch `techniques.json`, `keywords.json`, `results.jsonl` or
+`state.json`; did not activate any candidate; did not edit any page under
+`areas/`, `guides/` or `services/`.
+
+### Reasoning and uncertainties
+
+The duplicate-guide finding is the one I would defend hardest, because it does
+not rest on interpretation: five pages exist, I read their headings, and the
+next three queue entries route to `/index.html` in a function I executed against
+the real docroot. What I am *less* sure of is the size of the harm. Five
+overlapping guides on a 33-page site is not the thousands-of-pages pattern
+Google's scaled-content policy targets, and the prose is genuinely distinct. My
+fix is justified by authority-splitting — our own pages competing for one query —
+more than by any penalty risk, and I would rather stop the pattern at five than
+argue about where the line is at fifteen.
+
+The out-of-area impressions are the finding I am least certain how to act on.
+132 impressions across two dozen towns Eric cannot serve could mean Google is
+confused about the service area, or it could simply be what a young site looks
+like while Google works out what it is — broad, unconfident matching that
+settles as the entity firms up. The Akron paragraph is worth fixing either way,
+and it is free, so I have not tried to resolve the ambiguity before recommending
+it. What would resolve it: if the out-of-area share is still a quarter of
+discovered queries in a month with the paragraph fixed, the problem is the
+entity and not one page.
+
+I am uneasy about how good today looks. Eleven green steps, the first booking,
+clicks finally moving — and the underlying goal metric has not moved in five
+days, every town in the county is still at zero, and the two positions the site
+holds at number one produce no clicks at all. The engine is working. Whether the
+work is *earning* anything is still, honestly, unknown, and will stay unknown
+until the grace period ends on 26 August. The danger in a day like today is
+mistaking a healthy machine for a growing business.
+
+What would change my mind about the current strategy: if clicks track
+impressions through mid-August, the content engine deserves more fuel and
+recommendation 5 becomes the most important item on the list. If impressions
+keep climbing while clicks stay in single digits, then this site's visibility is
+landing where the map pack and AI Overviews take the tap, and the honest answer
+is the offline and profile channels — T007, T022, T021, T012 — rather than a
+thirty-fourth page.

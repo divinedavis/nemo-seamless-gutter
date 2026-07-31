@@ -25,10 +25,19 @@ SNAPSHOT_PATH = os.path.join(HERE, "snapshot.json")
 JOURNAL_PATH = os.path.join(HERE, "JOURNAL.md")
 
 # Series worth carrying to the agent. Aggregates only.
+#
+# `call_taps` (metrics.py, unique tappers of a tel: link per day) and `ai_calls`
+# (calls.py, inbound calls that reached the phone assistant) were both being
+# written into the ledger and read by nobody: the review agent sees only this
+# file, so a number missing here does not exist as far as the judgment layer is
+# concerned, and three consecutive reviews had to write "the phone is not
+# measured from here" about metrics that were already being collected. Counts
+# are aggregates — the caller numbers stay in the gitignored cache — so they
+# pass _assert_no_pii unchanged.
 SERIES = ("visitors", "pageviews", "organic_visitors", "local_visitors",
           "ai_visitors", "direct_visitors", "referral_visitors",
-          "campaign_visitors", "bot_hits", "bookings", "phone_leads",
-          "total_leads")
+          "campaign_visitors", "bot_hits", "call_taps", "ai_calls",
+          "bookings", "phone_leads", "total_leads")
 
 PII_PATTERNS = (
     (re.compile(r"\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b"), "phone number"),
