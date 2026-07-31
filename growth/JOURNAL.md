@@ -1303,3 +1303,26 @@ more pages. If clicks start tracking impressions, the content engine is working
 and the correct move is to feed it — which is what recommendation 3 is really
 about, because after mid-August the seasonal window closes and that question
 gets answered a year late.
+
+## 2026-07-31 — engine run
+
+Goal: **2.0%** top-3 share of 98 tracked queries (target 50%).
+2026-07-30: 7 visitors (3 organic, 0 maps) · 1 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: answer-first opening on /guides/gutter-cleaning-cost-york-pa.html for 'gutter cleaning' (55 words, + FAQ schema, 8 impressions)
+- `strengthen_pages` — ok: added "Emergency Gutter Repair After a Storm in York, PA" to /services/gutter-cleaning-repair.html for 'emergency gutter repair after storm york pa'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: published Wrightsville (11,841 bytes; 2 town(s) left in the queue)
+- `money_pages` — ok: published 'gutter guys near me' → /guides/gutter-guys-near-me.html
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 32 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 4 URL(s), HTTP 200
+
+**Scout proposed (as candidates, not running):**
+- T024 "Text a photo, get a price range today" — 300 GBP views and 7 site visits a day are producing 0 calls because the only asks on the profile and site are 'book a slot' or 'call a contractor and hope he answers'. A homeowner staring at a gutter 
+- T025 Brave submission + FAQPage schema for Claude/Perplexity citations — The site has zero AI-answer-engine visitors, and the ledger's GEO work is content-side only — it assumes the engines can see the pages. They partly can't: the same-morning IndexNow push covers Bing (s
+- T026 Six real York County authority links (chamber, suppliers, historic groups) — The site's ranking problem is prominence, not pages: it already sits top-3 for almost nothing across 87 tracked queries while thin national aggregators outrank it. A handful of genuinely local, hand-v
