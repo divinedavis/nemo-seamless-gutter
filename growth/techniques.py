@@ -253,7 +253,8 @@ def area_pages(ctx):
     done = _area_slugs(ctx)
     todo = [t for t in TOWN_QUEUE if f"seamless-gutters-{t[0]}-pa.html" not in done]
     if not todo:
-        return {"ok": True, "detail": "every queued town already has a page"}
+        return {"ok": True, "noop": True,
+                "detail": "every queued town already has a page"}
 
     # A town that fails to generate should cost that town, not the day — the
     # next one in the queue is just as worth publishing, and the one skipped
@@ -395,7 +396,7 @@ def money_pages(ctx):
 
     gaps = [k for k in kws if _needs_its_own_page(k)]
     if not gaps:
-        return {"ok": True,
+        return {"ok": True, "noop": True,
                 "detail": "no query needs its own page — the remaining gaps all "
                           "belong on pages that exist, which strengthen_pages handles"}
 
@@ -409,7 +410,8 @@ def money_pages(ctx):
     slug = re.sub(r"[^a-z0-9]+", "-", query.lower()).strip("-")[:70]
     filename = f"{slug}.html"
     if ctx.read(f"guides/{filename}") is not None:
-        return {"ok": True, "detail": f"'{query}' already has a page at /guides/{filename}"}
+        return {"ok": True, "noop": True,
+                "detail": f"'{query}' already has a page at /guides/{filename}"}
 
     canonical = f"{SITE}/guides/{filename}"
     try:
@@ -472,7 +474,8 @@ def internal_links(ctx):
     """
     pages = _all_area_pages(ctx)
     if len(pages) < 2:
-        return {"ok": True, "detail": "not enough area pages to interlink yet"}
+        return {"ok": True, "noop": True,
+                "detail": "not enough area pages to interlink yet"}
 
     updated = 0
     for label, href in pages:
@@ -500,7 +503,8 @@ def internal_links(ctx):
         ctx.backup(rel)
         ctx.write(rel, out)
         updated += 1
-    return {"ok": True, "detail": f"refreshed nearby-links on {updated} page(s)"}
+    return {"ok": True, "noop": not updated,
+            "detail": f"refreshed nearby-links on {updated} page(s)"}
 
 
 # ----------------------------------------------------------------- local schema
@@ -558,7 +562,8 @@ def local_schema(ctx):
         out = src.replace("</head>", block + "</head>", 1)
         verb = "added"
     if out == src:
-        return {"ok": True, "detail": "LocalBusiness schema already current"}
+        return {"ok": True, "noop": True,
+                "detail": "LocalBusiness schema already current"}
     ctx.backup("index.html")
     ctx.write("index.html", out)
     return {"ok": True, "detail": f"{verb} LocalBusiness schema on the homepage"}
@@ -569,7 +574,7 @@ def local_schema(ctx):
 def rebuild_sitemap(ctx):
     """Re-run the existing sitemap generator so new pages are discoverable."""
     if ctx.dry_run:
-        return {"ok": True, "detail": "[dry-run] would rebuild sitemap.xml"}
+        return {"ok": True, "noop": True, "detail": "[dry-run] would rebuild sitemap.xml"}
     script = os.path.join(ctx.docroot, "seo", "gen_sitemap.py")
     if not os.path.exists(script):
         return {"ok": False, "detail": "seo/gen_sitemap.py not found"}
@@ -592,9 +597,10 @@ def ping_indexnow(ctx):
     """
     urls = list(dict.fromkeys(ctx.new_urls + ctx.changed_urls))
     if not urls:
-        return {"ok": True, "detail": "nothing new to submit"}
+        return {"ok": True, "noop": True, "detail": "nothing new to submit"}
     if ctx.dry_run:
-        return {"ok": True, "detail": f"[dry-run] would submit {len(urls)} URL(s)"}
+        return {"ok": True, "noop": True,
+                "detail": f"[dry-run] would submit {len(urls)} URL(s)"}
 
     try:
         key = open(os.path.join(ctx.docroot, "seo", "indexnow_key.txt")).read().strip()
@@ -805,7 +811,8 @@ def strengthen_pages(ctx):
     if errors:
         return {"ok": False,
                 "detail": f"{len(errors)} candidate(s) failed, last: {errors[-1]}"}
-    return {"ok": True, "detail": "no uncovered query has an existing page to strengthen"}
+    return {"ok": True, "noop": True,
+            "detail": "no uncovered query has an existing page to strengthen"}
 
 
 # ----------------------------------------------------------- service pages
@@ -840,7 +847,8 @@ def service_pages(ctx):
     todo = [s for s in SERVICE_QUEUE
             if ctx.read(f"services/{s[0]}.html") is None]
     if not todo:
-        return {"ok": True, "detail": "every queued service already has a page"}
+        return {"ok": True, "noop": True,
+                "detail": "every queued service already has a page"}
 
     slug, title, query, brief = todo[0]
     filename = f"{slug}.html"
@@ -950,7 +958,8 @@ def improve_ctr(ctx):
     """
     from . import gsc
     if not gsc.available():
-        return {"ok": True, "detail": "no Search Console key — nothing to optimise against"}
+        return {"ok": True, "noop": True,
+                "detail": "no Search Console key — nothing to optimise against"}
 
     history = ledger.get_state("ctr_rewrites", {})
     today = ledger.today()
@@ -1029,7 +1038,7 @@ def improve_ctr(ctx):
                           f"({page['impressions']} impressions, {page['clicks']} clicks, "
                           f"pos {page['position']:.1f}) — {data.get('why', '')[:110]}"}
 
-    return {"ok": True, "detail": "no page is due a snippet rewrite"}
+    return {"ok": True, "noop": True, "detail": "no page is due a snippet rewrite"}
 
 
 # --------------------------------------------------------- tracked universe
@@ -1088,7 +1097,7 @@ def adopt_queries(ctx):
     """
     from . import gsc, keywords
     if not gsc.available():
-        return {"ok": True, "detail": "no Search Console key"}
+        return {"ok": True, "noop": True, "detail": "no Search Console key"}
     try:
         found = gsc.discover(min_impressions=2)
     except Exception as e:
@@ -1123,7 +1132,8 @@ def adopt_queries(ctx):
             added.append(q)
 
     if not added:
-        return {"ok": True, "detail": "no new in-area searches worth tracking"}
+        return {"ok": True, "noop": True,
+                "detail": "no new in-area searches worth tracking"}
     return {"ok": True,
             "detail": f"adopted {len(added)} real search(es) into the tracked "
                       f"universe: {', '.join(added[:5])}"
@@ -1314,7 +1324,8 @@ def geo_answer_first_content_pass(ctx):
     if errors:
         return {"ok": False,
                 "detail": f"{len(errors)} page(s) failed, last: {errors[-1]}"}
-    return {"ok": True, "detail": "every ranking page already opens with a direct answer"}
+    return {"ok": True, "noop": True,
+            "detail": "every ranking page already opens with a direct answer"}
 
 
 REGISTRY = {
