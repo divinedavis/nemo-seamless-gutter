@@ -244,5 +244,31 @@ class CallTaps(BaseCollect):
         self.assertEqual(m["call_taps"], 0)
 
 
+class Rotations(unittest.TestCase):
+    """A backfill is only as deep as the archives it bothers to open."""
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+        self.log = os.path.join(self.dir, "nemo-access.log")
+
+    def touch(self, name):
+        open(os.path.join(self.dir, name), "w").close()
+
+    def test_every_kept_rotation_is_read_in_order(self):
+        for n in ("nemo-access.log", "nemo-access.log.1",
+                  "nemo-access.log.2.gz", "nemo-access.log.3.gz"):
+            self.touch(n)
+        got = [os.path.basename(p) for p in metrics.rotations(self.log)]
+        self.assertEqual(got, ["nemo-access.log", "nemo-access.log.1",
+                               "nemo-access.log.2.gz", "nemo-access.log.3.gz"])
+
+    def test_another_sites_log_is_not_picked_up(self):
+        self.touch("nemo-access.log")
+        self.touch("other-access.log.1")
+        self.touch("nemo-access.log.old")
+        got = [os.path.basename(p) for p in metrics.rotations(self.log)]
+        self.assertEqual(got, ["nemo-access.log"])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

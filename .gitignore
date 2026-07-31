@@ -43,4 +43,9 @@ growth/.elevenlabs_key
 # Caller numbers for calls already identified — personal data, and rebuildable
 # from the ElevenLabs API, so it stays on the droplet.
 growth/calls_cache.json
+# All-time visitor roster. Salted hashes of IP+UA, never the addresses
+# themselves, but still audience data — and, like the ledger, a history the
+# access log can no longer rebuild once it has rotated.
+growth/audience.json
+growth/audience.json.tmp
 *.growth-bak

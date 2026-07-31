@@ -307,16 +307,37 @@ def _open_log(path):
     return open(path, errors="replace")
 
 
-def read_log(dates, path=None):
-    """Parse the access log(s) for the given set of date strings.
+def rotations(path):
+    """The live log plus every rotation of it still on disk, newest first.
 
-    Also reads the .1 rotation, because a 6am run needs yesterday and logrotate
-    will usually have moved yesterday's tail into nemo-access.log.1 overnight.
+    A 6am run needs yesterday, and logrotate will usually have moved yesterday's
+    tail into nemo-access.log.1 overnight — but a backfill wants everything
+    logrotate has kept, so the whole set is enumerated rather than the first two
+    guessed at. Lines are date-filtered anyway, so reading an extra archive
+    costs a scan and changes no number.
     """
+    out = [path]
+    d, base = os.path.dirname(path) or ".", os.path.basename(path)
+    try:
+        names = os.listdir(d)
+    except OSError:
+        return out
+    keyed = []
+    for n in names:
+        if not n.startswith(base + "."):
+            continue
+        suffix = n[len(base) + 1:].removesuffix(".gz")
+        if suffix.isdigit():
+            keyed.append((int(suffix), os.path.join(d, n)))
+    return out + [p for _, p in sorted(keyed)]
+
+
+def read_log(dates, path=None):
+    """Parse the access log(s) for the given set of date strings."""
     path = path or ACCESS_LOG
     want = set(dates)
     hits = []
-    for p in (path, path + ".1", path + ".2.gz"):
+    for p in rotations(path):
         if not os.path.exists(p):
             continue
         try:
@@ -334,11 +355,18 @@ def read_log(dates, path=None):
     return hits
 
 
-def collect(days=1, end=None, log_path=None, resolver=None):
+def collect(days=1, end=None, log_path=None, resolver=None, roster=None):
     """Measure the last `days` complete days. Returns {date: {metric: value}}.
 
     Default is yesterday only — today is still in progress, and a partial day
     recorded as a data point would poison every trend the review loop reads.
+
+    Pass a dict as `roster` to also receive the surviving visitors themselves as
+    {date: {visitor_id: pageviews}}. The daily counts here cannot answer "how
+    many different people, ever" or "how many came back", because the access log
+    is rotated away after a few days — audience.py accumulates that from this
+    sink. It is an out-parameter rather than a second return value so no caller
+    of collect() has to change.
     """
     end = end or (datetime.date.today() - datetime.timedelta(days=1))
     start = end - datetime.timedelta(days=days - 1)
@@ -463,6 +491,8 @@ def collect(days=1, end=None, log_path=None, resolver=None):
                     if any(p.startswith(pre) for p in v["paths"] for pre in prefixes))
             mm[f"owned::{slug}"] = n
         out[d] = mm
+        if roster is not None:
+            roster[d] = {vid: len(v["paths"]) for vid, v in vis.items()}
 
     # ---- leads and bookings: the numbers that actually mean money -----------
     lead_rows = read_leads(dates)
@@ -599,9 +629,18 @@ def record_day(date, m):
 
 
 def collect_and_record(days=1, log_path=None):
-    data = collect(days=days, log_path=log_path)
+    roster = {}
+    data = collect(days=days, log_path=log_path, roster=roster)
     for d, m in sorted(data.items()):
         record_day(d, m)
+    # Fold today's visitors into the all-time roster before the log rotates
+    # away. Imported here, not at module scope, because audience imports this
+    # module back and the daily numbers must not depend on the roster file.
+    try:
+        from . import audience
+        audience.merge_and_save(roster)
+    except Exception:
+        pass
     totals = lead_totals()
     today = ledger.today()
     for k, v in totals.items():
