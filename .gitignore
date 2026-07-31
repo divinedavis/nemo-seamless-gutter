@@ -20,6 +20,10 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
+# python bytecode — the review agent runs the growth test suite from a checkout
+__pycache__/
+*.py[cod]
+
 # SEO automation secrets + generated drafts
 seo/.env
 seo/drafts/
