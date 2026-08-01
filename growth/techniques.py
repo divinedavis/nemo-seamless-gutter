@@ -79,7 +79,20 @@ class Context:
         self.changed_urls = []
 
     def path(self, relpath):
-        return os.path.join(self.docroot, relpath.lstrip("/"))
+        """Resolve a docroot-relative path, refusing anything that escapes it.
+
+        Every caller today builds its filename from a slug that has already been
+        through `[^a-z0-9]+`, so nothing can currently traverse. That is a
+        property of the callers, not of this function — and this function is what
+        writes to disk as root. One future technique that derives a filename from
+        a model-supplied title without slugifying it would otherwise be an
+        arbitrary file write.
+        """
+        p = os.path.normpath(os.path.join(self.docroot, relpath.lstrip("/")))
+        root = os.path.normpath(self.docroot)
+        if p != root and not p.startswith(root + os.sep):
+            raise ValueError(f"path escapes the docroot: {relpath!r}")
+        return p
 
     def read(self, relpath):
         p = self.path(relpath)
@@ -132,6 +145,23 @@ def _attr(s):
     return html.escape(str(s or ""), quote=True)
 
 
+def _ld(obj):
+    """Serialise JSON-LD for embedding inside a <script> block.
+
+    json.dumps escapes quotes and backslashes but NOT '/', so a model that
+    writes "</script>" anywhere in an FAQ answer or a lede closes the block
+    early and everything after it is parsed as HTML. Every other field on
+    these pages goes through _esc(); this is the one place model text lands
+    somewhere _esc() cannot be used, because the content has to stay valid
+    JSON.
+
+    Escaping '<' as \\u003c is valid JSON (the parser reads it back as '<'),
+    is what the JSON-LD spec recommends for inline blocks, and closes the
+    comment form ('<!--') as well as the tag form.
+    """
+    return json.dumps(obj, indent=2).replace("<", "\\u003c")
+
+
 def _render_sections(sections):
     """Body copy as it appears inside div.container.prose on the real pages:
     headings and paragraphs directly, no extra wrapper divs."""
@@ -160,11 +190,11 @@ def _render_faqs(faqs):
 
 
 def _faq_ld(faqs):
-    return json.dumps({
+    return _ld({
         "@context": "https://schema.org", "@type": "FAQPage",
         "mainEntity": [{"@type": "Question", "name": f.get("q", ""),
                         "acceptedAnswer": {"@type": "Answer", "text": f.get("a", "")}}
-                       for f in (faqs or [])]}, indent=2)
+                       for f in (faqs or [])]})
 
 
 def _provider_ld():
@@ -289,7 +319,7 @@ def area_pages(ctx):
     filename = f"seamless-gutters-{slug}-pa.html"
     canonical = f"{SITE}/areas/{filename}"
 
-    service_ld = json.dumps({
+    service_ld = _ld({
         "@context": "https://schema.org", "@type": "Service",
         "serviceType": "Seamless Gutter Installation",
         "name": f"Seamless Gutters in {town}, PA",
@@ -299,7 +329,7 @@ def area_pages(ctx):
         "url": canonical,
         "offers": {"@type": "Offer", "priceCurrency": "USD",
                    "description": f"Free seamless gutter estimate in {town}, PA"},
-    }, indent=2)
+    })
 
     body = _render_sections(data["sections"])
     faqs = _render_faqs(data.get("faqs"))
@@ -313,7 +343,7 @@ def area_pages(ctx):
         meta_desc=_attr((data.get("meta_desc") or "")[:158]),
         canonical=canonical,
         geo=templates.GEO_META.format(town=_esc(town), lat=lat, lon=lon),
-        og_title=f"Seamless Gutters in {town}, PA — {BRAND}",
+        og_title=_attr(f"Seamless Gutters in {town}, PA — {BRAND}"),
         og_type="website",
         primary_ld=service_ld, faq_ld=_faq_ld(data.get("faqs")),
         crumb_href="/#areas", crumb_label="Service Areas",
@@ -425,7 +455,7 @@ def money_pages(ctx):
         return {"ok": False, "detail": f"model returned no sections for '{query}'"}
 
     h1 = data.get("h1") or query.title()
-    article_ld = json.dumps({
+    article_ld = _ld({
         "@context": "https://schema.org", "@type": "Article",
         "headline": h1[:110],
         "description": (data.get("meta_desc") or "")[:300],
@@ -435,7 +465,7 @@ def money_pages(ctx):
                       "logo": {"@type": "ImageObject",
                                "url": f"{SITE}/assets/logo-4k.png"}},
         "about": _provider_ld(),
-        "mainEntityOfPage": canonical}, indent=2)
+        "mainEntityOfPage": canonical})
 
     body = _render_sections(data["sections"])
     faqs = _render_faqs(data.get("faqs"))
@@ -444,10 +474,10 @@ def money_pages(ctx):
 
     page = templates.HEAD.format(
         ga=GA_ID,
-        title=f"{data.get('title') or h1} | {BRAND}",
+        title=_esc(f"{data.get('title') or h1} | {BRAND}"),
         meta_desc=_attr((data.get("meta_desc") or "")[:158]),
         canonical=canonical, geo="",
-        og_title=f"{h1} — {BRAND}", og_type="article",
+        og_title=_attr(f"{h1} — {BRAND}"), og_type="article",
         primary_ld=article_ld, faq_ld=_faq_ld(data.get("faqs")),
         crumb_href="/#guides", crumb_label="Guides", crumb_here=_esc(h1[:48]),
         eyebrow="Gutter Guide · York County, PA",
@@ -520,7 +550,7 @@ def local_schema(ctx):
     if src is None:
         return {"ok": False, "detail": "no index.html in the docroot"}
 
-    blob = json.dumps({
+    blob = _ld({
         "@context": "https://schema.org", "@type": "RoofingContractor",
         "@id": f"{SITE}/#business", "name": BRAND, "url": f"{SITE}/",
         "telephone": PHONE_E164, "email": "enemo@nemoseamlessgutter.com",
@@ -547,7 +577,7 @@ def local_schema(ctx):
                     ("Gutter cleaning and repair",
                      "/services/gutter-cleaning-repair.html"),
                     ("Half-round gutters", "/services/half-round-gutters.html"))]},
-    }, indent=2)
+    })
 
     marker = '<script type="application/ld+json" data-growth="localbusiness">'
     block = f"  {marker}\n{blob}\n  </script>\n"
@@ -923,7 +953,7 @@ def service_pages(ctx):
         return {"ok": False, "detail": f"model returned no sections for {title}"}
 
     h1 = data.get("h1") or title
-    service_ld = json.dumps({
+    service_ld = _ld({
         "@context": "https://schema.org", "@type": "Service",
         "serviceType": title.replace("&amp;", "and"),
         "name": h1, "description": (data.get("lede") or "")[:300],
@@ -933,7 +963,7 @@ def service_pages(ctx):
         "url": canonical,
         "offers": {"@type": "Offer", "priceCurrency": "USD",
                    "description": "Free on-site estimate in York County, PA"},
-    }, indent=2)
+    })
 
     body = _render_sections(data["sections"])
     faqs = _render_faqs(data.get("faqs"))
@@ -941,13 +971,13 @@ def service_pages(ctx):
         body += "\n" + faqs
 
     page = templates.HEAD.format(
-        ga=GA_ID, title=f"{data.get('title') or h1} | {BRAND}",
+        ga=GA_ID, title=_esc(f"{data.get('title') or h1} | {BRAND}"),
         meta_desc=_attr((data.get("meta_desc") or "")[:158]),
         canonical=canonical, geo="",
-        og_title=f"{h1} — {BRAND}", og_type="website",
+        og_title=_attr(f"{h1} — {BRAND}"), og_type="website",
         primary_ld=service_ld, faq_ld=_faq_ld(data.get("faqs")),
         crumb_href="/#services", crumb_label="Services", crumb_here=_esc(title),
-        eyebrow=f"{title} · York County, PA",
+        eyebrow=_esc(f"{title} · York County, PA"),
         h1=_esc(h1), lede=_esc(data.get("lede", "")),
         body=body, cta_heading="Get a free estimate",
         nearby=_nearby_block(_all_area_pages(ctx), ""))

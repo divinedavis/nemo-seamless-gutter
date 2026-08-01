@@ -17,8 +17,10 @@ import re
 import sys
 import json
 import glob
+import html
 import urllib.request
 import urllib.error
+from html.parser import HTMLParser
 
 WEB_ROOT = os.environ.get("WEB_ROOT", "/var/www/nemo-seamless-gutter")
 BASE = "https://nemoseamlessgutter.com"
@@ -142,11 +144,130 @@ def claude(topic):
     return json.loads(text)
 
 
+# --- treating the model's output as untrusted --------------------------------
+# The prompt asks for a specific short list of tags. That is an instruction, not
+# a constraint: this file takes `body_html` and writes it into a live page, and
+# on --publish that page goes up with nobody having read it. So the allowlist is
+# enforced here, where it is actually binding.
+
+ALLOWED_TAGS = {
+    "p": {"class"}, "h2": set(), "h3": set(), "ul": set(), "ol": set(),
+    "li": set(), "strong": set(), "em": set(), "br": set(), "a": {"href"},
+}
+VOID_TAGS = {"br"}
+# Only the classes the site's stylesheet actually defines for prose.
+ALLOWED_CLASSES = {"lead"}
+# For most disallowed tags the right move is to drop the tag and keep the text
+# — a stray <div> should lose the wrapper, not the sentence. For these the
+# content IS code, so keeping it would print the body of a script onto the page
+# as visible prose. Drop both.
+DROP_CONTENT_TAGS = {"script", "style", "template", "noscript", "svg", "math"}
+
+
+def _safe_href(v):
+    """Same-site links only. The guides link to /services/... and tel:; there is
+    no reason for a generated page to point anywhere else, and 'javascript:' is
+    the whole reason this check exists."""
+    v = (v or "").strip()
+    if v.startswith("/") and not v.startswith("//"):
+        return v
+    if v.startswith(f"{BASE}/"):
+        return v
+    if re.fullmatch(r"tel:\+?[0-9\-() ]{7,}", v):
+        return v
+    return None
+
+
+class _Sanitizer(HTMLParser):
+    """Rewrite the model's HTML keeping only allowlisted tags and attributes.
+
+    Anything not on the list is dropped and its text kept, so a stray <div>
+    loses the wrapper rather than the sentence. Text is re-escaped on the way
+    out, which is what closes the injection: a <script> becomes literal text.
+    """
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.out = []
+        self.open_tags = []
+        self.suppress_depth = 0
+
+    def handle_starttag(self, tag, attrs):
+        if tag in DROP_CONTENT_TAGS:
+            self.suppress_depth += 1
+            return
+        if self.suppress_depth or tag not in ALLOWED_TAGS:
+            return
+        # <p><p> is invalid and browsers auto-close it; do the same here so the
+        # generated source matches what actually renders.
+        if tag in ("p", "li") and self.open_tags and self.open_tags[-1] == tag:
+            self.out.append(f"</{self.open_tags.pop()}>")
+        keep = []
+        for name, value in attrs:
+            if name not in ALLOWED_TAGS[tag]:
+                continue
+            if name == "class":
+                classes = [c for c in (value or "").split() if c in ALLOWED_CLASSES]
+                if classes:
+                    keep.append(f'class="{" ".join(classes)}"')
+            elif name == "href":
+                safe = _safe_href(value)
+                if safe:
+                    keep.append(f'href="{html.escape(safe, quote=True)}"')
+        attr_s = (" " + " ".join(keep)) if keep else ""
+        self.out.append(f"<{tag}{attr_s}>")
+        if tag not in VOID_TAGS:
+            self.open_tags.append(tag)
+
+    def handle_endtag(self, tag):
+        if tag in DROP_CONTENT_TAGS:
+            self.suppress_depth = max(0, self.suppress_depth - 1)
+            return
+        if self.suppress_depth:
+            return
+        if tag in ALLOWED_TAGS and tag not in VOID_TAGS and tag in self.open_tags:
+            # Close back to the matching tag so a model that forgets a </p>
+            # cannot leave the rest of the page nested inside it.
+            while self.open_tags:
+                t = self.open_tags.pop()
+                self.out.append(f"</{t}>")
+                if t == tag:
+                    break
+
+    def handle_data(self, data):
+        if self.suppress_depth:
+            return
+        self.out.append(html.escape(data, quote=False))
+
+    def result(self):
+        while self.open_tags:
+            self.out.append(f"</{self.open_tags.pop()}>")
+        return "".join(self.out)
+
+
+def sanitize_html(raw):
+    p = _Sanitizer()
+    p.feed(str(raw or ""))
+    p.close()
+    return p.result()
+
+
+def _ld(obj):
+    """JSON-LD for an inline <script> block. json.dumps does not escape '/', so
+    a title containing '</script>' would close the block and everything after it
+    would be parsed as HTML. '\\u003c' is valid JSON and reads back as '<'."""
+    return json.dumps(obj).replace("<", "\\u003c")
+
+
 def build_page(art, slug):
     head_links, header, footer_float = read_chrome()
     url = f"{BASE}/guides/{slug}.html"
-    title = art["title"]
-    meta = art["meta"]
+    # Every one of these is model output. `title` and `meta` land inside
+    # attribute values, so they need quote=True escaping; body_html is the only
+    # field allowed to carry markup, and only what the allowlist permits.
+    title = html.escape(str(art["title"]), quote=True)
+    meta = html.escape(str(art["meta"]), quote=True)
+    body_html = sanitize_html(art["body_html"])
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -164,8 +285,8 @@ def build_page(art, slug):
   <meta property="og:image" content="{BASE}/assets/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <script type="application/ld+json">
-  {{"@context":"https://schema.org","@type":"Article","headline":{json.dumps(title)},
-    "description":{json.dumps(meta)},
+  {{"@context":"https://schema.org","@type":"Article","headline":{_ld(art["title"])},
+    "description":{_ld(art["meta"])},
     "author":{{"@type":"Organization","name":"NEMO Seamless Gutter"}},
     "publisher":{{"@type":"Organization","name":"NEMO Seamless Gutter","logo":{{"@type":"ImageObject","url":"{BASE}/assets/logo-4k.png"}}}},
     "image":"{BASE}/assets/og.png","mainEntityOfPage":"{url}"}}
@@ -179,7 +300,7 @@ def build_page(art, slug):
     <h1>{title}</h1>
   </div></section>
   <article class="article"><div class="container prose">
-    {art["body_html"]}
+    {body_html}
     <div class="cta-band">
       <h2>Need gutters done right?</h2>
       <p>Book a free estimate in about 30 seconds — or call or text anytime.</p>
@@ -194,6 +315,43 @@ def build_page(art, slug):
 """
 
 
+def check_publishable(pathname):
+    """Last look at a draft before it becomes a live page.
+
+    --publish takes the newest file in drafts/ and moves it into the docroot,
+    on a cron, with nobody reading it first. This will not catch bad writing,
+    but it will catch a page that was truncated mid-write, lost its chrome, or
+    somehow carries a script tag — all of which are worse live than absent.
+
+    Returns a list of reasons; empty means publishable.
+    """
+    try:
+        with open(pathname, errors="replace") as f:
+            page = f.read()
+    except OSError as e:
+        return [f"unreadable: {e}"]
+
+    problems = []
+    if len(page) < 2000:
+        problems.append(f"suspiciously short ({len(page)} bytes)")
+    if not page.lstrip().startswith("<!DOCTYPE"):
+        problems.append("does not start with <!DOCTYPE")
+    if "</html>" not in page:
+        problems.append("no closing </html> — likely truncated")
+    for needed in ('<article class="article"', "<h1>", "</footer>"):
+        if needed not in page:
+            problems.append(f"missing {needed}")
+    # The only <script> a guide should carry is the JSON-LD block plus the
+    # chrome copied off a live page. Anything else means the sanitizer was
+    # bypassed or the chrome source itself was tampered with.
+    scripts = re.findall(r"<script\b[^>]*>", page, re.I)
+    unexpected = [s for s in scripts
+                  if "application/ld+json" not in s.lower() and "src=" not in s.lower()]
+    if len(unexpected) > 1:  # the GA4 bootstrap in the chrome is the allowed one
+        problems.append(f"{len(unexpected)} unexpected inline <script> tag(s)")
+    return problems
+
+
 def main():
     load_env()
     os.makedirs(DRAFTS, exist_ok=True)
@@ -204,6 +362,14 @@ def main():
             print("[gen_article] no drafts to publish")
             return
         src = drafts[-1]
+        problems = check_publishable(src)
+        if problems:
+            # Leave the draft in place: a human can look at it, and the next
+            # run does not silently publish it either.
+            print(f"[gen_article] REFUSED to publish {os.path.basename(src)}:")
+            for p in problems:
+                print(f"  - {p}")
+            sys.exit(1)
         dest = os.path.join(WEB_ROOT, "guides", os.path.basename(src))
         os.replace(src, dest)
         print(f"[gen_article] PUBLISHED {os.path.basename(dest)} -> /guides/. Run gen_sitemap.py + indexnow_submit.py.")

@@ -11,7 +11,9 @@ build log said "ok":
 
 Run: python3 -m growth.test_techniques   (from the repo root)
 """
+import json
 import os
+import re
 import tempfile
 import unittest
 
@@ -93,6 +95,59 @@ class TopicGuideTest(unittest.TestCase):
         blank = tempfile.TemporaryDirectory()
         self.addCleanup(blank.cleanup)
         self.assertIsNone(T._topic_guide(_Ctx(blank.name), "york gutters"))
+
+
+class JsonLdEscapingTest(unittest.TestCase):
+    """Model text lands in JSON-LD, which sits inside a <script> block.
+
+    json.dumps escapes quotes but not '/', so before _ld() a model that wrote
+    "</script>" anywhere in an FAQ answer closed the block and everything after
+    it became live HTML on an auto-published page.
+    """
+
+    EVIL = 'Twice a year.</script><script>alert(1)</script>'
+
+    def test_faq_answer_cannot_close_the_script_block(self):
+        out = T._faq_ld([{"q": "How often?", "a": self.EVIL}])
+        self.assertNotIn("</script>", out)
+        self.assertNotIn("<script", out)
+
+    def test_faq_question_cannot_close_the_script_block(self):
+        out = T._faq_ld([{"q": self.EVIL, "a": "Twice a year."}])
+        self.assertNotIn("</script>", out)
+
+    def test_escaping_is_invisible_to_a_json_ld_consumer(self):
+        # Google must still read the real text — < is a JSON escape, not a
+        # content change. If this breaks, the schema is silently wrong.
+        out = T._faq_ld([{"q": "How often?", "a": self.EVIL}])
+        back = json.loads(out)
+        self.assertEqual(
+            back["mainEntity"][0]["acceptedAnswer"]["text"], self.EVIL)
+
+    def test_html_comment_open_is_escaped_too(self):
+        out = T._ld({"description": "<!--"})
+        self.assertNotIn("<!--", out)
+
+    def test_no_ld_call_site_passes_indent(self):
+        """_ld sets its own indent. The three page builders were converted from
+        json.dumps(..., indent=2), and leaving that argument behind is a
+        TypeError that only fires when a technique actually runs — which the
+        unit tests do not do, because those paths need a live model call. This
+        catches it in the source instead."""
+        src = open(os.path.join(os.path.dirname(__file__), "techniques.py")).read()
+        # Every _ld( ... ) call, brace-matched to its closing paren.
+        for m in re.finditer(r"\b_ld\(", src):
+            depth, i = 0, m.end() - 1
+            while i < len(src):
+                if src[i] in "([{":
+                    depth += 1
+                elif src[i] in ")]}":
+                    depth -= 1
+                    if depth == 0:
+                        break
+                i += 1
+            self.assertNotIn("indent=", src[m.end():i],
+                             msg=f"_ld() call near offset {m.start()} still passes indent=")
 
 
 if __name__ == "__main__":

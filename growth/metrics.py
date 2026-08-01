@@ -603,10 +603,14 @@ def lead_totals(db=None):
     phones = owner_phones()
     try:
         con.row_factory = sqlite3.Row
-        for table, key in (("bookings", "bookings_all_time"),
-                           ("leads", "phone_leads_all_time")):
+        # Written out rather than interpolated. A table name cannot be a bound
+        # parameter, so an f-string here is the one shape in this file that
+        # would quietly become an injection the day the table list stops being
+        # a literal.
+        for sql, key in (("select * from bookings", "bookings_all_time"),
+                         ("select * from leads", "phone_leads_all_time")):
             try:
-                rows = con.execute(f"select * from {table}").fetchall()
+                rows = con.execute(sql).fetchall()
             except sqlite3.Error:
                 continue
             for r in rows:
