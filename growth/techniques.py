@@ -688,7 +688,7 @@ def _host_page(ctx, kw):
     for words, page in SERVICE_HINTS:
         if any(w in q for w in words) and ctx.read(page.lstrip("/")) is not None:
             return page
-    guide = _provider_guide(ctx, q)
+    guide = _provider_guide(ctx, q) or _topic_guide(ctx, q)
     if guide:
         return guide
     return "/index.html" if ctx.read("index.html") is not None else None
@@ -721,6 +721,62 @@ def _provider_guide(ctx, q):
         if ctx.read(page.lstrip("/")) is not None:
             return page
     return None
+
+
+# Words that carry no topic. Stripped from both sides before comparing a query
+# against a guide, so "what size gutters do i need" and "5 inch vs 6 inch
+# gutters" reduce to the same handful of words the existing size guide is about.
+TOPIC_STOP = frozenset((
+    "a", "an", "and", "are", "be", "best", "better", "can", "cost", "costs",
+    "do", "does", "for", "from", "get", "good", "how", "i", "in", "is", "it",
+    "long", "many",
+    "me", "much", "my", "near", "need", "of", "often", "on", "or", "pa",
+    "pennsylvania", "per", "price", "prices", "should", "the", "to", "vs",
+    "what", "when", "which", "who", "why", "with", "worth", "you", "your"))
+
+
+def _topic_words(text):
+    """Content words of a query or a slug, singularised crudely."""
+    out = set()
+    for w in re.split(r"[^a-z0-9]+", (text or "").lower()):
+        if not w or w in TOPIC_STOP:
+            continue
+        out.add(w[:-1] if len(w) > 3 and w.endswith("s") else w)
+    return out
+
+
+def _topic_guide(ctx, q):
+    """The existing guide that already answers this query, if there is one.
+
+    _provider_guide, added 2026-07-31, caught queries built out of firm words
+    ("gutter company york pa"). It did not catch the next morning's duplicate:
+    "york gutters" routed nowhere, so money_pages wrote
+    /guides/york-gutters.html the day after it wrote /guides/gutters-york-pa.html
+    for "gutters york pa" — the same question, the words reversed, six shared
+    headings. Three "5 inch vs 6 inch gutters" phrasings plus "what size gutters
+    do i need" were queued behind it, against a size guide the site already has.
+
+    A word list cannot keep up with that; the test has to be about topic. A
+    query whose content words are all already in a guide's slug belongs on that
+    guide, and strengthen_pages will add the section there instead.
+    """
+    want = _topic_words(q)
+    if len(want) < 2:            # too thin to match on without false positives
+        return None
+    d = os.path.join(ctx.docroot, "guides")
+    if not os.path.isdir(d):
+        return None
+    best = None
+    for f in sorted(os.listdir(d)):
+        if not f.endswith(".html"):
+            continue
+        have = _topic_words(f[:-5])
+        if want <= have and (best is None or len(have) < best[0]):
+            # Prefer the tightest guide: a query about gutter size belongs on
+            # the size guide, not on whichever longer page happens to contain
+            # those words too.
+            best = (len(have), f"/guides/{f}")
+    return best[1] if best else None
 
 
 def _existing_headings(src):
@@ -914,6 +970,10 @@ Rules:
 the searcher typed, then append " | NEMO Seamless Gutter" if it still fits in 60 — dropping \
 the business name entirely costs the branded searches, where someone already looking for \
 this company needs to recognise it in the results.
+- The title or the description must name the place — York, York County, or PA. Many of the \
+searches below are national wording ("gutter installer", "gutter contractor") that a \
+homeowner two states away types too. A snippet with no place in it gives a York homeowner \
+nothing to recognise, and tells Google this page belongs to no particular town.
 - Description: 155 characters maximum, active voice, gives a concrete reason to click \
 (free on-site estimate, formed on site, same-week scheduling) and ends with the phone number.
 - Never invent a review count, star rating, years in business, award, certification, \
@@ -924,6 +984,10 @@ than a dull one.
 
 Return ONLY valid JSON: {"title": "...", "description": "...", "why": "one sentence on what \
 you changed and why"}"""
+
+# The words that tell a searcher in Hallam that this contractor can reach their
+# house. "pa" is bounded so it does not match inside "page" or "repair".
+GEO_ANCHOR = re.compile(r"\byork\b|\bpennsylvania\b|\bpa\b", re.I)
 
 # Long enough to see whether a rewrite moved anything before touching it again.
 # Rewriting a title every morning would make the effect unmeasurable and would
@@ -1018,6 +1082,20 @@ def improve_ctr(ctx):
             return {"ok": False,
                     "detail": f"rejected over-long snippet for {rel} "
                               f"(title {len(title)}, desc {len(desc)})"}
+        # On 2026-07-27 this technique rewrote the homepage from "Seamless
+        # Gutters in York, PA | NEMO Seamless Gutter" to "Gutter Installer &
+        # Contractor | NEMO Seamless Gutter" — obeying the rule above to lead
+        # with what the searcher typed, on a page whose top queries are the
+        # geo-agnostic "gutter installer" and "gutter contractor". It has held
+        # position 1 on those ever since, over 258 impressions, for zero
+        # clicks. A snippet naming no place is the one thing this technique can
+        # do that actively costs the business something, so it is refused here
+        # as well as discouraged in the prompt.
+        if not (GEO_ANCHOR.search(title) or GEO_ANCHOR.search(desc)):
+            return {"ok": False,
+                    "detail": f"rejected placeless snippet for {rel} — neither "
+                              f"title nor description names York or PA "
+                              f"(title: {title!r})"}
 
         out = src
         if current_title:
