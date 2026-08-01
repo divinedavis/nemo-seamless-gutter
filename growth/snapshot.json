@@ -1,15 +1,15 @@
 {
-  "generated": "2026-07-31T06:04:37+00:00",
-  "date": "2026-07-31",
+  "generated": "2026-08-01T06:05:07+00:00",
+  "date": "2026-08-01",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
     "target_pct": 50,
-    "share_pct": 2.0,
+    "share_pct": 1.9,
     "measured": true,
     "why_unmeasured": null,
-    "coverage_pct": 42.9,
-    "tracked_queries": 98,
+    "coverage_pct": 40.7,
+    "tracked_queries": 108,
     "top3": 2,
     "top10": 6,
     "ranked_known": 21
@@ -39,6 +39,10 @@
       {
         "date": "2026-07-30",
         "value": 7
+      },
+      {
+        "date": "2026-07-31",
+        "value": 6
       }
     ],
     "pageviews": [
@@ -65,6 +69,10 @@
       {
         "date": "2026-07-30",
         "value": 12
+      },
+      {
+        "date": "2026-07-31",
+        "value": 14
       }
     ],
     "organic_visitors": [
@@ -91,6 +99,10 @@
       {
         "date": "2026-07-30",
         "value": 3
+      },
+      {
+        "date": "2026-07-31",
+        "value": 1
       }
     ],
     "local_visitors": [
@@ -116,6 +128,10 @@
       },
       {
         "date": "2026-07-30",
+        "value": 0
+      },
+      {
+        "date": "2026-07-31",
         "value": 0
       }
     ],
@@ -143,6 +159,10 @@
       {
         "date": "2026-07-30",
         "value": 0
+      },
+      {
+        "date": "2026-07-31",
+        "value": 0
       }
     ],
     "direct_visitors": [
@@ -169,6 +189,10 @@
       {
         "date": "2026-07-30",
         "value": 3
+      },
+      {
+        "date": "2026-07-31",
+        "value": 4
       }
     ],
     "referral_visitors": [
@@ -194,6 +218,10 @@
       },
       {
         "date": "2026-07-30",
+        "value": 0
+      },
+      {
+        "date": "2026-07-31",
         "value": 0
       }
     ],
@@ -221,6 +249,10 @@
       {
         "date": "2026-07-30",
         "value": 0
+      },
+      {
+        "date": "2026-07-31",
+        "value": 1
       }
     ],
     "bot_hits": [
@@ -247,6 +279,10 @@
       {
         "date": "2026-07-30",
         "value": 1200
+      },
+      {
+        "date": "2026-07-31",
+        "value": 3162
       }
     ],
     "bookings": [
@@ -273,6 +309,10 @@
       {
         "date": "2026-07-30",
         "value": 1
+      },
+      {
+        "date": "2026-07-31",
+        "value": 0
       }
     ],
     "phone_leads": [
@@ -298,6 +338,10 @@
       },
       {
         "date": "2026-07-30",
+        "value": 0
+      },
+      {
+        "date": "2026-07-31",
         "value": 0
       }
     ],
@@ -325,6 +369,10 @@
       {
         "date": "2026-07-30",
         "value": 1
+      },
+      {
+        "date": "2026-07-31",
+        "value": 0
       }
     ]
   },
@@ -336,48 +384,48 @@
   "keywords": {
     "by_town": {
       "county": {
-        "total": 61,
-        "covered": 25,
+        "total": 65,
+        "covered": 26,
         "top3": 2
       },
       "hanover": {
-        "total": 5,
+        "total": 6,
         "covered": 4,
         "top3": 0
       },
       "dover": {
-        "total": 9,
+        "total": 10,
         "covered": 3,
         "top3": 0
       },
       "red-lion": {
-        "total": 5,
+        "total": 6,
         "covered": 2,
         "top3": 0
       },
       "dallastown": {
-        "total": 5,
+        "total": 6,
         "covered": 2,
         "top3": 0
       },
       "spring-grove": {
-        "total": 5,
+        "total": 6,
         "covered": 3,
         "top3": 0
       },
       "york": {
-        "total": 8,
-        "covered": 3,
+        "total": 9,
+        "covered": 4,
         "top3": 0
       }
     },
     "by_intent": {
       "hire": {
-        "total": 66,
-        "covered": 37
+        "total": 72,
+        "covered": 39
       },
       "price": {
-        "total": 16,
+        "total": 19,
         "covered": 3
       },
       "diy": {
@@ -385,7 +433,7 @@
         "covered": 1
       },
       "check": {
-        "total": 9,
+        "total": 10,
         "covered": 1
       }
     },
@@ -393,6 +441,7 @@
       "best gutter company dallastown pa",
       "best gutter company york pa",
       "downspout extension installation dover pa",
+      "downspout extension installation red lion pa",
       "downspout installations york",
       "emergency gutter repair near me dallastown pa",
       "gutter cleaning dallastown pa",
@@ -405,19 +454,22 @@
       "gutter installers dover pa",
       "gutter installers york",
       "gutter installers york pa",
+      "gutter repair dallastown pa",
       "gutter repair hanover pa",
       "gutter repair near me",
       "gutter repair red lion pa",
       "gutter replacement near me",
       "gutters dover",
       "gutters dover pa",
-      "half round copper gutters historic home york pa",
+      "half round copper gutters near me",
       "half round copper gutters york pa",
       "half round gutter installation york county",
       "schuylkill county seamless gutter",
       "seamless gutter company spring grove pa",
+      "seamless gutter installers hanover pa",
       "soffit and fascia repair spring grove pa",
       "soffit and fascia repair york pa",
+      "who installs gutters in dover pa",
       "who installs gutters in red lion pa",
       "5 inch vs 6 inch gutters",
       "5 inch vs 6 inch gutters which do i need",
@@ -433,14 +485,18 @@
       "gutter installation cost per foot pennsylvania",
       "gutter overflowing in heavy rain",
       "gutter pulling away from house",
+      "gutter pulling away from house repair",
       "gutter pulling away from house repair cost",
       "gutter replacement cost york pa",
+      "gutter replacement estimate spring grove pa",
       "gutters overflowing in heavy rain",
       "half round gutter cost per foot",
+      "how much do new gutters cost in pa",
       "how much does a gutter guard cost per foot",
       "how often should gutters be cleaned in pa",
       "ice dam gutter damage repair pa",
       "ice dams gutters pennsylvania",
+      "leaffilter vs local gutter guard cost",
       "seamless gutter installation cost per linear foot pennsylvania",
       "seamless gutter installation cost york pa",
       "seamless gutters vs sectional gutters",
@@ -463,13 +519,13 @@
       {
         "query": "gutters",
         "position": 5.6,
-        "impressions": 21,
+        "impressions": 24,
         "clicks": 0
       },
       {
         "query": "gutter replacement",
         "position": 10.2,
-        "impressions": 19,
+        "impressions": 21,
         "clicks": 0
       },
       {
@@ -492,8 +548,20 @@
       },
       {
         "query": "seamless+gutters+perkasie+pa",
-        "position": 26.2,
+        "position": 25.4,
+        "impressions": 11,
+        "clicks": 0
+      },
+      {
+        "query": "seamless gutter installation companies york sc",
+        "position": 16.8,
         "impressions": 10,
+        "clicks": 0
+      },
+      {
+        "query": "seamless gutter services york sc",
+        "position": 15.4,
+        "impressions": 9,
         "clicks": 0
       },
       {
@@ -515,6 +583,12 @@
         "clicks": 0
       },
       {
+        "query": "gutter replacement services",
+        "position": 12.6,
+        "impressions": 8,
+        "clicks": 0
+      },
+      {
         "query": "gutter soffit and fascia replacement",
         "position": 1.8,
         "impressions": 8,
@@ -523,6 +597,12 @@
       {
         "query": "seamless gutter company crum lynne pa",
         "position": 24.4,
+        "impressions": 8,
+        "clicks": 0
+      },
+      {
+        "query": "seamless gutter installation in myerstown pa",
+        "position": 40.8,
         "impressions": 8,
         "clicks": 0
       },
@@ -539,14 +619,20 @@
         "clicks": 0
       },
       {
-        "query": "seamless gutter installation in myerstown pa",
-        "position": 41,
-        "impressions": 7,
+        "query": "gutter company york sc",
+        "position": 25.3,
+        "impressions": 6,
         "clicks": 0
       },
       {
-        "query": "gutter replacement services",
-        "position": 13.7,
+        "query": "gutter repair",
+        "position": 11.5,
+        "impressions": 6,
+        "clicks": 0
+      },
+      {
+        "query": "seamless gutter installation in newmanstown pa",
+        "position": 34.5,
         "impressions": 6,
         "clicks": 0
       },
@@ -563,14 +649,8 @@
         "clicks": 0
       },
       {
-        "query": "gutter repair",
-        "position": 13.2,
-        "impressions": 5,
-        "clicks": 0
-      },
-      {
-        "query": "seamless gutter installation in newmanstown pa",
-        "position": 39.8,
+        "query": "seamless gutter installation york sc",
+        "position": 20.4,
         "impressions": 5,
         "clicks": 0
       },
@@ -581,8 +661,20 @@
         "clicks": 0
       },
       {
+        "query": "alamo heights seamless gutter installation",
+        "position": 99,
+        "impressions": 4,
+        "clicks": 0
+      },
+      {
         "query": "gutter company bulger, pa",
         "position": 44.2,
+        "impressions": 4,
+        "clicks": 0
+      },
+      {
+        "query": "gutter installation services york sc",
+        "position": 42.5,
         "impressions": 4,
         "clicks": 0
       },
@@ -611,12 +703,6 @@
         "clicks": 0
       },
       {
-        "query": "alamo heights seamless gutter installation",
-        "position": 99,
-        "impressions": 3,
-        "clicks": 0
-      },
-      {
         "query": "best 6 inch gutter company burgettstown, pa",
         "position": 39.3,
         "impressions": 3,
@@ -641,40 +727,34 @@
         "clicks": 0
       },
       {
-        "query": "seamless gutter contractors crum lynne pa",
-        "position": 43.3,
+        "query": "gutter installation wilkes barre, pa",
+        "position": 65.7,
         "impressions": 3,
         "clicks": 0
       },
       {
-        "query": "seamless gutter essington pa",
-        "position": 22,
+        "query": "gutter installers york sc",
+        "position": 35.3,
         "impressions": 3,
         "clicks": 0
       },
       {
-        "query": "seamless gutter services essington pa",
-        "position": 27.3,
-        "impressions": 3,
-        "clicks": 0
-      },
-      {
-        "query": "siding installation york",
-        "position": 34.3,
+        "query": "rain gutter installation york sc",
+        "position": 41.7,
         "impressions": 3,
         "clicks": 0
       }
     ]
   },
   "gsc": {
-    "date": "2026-07-31",
+    "date": "2026-08-01",
     "ok": true,
     "connected": true,
-    "rows": 189,
+    "rows": 219,
     "matched": 21,
-    "clicks": 5,
-    "impressions": 975,
-    "avg_position": 17.0
+    "clicks": 6,
+    "impressions": 1167,
+    "avg_position": 18.3
   },
   "techniques": [
     {
@@ -710,6 +790,10 @@
         },
         {
           "date": "2026-07-30",
+          "value": 0
+        },
+        {
+          "date": "2026-07-31",
           "value": 0
         }
       ]
@@ -747,6 +831,10 @@
         },
         {
           "date": "2026-07-30",
+          "value": 0
+        },
+        {
+          "date": "2026-07-31",
           "value": 0
         }
       ]
@@ -1060,6 +1148,10 @@
         {
           "date": "2026-07-30",
           "value": 0
+        },
+        {
+          "date": "2026-07-31",
+          "value": 0
         }
       ]
     },
@@ -1206,6 +1298,60 @@
       "notes": "first step: Price and apply for the local chamber / York County Economic Alliance membership tier that includes a linked directory listing, and in the same sitting email the aluminium coil supplier asking to be added to their 'find an installer' page \u2014 an honest ask with no payment involved.\neffort: weeks\ncost: under $100/mo\nexpected: 6 earned links from York-County-rooted domains in 90 days (target list of 15, ~40% yield). Leading indicator: the tracked top-3 share moving off 2.3% on town-plus-service queries within 60\u201390 days of the first links landing; lagging indicator: 1\u20132 phone calls that name the chamber directory or a historic-district referral.",
       "verdict": null,
       "owned_visitors": null
+    },
+    {
+      "id": "T027",
+      "slug": "missed_call_text_back",
+      "name": "Missed-call text-back on the business line",
+      "kind": "conversion",
+      "status": "candidate",
+      "hypothesis": "The AI agent catches calls it answers, but it cannot catch the caller who hangs up at ring 3, calls at 8pm, or gets a busy signal while Eric is talking to someone else \u2014 and those are exactly the homeowners with water running down a wall. An automatic SMS back to the number that just called ('Sorry I missed you \u2014 I'm on a roof in York. What's the address and what's the gutter doing? I can text you a range today.') keeps the conversation alive in the 8-minute window before they dial the next gutter company. With only 300 profile views and ~6 visits a day, NEMO cannot afford to leak a single inbound call; this is the only lever that adds booked estimates without adding a single visitor.",
+      "evidence": "2026 home-services write-ups put missed-call text-back at the top of the automation list for owner-operators: <cite index=\"25-9,25-10,25-11\">most service businesses miss 30 to 60 percent of inbound calls, most of those callers book the next available competitor within about 8 minutes, and the text-back closes that window</cite> (https://netpartners.marketing/missed-call-text-back-highest-roi-automation-service-businesses/). Reply rates are high because the caller initiated contact: <cite index=\"28-2,28-3\">SMS reply rates from missed-call text-back average 35 to 50 percent for home service businesses versus 5 to 10 percent for cold outbound SMS, because the caller already wanted to reach you</cite> (https://www.marqeable.com/blog/missed-call-text-back-home-services/). Speed is the whole game: <cite index=\"14-12,14-13\">CallRail's 2026 home services research found responding within 60 seconds lifts conversion 391%, and waiting 5 minutes cuts qualifying odds by 80%</cite> (https://pipelineon.com/blog/contractor-website-conversion-rate/).",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-01",
+      "added": "2026-08-01",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Turn on missed-call auto-text in the existing phone/AI-agent provider (or a $15-30/mo add-on), with the first message written in Eric's own words, an explicit 'Reply STOP to opt out', and A2P 10DLC brand registration submitted the same day so the carriers do not filter it. Reply-only to inbound callers \u2014 never a list, never a blast.\neffort: hours\ncost: under $100/mo\nexpected: Text fires on 100% of unanswered/abandoned calls within 60 seconds; 35-50% of those callers reply; over a 60-day test, 3-6 conversations that would otherwise have been silence, and 1-2 booked estimates that show up in the ledger as 'recovered missed call'.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T028",
+      "slug": "heavy_rain_response_play",
+      "name": "Heavy-rain 48-hour response play (overflow page + GBP post)",
+      "kind": "distribution",
+      "status": "candidate",
+      "hypothesis": "York County gets thunderstorm bands in August and nor'easter rain in September, and the moment a gutter overflows over the front door a homeowner searches 'gutters overflowing in heavy rain' or 'gutter pulling away from house' \u2014 that is a next-7-days job, not a next-spring job. NEMO has no page owning that emergency wording and posts nothing when it rains. One permanent diagnostic page ('Why your gutters overflow in heavy rain \u2014 and what it costs to fix in York County'), phone-first, plus a Business Profile post pushed within hours of a National Weather Service heavy-rain or wind advisory for York County, puts the business in front of demand that is already compressed into 48 hours and that no local gutter contractor is timing for. IndexNow is already wired, so the page can be re-pushed the same morning.",
+      "evidence": "Weather is a targeting signal, not backdrop: <cite index=\"36-2,36-3\">a heat wave, early frost, or storm front creates a predictable spike in demand, and brands that plan around those triggers convert at a different rate than always-on generic activity</cite> (https://kortx.io/news/home-services-marketing-playbook/). The window is short and the first responder wins: <cite index=\"39-1\">demand compresses instantly, repairs are non-optional, and homeowners typically contact 2-3 contractors within the first 24-48 hours and decide within 72</cite> (https://www.pinkcallers.com/blog/how-storm-season-creates-lead-surges-for-contractors). Rain-driven query surges are documented in the adjacent trade: <cite index=\"37-16\">'roof leak repair' (+69%) and 'emergency roof repair' (+70%) show consistent seasonal surges driven by heavy rain or storm activity</cite> (https://stacker.com/stories/small-business/seasonal-search-shifts-home-services-demand-what-spikes-when-and-how-stay). And <cite index=\"40-23,40-24,40-25\">contractors who build the landing page and response system 60-90 days before storm season capture far more of it than those who scramble after</cite> (https://resultcalls.com/blog/how-to-use-seasonal-roofing-marketing-to-get-roofing-leads) \u2014 which is exactly what August 1 is, 60 days ahead of PA leaf-fall and the autumn rain.",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-01",
+      "added": "2026-08-01",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Write the overflow diagnostic page today: symptom-first headings (water sheeting over the front, gutter sagging at the seam, downspout backing up), an honest 'what this usually costs in York County' band, Eric's number as the first thing under the fold, and photos of real York jobs. Then subscribe the phone to NWS alerts for York County zone PAZ066 so the trigger is automatic, not remembered.\neffort: days\ncost: free\nexpected: One page live before Labor Day; a GBP post inside 12 hours of every NWS heavy-rain/wind advisory for York County (roughly 6-10 events between now and December). Success = the overflow page becomes a top-5 landing page by October and produces 2+ calls per rain event week, plus measurable GBP 'call' actions clustered on advisory days.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T029",
+      "slug": "apple_bing_place_cards",
+      "name": "Apple Business + Bing Places verified place cards",
+      "kind": "indexing",
+      "status": "candidate",
+      "hypothesis": "The ledger's AI-answer work is all on-site \u2014 it assumes the engines can read nemoseamlessgutter.com. But when a York homeowner asks Siri or Copilot 'who installs gutters near me', those assistants do not read the site first, they read the place-card graph. NEMO is invisible there. Two free verified listings (Apple, Bing) with the exact same name/address/phone as the GBP put the business into the two datasets that Siri, Copilot and ChatGPT search lean on for local trade queries, and they double as high-authority citations that raise the map-pack prominence the site is currently short of. This is an afternoon of work that cannot be undone by an algorithm update, and it is the cheapest fix available for the '0 AI answer engine visitors' line.",
+      "evidence": "<cite index=\"17-8,17-9,17-10,17-11\">Microsoft Copilot uses Bing's index as its primary source for local business queries, pulling names, addresses, phone numbers, hours and photos straight from Bing Places data, and businesses with verified complete listings are the ones Copilot surfaces</cite> (https://birdeye.com/blog/business-listing-on-bing/). Setup is trivial and free: <cite index=\"22-21,22-24,22-25\">fifteen minutes of setup buys a permanent accurate presence in the data source AI assistants check first, and claiming and verifying costs nothing</cite> (https://osprey.solutions/blog/bing-places-for-business-2026). On the Apple side, <cite index=\"21-1,21-2\">Apple Business Connect is one of a small number of trusted nodes AI systems verify a business against, so investment there improves local AI visibility beyond iOS</cite> (https://www.trymaas.com/blog/apple-business-connect-apple-maps-marketers-2026/), and <cite index=\"23-19,23-20,23-21\">Siri increasingly names one or two specific businesses conversationally rather than listing links \u2014 if the business is not in Apple's data pipeline it will never be named</cite> (https://www.marketingcode.com/apple-intelligence-siri-contractors-invisible/). Listing data quality is the common failure: <cite index=\"17-6\">Uberall found around 68% of local businesses appear incorrectly in AI results due to missing, inconsistent or outdated listing data</cite>.",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-01",
+      "added": "2026-08-01",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Claim the Apple place card at businessconnect.apple.com using the exact GBP name, address, phone and hours, and upload the same 8-10 real job photos already on the GBP \u2014 then do Bing Places the same afternoon, and report any duplicate listings found on either.\neffort: hours\ncost: free\nexpected: Both listings verified within 10 days. Baseline test: ask Siri, Copilot and ChatGPT 'seamless gutter installer in York PA' before and 30 days after \u2014 target going from 0/3 naming NEMO to at least 1/3. Secondary: first non-zero 'AI answer engine visitors' and first non-zero directory referrals in the daily numbers.",
+      "verdict": null,
+      "owned_visitors": null
     }
   ],
   "scoreboard": {
@@ -1238,93 +1384,97 @@
       "T023",
       "T024",
       "T025",
-      "T026"
+      "T026",
+      "T027",
+      "T028",
+      "T029"
     ]
   },
   "last_build": {
-    "date": "2026-07-31",
+    "date": "2026-08-01",
     "log": [
       {
         "ok": true,
-        "detail": "no new in-area searches worth tracking",
+        "detail": "adopted 1 real search(es) into the tracked universe: york gutters",
         "slug": "adopt_queries"
       },
       {
         "ok": true,
-        "detail": "no page is due a snippet rewrite",
+        "detail": "rewrote title/description on /guides/gutter-cleaning-cost-york-pa.html (11 impressions, 0 clicks, pos 9.3) \u2014 Front-loaded the exact search wording (\"gutter cleaning\" + York) instead of a question phrasing, and swapped t",
         "slug": "improve_ctr"
       },
       {
         "ok": true,
-        "detail": "answer-first opening on /guides/gutter-cleaning-cost-york-pa.html for 'gutter cleaning' (55 words, + FAQ schema, 8 impressions)",
+        "detail": "answer-first opening on /services/gutter-cleaning-repair.html for 'clogged gutter repair' (54 words, + FAQ schema, 10 impressions)",
         "slug": "geo_answer_first_content_pass"
       },
       {
         "ok": true,
-        "detail": "added \"Emergency Gutter Repair After a Storm in York, PA\" to /services/gutter-cleaning-repair.html for 'emergency gutter repair after storm york pa'",
+        "detail": "added \"Copper Half-Round Gutters for Historic Homes in York, PA\" to /services/half-round-gutters.html for 'half round copper gutters historic home york pa'",
         "slug": "strengthen_pages"
       },
       {
         "ok": true,
+        "noop": true,
         "detail": "every queued service already has a page",
         "slug": "service_pages"
       },
       {
         "ok": true,
-        "detail": "published Wrightsville (11,841 bytes; 2 town(s) left in the queue)",
+        "detail": "published Hallam (12,154 bytes; 1 town(s) left in the queue)",
         "slug": "area_pages"
       },
       {
         "ok": true,
-        "detail": "published 'gutter guys near me' \u2192 /guides/gutter-guys-near-me.html",
+        "detail": "published 'york gutters' \u2192 /guides/york-gutters.html",
         "slug": "money_pages"
       },
       {
         "ok": true,
-        "detail": "refreshed nearby-links on 0 page(s)",
+        "noop": false,
+        "detail": "refreshed nearby-links on 13 page(s)",
         "slug": "internal_links"
       },
       {
         "ok": true,
+        "noop": true,
         "detail": "LocalBusiness schema already current",
         "slug": "local_schema"
       },
       {
         "ok": true,
-        "detail": "[gen_sitemap] wrote 32 URLs to sitemap.xml",
+        "detail": "[gen_sitemap] wrote 35 URLs to sitemap.xml",
         "slug": "rebuild_sitemap"
       },
       {
         "ok": true,
-        "detail": "submitted 4 URL(s), HTTP 200",
+        "detail": "submitted 18 URL(s), HTTP 200",
         "slug": "ping_indexnow"
       }
     ],
     "new": 2,
-    "changed": 2
+    "changed": 16
   },
   "last_scout": {
-    "date": "2026-07-31",
+    "date": "2026-08-01",
     "ok": true,
     "techniques_added": [
-      "text_a_photo_price_range",
-      "brave_index_faq_schema",
-      "york_local_authority_links"
+      "missed_call_text_back",
+      "heavy_rain_response_play",
+      "apple_bing_place_cards"
     ],
     "keywords_added": [
-      "gutter guard installation cost per foot",
-      "half round copper gutters york pa",
-      "seamless gutter installation cost per linear foot pennsylvania",
-      "gutter repair hanover pa",
-      "who installs gutters in red lion pa",
-      "gutter overflowing in heavy rain",
-      "gutter pulling away from house repair cost",
-      "5 inch vs 6 inch gutters which do i need",
-      "downspout extension installation dover pa",
-      "soffit and fascia repair spring grove pa",
-      "emergency gutter repair near me dallastown pa"
+      "how much do new gutters cost in pa",
+      "seamless gutter installers hanover pa",
+      "gutter repair dallastown pa",
+      "half round copper gutters near me",
+      "leaffilter vs local gutter guard cost",
+      "gutter pulling away from house repair",
+      "who installs gutters in dover pa",
+      "gutter replacement estimate spring grove pa",
+      "downspout extension installation red lion pa"
     ],
-    "notes": "Order of operations: the photo-text offer first (hours, free, aimed straight at the weakest number), Brave submission second (10 minutes, nobody local has done it), local links third because they take weeks. TIMING MATTERS RIGHT NOW \u2014 it is 31 July. York County leaf-fall guard and cleaning work is decided in August and early September; every dollar and hour spent before Labor Day is worth more than the same effort in November, and mid-winter is when to write pages, not chase bookings. THE HONEST DIAGNOSIS OF 300 VIEWS / 0 CALLS: the profile is probably not being skipped for ranking reasons alone. 4.2 stars on 13 reviews reads as 'a few unhappy customers' to a homeowner comparing three options. Do not touch that number with anything artificial. The fix is the ledger's existing review candidate plus replying publicly and calmly to every negative review \u2014 <cite index=\"5-8\">recency, frequency, the specific words customers use, and whether the owner responds all affect local results</cite>. Coaching customers to name the actual service ('replaced our half-round copper on Beaver Street') is legitimate and useful, since <cite index=\"8-11\">a review naming a specific service carries more signal than 'great service'</cite>; asking them to praise, script, or omit anything is not, and never offer anything of value for a review. CONSIDERED AND REJECTED: (1) Paid AEO services that promise AI citations via 'device farms' of real phones simulating browsing \u2014 one vendor sells this openly; it is fabricated engagement, it risks the profile, and a suspension costs more than this business can earn back. (2) Yext/Moz Local style blasts to 70+ directories \u2014 <cite index=\"26-3,26-4\">practitioners report citation cleanup rarely moves the needle and recommend spending the effort on GBP activity and reviews instead</cite>, so the existing NAP candidate should stay narrow and manual. (3) Angi/HomeAdvisor paid leads \u2014 <cite index=\"4-4\">shared with five other companies</cite>; a one-owner shop cannot win a five-way price race. (4) Putting keywords in the GBP business name ('NEMO Seamless Gutter York PA Gutter Installation') \u2014 it does move rankings, which is exactly why it is a reportable guideline violation; not worth the suspension. (5) Any paid photo-to-quote or FSM platform at $149/mo right now \u2014 the bottleneck is inbound volume, not estimating software. A phone camera and a text thread cost nothing; revisit software after there are 20 leads a month to lose. (6) Blanket texting past contacts \u2014 with one all-time booking there is no list, and unsolicited bulk SMS is illegal under the TCPA regardless. One caution on the photo offer: publish ranges, state plainly that a final price needs an on-site measure, and never let the AI agent quote a firm number."
+    "notes": "Order of operations: do Apple/Bing this week (it is free and permanent), write the heavy-rain page before Labor Day so it has 6-8 weeks to season before PA leaf-fall, and turn on missed-call text-back immediately \u2014 it is the only one of the three that can add a booked estimate without adding a visitor, and the phone is the weakest number on the board.\n\nCompliance guardrails on the text-back: it may only reply to a number that just called NEMO (established business relationship), it must carry opt-out language, and A2P 10DLC registration must be filed or deliverability collapses within 60 days. It must never be repurposed into a list blast or a 'we noticed storm damage in your area' outbound campaign \u2014 that is where TCPA exposure and a reputation problem both live. Same rule for the rain play: it lives on owned surfaces only (the site, the GBP post), never in unsolicited texts or emails to non-customers.\n\nRejected this round, and why:\n- Weather-triggered SMS/email blasts to a purchased or scraped homeowner list in affected zip codes. Sources tout this heavily and it works for storm-chasing roofers, but it is unsolicited bulk messaging, it needs a CRM Eric does not have, and one complaint outweighs any job it wins.\n- Local Falcon / geo-grid rank scanning. Genuinely useful (it would show exactly how far from the York address the profile dies), but it is a measurement tool, not a call generator, and Search Console was only connected on 07-27 \u2014 let one measurement layer settle before buying a second.\n- Exit-intent popups offering a PDF in exchange for a phone number. Recommended by the conversion sources, but it collects tyre-kickers, not estimates, and it slows a site whose job is to surface a phone number in under three seconds.\n- Adding a call-tracking number as the GBP primary. Legitimate when done Google's way (tracking number primary, real number as additional), but with 13 reviews and thin citations, any NAP churn right now risks more than the attribution data is worth. Revisit once Apple and Bing are verified and consistent.\n- Trade-partner referral swaps with roofers and painters. Real, but too close to the home-inspector/realtor loop already sitting in the ledger as a candidate \u2014 run that one first before adding a second referral channel.\n\nOne honest caution on the numbers: 6 visitors a day and 300 profile views a month means every technique here is being tested on a sample too small to prove anything in two weeks. Judge all three at 60 days, on calls answered and estimates booked, not on traffic.\n\nSeasonal note: everything proposed is timed for the August-November ramp. From mid-December through February, shift the rain play to ice-dam and downspout-freeze wording rather than letting it go stale \u2014 that is the second PA demand spike and the same page can carry it with one seasonal section swapped in."
   },
   "pages": {
     "areas": [
@@ -1332,6 +1482,7 @@
       "seamless-gutters-dillsburg-pa.html",
       "seamless-gutters-dover-pa.html",
       "seamless-gutters-glen-rock-pa.html",
+      "seamless-gutters-hallam-pa.html",
       "seamless-gutters-hanover-pa.html",
       "seamless-gutters-manchester-pa.html",
       "seamless-gutters-mount-wolf-pa.html",
@@ -1343,6 +1494,7 @@
       "seamless-gutters-wrightsville-pa.html"
     ],
     "guides": [
+      "5-vs-6-inch-gutters-right-size-for-york-county-homes.html",
       "best-gutter-company-york-county-pa.html",
       "copper-gutters-historic-home-york-pa.html",
       "gutter-cleaning-cost-york-pa.html",
@@ -1352,7 +1504,8 @@
       "gutters-york-pa.html",
       "how-much-do-seamless-gutters-cost.html",
       "seamless-vs-sectional-gutters.html",
-      "signs-your-gutters-need-replacing-york-county-pa.html"
+      "signs-your-gutters-need-replacing-york-county-pa.html",
+      "york-gutters.html"
     ],
     "services": [
       "commercial-gutters.html",

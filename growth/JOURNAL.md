@@ -1730,3 +1730,26 @@ keep climbing while clicks stay in single digits, then this site's visibility is
 landing where the map pack and AI Overviews take the tap, and the honest answer
 is the offline and profile channels — T007, T022, T021, T012 — rather than a
 thirty-fourth page.
+
+## 2026-08-01 — engine run
+
+Goal: **1.9%** top-3 share of 108 tracked queries (target 50%).
+2026-07-31: 6 visitors (1 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: adopted 1 real search(es) into the tracked universe: york gutters
+- `improve_ctr` — ok: rewrote title/description on /guides/gutter-cleaning-cost-york-pa.html (11 impressions, 0 clicks, pos 9.3) — Front-loaded the exact search wording ("gutter cleaning" + York) instead of a question phrasing, and swapped t
+- `geo_answer_first_content_pass` — ok: answer-first opening on /services/gutter-cleaning-repair.html for 'clogged gutter repair' (54 words, + FAQ schema, 10 impressions)
+- `strengthen_pages` — ok: added "Copper Half-Round Gutters for Historic Homes in York, PA" to /services/half-round-gutters.html for 'half round copper gutters historic home york pa'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: published Hallam (12,154 bytes; 1 town(s) left in the queue)
+- `money_pages` — ok: published 'york gutters' → /guides/york-gutters.html
+- `internal_links` — ok: refreshed nearby-links on 13 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 35 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 18 URL(s), HTTP 200
+
+**Scout proposed (as candidates, not running):**
+- T027 Missed-call text-back on the business line — The AI agent catches calls it answers, but it cannot catch the caller who hangs up at ring 3, calls at 8pm, or gets a busy signal while Eric is talking to someone else — and those are exactly the home
+- T028 Heavy-rain 48-hour response play (overflow page + GBP post) — York County gets thunderstorm bands in August and nor'easter rain in September, and the moment a gutter overflows over the front door a homeowner searches 'gutters overflowing in heavy rain' or 'gutte
+- T029 Apple Business + Bing Places verified place cards — The ledger's AI-answer work is all on-site — it assumes the engines can read nemoseamlessgutter.com. But when a York homeowner asks Siri or Copilot 'who installs gutters near me', those assistants do 
