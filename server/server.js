@@ -29,6 +29,15 @@ const { runSetup, validateSetupToken } = require('./setup');
 
 const app = express();
 app.disable('x-powered-by');
+// The process listens on 127.0.0.1 only, so every request arrives through the
+// local nginx. Telling Express that lets req.ip resolve the real client from
+// X-Forwarded-For *correctly* — walking the header from the right and stopping
+// at the first non-loopback hop. Reading the header by hand is what goes wrong:
+// nginx sets `X-Forwarded-For $proxy_add_x_forwarded_for`, which APPENDS the
+// real address to whatever the client sent, so the LEFTMOST entry is entirely
+// attacker-controlled and keying a rate limiter on it lets a caller hand
+// themselves a fresh bucket on every single request.
+app.set('trust proxy', 'loopback');
 
 // Escape user-controlled values before interpolating them into any HTML output,
 // to prevent stored XSS (booking fields are accepted verbatim and rendered later).
@@ -41,14 +50,39 @@ function escapeHtml(s) {
     .replace(/'/g, '&#39;');
 }
 
+// Only errors we raised deliberately (they carry a 4xx `status`) describe
+// themselves to the caller. Anything else is an internal fault, and its message
+// — a SQLite error, a failed date parse, a file path — is for the log, not for
+// whoever sent the request that broke it.
+function publicError(err, fallback) {
+  const status = err && err.status;
+  if (Number.isInteger(status) && status >= 400 && status < 500 && err.message) return err.message;
+  console.error('[error]', (err && err.stack) || err);
+  return fallback;
+}
+
 // Baseline security response headers (no helmet dependency present; a small
 // middleware keeps the footprint minimal).
+// These pages load no third-party anything and run no JavaScript at all, so the
+// policy can be far stricter than the static site's: script-src 'none' means an
+// injected <script> is inert even if escaping were ever bypassed somewhere.
 app.use((_req, res, next) => {
-  res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'");
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'none'; script-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; " +
+      "base-uri 'none'; form-action 'self'; frame-ancestors 'none'; object-src 'none'"
+  );
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-Content-Type-Options', 'nosniff');
+  // no-referrer matters more here than anywhere else on the site: these URLs
+  // carry the uid+sig that authorises cancelling a booking, and the Referer
+  // header would hand it to any host a page ever links out to.
   res.setHeader('Referrer-Policy', 'no-referrer');
+  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=(), payment=(), usb=()');
   res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains');
+  // Management links are private to one customer or to Eric; keep them out of
+  // search results even if a link is ever pasted somewhere public.
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow');
   next();
 });
 
@@ -56,17 +90,55 @@ app.use(express.json({ limit: '32kb' }));
 app.use(express.urlencoded({ extended: false, limit: '32kb' }));
 
 // --- tiny in-memory rate limiter for the booking endpoint ---
+// Bounded on purpose: an unevicted Map keyed by anything the caller influences
+// is a memory-exhaustion primitive — enough distinct keys and the booking API
+// gets OOM-killed, which takes the whole calendar offline.
 const hits = new Map();
-function rateLimit(ip, max, windowMs) {
+const RATE_MAX_KEYS = 20000;
+
+function sweepExpired(now) {
+  for (const [k, rec] of hits) if (now > rec.reset) hits.delete(k);
+}
+
+function rateLimit(key, max, windowMs) {
   const now = Date.now();
-  const rec = hits.get(ip) || { count: 0, reset: now + windowMs };
+  const rec = hits.get(key) || { count: 0, reset: now + windowMs };
   if (now > rec.reset) {
     rec.count = 0;
     rec.reset = now + windowMs;
   }
   rec.count += 1;
-  hits.set(ip, rec);
+  hits.set(key, rec);
+  if (hits.size > RATE_MAX_KEYS) {
+    sweepExpired(now);
+    // Still full: drop the oldest buckets (Map preserves insertion order)
+    // rather than clearing the table, so a flood can't wipe every counter —
+    // including its own — and hand itself a clean slate.
+    if (hits.size > RATE_MAX_KEYS) {
+      let over = hits.size - RATE_MAX_KEYS;
+      for (const k of hits.keys()) {
+        if (over-- <= 0) break;
+        hits.delete(k);
+      }
+    }
+  }
   return rec.count <= max;
+}
+setInterval(() => sweepExpired(Date.now()), 10 * 60000).unref();
+
+// The real client address, via the trust-proxy setting configured above.
+function clientIp(req) {
+  return req.ip || 'unknown';
+}
+
+// Shared guard for the signed-link pages (/booking/*, /owner/*) and the setup
+// endpoint. The signatures are 128-bit so guessing is not the threat; this caps
+// the damage from someone hammering these routes — each hit costs a DB read,
+// and /owner/schedule builds ten days of forecast and job lists per request.
+function limited(req, res, bucket, max, windowMs) {
+  if (rateLimit(`${bucket}-${clientIp(req)}`, max, windowMs)) return false;
+  res.status(429).send(manageHtml('Slow down', '<h1>Too many requests.</h1><p class="muted">Please wait a minute and try again.</p>'));
+  return true;
 }
 
 const { busyForDay } = scheduler;
@@ -133,7 +205,7 @@ app.get('/api/availability', async (req, res) => {
       weather: { status: verdict.status, blocked: verdict.blocked, reason: verdict.reason, pop: verdict.pop == null ? null : verdict.pop, summary: verdict.summary || null },
     });
   } catch (err) {
-    res.status(err.status || 500).json({ error: err.message });
+    res.status(err.status || 500).json({ error: publicError(err, 'Could not load availability') });
   }
 });
 
@@ -149,8 +221,7 @@ app.get('/api/next-openings', async (req, res) => {
   // bucket, with the phone assistant separated out (one storm-week shift really
   // can be dozens of legitimate calls).
   const fromAgent = Boolean(config.agentToken) && req.headers['x-agent-token'] === config.agentToken;
-  const ip = (req.headers['x-forwarded-for'] || req.ip || '').split(',')[0].trim();
-  if (!rateLimit(fromAgent ? 'openings-ai' : `openings-${ip}`, fromAgent ? 120 : 30, 10 * 60000)) {
+  if (!rateLimit(fromAgent ? 'openings-ai' : `openings-${clientIp(req)}`, fromAgent ? 120 : 30, 10 * 60000)) {
     return res.status(429).json({ error: 'Too many requests, please try again later.' });
   }
   try {
@@ -174,7 +245,7 @@ app.get('/api/next-openings', async (req, res) => {
         : `No openings in the next ${config.holds.rebookSearchDays} days. Take a message for Eric instead.`,
     });
   } catch (err) {
-    res.status(err.status || 500).json({ error: err.message });
+    res.status(err.status || 500).json({ error: publicError(err, 'Could not load openings') });
   }
 });
 
@@ -183,20 +254,25 @@ app.post('/api/book', async (req, res) => {
   // would otherwise share one bucket with itself and lock out later callers.
   // Give it its own, roomier bucket — a busy storm week is a lot of calls.
   const fromAgent = Boolean(config.agentToken) && req.headers['x-agent-token'] === config.agentToken;
-  const ip = (req.headers['x-forwarded-for'] || req.ip || '').split(',')[0].trim();
-  const limitKey = fromAgent ? 'phone-ai' : ip;
+  const limitKey = fromAgent ? 'phone-ai' : `book-${clientIp(req)}`;
   const limitMax = fromAgent ? 30 : 8;
   if (!rateLimit(limitKey, limitMax, 10 * 60000)) return res.status(429).json({ error: 'Too many requests, please try again later.' });
 
   try {
     const b = req.body || {};
-    const name = String(b.name || '').trim();
-    const phone = String(b.phone || '').trim();
-    const email = String(b.email || '').trim();
-    const address = String(b.address || '').trim();
-    const notes = String(b.notes || '').trim().slice(0, 1000);
-    const service = String(b.service || '').trim();
-    const start = String(b.start || '').trim();
+    // Clip every field, the way /api/lead already does. The 32kb body cap alone
+    // is not a field limit: a 30kb "name" is storable, and it is then rendered
+    // into Eric's alert email, the calendar invite and the manage page. Escaped
+    // everywhere, so this is bloat rather than injection — but a booking table
+    // full of them is still a real mess to clean up.
+    const clip = (v, n) => String(v == null ? '' : v).trim().slice(0, n);
+    const name = clip(b.name, 120);
+    const phone = clip(b.phone, 40);
+    const email = clip(b.email, 200);
+    const address = clip(b.address, 300);
+    const notes = clip(b.notes, 1000);
+    const service = clip(b.service, 60);
+    const start = clip(b.start, 40);
 
     const svc = serviceOrThrow(service);
     if (name.length < 2) return res.status(400).json({ error: 'Please enter your name.' });
@@ -280,7 +356,7 @@ app.post('/api/book', async (req, res) => {
         : `You're all set for ${v.spoken}.`,
     });
   } catch (err) {
-    res.status(err.status || 500).json({ error: err.message || 'Booking failed' });
+    res.status(err.status || 500).json({ error: publicError(err, 'Booking failed') });
   }
 });
 
@@ -384,7 +460,9 @@ app.get('/api/admin/bookings', (req, res) => {
 
 app.post('/api/admin/cancel', (req, res) => {
   if (!requireAdmin(req, res)) return;
-  const uid = String((req.body && req.body.uid) || req.query.uid || '');
+  // Body only — a uid in the query string ends up in the nginx access log, and
+  // the uid is half of what a management link is made of.
+  const uid = String((req.body && req.body.uid) || '');
   const existing = stmts.byUid.get(uid);
   if (!existing) return res.status(404).json({ error: 'not found' });
   stmts.cancel.run(uid);
@@ -404,6 +482,7 @@ function manageHtml(title, body) {
 }
 
 app.get('/booking/manage', (req, res) => {
+  if (limited(req, res, 'manage', 60, 10 * 60000)) return;
   const uid = String(req.query.uid || '');
   const sig = String(req.query.sig || '');
   if (!calendar.verifyManageSig(uid, sig)) return res.status(403).send(manageHtml('Invalid link', '<h1>This link is invalid.</h1><p class="muted">Please use the link from your booking email.</p>'));
@@ -432,6 +511,7 @@ app.get('/booking/manage', (req, res) => {
 });
 
 app.post('/booking/cancel', async (req, res) => {
+  if (limited(req, res, 'cancel', 20, 10 * 60000)) return;
   const uid = String((req.body && req.body.uid) || '');
   const sig = String((req.body && req.body.sig) || '');
   if (!calendar.verifyManageSig(uid, sig)) return res.status(403).send(manageHtml('Invalid link', '<h1>This link is invalid.</h1>'));
@@ -458,6 +538,7 @@ app.post('/booking/cancel', async (req, res) => {
  * one is the whole interaction. No login, no app, no phone tag.
  * ------------------------------------------------------------------------- */
 app.get('/booking/reschedule', async (req, res) => {
+  if (limited(req, res, 'resched', 60, 10 * 60000)) return;
   const uid = String(req.query.uid || '');
   const sig = String(req.query.sig || '');
   if (!calendar.verifyManageSig(uid, sig)) {
@@ -494,6 +575,7 @@ app.get('/booking/reschedule', async (req, res) => {
 });
 
 app.post('/booking/reschedule', async (req, res) => {
+  if (limited(req, res, 'resched', 30, 10 * 60000)) return;
   const uid = String((req.body && req.body.uid) || '');
   const sig = String((req.body && req.body.sig) || '');
   const start = String((req.body && req.body.start) || '');
@@ -532,6 +614,8 @@ app.post('/booking/reschedule', async (req, res) => {
 const OWNER_SCHEDULE_KEY = calendar.OWNER_SCHEDULE_KEY;
 
 app.get('/owner/schedule', (req, res) => {
+  // Heaviest page in the app: ten days of forecast lookups and job queries.
+  if (limited(req, res, 'owner', 60, 10 * 60000)) return;
   if (!calendar.verifyManageSig(OWNER_SCHEDULE_KEY, String(req.query.sig || ''))) {
     return res.status(403).send(manageHtml('Invalid link', '<h1>This link is invalid.</h1>'));
   }
@@ -581,6 +665,7 @@ app.get('/owner/schedule', (req, res) => {
 });
 
 app.post('/owner/schedule', (req, res) => {
+  if (limited(req, res, 'owner', 60, 10 * 60000)) return;
   const sig = String((req.body && req.body.sig) || '');
   if (!calendar.verifyManageSig(OWNER_SCHEDULE_KEY, sig)) {
     return res.status(403).send(manageHtml('Invalid link', '<h1>This link is invalid.</h1>'));
@@ -604,6 +689,12 @@ app.post('/api/setup', async (req, res) => {
   // Referer header, or browser history. It is short-TTL + single-use (see
   // setup.js): it expires and is burned from .env after the first successful
   // connect, so the link can't be replayed.
+  // This is the credential-overwrite door. The token compare is constant-time
+  // and the token is single-use, but an unmetered endpoint still lets someone
+  // sit there guessing (and each miss is free); cap the attempts.
+  if (!rateLimit(`setup-${clientIp(req)}`, 10, 10 * 60000)) {
+    return res.status(429).json({ error: 'Too many attempts, please try again later.' });
+  }
   const p = req.body || {};
   const t = req.headers['x-setup-token'] || p.setupToken || p.t;
   const gate = validateSetupToken(t);
@@ -632,7 +723,7 @@ app.post('/api/setup', async (req, res) => {
       setTimeout(() => process.exit(0), 800);
     }
   } catch (err) {
-    res.status(500).json({ error: err.message || 'Setup failed' });
+    res.status(500).json({ error: publicError(err, 'Setup failed') });
   }
 });
 
