@@ -2182,3 +2182,26 @@ question gets answered a year late. Either way, the goal metric has not moved in
 six days, every town in the county is still at zero, and the business has one
 booking to its name. The engine is healthy. Whether it is earning anything is
 still unknown, and will stay unknown until the grace period ends on 26 August.
+
+## 2026-08-02 — engine run
+
+Goal: **1.7%** top-3 share of 117 tracked queries (target 50%).
+2026-08-01: 6 visitors (0 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: answer-first opening on /guides/seamless-vs-sectional-gutters.html for 'seamless vs sectional gutters' (53 words, + FAQ schema, 6 impressions)
+- `strengthen_pages` — ok: added "How to Choose the Best Gutter Company in Dallastown, PA" to /areas/seamless-gutters-dallastown-pa.html for 'best gutter company dallastown pa'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: published Jacobus (12,867 bytes; 0 town(s) left in the queue)
+- `money_pages` — ok: published 'gutter pulling away from house' → /guides/gutter-pulling-away-from-house.html
+- `internal_links` — ok: refreshed nearby-links on 6 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 37 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 9 URL(s), HTTP 200
+
+**Scout proposed (as candidates, not running):**
+- T030 Trade-partner referral loop (roofers, siders, painters) — Every roof replacement and siding job in York County ends with gutters off the house and someone has to hang them back. Roofing crews in York, Dover and Red Lion mostly sub that work out or fumble it.
+- T031 Leaf-season callback to past customers and unsold estimates — Eric already has a small list of people who bought from him and a larger one who got a quote and never called back. In York County the fall leaf-fall window is when a homeowner will finally say yes to
+- T032 Answer recommendation threads in York County Facebook groups — 'Anyone know a good gutter guy?' gets posted in York, Dover, Dallastown and Red Lion township Facebook groups every single week, and each of those posts is a homeowner buying within 30 days — the exac
