@@ -35,8 +35,23 @@ REDUNDANCY_RATIO = 0.10  # <10% of an overlapping technique's traffic = redundan
 PROTECTED = {"rebuild_sitemap", "ping_indexnow", "internal_links"}
 
 
+# The date a running technique should be judged from.
+#
+# `set_status` stamps `activated` whenever it flips something to active, so in
+# the normal path this is just that field. But a technique can reach the ledger
+# already active without going through it — seeded that way, or hand-edited in
+# techniques.json on the droplet — and T014 (geo_answer_first_content_pass) is
+# sitting in exactly that state today: status "active", `activated` null,
+# building pages every morning. Reading the missing field as "zero days old"
+# meant it could never leave the grace period and therefore could never be
+# judged, in the one module whose whole job is judging. `added` is the honest
+# floor: whatever day it started running, it was not before the day it existed.
+def _since(t):
+    return t.get("activated") or t.get("added")
+
+
 def _days_active(t):
-    a = t.get("activated")
+    a = _since(t)
     if not a:
         return 0
     try:
@@ -51,7 +66,7 @@ def _days_active(t):
 # technique gets killed on the strength of one morning.
 def _owned(t):
     return ledger.complete_series(t["slug"], "owned_visitors",
-                                  since=t.get("activated"))
+                                  since=_since(t))
 
 
 def _global(metric, since=None):
@@ -116,8 +131,9 @@ def evaluate(t):
     # trailing window against the window immediately before it was activated.
     metric = t.get("metric") or "organic_visitors"
     pairs = _global(metric)
-    after = [(d, v) for d, v in pairs if d >= (t.get("activated") or "")]
-    before = [(d, v) for d, v in pairs if d < (t.get("activated") or "")][-WINDOW:]
+    since = _since(t) or ""
+    after = [(d, v) for d, v in pairs if d >= since]
+    before = [(d, v) for d, v in pairs if d < since][-WINDOW:]
     a_med = statistics.median([v for _, v in after[-WINDOW:]]) if after else None
     b_med = statistics.median([v for _, v in before]) if before else None
     res["measured"] = {"metric": metric, "median_after": a_med, "median_before": b_med,

@@ -63,13 +63,22 @@ pattern Google's scaled-content policy targets.
 ## The goal metric, honestly
 
 The target is >50% of the tracked queries in `keywords.json` holding a **top-3**
-position. Position can only be known from Search Console, and that is **not
-connected yet**, so `share_pct` is `null` and the report says `UNMEASURED`.
+position. Position can only be known from Search Console, which was connected on
+**2026-07-27** (technique T010, now retired as done). `share_pct` has been a real
+measurement since 2026-07-28; it is `null` only if the connection breaks.
 
-Until then it shows *coverage* — does a page exist whose headings target the
-query — clearly labelled as a proxy. Coverage is not rank, and the report never
-prints one where a reader would read the other. Connecting Search Console
-(technique T010) is what turns the goal from a proxy into a measurement.
+Read it with its denominator in view. `share_pct` is `top3 / total`, and `total`
+is every query in `keywords.json` — including the ones Search Console has never
+returned a position for, which is most of them. `adopt_queries` and the scout
+both add queries, so the denominator grows on its own and the headline share
+falls on mornings when nothing on the site got worse. `ranked_known` in the same
+block is the count Search Console can actually rank; compare `top3` against that
+when you want to know whether the site moved, and against `total` when you want
+to know how far there is left to go.
+
+`coverage_pct` — does a page exist whose headings target the query — is still
+reported, clearly labelled as a proxy. Coverage is not rank, and the report never
+prints one where a reader would read the other.
 
     python3 growth_daily.py goal    # exits 0 once the goal is met, 1 until then
 
