@@ -1193,6 +1193,46 @@ def _names_other_market(query):
     return False
 
 
+# A "<Name> County" that is not ours. Matched against generated prose rather
+# than a search query, so it is case-sensitive on purpose: the model writes
+# place names capitalised, and lowering the whole string first would make
+# "the county" match.
+OFF_AREA_COUNTY = re.compile(r"\b([A-Z][a-z]+)\s+County\b")
+
+
+def _off_area_prose(text):
+    """The place this generated copy names that NEMO does not serve, or None.
+
+    `_names_other_market` guards what goes *in* to the answer-first pass — the
+    query the model is asked to answer. Nothing guarded what came back out, and
+    on 2026-07-29 what came back out was the opening of /services/gutter-guards.html:
+    "NEMO Seamless Gutter installs gutter guards on homes in Akron, PA and the
+    surrounding Lancaster and York County area." That paragraph is still live at
+    the time of writing, it sits under the geo:answer-first marker, and it is
+    precisely the passage an AI answer engine lifts — so a wrong place name
+    there is not a typo, it is the site telling York County searchers the
+    business is in Lancaster County.
+
+    Two shapes, because they fail differently. A town from OUT_OF_AREA is a
+    place the engine has already been told is somebody else's market. A
+    "<Name> County" other than York is the more dangerous one: it is
+    grammatical, it reads as local knowledge, and a word-count check waves it
+    straight through.
+
+    Word boundaries matter here in a way they do not for queries: OUT_OF_AREA
+    holds "york ne" for York, Nebraska, and a plain substring test would reject
+    the sentence "a York neighborhood".
+    """
+    low = text.lower()
+    for bad in OUT_OF_AREA:
+        if re.search(r"\b%s\b" % re.escape(bad), low):
+            return bad
+    for m in OFF_AREA_COUNTY.finditer(text):
+        if m.group(1).lower() != "york":
+            return m.group(0)
+    return None
+
+
 def adopt_queries(ctx):
     """Add real searches to the tracked universe, filtered to this business.
 
@@ -1388,6 +1428,14 @@ def geo_answer_first_content_pass(ctx):
                 break
             continue
 
+        off = _off_area_prose(answer)
+        if off:
+            errors.append(f"rejected answer for /{rel}: names {off!r}, "
+                          f"which is not York County")
+            if len(errors) >= MAX_ITEM_FAILURES:
+                break
+            continue
+
         block = (f"\n      {GEO_MARKER}"
                  f'\n      <p class="lead">{_esc(answer)}</p>')
         cut = anchor + len('<div class="container prose">')
@@ -1405,7 +1453,11 @@ def geo_answer_first_content_pass(ctx):
 
         # Only add FAQ markup where the page has none. Two FAQPage blocks on one
         # page is worse than none — the engines pick one and the other is noise.
-        faqs = [f for f in (data.get("faqs") or []) if f.get("q") and f.get("a")]
+        # One bad FAQ does not justify throwing away a good answer, so these are
+        # dropped individually rather than failing the page — but they are
+        # dropped, because they become both visible copy and JSON-LD.
+        faqs = [f for f in (data.get("faqs") or []) if f.get("q") and f.get("a")
+                and not _off_area_prose(f"{f['q']} {f['a']}")]
         added_faq = False
         if faqs and not has_faq:
             cta = out.find('      <div class="cta-band">')

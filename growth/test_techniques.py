@@ -150,5 +150,61 @@ class JsonLdEscapingTest(unittest.TestCase):
                              msg=f"_ld() call near offset {m.start()} still passes indent=")
 
 
+class OffAreaProseTest(unittest.TestCase):
+    """The answer-first block is the passage an AI engine quotes verbatim.
+
+    `_names_other_market` filters the query going in. Until 2026-08-03 nothing
+    checked what came back out, and what came back out on 2026-07-29 is still
+    live on /services/gutter-guards.html.
+    """
+
+    SHIPPED = ("NEMO Seamless Gutter installs gutter guards on homes in Akron, "
+               "PA and the surrounding Lancaster and York County area. We fit "
+               "micro-mesh and screen-style covers over existing or new seamless "
+               "gutters, matched to your roof pitch and the trees around the house.")
+
+    def test_rejects_the_paragraph_that_shipped(self):
+        self.assertEqual(T._off_area_prose(self.SHIPPED), "akron")
+
+    def test_rejects_a_neighbouring_county_on_its_own(self):
+        # The dangerous shape: grammatical, plausible, and no banned town in it.
+        self.assertEqual(
+            T._off_area_prose("We install seamless gutters across Lancaster "
+                              "County and the surrounding area."),
+            "Lancaster County")
+
+    def test_accepts_the_copy_it_should_have_written(self):
+        self.assertIsNone(T._off_area_prose(
+            "NEMO Seamless Gutter installs gutter guards on homes across York "
+            "County, Pennsylvania. We fit micro-mesh and screen-style covers "
+            "over existing or new seamless gutters."))
+
+    def test_york_county_itself_is_never_the_offender(self):
+        self.assertIsNone(T._off_area_prose("Serving all of York County, PA."))
+
+    def test_a_lowercase_county_is_not_a_place_name(self):
+        # "the county" and "your county" must not read as somebody else's.
+        self.assertIsNone(T._off_area_prose("Prices vary across the county."))
+
+    def test_york_nebraska_does_not_reject_a_york_neighborhood(self):
+        # OUT_OF_AREA holds "york ne"; a substring test fails this sentence.
+        self.assertIsNone(T._off_area_prose(
+            "We work in every York neighborhood, from Fireside to Springdale."))
+
+    def test_new_york_is_still_out_of_area(self):
+        self.assertEqual(T._off_area_prose("Serving New York and beyond."),
+                         "new york")
+
+    def test_the_guard_is_wired_into_the_answer_first_pass(self):
+        """A guard nothing calls is a guard that does not exist — and this one
+        cannot be reached by a unit test, because the path around it needs a
+        live model call."""
+        src = open(os.path.join(os.path.dirname(__file__), "techniques.py")).read()
+        body = src[src.index("def geo_answer_first_content_pass"):]
+        body = body[:body.index('return {"ok": True')]
+        self.assertIn("_off_area_prose(answer)", body)
+        self.assertIn("_off_area_prose(f\"{f['q']} {f['a']}\")", body)
+
+
 if __name__ == "__main__":
     unittest.main()

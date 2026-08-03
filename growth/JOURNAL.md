@@ -2716,3 +2716,399 @@ Goal: **1.6%** top-3 share of 122 tracked queries (target 50%).
 - T033 Reply to all 13 reviews, publicly fix the low ones — 300 GBP views a month produce zero calls, and the profile shows 4.2 stars with 13 reviews and (almost certainly) no owner replies. A York homeowner comparing three gutter installers on Maps sees a 4.2
 - T034 One real job page per completed install, photographed and dated — The site has town pages and guides but zero proof — and for a one-truck contractor with 13 reviews, proof is the thing that makes a stranger dial instead of bounce. Publishing a short page per finishe
 - T035 Claim Yelp page, switch on Request a Quote, answer inside the hour — This is the one channel that hands Eric a named York County homeowner with a stated gutter problem for zero dollars, rather than hoping a ranking becomes a call. Yelp quote requests cost nothing to re
+
+## 2026-08-03 — review agent
+
+### Lead: the two "position 1" queries this journal has cited for four days are dead, and `local_visitors` cannot see the map pack at all
+
+Two findings, both corrections of things believed here on the basis of numbers
+that do not mean what they were read to mean.
+
+**One: `gutter installer` at position 1 with 212 impressions is not live
+visibility. It stopped on 27 July.** The row has been byte-identical in five
+consecutive daily snapshots while other rows moved every day. Search Console's
+window here ends three days back, so five frozen days means literally zero
+impressions on 07-28, 07-29, 07-30 and 07-31. Working numbers below. This
+journal has cited those impressions three days running as an audience being
+wasted by a placeless homepage title. The title should still be fixed; the
+argument that it recovers a live audience should not be made again.
+
+**Two: `local_visitors` is structurally incapable of counting Google Business
+Profile traffic, and four ledger techniques are scored on it.** `LOCAL_HOSTS`
+(`growth/metrics.py:63`) matches `"google.com/maps"` against the referrer
+string, but Google strips the path from cross-origin referrers by default, so a
+GBP website click arrives as `https://www.google.com/` and falls through to
+`SEARCH_HOSTS` as **organic**; from the Maps mobile app it arrives with no
+referrer at all and lands in **direct**. T004 (active), T007, T008 and T016 all
+carry `"metric": "local_visitors"`. **"Maps flat zero on every day on record" —
+written in this journal on 07-31, 08-01 and 08-02 — is not evidence that the map
+pack sends nothing.** It is a blind spot, and it also plausibly explains why 9
+of 9 visitors on 08-02 were classified `direct`. `classify()` already routes
+`utm_source=gbp` to `local` (`metrics.py:277-288`); the code has been waiting
+for a tag nobody has set. Recommendation 2, two minutes, free.
+
+Still nobody's done it: homepage title names no place (**day 3**), the
+Akron/Lancaster paragraph is live on the gutter-guards page (**day 6**), the
+leaf-fall queue reorder (**day 5**), T007 unanswered (**day 8**).
+
+### Where the numbers stand
+
+The goal metric — tracked York County queries holding a top-3 position:
+
+| | 07-28 | 07-29 | 07-30 | 07-31 | 08-01 | 08-02 | 08-03 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **top-3 count** | 2 | 2 | 2 | 2 | 2 | 2 | **2** |
+| top-10 count | 7 | 6 | 6 | 6 | 6 | 6 | **7** |
+| `ranked_known` | 17 | 19 | 21 | 21 | 21 | 22 | **22** |
+| tracked queries | 76 | 87 | 87 | 98 | 108 | 117 | **122** |
+| share (`top3/total`) | 2.6% | 2.3% | 2.3% | 2.0% | 1.9% | 1.7% | **1.6%** |
+| coverage proxy | 48.7% | 44.8% | 46.0% | 42.9% | 40.7% | 39.3% | **39.3%** |
+
+**Top-3 is 2 for the seventh consecutive measured day.** Against the honest
+denominator — the 22 queries Search Console has returned a position for — that
+is 2 of 22, **9.1%**, unchanged from yesterday. The headline 1.6% fell for the
+sixth day running because the tracked universe grew by five queries, not because
+anything got worse; sixth entry flagging it, and I am still not changing
+`keywords.py:296` mid-series for the reason the 08-02 entry gave.
+
+**One thing moved: top-10 went 6 → 7, the first upward move in six days.** One
+query crossed into the top ten. On this volume that is directional at best and I
+am not calling it more than that.
+
+Per town (`covered`/`total`), every named town still at **0 top-3**:
+
+| bucket | total | covered | top-3 |
+| --- | --- | --- | --- |
+| county | 70 | 29 | **2** |
+| york | 13 | 4 | 0 |
+| dover | 11 | 3 | 0 |
+| hanover | 6 | 4 | 0 |
+| dallastown | 8 | 3 | 0 |
+| red-lion | 7 | 2 | 0 |
+| spring-grove | 7 | 3 | 0 |
+
+Search Console, 28-day rolling: rows **287** (+10), matched **22** (flat, third
+day), clicks **7**, impressions **1,677** (+89), avg position **21.0**.
+
+Because the window ends three days back and nothing has yet fallen off the far
+end, each day's delta is that one day's traffic. Read that way:
+
+| day earned | 07-27 | 07-28 | 07-29 | 07-30 | 07-31 |
+| --- | --- | --- | --- | --- | --- |
+| impressions | +189 | +289 | +192 | +421 | **+89** |
+| clicks | 0 | +2 | +1 | +1 | **0** |
+
+**Clicks did not move today — the first flat day since 07-30 — and impressions
+added on 07-31 were a fifth of the day before.** Site-wide CTR is 7 on 1,677,
+**0.42%**.
+
+Traffic (nginx, bots and owner IPs excluded):
+
+| | 07-28 | 07-29 | 07-30 | 07-31 | 08-01 | 08-02 |
+| --- | --- | --- | --- | --- | --- | --- |
+| visitors | 11 | 14 | 7 | 6 | 6 | **9** |
+| pageviews | 24 | 37 | 12 | 14 | 7 | **14** |
+| organic | 1 | 3 | 3 | 1 | 0 | **0** |
+| direct | 10 | 8 | 3 | 4 | 6 | **9** |
+| local (maps) | 0 | 0 | 0 | 0 | 0 | **0** |
+| AI-referred | 0 | 0 | 0 | 0 | 0 | **0** |
+| bot hits | 1,954 | 2,374 | 1,200 | 3,162 | 1,412 | **1,554** |
+
+Second consecutive zero-organic day, and **100% of 08-02's visitors classified
+`direct`** — see the lead for why that number should not be trusted as written.
+`call_taps` 0 for four days, `ai_calls` 0 for three, `bookings` 0 since 07-30.
+All-time: **1 booking, 0 phone leads.**
+
+**The measurement-is-broken watch is still not triggered for the visitor
+count** — 11/14/7/6/6/9 with four non-zero organic days in the series is a small
+site, not an over-broad filter. The channel *split* is a different matter and is
+the lead.
+
+**The engine is running short of work.** Six of eleven techniques no-op'd this
+morning: `adopt_queries`, `improve_ctr`, `service_pages`, `area_pages`
+(second day since `TOWN_QUEUE` emptied), `local_schema`, and `internal_links`
+refreshed 0 pages. Three did real work: one new guide
+(`ice-dams-gutters-pennsylvania`), one strengthen section, one answer-first
+opening. A week ago it was publishing a town page every morning.
+
+### Did previous changes work?
+
+**The frozen head terms — a correction, not a result.** Pulled every published
+snapshot and read one row across all of them:
+
+| snapshot | 07-28 | 07-29 | 07-30 | 07-31 | 08-01 | 08-02 | 08-03 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `gutter installer` | 104@1 | 106@1 | 212@1 | 212@1 | 212@1 | 212@1 | **212@1** |
+| `gutter contractor` | 20@1 | 20@1 | 46@1 | 46@1 | 46@1 | 46@1 | **46@1** |
+| `gutter guard installer` | 12@1 | 12@1 | 14@1 | 14@1 | 14@1 | 14@1 | **14@1** |
+| `gutters` | — | — | 20@5.8 | 21@5.6 | 24@5.6 | 25@5.4 | **46@3.7** |
+
+`gutters` moves every single day and improved four positions overnight, so this
+is not a stale pipeline — `growth/gsc.py` fetches live on every run with no
+cache. Those three specific rows stopped. Decoded against `LAG_DAYS = 3`:
+`gutter installer` earned **+106 impressions on 27 July alone** — more than half
+its total — and **zero on each of 07-28, 07-29, 07-30 and 07-31.** Same shape for
+the other two. So **272 of the 388 impressions on the geo-agnostic head terms
+are a one-day burst that ended six days ago**, not an audience sitting there
+waiting for a better title. Verdict on the 08-01/08-02 framing of those numbers:
+**wrong, and mine to correct.** The homepage title should still be fixed — a
+placeless title on a local business is wrong on its own terms — but its expected
+payoff is smaller than this journal has been claiming.
+
+**08-02's replaced prediction — "daily `organic_visitors` holds a 7-day median
+of ≥2 by 2026-08-16, or the click growth is a window artifact" — is tracking
+against itself but is not yet due.** Median over 07-27…08-02 of `[0,1,3,3,1,0,0]`
+is **1**. Two consecutive zeros. Thirteen days left; **too early to tell**, and I
+note today's flat click count is the first evidence on the artifact side.
+
+**08-02 rec #1, homepage title — NOT done. Day 3.** `index.html:16-17` still
+reads `Gutter Installer & Contractor | NEMO Seamless Gutter` with a description
+naming no place. This is authoritative rather than stale: `publish_state.sh`
+copies `index.html` droplet → repo every morning, and today's publish commit
+(`4e04a51`) did not touch it.
+
+**Akron/Lancaster paragraph (07-29 #1 through 08-02 #2) — NOT done. Day 6.**
+`services/gutter-guards.html:163`, and I confirmed something the earlier entries
+asserted without showing: it sits **directly under the `<!-- geo:answer-first -->`
+marker**, so it is T014's own output, not hand-written legacy copy. I shipped a
+guard against recurrence today (below); the guard does not repair the live page.
+
+**Leaf-fall queue reorder (07-30 #3 onward) — NOT done. Day 5.**
+`order = {"hire": 0, "price": 1, "check": 2, "diy": 3}` at
+`growth/techniques.py:435` and `:834`. Intent coverage today: hire **41/80
+(51%)**, price **3/24 (13%)**, check **3/11 (27%)**, diy **1/7 (14%)**. The gap
+between the bucket the engine works first and the buckets York County searches in
+October has widened by two more queries.
+
+**T007 (ask finished jobs for a Google review) — still `candidate`,
+`activated: null`. Day 8.**
+
+**08-02's own repo changes have not taken effect and cannot until someone
+deploys.** I read `growth/publish_state.sh`: it copies `growth/snapshot.json`,
+`sitemap.xml`, `index.html`, merges `JOURNAL.md`, and rsyncs `areas/`, `guides/`,
+`services/`. **It copies no `growth/*.py` in either direction.** So the
+`review.py` T014 fix and the README correction are inert, and the droplet→repo
+sync cannot overwrite them either. T014 still shows `activated: null` in today's
+snapshot, which is consistent with no deploy but does not prove it — the fix
+changes a computation, not a stored field.
+
+**08-02 rec #3 — "do not extend `TOWN_QUEUE`" — no action needed, and today's
+research supports it.** The March 2026 core update is reported to have hit
+templated location pages in home services hardest. I also measured what the
+08-02 entry measured for guides but not for areas; see below.
+
+**T001/T002/T018 remain inside grace to ~2026-08-26.** `owned_visitors` is now
+**five consecutive zero days** for each. On 6–9 visitor days that is noise, and
+T001 can no longer add to its own series.
+
+### What I checked in the code before recommending anything
+
+- **`local_visitors` cannot see GBP.** `LOCAL_HOSTS` at `growth/metrics.py:63`,
+  the referrer/UTM branch at `:273-301`, and the four techniques carrying
+  `"metric": "local_visitors"` in today's snapshot (T004, T007, T008, T016).
+  `classify()` already maps `utm_source=gbp|google-business|gmb` → `local`, so
+  no code change is needed — only the tag.
+- **Area-page similarity, measured rather than assumed.** The 08-02 entry ran
+  `SequenceMatcher` across the guides and found nothing above 0.30; nobody had
+  run it across the 15 area pages, which are the pages the doorway-page research
+  is actually about. Word-level, tags and scripts stripped, 105 pairs: **max
+  0.457** (Hanover | Red Lion), **median 0.227**, min 0.153. Guides for
+  comparison: max 0.225, median 0.152. So the town pages are roughly twice as
+  alike as the guides and Red Lion appears in three of the four tightest pairs —
+  but 0.457 is still inside the 60–70%-unique working standard cited on 08-02.
+  **Not an emergency; a reason not to mass-produce more from this template.**
+- **Call mechanics are already shipped, so T023 is largely redundant on-site.**
+  Floating tap-to-call on every generated page (`growth/templates.py:160`) and
+  eight `tel:` links in `index.html` including the hero. The remaining unshipped
+  part of T023 is the *answering*, not the button.
+- **Checked and NOT recommending, because it is already shipped:** FAQPage
+  JSON-LD on every generated page (`_faq_ld`), `rel="canonical"`
+  (`templates.py:33`), IndexNow (T006, 3 URLs today), `areaServed: York County`
+  in `_provider_ld()`, out-of-area query filtering into the answer-first pass
+  (`_names_other_market`, `techniques.py:1170`).
+- **Checked against the ledger and not filing as new:** every off-site idea
+  today's research touches is already T007, T011, T016, T022, T029 or T035.
+
+### What I researched today
+
+- **GBP signals are the largest single block of local-pack weight — 32% — and
+  the primary category is the most influential signal inside it**, with a
+  reported case of an HVAC business falling from position 1 to 31 after
+  broadening its primary category. Steady new reviews are reported to matter
+  more than total count.
+  ([SEOLocale](https://seolocale.com/google-map-pack-ranking-in-2026-how-the-local-3-pack-really-works/),
+  [Wolfpack Advising](https://wolfpackadvising.com/blog/how-to-rank-higher-on-google-maps/),
+  [Green Thumb Local](https://www.greenthumblocal.com/google-maps-rankings-for-home-service-businesses))
+  What it changes: T016 moves up the ranking. It is a free dashboard check with
+  the largest documented single-signal effect available to this business.
+- **AI Overviews appear on ~68% of local searches, and the businesses they cite
+  are the ones already ranking in the map pack.**
+  ([Search Engine Journal](https://www.searchenginejournal.com/ai-overviews-now-answer-most-local-searches-how-to-get-your-business-cited/580757/),
+  [Valley Marketing Group](https://thevalleymarketinggroup.com/blog/google-ai-mode-local-seo-service-businesses-2026/))
+  What it changes: it tempers T014. The answer-first pass is worth running, but
+  it is downstream of the map pack, not a way around it — which is consistent
+  with `ai_visitors` sitting at 0 on every day on record.
+- **The March 2026 core update hit templated location pages in home services
+  hardest** — pages that swap a city name in and offer nothing else.
+  ([Scorpion](https://www.scorpion.co/articles/news/industry-trends-news/googles-march-2026-core-update-what-local-servic/),
+  [Optra](https://optramarketing.com/blog/how-googles-algorithm-updates-affected-local-search/))
+  What it changes: nothing to do, but it is why I measured the area pages rather
+  than trusting the guide result.
+- **Google Analytics gained a native Business Profile integration on 8 June
+  2026, replacing UTM tagging as the way to see GBP website clicks — for sites
+  on GA4.**
+  ([PPC Land](https://ppc.land/google-analytics-links-business-profiles-to-report-local-metrics/),
+  [Search Engine Journal](https://www.searchenginejournal.com/google-analytics-is-adding-google-business-profile-data/578107/))
+  What it changes: this site measures from nginx logs, not GA4, so the
+  integration does nothing for it and the UTM tag remains the only way to see
+  that traffic. That is what turned a vague suspicion into recommendation 2.
+- **Conversion base rates, for calibration.** The median contractor site is
+  reported to convert 2–4% of visitors to a call or form; CallRail's 2026 home
+  services figure is that replying within 60 seconds lifts conversion 391%.
+  ([Social Climb](https://socialclimb.org/local-seo/contractor-website-conversion-essentials/),
+  [Hook Agency](https://hookagency.com/blog/contractor-website-design-trends-2026/))
+  What it changes: at 9 visitors a day, 2–4% predicts **0.2–0.4 calls per day**.
+  Four days of zero `call_taps` on ~28 visitors is exactly the base rate. It is
+  not evidence the button is broken, and no amount of conversion work fixes a
+  number that small — which is an argument for the map pack, not the page.
+
+**Rejected:** paid "AI visibility" packages (fifth time); geo-grid rank trackers
+(measurement, not calls); anything requiring GA4; and **extending `TOWN_QUEUE`**,
+re-rejected on today's core-update finding and my own similarity measurement.
+
+### Recommendations
+
+**Everything below needs a droplet action before it does anything.**
+`/var/www/nemo-seamless-gutter` is not a git checkout and `publish_state.sh`
+copies droplet → repo only, and copies no Python at all. The code I changed today
+is inert until `growth/` is synced by hand.
+
+1. **Audit the Business Profile's primary category — and do it in the same
+   sitting as #2.** *(Eric — 15 minutes. Free. T016, already in the ledger.)*
+   The 2026 sources put GBP signals at 32% of local-pack weight, the largest
+   single block, with primary category the most influential item inside it and a
+   documented position-1-to-31 fall from broadening one. The category must be the
+   most specific true match ("Gutter Cleaning Service" / "Gutter Contractor"),
+   not a general "Contractor". How you would know: `top3` moving off 2, or town
+   buckets leaving 0 — over four to eight weeks, not days. I cannot see the
+   profile from here, so I cannot tell you whether it is already right; that is
+   exactly why it is a 15-minute check. Checked: T016 `status: candidate`,
+   `activated: null` in today's snapshot — proposed 2026-07-29 and never actioned.
+2. **Add `?utm_source=gbp` to the website URL in the Business Profile.**
+   *(Eric — two minutes. Free. NEW.)* Without it this site cannot distinguish a
+   map-pack click from a plain organic one or from a bookmark, because Google
+   strips the referrer path and the Maps app sends no referrer at all. Four
+   techniques are scored on `local_visitors` and all four are currently being
+   judged blind — including T004, which is **active** and will be handed a
+   verdict by `review.py`. How you would know it worked: `local_visitors` becomes
+   non-zero within days, and some of what is now `direct` moves into it. Checked:
+   `growth/metrics.py:63` (`LOCAL_HOSTS`), `:273-301` (`classify`, which already
+   handles the tag). No code change required.
+3. **Put York back in the homepage title and description — on the droplet.**
+   *(Divine — minutes. Free. Day 3.)* Still right, with a **weaker** stated
+   reason than yesterday: the 272 impressions on `gutter installer` and
+   `gutter contractor` are dead, so this is no longer about recovering a live
+   audience. It is about a local business whose strongest page tells Google and
+   every reader nothing about where it works. `GEO_ANCHOR` blocks a future
+   placeless rewrite; it does not repair the one on disk, and the homepage is in
+   its 21-day `ctr_rewrites` cooldown until ~08-17. Checked: `index.html:16-17`
+   in today's post-publish tree; `GEO_ANCHOR` at `growth/techniques.py:1020`,
+   used at `:1124` on new output only.
+4. **Fix the Akron/Lancaster paragraph.** *(Divine — minutes, droplet access.
+   Free. Day 6.)* Rewrite the `<p class="lead">` under `<!-- geo:answer-first -->`
+   at `services/gutter-guards.html:163` to name York County and nothing else,
+   then drop that path from `geo_answered` in `state.json` so the corrected pass
+   can redo it. Sixth day that a page has been telling York County searchers this
+   business is in Lancaster County — and it is the exact passage an AI answer
+   engine lifts. I shipped the guard against a recurrence today; only a human
+   fixes the live page.
+5. **Answer T007 — yes or no.** *(Eric — one decision. Free. Day 8.)* Today's
+   sources say again that steady new reviews beat total count and that AI
+   Overviews cite the businesses already strong in the pack. 13 reviews at 4.2
+   with nobody being asked is still the largest untouched lever in the ledger. A
+   "no" closes it honestly and stops it being re-proposed every morning.
+6. **Reorder the content queue for leaf-fall.** *(Divine — the sort in
+   `money_pages` and `strengthen_pages`. Free. Day 5.)* hire is **51% covered**,
+   price **13%**, check **27%**, diy **14%**, and the sort works hire first.
+   Pages need 8–12 weeks; leaf-fall calls start mid-September. With `area_pages`
+   and `service_pages` both no-op'd, these two techniques *are* the engine now,
+   so their sort order matters more than it did a week ago. The window has closed
+   by another day. Checked: `growth/techniques.py:435` and `:834`.
+7. **Sync `growth/` to the droplet again.** *(Divine — minutes.)* The T014
+   grace-period fix from 08-02 and today's answer-first output guard are both
+   sitting in the repo doing nothing. `publish_state.sh` will never carry them.
+   How you would know: nothing observable in the snapshot, which is itself worth
+   noting — this deploy is unverifiable from the repo and should be reported by
+   whoever does it.
+8. **Carried, unverifiable from this repo, not restated at length:** T022
+   (itemised GBP Services + job photo cadence), T029 (Apple Business Connect +
+   Bing Places), T033/T034/T035 (this morning's scout proposals — review replies,
+   job-proof pages, Yelp RAQ), the ~30-page town cap. Open until someone says
+   otherwise.
+
+### What I changed in this repo today
+
+Two files. Neither is live until `growth/` is synced. **106 tests pass** across
+the six test modules (98 before, 8 new).
+
+- **`growth/techniques.py` — `_off_area_prose()` and `OFF_AREA_COUNTY`, wired
+  into `geo_answer_first_content_pass`.** The answer-first pass validated its
+  generated paragraph on **word count only**. `_names_other_market` filters the
+  query going *in* — that guard was added on 07-29, after the Akron paragraph
+  shipped — but nothing looked at what came back *out*, and what came back out is
+  still live on the site six days later. The new check rejects a generated answer
+  naming a town in `OUT_OF_AREA` or any `"<Name> County"` other than York, and
+  drops individual off-area FAQs rather than failing the whole page for one. It
+  uses word boundaries where the query filter uses substrings, because
+  `OUT_OF_AREA` contains `"york ne"` (York, Nebraska) and a substring test would
+  reject the sentence "a York neighborhood".
+- **`growth/test_techniques.py` — 8 new tests.** Written against the paragraph
+  that actually shipped, plus the shape it does not cover: a bare "Lancaster
+  County" with no banned town in it, which a word-count check waves straight
+  through. One test asserts the guard is reachable from the technique, because
+  the path around it needs a live model call and no unit test can walk it.
+
+I did not touch `techniques.json`, `keywords.json`, `results.jsonl` or
+`state.json`; did not activate, retire or re-status any technique; did not edit
+`index.html` or any page under `areas/`, `guides/` or `services/`, all of which
+are copied droplet → repo every morning and would be reverted tomorrow.
+
+### Reasoning and uncertainties
+
+**Both of today's findings are corrections, and that is the honest summary of
+the week.** Seven measured days, top-3 pinned at 2, every named town at zero.
+Nothing in that changed today. What changed is that two of the numbers this
+journal has been reasoning from turned out to mean less than was claimed: the
+head-term impressions are a dead burst, and the map-pack zero is a blind spot
+rather than a measurement. Both make the picture slightly *better* than the last
+few entries implied — the map pack may be sending traffic that lands in
+`direct` — and both make the evidence thinner.
+
+**Where I am least sure: the frozen rows.** I am confident about the arithmetic —
+five identical snapshots against a three-day-lagged window is zero impressions on
+four specific days, and `gutters` moving in the same fetch rules out a stale
+pipeline. I am much less confident about *why*. A ~106-impression single-day
+burst on 27 July, the day the engine started and the sitemap and IndexNow first
+fired, then silence, is consistent with Google briefly testing a newly-crawled
+site and deciding against it. It is also consistent with something in those
+queries' SERP that I cannot see. I would not spend effort chasing it; I would
+stop citing it.
+
+**Where I may be wrong about `local_visitors`.** I have read the classifier and
+Google's referrer behaviour is well documented, but I cannot see a raw referrer
+line from this repo — `metrics.py` parses a log on the droplet I have no access
+to. If GBP clicks *are* arriving with a full `google.com/maps/place/...`
+referrer, the metric works and my lead is wrong. The UTM tag settles it either
+way for two minutes of Eric's time, which is why I ranked it where I did rather
+than arguing about it.
+
+**What would change my mind about the whole strategy.** The 08-16 test stands:
+if daily organic visitors hold a 7-day median of ≥2, the content engine is
+working and recommendation 6 becomes the most valuable item here. If they stay at
+0–1 while impressions climb, the conclusion is that organic clicks are not this
+business's channel, and everything should move to the profile and the offline
+candidates. Today's numbers — clicks flat, impressions decelerating to +89,
+organic at zero two days running, and 51% of the tracked hire intent already
+covered by pages that rank for none of it — lean toward the second. **Nine days
+after the goal became measurable, the engine has published 38 URLs and the phone
+has rung once.**
