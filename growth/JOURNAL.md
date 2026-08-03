@@ -2693,3 +2693,26 @@ candidates (T007, T016, T022, T030, T031). Either way: six days measured, top-3
 stuck at 2, every town in the county at zero, zero call taps, and one booking to
 the business's name. The engine is healthy and it deployed cleanly for the first
 time. Whether it is earning anything is still unknown.
+
+## 2026-08-03 — engine run
+
+Goal: **1.6%** top-3 share of 122 tracked queries (target 50%).
+2026-08-02: 9 visitors (0 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: answer-first opening on /services/half-round-gutters.html for 'Half-Round Gutters in York, PA' (51 words, + FAQ schema, 5 impressions)
+- `strengthen_pages` — ok: added "Gutter Replacement Near You in York County, PA" to /services/seamless-gutter-installation.html for 'gutter replacement near me'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: published 'ice dams gutters pennsylvania' → /guides/ice-dams-gutters-pennsylvania.html
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 38 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 3 URL(s), HTTP 200
+
+**Scout proposed (as candidates, not running):**
+- T033 Reply to all 13 reviews, publicly fix the low ones — 300 GBP views a month produce zero calls, and the profile shows 4.2 stars with 13 reviews and (almost certainly) no owner replies. A York homeowner comparing three gutter installers on Maps sees a 4.2
+- T034 One real job page per completed install, photographed and dated — The site has town pages and guides but zero proof — and for a one-truck contractor with 13 reviews, proof is the thing that makes a stranger dial instead of bounce. Publishing a short page per finishe
+- T035 Claim Yelp page, switch on Request a Quote, answer inside the hour — This is the one channel that hands Eric a named York County homeowner with a stated gutter problem for zero dollars, rather than hoping a ranking becomes a call. Yelp quote requests cost nothing to re
