@@ -539,6 +539,40 @@ def internal_links(ctx):
 
 # ----------------------------------------------------------------- local schema
 
+_LD_BLOCK_RE = re.compile(
+    r'<script[^>]*type=["\']application/ld\+json["\'][^>]*>(.*?)</script>',
+    re.S | re.I)
+
+LB_MARKER = '<script type="application/ld+json" data-growth="localbusiness">'
+
+
+def _foreign_ld_nodes(src, node_id):
+    """Line numbers of JSON-LD blocks — other than ours — claiming `node_id`.
+
+    This technique used to look only for its own `data-growth` marker, so on a
+    page that already had a hand-written LocalBusiness node it appended a
+    second one and then reported "already current" every morning afterwards.
+    That is what happened to index.html on 2026-07-27: two RoofingContractor
+    nodes, both `@id` .../#business, one saying Mon-Fri 07:30-18:00 plus
+    Saturday 08:00-14:00 and the other saying Mon-Fri 07:00-18:00 and no
+    Saturday at all.
+
+    Two nodes sharing an @id are one node to a consumer that follows the spec,
+    and which value survives for a repeated property is not something the page
+    gets to decide. Hours are not a cosmetic field to lose that way — being
+    open at the time of search is a live local-ranking signal, so a merge that
+    silently drops Saturday is a Saturday the business is invisible.
+    """
+    hits = []
+    for m in _LD_BLOCK_RE.finditer(src):
+        opening_tag = src[m.start():m.start(1)]
+        if 'data-growth="localbusiness"' in opening_tag:
+            continue
+        if node_id in m.group(1):
+            hits.append(src.count("\n", 0, m.start()) + 1)
+    return hits
+
+
 def local_schema(ctx):
     """Put LocalBusiness schema with the real NAP on the homepage.
 
@@ -549,6 +583,17 @@ def local_schema(ctx):
     src = ctx.read("index.html")
     if src is None:
         return {"ok": False, "detail": "no index.html in the docroot"}
+
+    node_id = f"{SITE}/#business"
+    clash = _foreign_ld_nodes(src, node_id)
+    if clash:
+        lines = ", ".join(str(n) for n in clash)
+        return {"ok": False, "detail": (
+            f"index.html already declares {node_id} in another JSON-LD block "
+            f"(line {lines}), so this technique will not write a second node "
+            f"with the same @id. Merge the two by hand into one block — check "
+            f"openingHoursSpecification first, the two on disk disagree — then "
+            f"this runs again on its own.")}
 
     blob = _ld({
         "@context": "https://schema.org", "@type": "RoofingContractor",
@@ -579,7 +624,7 @@ def local_schema(ctx):
                     ("Half-round gutters", "/services/half-round-gutters.html"))]},
     })
 
-    marker = '<script type="application/ld+json" data-growth="localbusiness">'
+    marker = LB_MARKER
     block = f"  {marker}\n{blob}\n  </script>\n"
 
     if marker in src:

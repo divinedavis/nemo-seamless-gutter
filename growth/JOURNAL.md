@@ -3135,3 +3135,438 @@ Goal: **1.6%** top-3 share of 127 tracked queries (target 50%).
 - T036 Published flat-price fall gutter cleaning as the front door — Nobody calls a stranger to spend $2,400 on seamless gutter, but plenty of York County homeowners will call in August-October to get gutters cleaned before leaf-fall. Eric already does cleaning. A clea
 - T037 Mystery-call the AI phone agent and add a live human escape hatch — 300 profile views a month and zero phone-agent leads is not a demand problem, it is a suspicion that the answered-call experience is leaking. The ledger already plans a 5-minute callback on captured l
 - T038 Coordinate-grid map-pack check across York County — Search Console now measures organic position, but it cannot see the map pack — and the map pack is where 'gutter installer near me' money lands. For a service-area business, rank collapses with distan
+
+## 2026-08-04 — review agent
+
+### Lead: Google spent 2026-08-01 showing this site to Philadelphia, and the homepage has been serving two contradicting business records for eight days
+
+**One: site-wide Search Console numbers stopped describing this business
+overnight.** Impressions for the 28-day window went **1,677 → 20,196** in a
+single window-day. Clicks went **7 → 7**. Average position went **21.0 → 25.0**.
+None of it is York County. 39 of the 40 rows in `discovered_untracked` are now
+searches like `seamless gutter contractors glenside pa`, `seamless gutter
+company wayne pa`, `seamless gutter contractor norristown pa` — Glenside,
+Wayne, Norristown, Plymouth Meeting, Royersford, Phoenixville, Blue Bell,
+Collegeville, Willow Grove — the Montgomery/Chester County suburbs of
+Philadelphia, ninety-odd miles east, positions **10.0 to 35.5**, **zero clicks
+on all forty rows**.
+
+Nothing on this site names any of those towns. I grepped every `.html`, `.py`,
+`.json`, `.xml` and `.txt` in the repo: the only occurrences are in today's
+snapshot, reporting them back. This is Google matching generic "seamless gutter
+contractor" content into somebody else's geography, not a page anyone wrote.
+
+The engine's guards held — `adopt_queries` correctly logged "no new in-area
+searches worth tracking" and `_names_other_market` (`techniques.py:1170`) keeps
+them out of the goal's denominator. But the *reporting* did not hold:
+`gsc.avg_position` is a site-wide aggregate, so 25.0 is now a fact about
+Norristown. I fixed that in the repo today (below).
+
+**Two: `index.html` carries two `RoofingContractor` JSON-LD nodes with the same
+`@id`, stating different opening hours.** Line 45 is hand-written: Mon–Fri
+**07:30–18:00**, Saturday **08:00–14:00**. Line 176 is tagged
+`data-growth="localbusiness"` — T004's own output — and says Mon–Fri
+**07:00–18:00** and **no Saturday at all**. `local_schema` only ever looked for
+its own marker (`techniques.py:582`), so on 2026-07-27 it appended a second node
+beside the existing one and has reported *"LocalBusiness schema already
+current"* every morning since. `_provider_ld()` (`techniques.py:564-567`) writes
+the no-Saturday version onto all 36 generated pages, so **35 of 38 URLs on this
+site tell Google the business is closed on Saturday**, while the homepage
+simultaneously says it is open until 2pm.
+
+Two nodes sharing an `@id` are one node to a consumer that follows the spec, and
+which value wins for a repeated property is not the page's decision. That would
+be a pedantic complaint except for what I found in today's research: **Whitespark's
+2026 survey ranks "open at the time of search" the 5th strongest Local Pack
+factor**, and Google's Danny Sullivan has confirmed openness "recently became a
+stronger signal." A homeowner who finds an overflowing gutter finds it on a
+Saturday morning. T004 is an **active** technique whose entire hypothesis is
+"consistent NAP in structured data"; it has been publishing an inconsistency.
+
+Still nobody's done it: homepage title names no place (**day 4**), the
+Akron/Lancaster paragraph is live on the gutter-guards page (**day 7**), the
+leaf-fall queue reorder (**day 6**), T007 unanswered (**day 9**), `growth/` not
+synced to the droplet since 08-02 (**day 2**).
+
+### Where the numbers stand
+
+The goal metric — tracked York County queries holding a top-3 position:
+
+| | 07-28 | 07-29 | 07-30 | 07-31 | 08-01 | 08-02 | 08-03 | 08-04 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **top-3 count** | 2 | 2 | 2 | 2 | 2 | 2 | 2 | **2** |
+| top-10 count | 7 | 6 | 6 | 6 | 6 | 6 | 7 | **8** |
+| `ranked_known` | 17 | 19 | 21 | 21 | 21 | 22 | 22 | **22** |
+| tracked queries | 76 | 87 | 87 | 98 | 108 | 117 | 122 | **127** |
+| share (`top3/total`) | 2.6% | 2.3% | 2.3% | 2.0% | 1.9% | 1.7% | 1.6% | **1.6%** |
+| coverage proxy | 48.7% | 44.8% | 46.0% | 42.9% | 40.7% | 39.3% | 39.3% | **38.6%** |
+
+**Top-3 is 2 for the eighth consecutive measured day.** The headline share reads
+flat at 1.6% only because of rounding — 2/122 is 1.64%, 2/127 is 1.57%, so it
+fell again, for the seventh day running, and again because the denominator grew
+by five queries rather than because anything got worse. Against the honest
+denominator, the 22 queries Search Console returns a position for, it is 2 of 22
+= **9.1%**, unchanged for three days.
+
+**Top-10 went 7 → 8 — the second consecutive up move (6 → 7 → 8).** Two queries
+have crossed into the top ten in two days. That is the only tracked number
+moving in the right direction, and on this volume it is directional, not a
+result.
+
+Per town (`covered`/`total`), every named town still at **0 top-3**, day 8:
+
+| bucket | total | covered | top-3 |
+| --- | --- | --- | --- |
+| county | 73 (+3) | 29 | **2** |
+| york | 13 | 4 | 0 |
+| dover | 11 | 3 | 0 |
+| hanover | 6 | 4 | 0 |
+| dallastown | 8 | 3 | 0 |
+| red-lion | 8 (+1) | 3 (+1) | 0 |
+| spring-grove | 8 (+1) | 3 | 0 |
+
+Search Console, 28-day rolling: rows **493** (+206), matched **22** (flat, fourth
+day), clicks **7** (flat, second day), impressions **20,196** (+18,519), avg
+position **25.0** (+4.0). Site-wide CTR is 7 on 20,196 — **0.035%** — a number
+that means nothing and should not be quoted at Eric as if it did.
+
+Decoded against `LAG_DAYS = 3`, assuming nothing yet falls off the far end of the
+window, each day's delta is that one day's impressions:
+
+| day earned | 07-28 | 07-29 | 07-30 | 07-31 | 08-01 |
+| --- | --- | --- | --- | --- | --- |
+| impressions | +289 | +192 | +421 | +89 | **+18,519** |
+| clicks | +2 | +1 | +1 | 0 | **0** |
+
+Traffic (nginx, bots and owner IPs excluded):
+
+| | 07-29 | 07-30 | 07-31 | 08-01 | 08-02 | 08-03 |
+| --- | --- | --- | --- | --- | --- | --- |
+| visitors | 14 | 7 | 6 | 6 | 9 | **32** |
+| pageviews | 37 | 12 | 14 | 7 | 14 | **70** |
+| organic | 3 | 3 | 1 | 0 | 0 | **2** |
+| direct | 8 | 3 | 4 | 6 | 9 | **28** |
+| local (maps) | 0 | 0 | 0 | 0 | 0 | **0** |
+| AI-referred | 0 | 0 | 0 | 0 | 0 | **0** |
+| bot hits | 2,374 | 1,200 | 3,162 | 1,412 | 1,554 | **2,189** |
+
+**08-03 is 3.5× the previous best day and I cannot explain it.** 28 of 32
+visitors classified `direct`, organic only 2, and the GSC window does not reach
+08-03 so there is no rank data to check it against. It cleared a strict filter —
+`metrics.py` requires an asset load, caps pages per IP per day, rejects hosting
+ranges and ancient user agents — so it is not obviously a crawler. One day is one
+day: **this is not evidence of growth and should not be reported as any.** If it
+repeats twice more it is real; if it does not, it was a scrape or a share.
+
+`call_taps` **0 for five days**. `ai_calls` 0 for four. `bookings` 0 since 07-30.
+All-time: **1 booking, 0 phone leads.** Intent coverage: hire **42/83 (51%)**,
+price **3/25 (12%)**, check **3/12 (25%)**, diy **1/7 (14%)**.
+
+**The engine is running short of work, second day.** Seven of eleven techniques
+no-op'd: `adopt_queries`, `improve_ctr`, `geo_answer_first_content_pass`,
+`service_pages`, `area_pages`, `money_pages` (first no-op — "the remaining gaps
+all belong on pages that exist"), and `internal_links` refreshed 0 pages. One did
+real work: a Red Lion repair section. `new: 0, changed: 1`. A week ago it
+published a town page every morning; it now has essentially nothing left to build
+from its current queue.
+
+### Did previous changes work?
+
+**The 20,196 impressions are not a result, and nobody should treat them as one.**
+Zero clicks on all forty visible rows, all out of market, and the tracked county
+numbers (matched 22, top-3 2, clicks 7) did not move at all. Verdict: **not a
+change that worked, and not a change anyone made** — an event that happened to
+the site.
+
+**The frozen head terms — the 08-03 finding holds, and the flood has now hidden
+them.** `gutter installer` is **212 impressions @ position 1 for the eighth
+identical snapshot**, so still zero impressions on 07-28 through 08-01. But
+`gutter contractor` (46@1), `gutter guard installer` (14@1) and `gutters`
+(46@3.7) have **dropped out of `discovered_untracked` entirely** — not because
+they lost anything, but because `gsc.discover()` returns `out[:40]` sorted by
+impressions and thirty-nine Philadelphia queries now outrank them. `gutters` was
+the one row genuinely improving (20@5.8 → 46@3.7 over six days) and I can no
+longer see it. Noted as recommendation 7.
+
+**08-02's prediction — "daily `organic_visitors` holds a 7-day median of ≥2 by
+2026-08-16" — still tracking, still not due.** Median over 07-28…08-03 of
+`[1,3,3,1,0,0,2]` is **1**. Twelve days left. **Too early to tell.** The 08-03
+entry read the flat click count as leaning toward the artifact side; today clicks
+were flat a second day while impressions multiplied twelvefold, which leans
+further that way. Not calling it.
+
+**08-03 rec #1 (GBP primary category, T016) — no way to tell from here, and
+still `candidate`/`activated: null`.** Ninth day in the ledger untouched.
+
+**08-03 rec #2 (`?utm_source=gbp` on the Business Profile URL) — NOT done.**
+`local_visitors` is 0 on 08-03, as on every prior day. `classify()` routes the
+tag to `local` already, so a single non-zero day would prove it landed. Two
+minutes, still unspent, and four techniques are still being scored blind on that
+metric.
+
+**08-03 rec #3 (homepage title) — NOT done. Day 4.** `index.html:16` still reads
+`Gutter Installer &amp; Contractor | NEMO Seamless Gutter`; the description names
+no place. Today's publish commit (`03b3a3b`) touched `areas/`, the journal, the
+snapshot and the sitemap — not `index.html` — and `publish_state.sh` copies that
+file droplet → repo daily, so the repo copy is authoritative. **Today's flood is
+a much stronger argument for this than yesterday's was.** Yesterday I had to
+downgrade the case because the impressions it was meant to recover were dead. The
+case now is different and better: a site whose strongest page names no place got
+sprayed across a metropolitan area it does not serve. That is what a weak geo
+anchor looks like from Google's side.
+
+**08-03 rec #4 (Akron/Lancaster paragraph) — NOT done. Day 7.**
+`services/gutter-guards.html:163`, still under the `<!-- geo:answer-first -->`
+marker, still telling York County searchers this business is in Lancaster County.
+
+**08-03 rec #6 (leaf-fall queue reorder) — NOT done. Day 6.**
+`order = {"hire": 0, "price": 1, "check": 2, "diy": 3}` at `techniques.py:435`
+and `:834`. It matters more today, not less: `money_pages` no-op'd for the first
+time this morning saying the remaining gaps belong on existing pages — while
+**22 of 25 price-intent queries are uncovered**. The sort is why the engine
+believes it has run out of work.
+
+**08-03 rec #7 (sync `growth/` to the droplet) — NOT done. Day 2.** The T014
+grace-period fix (08-02) and the off-area output guard (08-03) are both still
+inert, and today's two changes join them.
+
+**T001/T002/T018 remain inside grace to ~2026-08-26.** `owned_visitors` is now
+**six consecutive zero days** for each. Still noise at this volume; still cannot
+be judged.
+
+**One denominator note, third time:** `schuylkill county seamless gutter` is
+still in the tracked universe (it is in today's `uncovered` list). It entered
+before the `_names_other_market` fix and nothing removes an already-tracked
+query. It inflates the goal's denominator by one. `keywords.json` is
+droplet-owned and gitignored, so I cannot fix it from here.
+
+### What I checked in the code before recommending anything
+
+- **The Philadelphia queries are not from this site's own copy.** `grep -rniE`
+  across `*.html`, `*.py`, `*.json`, `*.xml`, `*.txt` for twenty of the town
+  names: hits only inside `growth/snapshot.json`.
+- **The duplicate business node**, `index.html:45` vs `index.html:176`, both
+  `@type: RoofingContractor`, both `@id: https://nemoseamlessgutter.com/#business`,
+  contradicting `openingHoursSpecification`. `local_schema` at
+  `techniques.py:542-599` and the marker test at `:582`.
+- **Site hours appear nowhere in visible copy** — only in the two schema blocks.
+  A reader cannot tell when to call.
+- **The Search Console API cannot separate AI Mode / AI Overview impressions.**
+  `type` still accepts only web/image/video/news/discover/googleNews, there is no
+  `searchAppearance` value for it, and no BigQuery export. So I **rejected**
+  extending `gsc.py` to diagnose the flood automatically — it is a UI-only report.
+  `gsc.py:130-143` is the query body; it is already correct.
+- **Checked and NOT recommending, because it is already shipped:** FAQPage
+  JSON-LD on every generated page (`_faq_ld`), `rel="canonical"`
+  (`templates.py:33`), floating tap-to-call on every generated page
+  (`templates.py:160`) plus eight `tel:` links in `index.html`, `areaServed:
+  York County` in `_provider_ld()`, IndexNow (T006), out-of-area filtering on
+  queries entering the universe (`techniques.py:1170`) and on answer-first output
+  (`_off_area_prose`, shipped 08-03).
+- **Checked against the ledger and not filing as new:** business-hours accuracy
+  is in **no** technique — T016 is categories + owner Q&A, T022 is Services list
+  + photos, neither mentions hours. That is why recommendation 1 is new. Every
+  other off-site idea in today's research is already T007, T011, T016, T022,
+  T029, T033 or T035.
+
+### What I researched today
+
+- **"Open at the time of search" is the 5th strongest Local Pack ranking factor
+  in Whitespark's 2026 survey** (47 local SEO practitioners, 187 factors), with
+  reports of rankings degrading in the final hour a business shows as open and
+  of a business holding #1 while open and dropping to #4 when it closes. Danny
+  Sullivan: openness "recently became a stronger signal for non-navigational
+  queries."
+  ([Whitespark](https://whitespark.ca/local-search-ranking-factors/),
+  [The Kaleidoscope](https://thekaleidoscope.com/openness-ranking-factor-google-business-profile-hours-operation/),
+  [Sam Bretzmann](https://sambretzmann.com/2026-local-seo-ranking-factors-overview/))
+  What it changes: it turns a schema-tidiness bug into recommendation 1, and it
+  is the cheapest lever in this entire journal.
+- **Impression spikes with flat clicks are normal, are not a penalty, and the
+  most common 2026 cause is AI Mode query fan-out** — Google splitting one prompt
+  into 8–16 sub-queries, each registering impressions. The tell is stilted,
+  machine-shaped queries. Chasing a spike as if it were a problem "leads to
+  unnecessary fixes that solve nothing."
+  ([Brodie Clark](https://brodieclark.com/impression-spike-google-search-console/),
+  [Stan Ventures](https://www.stanventures.com/news/google-clarifies-why-sudden-search-impression-spikes-are-not-a-problem-6979/),
+  [Ritner Digital](https://www.ritnerdigital.com/blog/what-causes-those-sudden-impression-spikes-in-google-search-console))
+  What it changes: it stops me treating the flood as an emergency. But these
+  queries read as ordinary human searches, not fan-out shapes, so I do **not**
+  think AI Mode is the explanation here — see uncertainties.
+- **Search Console gained dedicated generative-AI performance reports on 3 June
+  2026**, isolating AI Overviews / AI Mode impressions — **UI only**, with no API
+  or BigQuery path, history starting ~18 May 2026.
+  ([PPC Land](https://ppc.land/google-finally-gives-search-console-its-own-generative-ai-visibility-reports/),
+  [Search Engine Land](https://searchengineland.com/google-ai-mode-traffic-data-search-console-457076))
+  What it changes: recommendation 4 — a five-minute human check that settles a
+  question the engine structurally cannot.
+- **Map-pack weight, 2026, consistent with the 08-03 sources:** primary category
+  is the single strongest signal; ~42% of local search clicks go to the three-pack;
+  AI Overviews now sit above the pack for many local searches and cite the
+  businesses already strong in it.
+  ([SEOLocale](https://seolocale.com/google-map-pack-ranking-in-2026-how-the-local-3-pack-really-works/),
+  [Wolfpack Advising](https://wolfpackadvising.com/blog/how-to-rank-higher-on-google-maps/),
+  [Local SEO Citation Builder](https://localseocitationbuilder.com/blog/map-pack-ranking-factors))
+- **LSA economics for this specific trade are better than the ledger's note
+  says.** The scout quoted the $53 all-trades average; gutter-category cost per
+  lead is reported at **$20–$55**, at the cheap end of the $25–$120 contractor
+  range, pay-per-lead not per-click, gated on background check, licence,
+  insurance and a Business Profile — with reviews the top ranking factor inside
+  the auction.
+  ([Searchlight Digital](https://searchlightdigital.io/google-local-service-ads-cost-per-lead/),
+  [Home Service Direct](https://www.homeservicedirect.net/google-local-services-ads-cost/))
+  What it changes: a refinement to T011's economics, and another reason T007
+  (reviews) blocks more than it looks like it blocks.
+- **Weak geo relevance is treated as fixable by aligning location signals** across
+  profile, site copy, schema and citations, with service area defined explicitly
+  rather than implied by the address.
+  ([Incremys](https://www.incremys.com/en/resources/blog/geo-search),
+  [Search Engine Land](https://searchengineland.com/local-seo-sprints-a-90-day-plan-for-service-businesses-in-2026-469059))
+
+**Rejected:** paid "AI visibility" packages (sixth time); any attempt to suppress
+the Philadelphia impressions — there is no lever for it and the sources agree
+it is not a problem to solve; extending `gsc.py` to pull AI-surface impressions
+(no API exists); geo-grid trackers as anything but diagnosis (T038 already);
+extending `TOWN_QUEUE` (re-rejected, fourth time).
+
+### Recommendations
+
+**Everything below needs a droplet action before it does anything.**
+`/var/www/nemo-seamless-gutter` is not a git checkout, and `publish_state.sh`
+copies droplet → repo only and carries no Python at all.
+
+1. **Confirm the real business hours, fix them in the Business Profile first,
+   then merge the two schema blocks.** *(Eric decides the hours — 5 minutes, free.
+   Divine merges the blocks — 10 minutes, droplet. NEW.)* Whitespark 2026 puts
+   "open at time of search" 5th among Local Pack factors and Google has confirmed
+   it strengthened. The **profile** hours are what Google ranks on; the schema is
+   corroboration, not the lever — but this site currently corroborates two
+   different answers and 35 of 38 pages say closed Saturday. If Eric works
+   Saturday mornings and the profile says otherwise, he is invisible for every
+   Saturday-morning "gutter overflowing" search in the county. How you would know:
+   nothing in this snapshot will show it; it shows up as map-pack impressions and
+   calls in GBP Performance, over weeks. Checked: `index.html:45` vs `:176`,
+   `techniques.py:564-567`, and the whole ledger — no technique covers hours.
+2. **Put York back in the homepage title and description.** *(Divine — minutes,
+   droplet. Free. Day 4.)* Promoted from #3 on a stronger argument than
+   yesterday's: the site was just shown across the Philadelphia suburbs for
+   generic seamless-gutter queries, which is what a placeless strongest-page looks
+   like from the index. `GEO_ANCHOR` (`techniques.py:1020`) blocks a future
+   placeless rewrite but does not repair the one on disk; the homepage is in its
+   21-day `ctr_rewrites` cooldown until ~08-17. Checked: `index.html:16-17`.
+3. **Add `?utm_source=gbp` to the website URL in the Business Profile.** *(Eric —
+   two minutes. Free. Day 2.)* Unchanged and still unspent. Four techniques
+   including active T004 are judged on `local_visitors`, which cannot see a
+   map-pack click without the tag. Checked: `metrics.py:63`, `:273-301` — the
+   classifier already handles it, no code change needed.
+4. **Open Search Console → the generative-AI performance report and look at
+   2026-08-01.** *(Divine — five minutes. Free. NEW.)* This settles whether the
+   18,519 impressions are AI Mode fan-out or Google genuinely testing this site in
+   Montgomery County, and it decides how much weight #2 deserves. The API cannot
+   answer it — the report is UI-only. How you would know it worked: you will have
+   a one-word answer to write in tomorrow's journal instead of my two hypotheses.
+5. **Answer T007 — yes or no.** *(Eric — one decision. Free. Day 9.)* Today's LSA
+   research adds a reason: reviews are the top ranking factor inside the LSA
+   auction too, so T007 gates T011 as well as the map pack. 13 reviews at 4.2 with
+   nobody being asked. A "no" closes it honestly.
+6. **Reorder the content queue for leaf-fall.** *(Divine — the sort at
+   `techniques.py:435` and `:834`. Free. Day 6.)* Now urgent rather than
+   advisable: `money_pages` no-op'd this morning claiming no query needs its own
+   page, while **22 of 25 price-intent queries are uncovered** and price is what
+   York County types in October. The sort is why the engine thinks it is finished.
+   Pages need 8–12 weeks; leaf-fall calls start mid-September.
+7. **Widen or split `gsc.discover()`.** *(Divine — small, `growth/gsc.py:299-325`.
+   Free. NEW.)* `out[:40]` sorted by impressions means one out-of-market flood
+   evicts every row this review actually needs — `gutters`, the only genuinely
+   improving row, vanished from view today. Simplest honest fix: return the top
+   40 by impressions **plus** the top 20 by position among rows under 100
+   impressions, or split the list into in-area and out-of-area buckets. I did not
+   ship it because the in-area test lives in `techniques.py` and importing it into
+   `gsc.py` is a bigger change than I want to make unreviewed on a day I already
+   changed two files.
+8. **Sync `growth/` to the droplet.** *(Divine — minutes. Day 2.)* Four changes
+   are now stranded: the T014 grace fix (08-02), the off-area output guard
+   (08-03), and today's two. `publish_state.sh` will never carry them. Whoever
+   does it should report it, because nothing in the snapshot can confirm it.
+9. **Carried, unchanged, not restated:** T016 (GBP category audit), T022, T029,
+   T033, T034, T035, T036–T038 (this morning's scout), the Akron/Lancaster repair
+   (day 7), the ~30-page town cap.
+
+### What I changed in this repo today
+
+Three files, two changes. **120 tests pass** (106 before, 14 new). Neither change
+is live until `growth/` is synced.
+
+- **`growth/gsc.py` — `tracked_totals()`, wired into `sync()` as `gsc.tracked`.**
+  Site-wide `totals()` answers "how is the property doing", which stopped being
+  the same question as "how is this business doing in York County" the moment
+  Google started showing the site in Montgomery County. The new function reports
+  clicks, impressions and an **impression-weighted** average position over the
+  curated keyword universe only, so tomorrow's snapshot carries a county number
+  beside the site-wide one instead of only 25.0. I documented its blind spot in
+  the docstring rather than hiding it: a geo-neutral search like
+  `gutter installer` is not in the tracked universe, so this is the floor of the
+  county's real numbers, not all of them.
+- **`growth/techniques.py` — `_foreign_ld_nodes()`, `LB_MARKER`, and a refusal in
+  `local_schema`.** It now detects a JSON-LD block other than its own claiming the
+  same `@id` and returns `ok: False` naming the line number and the field that
+  disagrees, instead of appending a second node. `ok: False` surfaces in the daily
+  email (`email_report.py:363`) and in `last_build`, so the conflict stays visible
+  every morning until a human merges the blocks — which is the right outcome: a
+  review agent that cannot deploy should not be silently rewriting a hand-authored
+  homepage. Verified against the real file: it reports line 45.
+- **`growth/test_gsc.py` (new, 7 tests) and `growth/test_techniques.py` (+7).**
+  The gsc tests are pure — no network — and include the exact 08-04 shape:
+  630 tracked impressions alongside 2,000 out-of-market ones must report the
+  county's position, not the average of both. One test asserts no-tracked-rows
+  returns `None` rather than 0.0, because a position of zero reads as "ranking
+  first everywhere". One asserts the conflict check runs before anything is
+  written.
+
+I did not touch `techniques.json`, `keywords.json`, `results.jsonl` or
+`state.json`; did not activate, retire or re-status any technique; did not edit
+`index.html` or any page under `areas/`, `guides/` or `services/`, all of which
+are copied droplet → repo every morning and would be reverted tomorrow.
+
+### Reasoning and uncertainties
+
+**The honest summary of day nine: top-3 is still 2, every named town is still 0,
+the phone has still rung once, and today's twelvefold traffic-looking number is
+somebody else's county.** The only tracked movement in a week is top-10 going
+6 → 7 → 8, which is two queries on very thin data.
+
+**Where I am least sure: what caused the flood.** Two hypotheses. (a) AI Mode
+query fan-out — the most common 2026 cause per the research, but the queries read
+as ordinary human searches ("seamless gutter contractors glenside pa"), not the
+stilted machine shapes the sources say identify fan-out, so I lean against it.
+(b) Google testing a newly-crawled, geo-unanchored site broadly across a
+metropolitan area, which fits the pattern of the 27 July head-term burst that
+then died. If (b), recommendation 2 matters more than it looks; if (a), it is
+noise and the geo argument reverts to yesterday's weaker one. **The GSC UI report
+distinguishes them in five minutes and I cannot** — that is recommendation 4 and
+it is why I did not rank the title fix first.
+
+**Where I may be wrong about the hours.** I have verified the contradiction in
+the files and I have the Whitespark ranking, but I cannot see the Business
+Profile, and **the profile's hours are what Google actually ranks on** — schema
+is corroboration. If the profile is already correct and open Saturdays, the
+schema merge is hygiene and not a ranking lever, and recommendation 1 drops to
+about #5. I still ranked it first because the check is five minutes, the
+downside if wrong is a tidier homepage, and the downside if right is every
+Saturday-morning search in the county.
+
+**Where I may be wrong about 08-03's 32 visitors.** It cleared a strict bot
+filter, so either it is real or the filter has a hole I cannot see from a repo
+with no access to the log. I have deliberately not built anything on it. If
+08-04 and 08-05 come in at 6–9 again, it was a one-off; if they hold near 30,
+it is the first real signal in this journal and everything reorders around
+finding out where it came from.
+
+**What would change my mind about the whole strategy.** The 08-16 test stands
+unchanged: 7-day median of daily `organic_visitors` ≥ 2 means the content engine
+works. Today it is 1, clicks are flat for a second day, and the engine no-op'd
+seven of eleven techniques because it believes it has run out of things to
+build — while 22 of 25 price queries and 9 of 12 check queries sit uncovered.
+**That is not an engine out of work; it is an engine sorting its work in the
+wrong order.** Recommendation 6 is now the one I would fight for.
+

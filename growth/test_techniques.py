@@ -206,5 +206,82 @@ class OffAreaProseTest(unittest.TestCase):
         self.assertIn("_off_area_prose(f\"{f['q']} {f['a']}\")", body)
 
 
+class DuplicateBusinessNodeTest(unittest.TestCase):
+    """local_schema appended a second business node instead of noticing one.
+
+    index.html shipped with a hand-written RoofingContractor carrying
+    @id .../#business. local_schema looked only for its own `data-growth`
+    marker, found none on 2026-07-27, and added a second node with the same
+    @id — then reported "LocalBusiness schema already current" every morning
+    for the eight days since. The two disagree about opening hours: the
+    hand-written one says Mon-Fri 07:30-18:00 and Saturday 08:00-14:00, the
+    generated one says Mon-Fri 07:00-18:00 and no Saturday at all.
+    """
+
+    HAND_WRITTEN = (
+        '<script type="application/ld+json">\n'
+        '{"@context":"https://schema.org","@type":"RoofingContractor",'
+        '"@id":"https://nemoseamlessgutter.com/#business",'
+        '"openingHoursSpecification":[{"opens":"07:30","closes":"18:00"}]}\n'
+        '</script>\n')
+
+    def _docroot(self, index_html):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        with open(os.path.join(tmp.name, "index.html"), "w") as f:
+            f.write(index_html)
+        return _Ctx(tmp.name)
+
+    def test_finds_the_node_that_shipped(self):
+        lines = T._foreign_ld_nodes(
+            "<head>\n" + self.HAND_WRITTEN + "</head>",
+            "https://nemoseamlessgutter.com/#business")
+        self.assertEqual(lines, [2])
+
+    def test_our_own_block_is_not_a_conflict_with_itself(self):
+        src = ("<head>\n  " + T.LB_MARKER + "\n"
+               '{"@id":"https://nemoseamlessgutter.com/#business"}\n'
+               "  </script>\n</head>")
+        self.assertEqual(
+            T._foreign_ld_nodes(src, "https://nemoseamlessgutter.com/#business"),
+            [])
+
+    def test_an_unrelated_ld_block_is_not_a_conflict(self):
+        src = ('<head>\n<script type="application/ld+json">\n'
+               '{"@type":"FAQPage","@id":"https://nemoseamlessgutter.com/#faq"}\n'
+               '</script>\n</head>')
+        self.assertEqual(
+            T._foreign_ld_nodes(src, "https://nemoseamlessgutter.com/#business"),
+            [])
+
+    def test_local_schema_refuses_to_add_a_second_node(self):
+        ctx = self._docroot("<head>\n" + self.HAND_WRITTEN + "</head><body></body>")
+        r = T.local_schema(ctx)
+        self.assertFalse(r["ok"])
+        self.assertIn("#business", r["detail"])
+        self.assertIn("openingHoursSpecification", r["detail"])
+
+    def test_the_refusal_writes_nothing(self):
+        ctx = self._docroot("<head>\n" + self.HAND_WRITTEN + "</head><body></body>")
+        before = ctx.read("index.html")
+        T.local_schema(ctx)
+        # _Ctx has no write(); reaching it at all would raise AttributeError.
+        self.assertEqual(ctx.read("index.html"), before)
+
+    def test_a_clean_page_is_still_writable(self):
+        """The guard must not block the case it was always meant to serve."""
+        ctx = self._docroot("<head>\n<title>x</title>\n</head><body></body>")
+        self.assertEqual(
+            T._foreign_ld_nodes(ctx.read("index.html"),
+                                "https://nemoseamlessgutter.com/#business"),
+            [])
+
+    def test_conflict_is_reported_before_anything_is_written(self):
+        src = open(os.path.join(os.path.dirname(__file__), "techniques.py")).read()
+        body = src[src.index("def local_schema"):]
+        body = body[:body.index("ctx.write")]
+        self.assertLess(body.index("_foreign_ld_nodes"), body.index("blob = _ld("))
+
+
 if __name__ == "__main__":
     unittest.main()

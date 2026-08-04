@@ -201,6 +201,44 @@ def totals(days=WINDOW_DAYS):
             "position": r.get("position"), "ctr": r.get("ctr", 0)}
 
 
+def tracked_totals(rows, tracked):
+    """The same three numbers, but over the tracked queries only.
+
+    Site-wide `totals()` answers "how is the property doing", which stops being
+    the same question as "how is this business doing in York County" the moment
+    Google starts showing the site somewhere else. On 2026-08-01 it showed it
+    for hundreds of "seamless gutter contractors <Philadelphia suburb> pa"
+    searches: site-wide impressions went 1,677 -> 20,196 in one window-day and
+    the site-wide average position went 21.0 -> 25.0 — while clicks stayed at
+    7 and nothing about the county changed. Read as a health metric that is a
+    fire; read correctly it is a different market's SERP, ninety miles away.
+
+    So report both. This one is impression-weighted over the rows whose query
+    is in the tracked universe, which is the set `keywords.py` curates to be
+    searches this business actually wants — the same set the goal percentage
+    is measured against.
+
+    Its blind spot, stated because it matters: a geo-neutral search like
+    "gutter installer" is not in the tracked universe, so real in-area demand
+    that names no town is excluded here. This is the floor of the county
+    number, not the whole of it.
+    """
+    tracked = {q.strip().lower() for q in tracked}
+    hits = [r for r in rows
+            if (r.get("query") or "").strip().lower() in tracked]
+    impressions = sum(int(r.get("impressions") or 0) for r in hits)
+    clicks = sum(int(r.get("clicks") or 0) for r in hits)
+    # Weighted by impressions, the way Search Console computes it. An unweighted
+    # mean would let one query with three impressions outvote one with three
+    # hundred.
+    weighted = sum(float(r.get("position") or 0) * int(r.get("impressions") or 0)
+                   for r in hits if r.get("position"))
+    seen = sum(int(r.get("impressions") or 0)
+               for r in hits if r.get("position"))
+    return {"rows": len(hits), "clicks": clicks, "impressions": impressions,
+            "avg_position": round(weighted / seen, 1) if seen else None}
+
+
 def sync(quiet=False):
     """Pull rank data and fold it into the tracked keyword universe.
 
@@ -247,7 +285,9 @@ def sync(quiet=False):
 
     out = {"ok": True, "connected": True, "rows": len(rows), "matched": matched,
            "clicks": t["clicks"], "impressions": t["impressions"],
-           "avg_position": round(t["position"], 1) if t.get("position") else None}
+           "avg_position": round(t["position"], 1) if t.get("position") else None,
+           # The county-only view of the same window. See tracked_totals().
+           "tracked": tracked_totals(rows, {k["query"] for k in keywords.load()})}
     ledger.set_state("gsc_last", {"date": ledger.today(), **out})
     if not quiet:
         print(f"  gsc: {len(rows)} queries in the last {WINDOW_DAYS}d, "
