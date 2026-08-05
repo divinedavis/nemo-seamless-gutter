@@ -296,6 +296,52 @@ def sync(quiet=False):
     return out
 
 
+TOP_BY_IMPRESSIONS = 40
+TOP_BY_POSITION = 20
+
+
+def _select_discoveries(rows, tracked, min_impressions=3):
+    """Pick which untracked queries the snapshot shows. Pure; see discover().
+
+    Ranking purely by impressions loses the rows this review actually needs.
+    On 2026-08-04 Google began showing the site across the Philadelphia
+    suburbs — forty queries at 186-530 impressions and zero clicks, ninety
+    miles outside the service area. They filled the list. The rows they pushed
+    off were the small, well-ranked ones: `gutters` had gone 20 impressions
+    @ 5.8 to 46 @ 3.7 over six days, the only genuinely improving row on
+    record, and it vanished from the snapshot without losing anything.
+
+    So take two slates. The top rows by impressions, as before — that is the
+    honest answer to "what is Google showing this site for". Then the
+    best-ranked rows that slate did not already carry, which is the answer to
+    "what is this site close to winning". A flood in someone else's market can
+    crowd out the first list; it cannot touch the second.
+
+    The second slate is not restricted to low-impression rows. That was the
+    first attempt and a test caught it: `gutter installer` sits at 214
+    impressions and position 1, which is loud enough to be cut by forty rows
+    at 500 and quiet enough to be nothing special — it fell through both
+    filters. The only threshold that belongs here is "was it already picked".
+    """
+    tracked = {q.strip().lower() for q in tracked}
+    out = [r for r in rows
+           if (r.get("query") or "").strip().lower() not in tracked
+           and (r.get("impressions") or 0) >= min_impressions]
+
+    loud = sorted(out, key=lambda r: -(r.get("impressions") or 0))
+    picked = loud[:TOP_BY_IMPRESSIONS]
+    seen = {r["query"] for r in picked}
+
+    best = [r for r in out if r["query"] not in seen and r.get("position")]
+    best.sort(key=lambda r: (float(r["position"]), -(r.get("impressions") or 0)))
+    picked += best[:TOP_BY_POSITION]
+
+    return [{"query": r["query"],
+             "position": round(r["position"], 1) if r.get("position") else None,
+             "impressions": int(r.get("impressions") or 0),
+             "clicks": int(r.get("clicks") or 0)} for r in picked]
+
+
 def discover(min_impressions=3):
     """Queries Google actually showed this site for that we are NOT tracking.
 
@@ -314,15 +360,8 @@ def discover(min_impressions=3):
         rows = fetch_queries()
     except Exception:
         return []
-    tracked = {k["query"] for k in keywords.load()}
-    out = [r for r in rows
-           if r["query"] not in tracked
-           and (r.get("impressions") or 0) >= min_impressions]
-    out.sort(key=lambda r: -(r.get("impressions") or 0))
-    return [{"query": r["query"],
-             "position": round(r["position"], 1) if r.get("position") else None,
-             "impressions": int(r.get("impressions") or 0),
-             "clicks": int(r.get("clicks") or 0)} for r in out[:40]]
+    return _select_discoveries(rows, {k["query"] for k in keywords.load()},
+                               min_impressions)
 
 
 def fetch_pages(days=WINDOW_DAYS):

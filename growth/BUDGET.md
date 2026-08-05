@@ -10,8 +10,9 @@ This is not hypothetical. It has already happened twice:
 |---|---|---|
 | 2026-07-27 | Account credit balance hit $0 | `area_pages`, `money_pages` and `scout` all no-op'd; only the non-LLM techniques ran |
 | 2026-07-28 | Self-imposed usage cap reached, locked until 08-01 | `scout` failed at 6am with a 400 — the build still ran, so the report looked healthy at a glance |
+| 2026-08-05 | Credit balance hit $0 again, five days after the 08-01 cap lifted | `strengthen_pages` failed after 3 candidates and `scout` failed; the other nine steps reported `ok` because they had nothing to do, so `last_build` read `new: 0, changed: 0` — a run that produced nothing and looked calm |
 
-Both times the engine kept reporting `[ok]` on nine of ten steps. **A cost failure
+All three times the engine kept reporting `[ok]` on most steps. **A cost failure
 here looks like a quiet, partial success**, which is exactly why it needs a rule
 rather than vigilance.
 

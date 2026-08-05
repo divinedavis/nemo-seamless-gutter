@@ -296,6 +296,18 @@ def summary():
         "share_pct": round(100.0 * top3 / total, 1) if total and ranked else None,
         "by_town": by_town,
         "by_intent": by_intent,
+        # Every tracked query Search Console returns a position for, best
+        # first. The aggregates above say the top-3 count went 2 -> 1; only
+        # this says which query fell, and "which one" is the difference
+        # between a fact and a shrug. Cheap to carry — `ranked_known` has
+        # been 17-22 since Search Console was connected.
+        "ranked": [{"query": k["query"], "town": k.get("town"),
+                    "intent": k.get("intent"), "target": k.get("target"),
+                    "covered": bool(k.get("covered")),
+                    "position": k.get("position"),
+                    "impressions": k.get("impressions"),
+                    "clicks": k.get("clicks")}
+                   for k in sorted(ranked, key=lambda x: float(x["position"]))],
         # Uncovered "hire" queries first — those are the ones that pay.
         "gaps": [k["query"] for k in
                  sorted(kws, key=lambda x: (x.get("intent") != "hire", x["query"]))

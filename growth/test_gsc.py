@@ -103,5 +103,73 @@ class TrackedTotalsTest(unittest.TestCase):
         self.assertLess(t["avg_position"], 10)
 
 
+class SelectDiscoveriesTest(unittest.TestCase):
+    """The second slate, added 2026-08-05.
+
+    `discover()` returned the top 40 untracked rows by impressions. That was
+    fine until 2026-08-04, when forty out-of-market rows at 186-530
+    impressions arrived at once and evicted every quiet row underneath them —
+    including `gutters` at 46 impressions and position 3.7, which was the only
+    row on the whole site that had been improving.
+    """
+
+    FLOOD = [_row(f"seamless gutter contractors town{i} pa", 30.0, 500 - i)
+             for i in range(45)]
+
+    def test_loud_rows_still_come_back_ranked_by_impressions(self):
+        got = G._select_discoveries(self.FLOOD, TRACKED)
+        self.assertEqual(got[0]["query"], "seamless gutter contractors town0 pa")
+        self.assertEqual(got[0]["impressions"], 500)
+
+    def test_a_flood_cannot_evict_a_well_ranked_quiet_row(self):
+        rows = self.FLOOD + [_row("gutters", 3.7, 46)]
+        got = G._select_discoveries(rows, TRACKED)
+        picked = {r["query"] for r in got}
+        # It loses on impressions to all 45 of them and would have been cut.
+        self.assertIn("gutters", picked)
+
+    def test_the_second_slate_is_ordered_by_position(self):
+        rows = self.FLOOD + [_row("gutter contractor", 1.0, 46),
+                             _row("gutters", 3.7, 46),
+                             _row("gutter guard installer", 12.0, 14)]
+        got = [r["query"] for r in G._select_discoveries(rows, TRACKED)]
+        # The five flood rows the first slate could not hold rank behind them,
+        # at position 30.
+        self.assertEqual(got[G.TOP_BY_IMPRESSIONS:G.TOP_BY_IMPRESSIONS + 3],
+                         ["gutter contractor", "gutters",
+                          "gutter guard installer"])
+
+    def test_tracked_queries_are_never_returned(self):
+        rows = [_row("gutter installation york pa", 2.0, 40),
+                _row("gutters", 3.7, 46)]
+        got = {r["query"] for r in G._select_discoveries(rows, TRACKED)}
+        self.assertEqual(got, {"gutters"})
+
+    def test_min_impressions_still_applies_to_the_quiet_slate(self):
+        rows = self.FLOOD + [_row("gutter installer somewhere", 1.0, 1)]
+        got = {r["query"] for r in G._select_discoveries(rows, TRACKED)}
+        self.assertNotIn("gutter installer somewhere", got)
+
+    def test_a_row_with_no_position_is_not_promoted(self):
+        rows = self.FLOOD + [{"query": "gutters", "position": None,
+                              "impressions": 46, "clicks": 0}]
+        got = {r["query"] for r in G._select_discoveries(rows, TRACKED)}
+        self.assertNotIn("gutters", got)
+
+    def test_no_row_appears_twice(self):
+        rows = self.FLOOD + [_row("gutters", 3.7, 46)]
+        got = [r["query"] for r in G._select_discoveries(rows, TRACKED)]
+        self.assertEqual(len(got), len(set(got)))
+
+    def test_a_mid_volume_well_ranked_row_survives_a_flood(self):
+        # The real 2026-08-05 row: `gutter installer`, 214 impressions at
+        # position 1. Loud enough to be cut by forty rows at ~500, and the
+        # first version of this function also excluded it from the second
+        # slate for being too loud, so it disappeared entirely.
+        rows = self.FLOOD + [_row("gutter installer", 1.0, 214)]
+        got = [r["query"] for r in G._select_discoveries(rows, TRACKED)]
+        self.assertEqual(got.count("gutter installer"), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

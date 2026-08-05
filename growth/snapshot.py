@@ -131,6 +131,9 @@ def build(docroot):
             "by_town": kw["by_town"],
             "by_intent": kw["by_intent"],
             "uncovered": kw["gaps"],
+            # The goal metric, one row per query, instead of only its total.
+            # See keywords.summary().
+            "ranked": kw["ranked"],
             # What Google shows this site for that nobody chose to track.
             # Not added automatically — see gsc.discover() for why.
             "discovered_untracked": gsc.discover(),
