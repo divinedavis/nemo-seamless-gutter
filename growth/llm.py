@@ -73,6 +73,10 @@ RETRY_STATUS = {408, 409, 425, 429, 500, 502, 503, 504, 529}
 RETRIES = int(os.environ.get("NEMO_LLM_RETRIES", "5"))
 BACKOFF = (2, 6, 15, 40, 75)  # seconds before attempt 2..6, plus jitter
 
+# Where an unparseable reply is written so the failure can be read later
+# instead of reproduced with another paid call.
+DEBUG_DIR = os.environ.get("NEMO_LLM_DEBUG_DIR", "/tmp")
+
 
 def _sleep_for(attempt, retry_after=None):
     """Wait before the next attempt. Honours Retry-After when the API sends it."""
@@ -85,9 +89,14 @@ def _sleep_for(attempt, retry_after=None):
     return base + random.uniform(0, base * 0.25)
 
 
-def call(system, prompt, max_tokens=4000, tools=None, timeout=240, key=None,
-         retries=None):
-    """One message round-trip. Returns the concatenated text blocks.
+def call_blocks(system, prompt, max_tokens=4000, tools=None, timeout=240,
+                key=None, retries=None):
+    """One message round-trip. Returns the text blocks as a list.
+
+    With web search on, a reply is a sequence of blocks — the model narrates
+    ("I'll research what's working..."), searches, then answers. Only the last
+    text block carries the answer, so a JSON caller needs them kept apart;
+    call() joins them for everyone else.
 
     Transient API failures are retried with exponential backoff; the error that
     finally escapes is the last one seen, so the report still names the cause.
@@ -114,8 +123,8 @@ def call(system, prompt, max_tokens=4000, tools=None, timeout=240, key=None,
         try:
             with urllib.request.urlopen(req, timeout=timeout) as r:
                 resp = json.loads(r.read().decode())
-            return "".join(b.get("text", "") for b in resp.get("content", [])
-                           if b.get("type") == "text")
+            return [b.get("text", "") for b in resp.get("content", [])
+                    if b.get("type") == "text"]
         except urllib.error.HTTPError as e:
             detail = e.read()[:300].decode(errors="replace")
             last = RuntimeError(f"anthropic {e.code}: {detail}")
@@ -132,6 +141,11 @@ def call(system, prompt, max_tokens=4000, tools=None, timeout=240, key=None,
             break
         time.sleep(wait)
     raise last
+
+
+def call(system, prompt, **kw):
+    """One message round-trip. Returns the concatenated text blocks."""
+    return "".join(call_blocks(system, prompt, **kw))
 
 
 def _salvage(blob):
@@ -227,32 +241,72 @@ def _repair(blob):
     return "".join(out)
 
 
-def call_json(system, prompt, **kw):
-    """Same, but pull a JSON object out of the reply and parse it."""
-    text = call(system, prompt, **kw)
+def _extract(text):
+    """Every parse strategy, tried against one chunk of text. None if all fail."""
     start, end = text.find("{"), text.rfind("}")
     if start < 0:
-        raise ValueError(f"no JSON object in reply: {text[:300]}")
+        return None
     blob = text[start:end + 1] if end > start else text[start:]
     try:
         return json.loads(blob)
     except json.JSONDecodeError:
-        m = re.search(r"```(?:json)?\s*(\{.*\})\s*```", text, re.S)
-        if m:
-            try:
-                return json.loads(m.group(1))
-            except json.JSONDecodeError:
-                pass
-        # Repair first (a stray quote mid-object), then salvage (a reply cut
-        # off at max_tokens), then both — truncation and a bad quote co-occur
-        # in the same long research replies.
-        for candidate in (_repair(blob), _repair(text[start:])):
-            try:
-                return json.loads(candidate)
-            except json.JSONDecodeError:
-                pass
-        for source in (text[start:], _repair(text[start:])):
-            rescued = _salvage(source)
-            if rescued is not None:
-                return rescued
-        raise
+        pass
+    m = re.search(r"```(?:json)?\s*(\{.*\})\s*```", text, re.S)
+    if m:
+        try:
+            return json.loads(m.group(1))
+        except json.JSONDecodeError:
+            pass
+    # Repair first (a stray quote mid-object), then salvage (a reply cut
+    # off at max_tokens), then both — truncation and a bad quote co-occur
+    # in the same long research replies.
+    for candidate in (_repair(blob), _repair(text[start:])):
+        try:
+            return json.loads(candidate)
+        except json.JSONDecodeError:
+            pass
+    for source in (text[start:], _repair(text[start:])):
+        rescued = _salvage(source)
+        if rescued is not None:
+            return rescued
+    return None
+
+
+def _dump_unparsed(blocks):
+    """Keep an unparseable reply on disk.
+
+    A scout parse failure used to leave nothing behind, so diagnosing one meant
+    paying for another research call to try to reproduce it. Writing the reply
+    down makes the next failure free to read.
+    """
+    try:
+        path = os.path.join(DEBUG_DIR, "nemo-llm-unparsed-%d.txt" % time.time())
+        with open(path, "w") as f:
+            f.write("\n\n----- next text block -----\n\n".join(blocks))
+        return path
+    except OSError:
+        return None
+
+
+def call_json(system, prompt, **kw):
+    """Same, but pull a JSON object out of the reply and parse it.
+
+    The last text block is tried first: with web search on, the earlier blocks
+    are the model narrating its research, and a brace in that prose would
+    otherwise drag the parse start into the commentary. Earlier blocks and the
+    whole joined reply are still tried, so a plain reply behaves as before.
+    """
+    blocks = call_blocks(system, prompt, **kw)
+    if not blocks:
+        raise ValueError("no text in reply")
+    candidates = list(reversed(blocks))
+    joined = "".join(blocks)
+    if joined not in candidates:
+        candidates.append(joined)
+    for text in candidates:
+        parsed = _extract(text)
+        if parsed is not None:
+            return parsed
+    path = _dump_unparsed(blocks)
+    where = f" (raw reply saved to {path})" if path else ""
+    raise ValueError(f"no parseable JSON object in reply{where}: {joined[:300]}")

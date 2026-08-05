@@ -5,6 +5,8 @@ a 529 with no retry, and a JSON reply with an unescaped quote.
 Run: python3 -m growth.test_llm   (from the repo root)
 """
 import json
+import os
+import tempfile
 import unittest
 import unittest.mock as mock
 import urllib.error
@@ -49,15 +51,43 @@ class RepairTest(unittest.TestCase):
 
     def test_call_json_recovers_broken_reply(self):
         broken = '{"h2": "The 5" profile", "paragraphs": ["a"]}'
-        with mock.patch.object(llm, "call", return_value=broken):
+        with mock.patch.object(llm, "call_blocks", return_value=[broken]):
             got = llm.call_json("sys", "prompt")
         self.assertEqual(got["paragraphs"], ["a"])
 
     def test_call_json_still_salvages_truncation(self):
         cut = '{"ideas": [{"name": "one"}, {"name": "tw'
-        with mock.patch.object(llm, "call", return_value=cut):
+        with mock.patch.object(llm, "call_blocks", return_value=[cut]):
             got = llm.call_json("sys", "prompt")
         self.assertEqual(got["ideas"][0]["name"], "one")
+
+    def test_call_json_ignores_braces_in_search_commentary(self):
+        """Web search puts narration in an earlier text block than the answer.
+
+        A brace in that narration used to drag the parse start into the prose,
+        so the whole research call was lost.
+        """
+        narration = 'I will look for a {slug, name} shaped answer.'
+        answer = '{"techniques": [{"slug": "one"}]}'
+        with mock.patch.object(llm, "call_blocks",
+                               return_value=[narration, answer]):
+            got = llm.call_json("sys", "prompt")
+        self.assertEqual(got["techniques"][0]["slug"], "one")
+
+    def test_call_json_writes_unparseable_reply_to_disk(self):
+        junk = "{{{ not json at all"
+        with tempfile.TemporaryDirectory() as tmp:
+            with mock.patch.object(llm, "call_blocks", return_value=[junk]), \
+                 mock.patch.object(llm, "DEBUG_DIR", tmp):
+                with self.assertRaises(ValueError):
+                    llm.call_json("sys", "prompt")
+            dumped = os.listdir(tmp)
+            self.assertEqual(len(dumped), 1)
+            self.assertIn(junk, open(os.path.join(tmp, dumped[0])).read())
+
+    def test_call_joins_blocks(self):
+        with mock.patch.object(llm, "call_blocks", return_value=["a", "b"]):
+            self.assertEqual(llm.call("sys", "prompt"), "ab")
 
 
 def _http_error(code):
