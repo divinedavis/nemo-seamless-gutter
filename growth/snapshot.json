@@ -1,16 +1,16 @@
 {
-  "generated": "2026-08-04T06:03:44+00:00",
-  "date": "2026-08-04",
+  "generated": "2026-08-05T06:00:16+00:00",
+  "date": "2026-08-05",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
     "target_pct": 50,
-    "share_pct": 1.6,
+    "share_pct": 0.8,
     "measured": true,
     "why_unmeasured": null,
     "coverage_pct": 38.6,
     "tracked_queries": 127,
-    "top3": 2,
+    "top3": 1,
     "top10": 8,
     "ranked_known": 22
   },
@@ -55,6 +55,10 @@
       {
         "date": "2026-08-03",
         "value": 32
+      },
+      {
+        "date": "2026-08-04",
+        "value": 10
       }
     ],
     "pageviews": [
@@ -97,6 +101,10 @@
       {
         "date": "2026-08-03",
         "value": 70
+      },
+      {
+        "date": "2026-08-04",
+        "value": 35
       }
     ],
     "organic_visitors": [
@@ -138,6 +146,10 @@
       },
       {
         "date": "2026-08-03",
+        "value": 2
+      },
+      {
+        "date": "2026-08-04",
         "value": 2
       }
     ],
@@ -181,6 +193,10 @@
       {
         "date": "2026-08-03",
         "value": 0
+      },
+      {
+        "date": "2026-08-04",
+        "value": 0
       }
     ],
     "ai_visitors": [
@@ -222,6 +238,10 @@
       },
       {
         "date": "2026-08-03",
+        "value": 0
+      },
+      {
+        "date": "2026-08-04",
         "value": 0
       }
     ],
@@ -265,6 +285,10 @@
       {
         "date": "2026-08-03",
         "value": 28
+      },
+      {
+        "date": "2026-08-04",
+        "value": 7
       }
     ],
     "referral_visitors": [
@@ -306,6 +330,10 @@
       },
       {
         "date": "2026-08-03",
+        "value": 0
+      },
+      {
+        "date": "2026-08-04",
         "value": 0
       }
     ],
@@ -349,6 +377,10 @@
       {
         "date": "2026-08-03",
         "value": 0
+      },
+      {
+        "date": "2026-08-04",
+        "value": 0
       }
     ],
     "bot_hits": [
@@ -391,6 +423,10 @@
       {
         "date": "2026-08-03",
         "value": 2189
+      },
+      {
+        "date": "2026-08-04",
+        "value": 1612
       }
     ],
     "call_taps": [
@@ -412,6 +448,10 @@
       },
       {
         "date": "2026-08-03",
+        "value": 0
+      },
+      {
+        "date": "2026-08-04",
         "value": 0
       }
     ],
@@ -438,6 +478,10 @@
       },
       {
         "date": "2026-08-03",
+        "value": 0
+      },
+      {
+        "date": "2026-08-04",
         "value": 0
       }
     ],
@@ -481,6 +525,10 @@
       {
         "date": "2026-08-03",
         "value": 0
+      },
+      {
+        "date": "2026-08-04",
+        "value": 0
       }
     ],
     "phone_leads": [
@@ -522,6 +570,10 @@
       },
       {
         "date": "2026-08-03",
+        "value": 0
+      },
+      {
+        "date": "2026-08-04",
         "value": 0
       }
     ],
@@ -565,6 +617,10 @@
       {
         "date": "2026-08-03",
         "value": 0
+      },
+      {
+        "date": "2026-08-04",
+        "value": 0
       }
     ]
   },
@@ -578,7 +634,7 @@
       "county": {
         "total": 73,
         "covered": 29,
-        "top3": 2
+        "top3": 1
       },
       "hanover": {
         "total": 6,
@@ -879,6 +935,12 @@
         "clicks": 0
       },
       {
+        "query": "gutter installer",
+        "position": 1,
+        "impressions": 214,
+        "clicks": 0
+      },
+      {
         "query": "seamless gutter contractors phoenixville pa",
         "position": 34.0,
         "impressions": 214,
@@ -888,12 +950,6 @@
         "query": "seamless gutter contractors willow grove pa",
         "position": 26.4,
         "impressions": 214,
-        "clicks": 0
-      },
-      {
-        "query": "gutter installer",
-        "position": 1,
-        "impressions": 212,
         "clicks": 0
       },
       {
@@ -953,14 +1009,14 @@
     ]
   },
   "gsc": {
-    "date": "2026-08-04",
+    "date": "2026-08-05",
     "ok": true,
     "connected": true,
-    "rows": 493,
+    "rows": 590,
     "matched": 22,
     "clicks": 7,
-    "impressions": 20196,
-    "avg_position": 25.0
+    "impressions": 21390,
+    "avg_position": 25.1
   },
   "techniques": [
     {
@@ -1013,6 +1069,10 @@
         {
           "date": "2026-08-03",
           "value": 0
+        },
+        {
+          "date": "2026-08-04",
+          "value": 1
         }
       ]
     },
@@ -1066,6 +1126,10 @@
         {
           "date": "2026-08-03",
           "value": 0
+        },
+        {
+          "date": "2026-08-04",
+          "value": 1
         }
       ]
     },
@@ -1394,6 +1458,10 @@
         {
           "date": "2026-08-03",
           "value": 0
+        },
+        {
+          "date": "2026-08-04",
+          "value": 2
         }
       ]
     },
@@ -1804,7 +1872,7 @@
     ]
   },
   "last_build": {
-    "date": "2026-08-04",
+    "date": "2026-08-05",
     "log": [
       {
         "ok": true,
@@ -1825,8 +1893,8 @@
         "slug": "geo_answer_first_content_pass"
       },
       {
-        "ok": true,
-        "detail": "added \"Gutter Repair in Red Lion, PA\" to /areas/seamless-gutters-red-lion-pa.html for 'gutter repair red lion pa'",
+        "ok": false,
+        "detail": "3 candidate(s) failed, last: generation failed for 'gutter repair near me': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011Cdj6FNcaSdvThexG51exc\"}",
         "slug": "strengthen_pages"
       },
       {
@@ -1866,29 +1934,18 @@
       },
       {
         "ok": true,
-        "detail": "submitted 1 URL(s), HTTP 200",
+        "noop": true,
+        "detail": "nothing new to submit",
         "slug": "ping_indexnow"
       }
     ],
     "new": 0,
-    "changed": 1
+    "changed": 0
   },
   "last_scout": {
-    "date": "2026-08-04",
-    "ok": true,
-    "techniques_added": [
-      "flat_price_fall_cleaning_entry_offer",
-      "phone_agent_mystery_call_audit",
-      "map_pack_grid_check"
-    ],
-    "keywords_added": [
-      "gutter replacement cost per foot pa",
-      "gutter cleaning red lion pa",
-      "copper half round gutters pennsylvania",
-      "gutter overflowing in heavy rain what to do",
-      "gutter contractor near me spring grove pa"
-    ],
-    "notes": "Priority order: the mystery-call audit first (it costs nothing and may explain the zero-call number by itself before another dollar or hour goes into traffic), then the cleaning offer (the seasonal window to publish it is now \u2014 August books September and October), then the grid check to aim everything else. Check GBP Performance for actual call counts before assuming zero calls; the profile may be producing calls that are dying at the answer. Considered and rejected: (1) Google call-only ad campaigns \u2014 Google is retiring call-only in favour of responsive search ads with call assets, which sit in a different auction and lose the urgency premium (https://www.leadgen-economy.com/blog/google-call-only-ads-sunset-pay-per-call-migration/), and realistic contractor Google Ads budgets are quoted at $1,500-$4,000/mo with $60-$250 cost per lead (https://mwolfmedia.com/google-ads-cost-for-home-service-businesses/) \u2014 the LSA candidate already in the ledger is better economics for a one-truck shop at roughly $53 average per lead, so paid search should wait until LSA has been tried. (2) Buying Angi/Thumbtack leads \u2014 shared leads, race-to-the-bottom pricing, and it trains the business to compete on price rather than on the copper and half-round work nobody else does. (3) Any review incentive, kiosk or 'only ask the happy ones' filter \u2014 the FTC fake-review rule carries civil penalties up to $51,744 per violation and Google separately bans selective solicitation (https://lanternrow.com/blog/google-business-profile-optimization-for-local-service-businesses/); ask every customer with neutral wording and nothing else. (4) Geotagged-photo manipulation, CTR bots and cloud stacking \u2014 named explicitly as dead noise in 2026 local SEO and a suspension risk (https://www.localmighty.com/blog/google-business-profile-ranking-factors/). (5) Exit-intent discount popups \u2014 they were in one 2026 checklist but they mostly harvest email for a contractor who has no email programme and cannot use one without consent. One honest caution on the cleaning offer: it fills the calendar with low-ticket work, so cap it \u2014 Eric should treat it as lead generation for installs and guards, not as the business, and should stop taking cleans once his install schedule is full into November."
+    "date": "2026-08-05",
+    "ok": false,
+    "detail": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011Cdj6FPwh6RVocMWxMe1Da\"}"
   },
   "pages": {
     "areas": [
