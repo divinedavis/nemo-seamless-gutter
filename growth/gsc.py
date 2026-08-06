@@ -408,6 +408,61 @@ def underperformers(min_impressions=10, max_position=15.0, max_ctr=0.02):
     return out
 
 
+def _classify_pages(pages, min_impressions=10, max_position=15.0, max_ctr=0.02):
+    """The same three clauses as `underperformers`, with the reason kept.
+
+    `underperformers` tests a page's *average* position across every query
+    Google shows it for. That is a fair test while those queries are one
+    market. It stops being one when the page is also being shown ninety miles
+    away: on 2026-08-06 the window held 21,729 impressions, most of them
+    "seamless gutter contractors <Philadelphia suburb> pa" at positions 10-35
+    with no clicks. Those rows land on a page and pull its average past
+    `max_position`, and the page falls out of `underperformers` — so the
+    technique that rewrites titles can go quiet on exactly the page whose
+    title is the problem, and report "no page is due a snippet rewrite"
+    while doing it.
+
+    This changes no filter. It publishes the decision, so a reader can see
+    which pages were skipped and on which clause instead of taking the
+    no-op on trust. If the diagnosis above is right, the homepage appears
+    here with `ctr_candidate` false and "average position below the cutoff"
+    as its only reason.
+    """
+    out = []
+    for p in pages:
+        pos = p.get("position")
+        impressions = int(p.get("impressions") or 0)
+        ctr = float(p.get("ctr") or 0.0)
+        why = []
+        if impressions < min_impressions:
+            why.append("too few impressions")
+        if (pos or 99) > max_position:
+            why.append("average position below the cutoff")
+        if ctr > max_ctr:
+            why.append("click-through already above the floor")
+        out.append({"page": p.get("page"),
+                    "impressions": impressions,
+                    "clicks": int(p.get("clicks") or 0),
+                    "ctr": round(ctr, 4),
+                    "position": round(pos, 1) if pos else None,
+                    "ctr_candidate": not why,
+                    "skipped_because": why})
+    out.sort(key=lambda r: -r["impressions"])
+    return out
+
+
+def page_report(limit=25):
+    """`_classify_pages` over live data — [] if Search Console is not there.
+
+    Swallows failures on purpose: this is diagnostic colour on the snapshot,
+    and it must never be the reason the morning snapshot does not build.
+    """
+    try:
+        return _classify_pages(fetch_pages())[:limit]
+    except Exception:
+        return []
+
+
 def queries_for_page(page_url, days=WINDOW_DAYS, limit=25):
     """What people actually searched to reach one page — the raw material for
     a title that matches intent instead of guessing at it."""

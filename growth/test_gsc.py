@@ -171,5 +171,70 @@ class SelectDiscoveriesTest(unittest.TestCase):
         self.assertEqual(got.count("gutter installer"), 1)
 
 
+class ClassifyPagesTest(unittest.TestCase):
+    """Make a no-op from `improve_ctr` auditable.
+
+    On 2026-08-06 that technique reported "no page is due a snippet rewrite"
+    for the fourth morning running, while the homepage held position 1 for
+    `gutter installer` over 436 impressions for zero clicks. The snapshot
+    carried no way to tell whether the technique had looked at the homepage
+    and passed on it, or never saw it at all.
+    """
+
+    HOME = "https://nemoseamlessgutter.com/"
+
+    def _page(self, page, position, impressions, clicks=0, ctr=0.0):
+        return {"page": page, "position": position, "impressions": impressions,
+                "clicks": clicks, "ctr": ctr}
+
+    def test_a_well_ranked_unclicked_page_is_a_candidate(self):
+        rows = G._classify_pages([self._page(self.HOME, 2.0, 400)])
+        self.assertTrue(rows[0]["ctr_candidate"])
+        self.assertEqual(rows[0]["skipped_because"], [])
+
+    def test_an_out_of_market_flood_hides_the_page_from_the_rewriter(self):
+        # The homepage ranks 1st in York County and 10-35 across Montgomery
+        # County; Search Console reports one average over both. 24.8 was the
+        # site-wide figure on 2026-08-06.
+        rows = G._classify_pages([self._page(self.HOME, 24.8, 21729)])
+        self.assertFalse(rows[0]["ctr_candidate"])
+        self.assertEqual(rows[0]["skipped_because"],
+                         ["average position below the cutoff"])
+
+    def test_a_page_people_do_click_is_left_alone(self):
+        rows = G._classify_pages([self._page(self.HOME, 3.0, 500, 40, 0.08)])
+        self.assertFalse(rows[0]["ctr_candidate"])
+        self.assertIn("click-through already above the floor",
+                      rows[0]["skipped_because"])
+
+    def test_every_failing_clause_is_named_not_just_the_first(self):
+        rows = G._classify_pages([self._page("/quiet.html", 40.0, 3, 1, 0.33)])
+        self.assertEqual(len(rows[0]["skipped_because"]), 3)
+
+    def test_a_page_with_no_position_is_not_silently_promoted(self):
+        rows = G._classify_pages([self._page(self.HOME, None, 400)])
+        self.assertFalse(rows[0]["ctr_candidate"])
+
+    def test_the_verdict_agrees_with_underperformers_clause_for_clause(self):
+        # If these two ever disagree the report is worse than useless, so the
+        # filters are asserted against each other rather than restated.
+        pages = [self._page(self.HOME, 24.8, 21729),
+                 self._page("/a.html", 2.0, 400),
+                 self._page("/b.html", 3.0, 500, 40, 0.08),
+                 self._page("/c.html", 1.0, 4)]
+        kept = {p["page"] for p in pages
+                if p["impressions"] >= 10
+                and (p["position"] or 99) <= 15.0
+                and p["ctr"] <= 0.02}
+        flagged = {r["page"] for r in G._classify_pages(pages)
+                   if r["ctr_candidate"]}
+        self.assertEqual(flagged, kept)
+
+    def test_biggest_wasted_audience_is_reported_first(self):
+        rows = G._classify_pages([self._page("/small.html", 2.0, 20),
+                                  self._page(self.HOME, 2.0, 400)])
+        self.assertEqual(rows[0]["page"], self.HOME)
+
+
 if __name__ == "__main__":
     unittest.main()

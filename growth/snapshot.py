@@ -104,6 +104,9 @@ def build(docroot):
     kw = keywords.summary()
     sb = review.scoreboard()
     techs = ledger.load_techniques()
+    # Carried through as-is when Search Console has never run, so that
+    # "gsc": null still means "no rank data" rather than "an empty report".
+    gsc_last = ledger.get_state("gsc_last")
 
     snap = {
         "generated": datetime.datetime.now(datetime.timezone.utc)
@@ -138,7 +141,11 @@ def build(docroot):
             # Not added automatically — see gsc.discover() for why.
             "discovered_untracked": gsc.discover(),
         },
-        "gsc": ledger.get_state("gsc_last"),
+        # `pages` is why improve_ctr did or did not pick each page up. See
+        # gsc._classify_pages() — a no-op from that technique is otherwise
+        # unauditable from the snapshot alone.
+        "gsc": ({**gsc_last, "pages": gsc.page_report()} if gsc_last
+                else gsc_last),
         "techniques": [
             {"id": t["id"], "slug": t["slug"], "name": t["name"],
              "kind": t.get("kind"), "status": t.get("status"),
