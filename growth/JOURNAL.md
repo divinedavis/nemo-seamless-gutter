@@ -4001,3 +4001,26 @@ rather than the hypothesis. If it fails on 08-16 with the engine having been
 blocked for a third of the window, the honest reading is "inconclusive, rerun",
 not "content does not work" — and I am writing that down now, before the result,
 so it cannot be chosen after the fact.
+
+## 2026-08-06 — engine run
+
+Goal: **0.7%** top-3 share of 138 tracked queries (target 50%).
+2026-08-05: 6 visitors (1 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — ok: added "Looking for Gutter Repair Near You in York County, PA" to /services/gutter-cleaning-repair.html for 'gutter repair near me'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: published 'leaffilter alternative york pa' → /guides/leaffilter-alternative-york-pa.html
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 39 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 2 URL(s), HTTP 200
+
+**Scout proposed (as candidates, not running):**
+- T042 Accurate "open now" hours + Saturday estimate window on GBP — 300 profile views a month and zero calls is partly a filter problem, not a persuasion problem. York homeowners notice an overflowing gutter during a weekend downpour or after work, then search 'gutter
+- T043 30-second phone video proof on GBP and every town page — A stranger with 13 reviews and 4.2 stars has to be believed before they get dialled. Eric already stands next to a running brake forming aluminium on the truck — a 30-second vertical clip of coil goin
+- T044 Honest, disclosed answers in r/YorkPA and PA homeowner threads — Two payoffs from one hour a week. First, direct: 'anyone know a gutter guy in York?' and 'is $X fair for gutters?' threads on r/YorkPA get read by exactly the homeowner who will hire in the next 30 da
