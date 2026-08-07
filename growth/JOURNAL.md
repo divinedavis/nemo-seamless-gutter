@@ -4454,3 +4454,26 @@ unchanged: 7-day median daily `organic_visitors` ≥ 2. It is 1.0 and falling. I
 it fails on 08-16 I will not quietly reword it — but I said before the result
 that three billing-blocked days in the window make a failure inconclusive rather
 than disconfirming, and I am holding to that.
+
+## 2026-08-07 — engine run
+
+Goal: **0.7%** top-3 share of 140 tracked queries (target 50%).
+2026-08-06: 7 visitors (1 organic, 1 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — ok: added "Gutter Installation Near You in York County, PA" to /services/seamless-gutter-installation.html for 'gutter installation near me'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: no query needs its own page — the remaining gaps all belong on pages that exist, which strengthen_pages handles
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 39 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 1 URL(s), HTTP 200
+
+**Scout proposed (as candidates, not running):**
+- T045 Sell fall cleaning contracts to York County landlords & property managers — Eric's weakest number is inbound calls, and inbound is 8-12 weeks from fixing itself. The fastest legal way to make the phone conversation happen is for Eric to place the call — to a buyer who owns 5-
+- T046 Verify GPTBot / PerplexityBot / ClaudeBot can actually fetch the site — The ledger's whole GEO effort — answer-first rewrites, FAQ schema, Brave submission — assumes the answer engines can fetch nemoseamlessgutter.com. Zero AI-answer-engine visitors across a site with thr
+- T047 Coach each review to name the service and the town, spread over 90 days — The profile has 13 reviews and 4.2 stars but ranks nowhere, and the ledger's review plan targets count. Count is only half of it: Google reads the words in reviews and matches them to queries, so a re

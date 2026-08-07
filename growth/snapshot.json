@@ -1,6 +1,6 @@
 {
-  "generated": "2026-08-06T06:04:09+00:00",
-  "date": "2026-08-06",
+  "generated": "2026-08-07T06:03:26+00:00",
+  "date": "2026-08-07",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
@@ -8,8 +8,8 @@
     "share_pct": 0.7,
     "measured": true,
     "why_unmeasured": null,
-    "coverage_pct": 37.7,
-    "tracked_queries": 138,
+    "coverage_pct": 37.9,
+    "tracked_queries": 140,
     "top3": 1,
     "top10": 8,
     "ranked_known": 22
@@ -63,6 +63,10 @@
       {
         "date": "2026-08-05",
         "value": 6
+      },
+      {
+        "date": "2026-08-06",
+        "value": 7
       }
     ],
     "pageviews": [
@@ -113,6 +117,10 @@
       {
         "date": "2026-08-05",
         "value": 8
+      },
+      {
+        "date": "2026-08-06",
+        "value": 10
       }
     ],
     "organic_visitors": [
@@ -162,6 +170,10 @@
       },
       {
         "date": "2026-08-05",
+        "value": 1
+      },
+      {
+        "date": "2026-08-06",
         "value": 1
       }
     ],
@@ -213,6 +225,10 @@
       {
         "date": "2026-08-05",
         "value": 0
+      },
+      {
+        "date": "2026-08-06",
+        "value": 1
       }
     ],
     "ai_visitors": [
@@ -262,6 +278,10 @@
       },
       {
         "date": "2026-08-05",
+        "value": 0
+      },
+      {
+        "date": "2026-08-06",
         "value": 0
       }
     ],
@@ -313,6 +333,10 @@
       {
         "date": "2026-08-05",
         "value": 5
+      },
+      {
+        "date": "2026-08-06",
+        "value": 3
       }
     ],
     "referral_visitors": [
@@ -362,6 +386,10 @@
       },
       {
         "date": "2026-08-05",
+        "value": 0
+      },
+      {
+        "date": "2026-08-06",
         "value": 0
       }
     ],
@@ -413,6 +441,10 @@
       {
         "date": "2026-08-05",
         "value": 0
+      },
+      {
+        "date": "2026-08-06",
+        "value": 0
       }
     ],
     "bot_hits": [
@@ -463,6 +495,10 @@
       {
         "date": "2026-08-05",
         "value": 1894
+      },
+      {
+        "date": "2026-08-06",
+        "value": 1448
       }
     ],
     "call_taps": [
@@ -492,6 +528,10 @@
       },
       {
         "date": "2026-08-05",
+        "value": 0
+      },
+      {
+        "date": "2026-08-06",
         "value": 0
       }
     ],
@@ -526,6 +566,10 @@
       },
       {
         "date": "2026-08-05",
+        "value": 0
+      },
+      {
+        "date": "2026-08-06",
         "value": 0
       }
     ],
@@ -577,6 +621,10 @@
       {
         "date": "2026-08-05",
         "value": 0
+      },
+      {
+        "date": "2026-08-06",
+        "value": 0
       }
     ],
     "phone_leads": [
@@ -626,6 +674,10 @@
       },
       {
         "date": "2026-08-05",
+        "value": 0
+      },
+      {
+        "date": "2026-08-06",
         "value": 0
       }
     ],
@@ -677,6 +729,10 @@
       {
         "date": "2026-08-05",
         "value": 0
+      },
+      {
+        "date": "2026-08-06",
+        "value": 0
       }
     ]
   },
@@ -688,8 +744,8 @@
   "keywords": {
     "by_town": {
       "county": {
-        "total": 77,
-        "covered": 30,
+        "total": 79,
+        "covered": 31,
         "top3": 1
       },
       "hanover": {
@@ -725,11 +781,11 @@
     },
     "by_intent": {
       "hire": {
-        "total": 89,
-        "covered": 44
+        "total": 90,
+        "covered": 45
       },
       "price": {
-        "total": 29,
+        "total": 30,
         "covered": 3
       },
       "diy": {
@@ -764,7 +820,6 @@
       "gutter contractor red lion pa",
       "gutter contractors york pa",
       "gutter installation dover",
-      "gutter installation near me",
       "gutter installation york",
       "gutter installers dover pa",
       "gutter installers york",
@@ -778,6 +833,7 @@
       "half round copper gutters near me",
       "half round copper gutters york pa",
       "half round gutter installation york county",
+      "half round gutters historic home pa",
       "ice dam damage gutter replacement york county pa",
       "schuylkill county seamless gutter",
       "seamless gutter company spring grove pa",
@@ -800,6 +856,7 @@
       "gutter cleaning cost red lion pa",
       "gutter cleaning york pa cost",
       "gutter guard cost pa",
+      "gutter guard installation cost",
       "gutter guard installation cost per foot",
       "gutter guard installation cost york pa",
       "gutter installation cost per foot pennsylvania",
@@ -1073,13 +1130,13 @@
     ]
   },
   "gsc": {
-    "date": "2026-08-06",
+    "date": "2026-08-07",
     "ok": true,
     "connected": true,
-    "rows": 604,
+    "rows": 618,
     "matched": 22,
     "clicks": 7,
-    "impressions": 21729,
+    "impressions": 21810,
     "avg_position": 24.8
   },
   "techniques": [
@@ -1141,6 +1198,10 @@
         {
           "date": "2026-08-05",
           "value": 0
+        },
+        {
+          "date": "2026-08-06",
+          "value": 0
         }
       ]
     },
@@ -1201,6 +1262,10 @@
         },
         {
           "date": "2026-08-05",
+          "value": 0
+        },
+        {
+          "date": "2026-08-06",
           "value": 0
         }
       ]
@@ -1537,6 +1602,10 @@
         },
         {
           "date": "2026-08-05",
+          "value": 0
+        },
+        {
+          "date": "2026-08-06",
           "value": 0
         }
       ]
@@ -2008,6 +2077,60 @@
       "notes": "first step: Read r/YorkPA's rules on self-promotion, then post one genuinely useful reply (no link) to the most recent gutter, ice-dam or downspout thread, signing as Eric, owner of NEMO Seamless Gutter in York.\neffort: hours\ncost: free\nexpected: 6-10 substantive answers/month; 2-4 DMs or calls per month by week 6; NEMO named in a Reddit-sourced AI answer for 'gutter contractor york pa' within 90 days. Also expect real price questions worth turning into site content.",
       "verdict": null,
       "owned_visitors": null
+    },
+    {
+      "id": "T045",
+      "slug": "property_manager_fall_cleaning_contracts",
+      "name": "Sell fall cleaning contracts to York County landlords & property managers",
+      "kind": "distribution",
+      "status": "candidate",
+      "hypothesis": "Eric's weakest number is inbound calls, and inbound is 8-12 weeks from fixing itself. The fastest legal way to make the phone conversation happen is for Eric to place the call \u2014 to a buyer who owns 5-40 roofs instead of one. York city, Dover and Red Lion have a dense rental stock managed by a countable number of local property managers, landlords and HOA boards, and every one of them has to get gutters cleared before November or eat ice-dam and fascia damage claims. This is B2B outreach to listed business numbers, not consumer cold-calling, and one 'yes' books a route of 10+ addresses in a single street \u2014 exactly the density gutter work needs. It also converts into the referral engine the ledger already wants: property managers hand out contractor names all year.",
+      "evidence": "Gutter lead-gen guidance for 2026 names property managers and referral partnerships as a core channel, and notes gutter work is a density business where one partner relationship can be worth six figures a year: <cite index=\"36-4,36-12,36-13,36-14,36-15\">build a referral program with local roofers and property managers; one roofer referral relationship can yield over $170,000 annually in gutter work \u2014 warm, pre-qualified business at zero advertising cost</cite>. Seasonal timing is the point: <cite index=\"39-8,39-9\">gutter demand spikes in fall as leaves clog systems, so pre-sell in late summer and scale hard September-November</cite>. Phone-originated leads also convert far better than web leads: <cite index=\"31-6,31-7\">paid-search construction leads convert at 2.61% while high-intent home-services phone leads convert at 46% on the call \u2014 an 18x spread</cite>. https://resultsdigitalus.com/how-gutter-company-lead-generation-works-in-2026/ and https://www.elev8operations.com/guides/how-to-get-more-gutter-leads-2026",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-07",
+      "added": "2026-08-07",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Spend 60 minutes building a one-page list: search Google Maps for 'property management york pa', 'apartments york pa', 'HOA management york county' and write down company name, office number and rough door count for the first 40 that manage single-family or small multi-family stock. Call the first ten tomorrow morning between 8:30 and 10:00 with one sentence: flat per-building fall cleaning price, before-and-after photo of every downspout, invoiced monthly.\neffort: days\ncost: free\nexpected: A list of 40 named York County property managers / landlords / HOA contacts built in one evening; 40 calls over two weeks in the last half of August; 8-12 conversations, 5 on-site walkthroughs, 2 signed fall cleaning routes covering 15+ buildings before the first heavy leaf drop. Success = the first month in this business's history with double-digit outbound conversations and at least 2 repeat-revenue accounts.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T046",
+      "slug": "ai_crawler_access_audit",
+      "name": "Verify GPTBot / PerplexityBot / ClaudeBot can actually fetch the site",
+      "kind": "indexing",
+      "status": "candidate",
+      "hypothesis": "The ledger's whole GEO effort \u2014 answer-first rewrites, FAQ schema, Brave submission \u2014 assumes the answer engines can fetch nemoseamlessgutter.com. Zero AI-answer-engine visitors across a site with three guides and nine location/service pages is the signature of a fetch failure, not a content failure. Modern hosts and CDNs block AI crawlers by default, so the owner can be invisible to ChatGPT and Perplexity without ever having made a decision about it. This is a 30-minute check with a binary outcome, and it gates every hour already spent on GEO content. Perplexity in particular is a realistic near-term win for a one-truck contractor because its source pool is small and freshness-weighted, so a single well-structured York gutter page can surface fast.",
+      "evidence": "<cite index=\"19-3,19-4,19-5\">Check robots.txt for GPTBot, OAI-SearchBot, PerplexityBot, ClaudeBot and Bingbot, then check the CDN \u2014 Cloudflare switched to blocking AI crawlers by default, so many site owners are blocked without knowing; if you can't be crawled, nothing else matters</cite>. On the upside for a small local site: <cite index=\"23-6,23-7\">Perplexity's source pool is smaller and more curated, so a single well-structured page from a local business can show up in answer cards</cite>, and <cite index=\"23-12\">pages get re-crawled on a rolling basis, often within 24-72 hours on an already-crawled domain</cite>. https://mediaofficers.com/insights/how-to-get-cited-by-chatgpt-perplexity-ai-overviews and https://www.pleiadesconsultancy.com/blog/how-to-get-cited-by-perplexity-ai-2026",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-07",
+      "added": "2026-08-07",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Open nemoseamlessgutter.com/robots.txt and confirm no Disallow rules hit GPTBot, OAI-SearchBot, PerplexityBot, ClaudeBot, Google-Extended or Bingbot; then check the host/CDN dashboard for an AI-bot or 'AI Scrapers and Crawlers' blocking toggle and turn it off for these agents.\neffort: hours\ncost: free\nexpected: A pass/fail answer within one working session. If it fails: allow-listing the AI user agents should produce the site's first non-zero AI-answer-engine referrals within 2-4 weeks, and 'who is the best gutter company in york pa' / 'seamless gutter cost york pa' asked in ChatGPT, Perplexity and Google AI Mode should return NEMO as a named source in at least 2 of 6 test prompts by 30 days. If it passes, the ledger stops spending GEO hours on a crawler problem that does not exist.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T047",
+      "slug": "review_justification_wording",
+      "name": "Coach each review to name the service and the town, spread over 90 days",
+      "kind": "lifecycle",
+      "status": "candidate",
+      "hypothesis": "The profile has 13 reviews and 4.2 stars but ranks nowhere, and the ledger's review plan targets count. Count is only half of it: Google reads the words in reviews and matches them to queries, so a review that says 'installed seamless gutter and guards on our Dallastown ranch' feeds relevance for exactly the money queries NEMO cannot rank for, while a review that says 'great job, fast' feeds nothing. Same phone call to the customer, better instruction, and it is completely honest \u2014 Eric is asking a real customer to describe the real work in their own words, not dictating text or paying for it. Pacing matters too: two or three a month for a quarter beats ten in a weekend, and this business's low volume makes that pacing natural rather than something to fake.",
+      "evidence": "<cite index=\"3-16,3-17,3-18,3-19\">When a customer explicitly mentions a service in their review, Google connects that term to your business and creates a 'review justification' \u2014 a signal proving you perform the work the searcher wants; so when you ask for a review, prompt the client to mention the specific service you provided</cite>. On weighting and pacing: <cite index=\"7-6,7-7\">Whitespark's 2026 report puts GBP signals at 32% of local-pack weight and reviews at 20%, up from 16% in 2023, with review velocity the eleventh most important individual factor \u2014 and it cannot be faked retroactively</cite>, and <cite index=\"1-10\">a steady flow of reviews over 90 days ranks better than a sudden burst of 50 followed by silence</cite>. https://localdominator.co/local-search-ranking-factors/ and https://whitespark.ca/local-search-ranking-factors/",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-07",
+      "added": "2026-08-07",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Write the 20-word ask Eric says out loud at the truck before he drives away \u2014 asking the customer to mention which gutter work was done and which town they're in \u2014 and use it on the very next completed job this week. No incentive, no gating, no filtering by expected rating.\neffort: hours\ncost: free\nexpected: 13 reviews to 22-25 by end of November at a steady 2-3/month, with at least 60% of new ones naming a specific service (seamless install, guards, cleaning, half-round/copper) and a York County town in the body. Leading indicator: Google starts showing service-term justifications under the listing in search. Target 4.4+ stars and first top-3 map-pack appearances for a service-plus-town query by January.",
+      "verdict": null,
+      "owned_visitors": null
     }
   ],
   "scoreboard": {
@@ -2058,11 +2181,14 @@
       "T041",
       "T042",
       "T043",
-      "T044"
+      "T044",
+      "T045",
+      "T046",
+      "T047"
     ]
   },
   "last_build": {
-    "date": "2026-08-06",
+    "date": "2026-08-07",
     "log": [
       {
         "ok": true,
@@ -2084,7 +2210,7 @@
       },
       {
         "ok": true,
-        "detail": "added \"Looking for Gutter Repair Near You in York County, PA\" to /services/gutter-cleaning-repair.html for 'gutter repair near me'",
+        "detail": "added \"Gutter Installation Near You in York County, PA\" to /services/seamless-gutter-installation.html for 'gutter installation near me'",
         "slug": "strengthen_pages"
       },
       {
@@ -2101,7 +2227,8 @@
       },
       {
         "ok": true,
-        "detail": "published 'leaffilter alternative york pa' \u2192 /guides/leaffilter-alternative-york-pa.html",
+        "noop": true,
+        "detail": "no query needs its own page \u2014 the remaining gaps all belong on pages that exist, which strengthen_pages handles",
         "slug": "money_pages"
       },
       {
@@ -2123,31 +2250,26 @@
       },
       {
         "ok": true,
-        "detail": "submitted 2 URL(s), HTTP 200",
+        "detail": "submitted 1 URL(s), HTTP 200",
         "slug": "ping_indexnow"
       }
     ],
-    "new": 1,
+    "new": 0,
     "changed": 1
   },
   "last_scout": {
-    "date": "2026-08-06",
+    "date": "2026-08-07",
     "ok": true,
     "techniques_added": [
-      "open_now_hours_and_saturday_estimate_window",
-      "thirty_second_phone_video_proof",
-      "reddit_york_county_thread_presence"
+      "property_manager_fall_cleaning_contracts",
+      "ai_crawler_access_audit",
+      "review_justification_wording"
     ],
     "keywords_added": [
-      "gutter contractor open saturday york pa",
-      "emergency gutter repair near me york pa",
-      "gutter cleaning york pa cost",
-      "half round copper gutter installers york pa",
-      "cost to replace gutters on a ranch house pa",
-      "fascia and soffit repair dover pa",
-      "ice dam damage gutter replacement york county pa"
+      "gutter guard installation cost",
+      "half round gutters historic home pa"
     ],
-    "notes": "Sequencing matters more than the ideas: leaf-fall in York County starts in roughly six weeks, so do the hours fix this week (one hour, zero cost, affects the same 300 views immediately), start video on the next job, and let Reddit compound over 90 days. Only change hours OR video first if you want to know which one moved the phone \u2014 changing both plus a GBP post on the same day makes the result unreadable. Considered and rejected: (1) coaching customers to name the service and town in their review text \u2014 genuinely a 2026 ranking lever via review justifications, but it sits too close to the review-request item already in the ledger and would double-count; (2) opening additional GBP locations, which several 2026 write-ups name as the biggest remaining local lever \u2014 rejected outright, a one-truck shop has one real address and virtual or relative-driveway locations are the fastest route to the suspension that would cost more than any technique earns; (3) LSA competitive quotes / 'Message Fanout' readiness, where one homeowner request now fans out to four paying providers and Google favours fast responders \u2014 real and relevant, but it is an extension of the LSA candidate already logged, so fold it into that item when LSA goes live rather than as a new technique; (4) display remarketing \u2014 needs a budget and audience volume that 6 visitors a day cannot produce; (5) any Reddit tactic involving a second account, undisclosed promotion or upvoting \u2014 against site rules and it would be the one thing that permanently poisons the channel; (6) buying into 'best gutter contractors in York 2026' listicle placements, since paid inclusion is a bought link. Earning an unpaid mention in a real York outlet is fine and belongs under the authority-links item. One honesty guardrail on the hours technique: only publish hours the AI agent truly covers, and make sure the agent tells callers when Eric will physically call back \u2014 publishing 24/7 and answering with a machine that promises nothing is worse than being closed."
+    "notes": ""
   },
   "pages": {
     "areas": [
