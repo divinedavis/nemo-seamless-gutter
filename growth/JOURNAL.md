@@ -4477,3 +4477,406 @@ Goal: **0.7%** top-3 share of 140 tracked queries (target 50%).
 - T045 Sell fall cleaning contracts to York County landlords & property managers — Eric's weakest number is inbound calls, and inbound is 8-12 weeks from fixing itself. The fastest legal way to make the phone conversation happen is for Eric to place the call — to a buyer who owns 5-
 - T046 Verify GPTBot / PerplexityBot / ClaudeBot can actually fetch the site — The ledger's whole GEO effort — answer-first rewrites, FAQ schema, Brave submission — assumes the answer engines can fetch nemoseamlessgutter.com. Zero AI-answer-engine visitors across a site with thr
 - T047 Coach each review to name the service and the town, spread over 90 days — The profile has 13 reviews and 4.2 stars but ranks nowhere, and the ledger's review plan targets count. Count is only half of it: Google reads the words in reviews and matches them to queries, so a re
+
+## 2026-08-07 — review agent
+
+### Lead: the page-writing engine has run out of queue, and the one technique left is 87 days deep
+
+Nine of today's eleven build steps were no-ops. That is not a failure — I read the
+code and the no-ops are honest. But three of them together are a structural fact
+this journal has not stated before:
+
+- `area_pages` — "every queued town already has a page"
+- `service_pages` — "every queued service already has a page"
+- `money_pages` — "no query needs its own page — the remaining gaps all belong on
+  pages that exist"
+
+`money_pages` is right, and for a good reason. `_needs_its_own_page`
+(`techniques.py:411-427`) refuses to build when the query already has a host page
+that is not the homepage, because a second page targeting the same search splits
+the site against itself. All 87 uncovered queries now have such a host. So
+`money_pages` has structurally retired itself from the backlog and handed the
+whole thing to `strengthen_pages`.
+
+**`strengthen_pages` writes one section per run.** I read it end to end
+(`techniques.py:860-905`): it sorts the uncovered list, walks it, and returns on
+the first success. One query a day, single file, 87 deep. And it sorts
+`{"hire": 0, "price": 1, "check": 2, "diy": 3}` at `:879`, with 45 uncovered hire
+queries ahead of 27 uncovered price ones.
+
+Do the arithmetic that follows: price-intent work starts around **21 September**,
+and at the 8–12 weeks a new section needs to rank it lands in **late November to
+December**. Leaf-fall in York County runs mid-September to November. The queue as
+ordered will finish writing about autumn after autumn is over.
+
+This is the fourth day running that the queue reorder has been recommended
+(rec 5 on 08-05, 08-06). What is new today is that the estimate is no longer
+"one to two a day between two techniques" — `money_pages` is out, so it is one a
+day through one technique, and the date slipped accordingly. **This is now the
+highest-value code change available and it is two dictionary literals.**
+
+**Second: nothing synced, day 5, and there are now nine stranded changes.**
+`gsc.pages` is absent from today's snapshot, `keywords.ranked` is absent, and
+`discovered_untracked` is exactly 40 rows (the old `out[:40]`, not the widened
+`_select_discoveries`). The droplet is running code from 2026-08-01 or earlier.
+Three of the stranded changes exist solely to answer questions these reviews keep
+failing to answer, and one of them — the `gsc.pages` report added yesterday — has
+a **deadline of 2026-08-17**, when the homepage's `CTR_COOLDOWN_DAYS` expires and
+we find out whether `improve_ctr` can see its own most important page. Ten days.
+
+### Where the numbers stand
+
+The goal metric — tracked York County queries holding a top-3 position:
+
+| | 08-01 | 08-02 | 08-03 | 08-04 | 08-05 | 08-06 | 08-07 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **top-3 count** | 2 | 2 | 2 | 2 | 1 | 1 | **1** |
+| top-10 count | 6 | 7 | 8 | 8 | 8 | 8 | **8** |
+| `ranked_known` | 21 | 22 | 22 | 22 | 22 | 22 | **22** |
+| tracked queries | 108 | 117 | 122 | 127 | 127 | 138 | **140** |
+| share (`top3/total`) | 1.9% | 1.7% | 1.6% | 1.6% | 0.8% | 0.7% | **0.7%** |
+| coverage proxy | 40.7% | 39.3% | 39.3% | 38.6% | 38.6% | 37.7% | **37.9%** |
+
+Top-3 flat at 1 for a third day. Top-10 flat at 8 for a sixth. `ranked_known`
+flat at 22 for a seventh. The headline 0.7% is arithmetic about a denominator the
+scout keeps growing, not a measurement of anything: against the 22 queries Search
+Console actually returns a position for it is **1 of 22 = 4.5%**, flat. Read that
+number. Nothing moved toward the goal today, and nothing has moved in six days.
+
+Per town — every named town is still zero and has been for all twelve measured
+days:
+
+| bucket | total | covered | top-3 |
+| --- | --- | --- | --- |
+| county | 79 (+2) | 31 (+1) | **1** |
+| york | 19 | 5 | 0 |
+| dover | 12 | 4 | 0 |
+| hanover | 6 | 4 | 0 |
+| dallastown | 8 | 3 | 0 |
+| red-lion | 8 | 3 | 0 |
+| spring-grove | 8 | 3 | 0 |
+
+Intent coverage: hire **45/90**, price **3/30**, check 4/13, diy 1/7. Price has
+now been stuck on 3 covered for **nine days** while its total grew from 25 to 30.
+Uncovered by intent: hire 45, price 27, check 9, diy 6 — 87 total, which is the
+queue the section above is about.
+
+Search Console, 28-day rolling: rows **618** (+14), matched **22** (flat, seventh
+day), clicks **7** (flat, fifth day), impressions **21,810** (+81), avg position
+**24.8** (flat). Impressions have essentially stopped growing — +81 today against
++339 yesterday — so the out-of-market flood has plateaued rather than spread.
+
+**`discovered_untracked` is 40 of 40 out-of-market today, not 39 of 40.** I
+recomputed it myself rather than carrying yesterday's figure: matching all 40
+rows against the fifteen town names the site has pages for plus "county" returns
+**zero in-market rows**, 11,930 impressions, **0 clicks**. Every query is of the
+form `seamless gutter contractor(s) <Montgomery-or-Chester-County town> pa`. My
+count and yesterday's differ by one row and I cannot rule out a methodology
+difference in the town list; the conclusion is the same either way.
+
+Traffic (nginx, bots and owner IPs excluded):
+
+| | 08-01 | 08-02 | 08-03 | 08-04 | 08-05 | 08-06 |
+| --- | --- | --- | --- | --- | --- | --- |
+| visitors | 6 | 9 | 32 | 10 | 6 | **7** |
+| pageviews | 7 | 14 | 70 | 35 | 8 | **10** |
+| organic | 0 | 0 | 2 | 2 | 1 | **1** |
+| direct | 6 | 9 | 28 | 7 | 5 | **3** |
+| local (maps) | 0 | 0 | 0 | 0 | 0 | **1** |
+| AI-referred | 0 | 0 | 0 | 0 | 0 | **0** |
+| bot hits | 1,412 | 1,554 | 2,189 | 1,612 | 1,894 | **1,448** |
+
+**`local_visitors` is 1 — the first non-zero in twelve measured days.** I am
+recording it and refusing to read anything into it. n=1, and it does **not**
+mean the `?utm_source=gbp` tag was added: `classify()` (`metrics.py:273-301`)
+returns "local" for a `google.com/maps` referrer as well as for the tag, so one
+person arriving from Maps produces exactly this. If the tag had been added, the
+number would be attributable; it is not.
+
+`call_taps` **0 for eight days**. `ai_calls` 0 for six. `bookings` 0 since 07-30.
+All-time: **1 booking, 0 phone leads.**
+
+### Did previous changes work?
+
+**The call-tap zero is real, and I verified the whole chain rather than assuming
+it.** Eight days of `call_taps: 0` across **83 visitors** is the kind of number
+that is usually broken instrumentation, so I traced it end to end before
+believing it: `analytics.js:32-45` fires the beacon on any `a[href^="tel:"]`
+click and is loaded by **all 38 pages** (`templates.py:26` puts it on every
+generated page; `index.html:12` has it too — I grepped, 37 of 37 generated pages
+plus the homepage); nginx answers `/e/call-tap` with a **204**
+(`deploy/nginx-nemo-seamless-gutter.conf:27-30`), which is the 2xx the parser
+requires; and `metrics.py:450` tests the tap path *before* the `method != "GET"`
+filter at `:455`, so `sendBeacon`'s POST is counted rather than dropped. There is
+no bug. **Verdict: the zero is a real zero.** Eighty-three people came to this
+site in eight days and not one tapped the phone number.
+
+**08-06 rec 1 (homepage title) — NOT done, day 7.** `index.html:16` is still
+`Gutter Installer &amp; Contractor | NEMO Seamless Gutter`; `:17` still names no
+place. The 30-day falsifiable prediction recorded yesterday has not started,
+because the change it predicts about has not been made.
+
+**08-06 rec 2 (sync `growth/`) — NOT done, day 5.** Nine stranded changes now:
+T014 grace (08-02), off-area output guard (08-03), `tracked_totals` and the
+`local_schema` refusal (08-04), `keywords.ranked` and widened discovery (08-05),
+`gsc.pages` (08-06), and today's crawler counters. **Verdict: not tested, because
+not deployed** — and that verdict is now six days old.
+
+**08-06 rec 3 (read `gsc.pages` before 08-17) — cannot be done.** The block is
+not in today's snapshot. Blocked on the sync. Ten days left.
+
+**08-06 rec 4 / T016 (GBP category audit) — NOT done, day 12 since T016 was
+filed.** `status: candidate`, `activated: null`. No screenshot, no answer.
+
+**08-06 rec 5 (leaf-fall queue reorder) — NOT done, day 9.** `order = {"hire": 0,
+"price": 1, "check": 2, "diy": 3}` unchanged at `techniques.py:435` and `:879`.
+Cost re-estimated upward today; see the lead.
+
+**08-06 rec 6 (merge the two schema blocks) — NOT done, day 4.** `index.html:49`
+and `:180` still share `@id` `https://nemoseamlessgutter.com/#business`, still
+declare `RoofingContractor` twice, and still give two different email addresses
+(`:54` `eric@`, `:184` `enemo@`) and two different opening-hours blocks (`:79`,
+`:202`).
+
+**08-06 rec 7 (`?utm_source=gbp`) — cannot tell, and probably NOT done, day 5.**
+See the `local_visitors: 1` note above — the metric moved but not in a way that
+identifies the cause.
+
+**08-06 rec 8 (answer T007) — NOT done, day 12.** Still `candidate`, still
+`notes: first step: confirm with Eric...`.
+
+**08-02's prediction — "daily `organic_visitors` holds a 7-day median of ≥2 by
+2026-08-16" — still failing.** Median over 07-31…08-06, `[1,0,0,2,2,1,1]`, is
+**1.0**, unchanged from yesterday. Nine days left. **Too early to call formally;
+I would bet against it.** The caveat recorded before the result stands: three
+billing-blocked days sit inside the window, so a failure reads "inconclusive,
+rerun", not "content does not work".
+
+**T001/T002/T018 remain inside grace to ~2026-08-26.** `owned_visitors` still 0
+on nearly every day. Unjudgeable at this volume.
+
+**Prompt correction.** The scheduled prompt still describes the state of
+2026-07-28 — "429 impressions", "county bucket was 2 of 50", and a scout blocked
+until 2026-08-01. All three are stale: impressions are 21,810, the county bucket
+is 1 of 79, and the scout ran cleanly this morning filing T045–T047. The prompt
+also names `by_town.top3 / total` as the goal metric; that ratio is now dominated
+by scout-driven denominator growth and `ranked_known` (22) is the honest
+denominator. Noting it so the prompt can be corrected, per its own instruction.
+
+### What I checked in the code before recommending anything
+
+- **`money_pages` has emptied its own queue by design**, not by bug —
+  `_needs_its_own_page`, `techniques.py:411-427`. **`strengthen_pages` returns
+  after one successful section per run** — `techniques.py:860-905`. Both sort
+  hire-first at `:435` and `:879`. This is what the lead rests on.
+- **The call-tap chain, verified in four places** — `analytics.js:32-45`,
+  `templates.py:26`, `deploy/nginx-nemo-seamless-gutter.conf:27-30`,
+  `metrics.py:450-455`. No bug; the zero is real.
+- **robots.txt already answers half of T046, filed by the scout this morning.**
+  I read it: GPTBot, OAI-SearchBot, ChatGPT-User, PerplexityBot, ClaudeBot,
+  anthropic-ai, Google-Extended, Applebot, Amazonbot and meta-externalagent are
+  each explicitly `Allow: /`. So the technique's "check robots.txt" first step is
+  **done and clean**, and what remains is the host/CDN layer — which the site's
+  own access log can answer, except that `metrics.py` collapses every crawler
+  into one `bot_hits` integer and throws the identity away. Fixed below.
+- **Already shipped, so not recommending:** `FAQPage` JSON-LD on every generated
+  page (`_faq_ld`, `techniques.py:192`), `Service` JSON-LD on area pages
+  (`:323-331`), `OfferCatalog` (`:613-617`), `rel=canonical`
+  (`templates.py:33`), floating tap-to-call (`templates.py:160`), IndexNow (T006,
+  HTTP 200 today), the GEO_ANCHOR placeless-snippet guard (`:1169`).
+- **Checked against the ledger and not filed as new:** Local Services Ads is
+  **T011**, a candidate since 07-27 — today I am costing it, not proposing it.
+  AI-crawler access is **T046**, filed this morning. Review wording is **T047**.
+  Nothing in today's research is a new technique.
+
+### What I researched today
+
+- **Google Business Profile service areas do not affect ranking.** Sterling Sky:
+  ranking for a service-area business is computed from the hidden verified
+  address, and listing towns in the service area is *visual only*
+  ([Sterling Sky](https://www.sterlingsky.ca/does-the-service-area-in-google-my-business-impact-ranking/),
+  corroborated by [Map Ranks](https://www.mapranks.com/2026/06/29/google-maps-optimization-service-area-businesses/)).
+  **Why this matters here:** it pre-empts the obvious wrong move. Every named
+  town has held top-3 = 0 for twelve days, and the cheapest-looking fix — add
+  all fifteen towns to the GBP service area — would do **nothing** for rank. The
+  documented route to ranking outside the home address is prominence: reviews and
+  per-town pages, which is what the engine is already doing. Nobody has proposed
+  the service-area move yet; I want it rejected in writing before someone does.
+- **Local Services Ads, costed for this trade.** $20–$55 per lead for gutter
+  companies; across 888 contractors in February 2026 the blend was **$53/lead,
+  $233 per paying customer, 7.84x closed ROAS** on a $1,826 average ticket, at
+  roughly half the CPL of ordinary Google Ads
+  ([Searchlight](https://searchlightdigital.io/google-local-service-ads-cost-per-lead/),
+  [Home Service Direct](https://www.homeservicedirect.net/google-local-services-ads-cost/),
+  [Results Digital](https://resultsdigitalus.com/how-gutter-company-lead-generation-works-in-2026/)).
+  **Why this matters here:** T011 has sat as an unpriced candidate for twelve
+  days. Those figures are vendor-adjacent and I would treat the ROAS as
+  marketing, but the CPL range is consistent across three independent sources and
+  it converts T011 from a vague idea into a decision Eric can actually make: at
+  $53/lead and a gutter job worth four figures, one closed job pays for roughly
+  thirty leads. It is the only lever identified in twelve days that can produce a
+  phone call *inside* leaf-fall season rather than after it.
+- **Zero-click and AI Overviews as an alternative explanation for the
+  Philadelphia flood.** 2026 write-ups note AI Overviews now render above the map
+  pack and that a site can accrue large impression counts from AI-surface
+  appearances at middling positions with no click
+  ([Surmado](https://www.surmado.com/blog/local-ai-search-zero-click-survival),
+  [Digital Applied](https://www.digitalapplied.com/blog/60-percent-searches-zero-click-crisis-2026-seo-strategy)).
+  **Why this matters here:** yesterday's entry concluded the placeless homepage
+  title is the leading explanation for 21,810 impressions at zero clicks. That
+  may still be right, but this is a competing mechanism that would produce the
+  identical signature and would *not* be fixed by a title rewrite. I am flagging
+  it so yesterday's 30-day prediction is not scored as though the title were the
+  only candidate cause. Distinguishing them needs the Search Console
+  `searchAppearance` dimension, which `gsc.py` does not currently request.
+- **Rejected:** adding towns to the GBP service area (above — it does not rank);
+  GBP posting cadence as a ranking lever (rejected 08-05 on Sterling Sky's
+  9-week/441-keyword test, nothing overturns it); paid "AI visibility" packages
+  (ninth time); extending `TOWN_QUEUE` (sixth time); the unsourced "AI assistants
+  recommend you at 150+ reviews" claim (rejected 08-06, still no method behind
+  it); anything involving fabricated or incentivised reviews, review gating,
+  bought links, a second GBP location, or posting under a name that is not Eric's.
+
+### Recommendations
+
+**Everything below needs a droplet action before it does anything.**
+`/var/www/nemo-seamless-gutter` is not a git checkout and `publish_state.sh`
+copies droplet → repo only. Nothing in this commit is live.
+
+1. **Reorder the content queue for leaf-fall — this is now the top item.**
+   *(Divine — two dictionary literals at `techniques.py:435` and `:879`. Free.
+   Day 9.)* Put `price` ahead of `hire` until 30 November. This moved from rec 5
+   to rec 1 today for a specific reason: `money_pages` has emptied its queue, so
+   the entire 87-query backlog runs through `strengthen_pages` at one a day, and
+   the 45 hire queries sitting in front of the 27 price ones now push price-intent
+   content to a late-September start and a **November–December ranking date** for
+   content written to catch **September–November** demand. How you would know it
+   worked: `keywords.by_intent.price.covered` starts moving off 3 within a week
+   of the change — it has not moved in nine days. Checked: `techniques.py:411-427`
+   (`money_pages` no-op is by design), `:860-905` (one section per run), `:435`
+   and `:879` (both sort dicts), and today's uncovered-by-intent split computed
+   from the snapshot.
+2. **Sync `growth/` to the droplet.** *(Divine — minutes. Day 5.)* Nine stranded
+   changes, and one of them has a ten-day fuse: `gsc.pages` is what tells us on
+   2026-08-17 whether `improve_ctr` can see the homepage it broke on 07-27, and
+   it cannot report if it is not deployed. Rec 1 is also inert until this
+   happens. Whoever does it should say so in the journal, because nothing in the
+   snapshot confirms a sync. Checked: today's `keywords` block has no `ranked`
+   key, `gsc` has no `pages` key, and `discovered_untracked` is exactly 40 rows —
+   three independent proofs the droplet is on old code.
+3. **Put York back in the homepage title and description, by hand.** *(Divine —
+   minutes on the droplet. Free. Day 7.)* Unchanged from yesterday and still
+   worth doing on its own merits — the site's most important page names no place.
+   I have **demoted it from rec 1 to rec 3**, because today's research surfaced a
+   competing explanation for the impression flood (AI-surface zero-click) that a
+   title rewrite would not fix, so I am less confident than yesterday's entry was
+   that this is the cause of the 21,810 impressions. It is still cheap and still
+   correct. Checked: `index.html:16-17`.
+4. **Decide on Local Services Ads — T011, now with numbers.** *(Eric — a spending
+   decision, so his alone. ~$53/lead, and he sets the weekly cap.)* Twelve
+   measured days have produced 7 clicks, 0 call taps and 0 phone leads, and every
+   organic lever in this journal is 8–12 weeks from paying out — which lands
+   after leaf-fall. LSA is the only identified route to a call inside the season.
+   It is Google-official, requires the license/insurance check he can pass, and
+   the budget is capped by him. I am **not** recommending he spend; I am
+   recommending he decide, because "no" is also an answer and it has been open
+   for twelve days. Checked: T011 in today's snapshot (`status: candidate`,
+   `activated: null`, no cost estimate in the record).
+5. **Audit the GBP primary category — T016.** *(Eric — five minutes. Free. Day
+   12.)* Unchanged and still the highest-weight controllable factor. Open the
+   profile, screenshot the current primary category, report it. Do not change it
+   blind. And while in there: **do not add the fifteen towns to the service area
+   expecting rank** — see today's research; it is visual only. Checked: T016
+   `status: candidate`; `index.html:48` and `:179` both `RoofingContractor`.
+6. **Fix the two schema blocks.** *(Eric decides the hours; Divine merges — 10
+   minutes, droplet. Day 4.)* Two `@id`-identical blocks, two email addresses,
+   two opening-hours sets, one page. Checked: `index.html:49` vs `:180`, `:54`
+   vs `:184`, `:79` vs `:202`.
+7. **Add `?utm_source=gbp` to the Business Profile website URL.** *(Eric — two
+   minutes. Free. Day 5.)* Today's single `local_visitors` is exactly why this
+   matters: the metric moved and nobody can say why. Checked: `metrics.py:63`,
+   `:273-301` — no code change needed.
+8. **Answer T007 — yes or no.** *(Eric — one decision. Free. Day 12.)* Reviews
+   are 20% of local-pack weight, the profile has 13, and nobody is being asked.
+9. **Carried, unchanged, not restated:** the Akron/Lancaster paragraph at
+   `services/gutter-guards.html:163` (day 10 — a York County contractor's gutter
+   guards page still opens by naming a Lancaster County town), T008's false
+   hypothesis, T011's siblings T022/T029/T033–T038, T042–T047, the ~30-page town
+   cap, and `schuylkill county seamless gutter` still inflating the tracked
+   universe by one (sixth mention, droplet-owned, unfixable from here).
+
+### What I changed in this repo today
+
+Three files, one change. **152 tests pass** (145 before, 7 new). Nothing here is
+live until `growth/` is synced — this is the ninth stranded change, and I want to
+be honest that the sync matters more than the change does.
+
+- **`growth/metrics.py` — `AI_CRAWLERS` and `CRAWLER_SERIES`.** Nine named
+  crawler families counted per day: GPTBot, OAI-SearchBot, ChatGPT-User,
+  PerplexityBot, ClaudeBot, Google-Extended, Applebot, plus **Bingbot and
+  Googlebot as controls**. Counted *before* the bot gates, because every one of
+  these is a bot and would otherwise disappear into `bot_hits`; counted at **any
+  HTTP status**, because a 403 from a CDN rule is the finding, not noise.
+- **`growth/snapshot.py` — publish them.** `SERIES` gains the nine keys, so they
+  ride the existing ledger path with no new plumbing.
+- **`growth/test_metrics.py` — 7 tests, no network.** A GPTBot fetch counts; a
+  403'd PerplexityBot counts; crawlers stay bots and never become visitors; a
+  crawler that never came reads a real 0 rather than a missing key; the owner
+  opt-out still wins; one hit is charged to exactly one crawler.
+
+Why this and not something else: T046 was filed this morning and asks a binary
+question — can the answer engines fetch this site. Its first step, robots.txt, I
+answered by reading the file (all clean). Its second step is a CDN dashboard
+hunt that needs a human. But the nginx log already contains the answer and
+`metrics.py` already reads every line of it — it was throwing the user agent away.
+This turns a human errand into a number that appears in tomorrow's snapshot, and
+Bingbot is in the list so that "GPTBot is absent" can be distinguished from "the
+log parser is broken".
+
+I did not touch `techniques.json`, `keywords.json`, `results.jsonl` or
+`state.json`; did not activate, retire or re-status any technique; did not edit
+`index.html` or anything under `areas/`, `guides/` or `services/`, all of which
+are copied droplet → repo every morning and would be reverted tomorrow. I
+deliberately did **not** reorder the sort dicts myself — that is rec 1 and it
+changes what the engine writes, which is a decision, not a diagnostic.
+
+### Reasoning and uncertainties
+
+**Day twelve. Twelve days of measurement: one top-3 query, zero top-3 in any of
+the seven named towns, zero call taps in eight days across 83 visitors, one
+booking ever, zero phone leads ever.** The engine is healthy and building; the
+business is not getting calls.
+
+**The thing I am most confident about today is also the most boring.** The queue
+reorder is two dictionary literals and it is the difference between price-intent
+content ranking in October and ranking in December. I have now recommended it
+four days running, the cost estimate has gone *up* each time as I understood the
+pipeline better, and it remains undone. If only one thing on this list happens
+this week, make it rec 1 — and rec 2, because rec 1 does nothing without it.
+
+**Where I changed my mind.** Yesterday's entry made a confident case that the
+placeless homepage title explains the 21,810-impression Philadelphia flood, and I
+inherited that as near-settled. Today's research turned up a mechanism that
+produces the same signature — AI Overview and AI-surface impressions at middling
+positions, which by their nature do not click — and would not be repaired by a
+title rewrite. I have not shown that is what is happening. I have shown that
+yesterday's hypothesis is one of at least two, which is why the title dropped
+from rec 1 to rec 3. Yesterday's 30-day prediction should be scored with that
+caveat attached, and it was made in good faith on the evidence then available.
+
+**Where I am least sure: whether this journal is measuring the right thing at
+all.** `top3` has moved by one position in twelve days and the denominator moves
+every morning because the scout keeps adding queries. Meanwhile the number that
+would actually tell Eric something — 83 visitors, 0 taps — is a conversion
+problem, not a ranking problem, and no amount of rank fixes a site nobody rings.
+I do not think the answer is to stop doing SEO; a site with 7 clicks in 28 days
+has a traffic problem too. But if I am wrong about anything structural here, it
+is that twelve days of these reviews have spent most of their words on rank while
+the tap rate sat at 0/83 and went unexamined until today.
+
+**What would change my mind about the whole strategy.** The 08-16 test stands
+unchanged: 7-day median daily `organic_visitors` ≥ 2. It is 1.0 and flat, nine
+days out. Separately, and newly: if `call_taps` is still 0 on 2026-08-20 with
+more than 150 cumulative visitors since 07-30, then the bottleneck is conversion
+rather than acquisition, and the ranked list above is mostly aimed at the wrong
+half of the problem. I am recording that threshold now, before the result.

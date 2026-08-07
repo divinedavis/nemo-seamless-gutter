@@ -244,6 +244,53 @@ class CallTaps(BaseCollect):
         self.assertEqual(m["call_taps"], 0)
 
 
+class AnswerEngineCrawlers(BaseCollect):
+    """Whether the AI crawlers reach the site at all — T046's whole question.
+
+    Every one of these agents is already excluded as a bot. The point of the
+    counters is that "excluded" and "never came" look identical in bot_hits,
+    and only one of those two is a problem worth an afternoon.
+    """
+
+    GPTBOT = "Mozilla/5.0 AppleWebKit/537.36 (compatible; GPTBot/1.2; +https://openai.com/gptbot)"
+    PERPLEXITY = "Mozilla/5.0 (compatible; PerplexityBot/1.0; +https://perplexity.ai/perplexitybot)"
+
+    def test_a_gptbot_fetch_is_counted(self):
+        m = self.collect(line("203.0.113.5", "/", ua=self.GPTBOT))
+        self.assertEqual(m["crawl_gptbot"], 1)
+
+    def test_a_crawler_that_never_came_reads_zero_not_missing(self):
+        m = self.collect(visit("192.0.2.30"))
+        for key in metrics.CRAWLER_SERIES:
+            self.assertEqual(m[key], 0, f"{key} must be a real zero")
+
+    def test_a_blocked_crawler_still_counts(self):
+        # A 403 from a CDN rule is the finding, not something to filter out.
+        m = self.collect(line("203.0.113.6", "/", ua=self.PERPLEXITY, status=403))
+        self.assertEqual(m["crawl_perplexitybot"], 1)
+
+    def test_crawlers_are_still_bots_not_visitors(self):
+        m = self.collect(line("203.0.113.7", "/", ua=self.GPTBOT))
+        self.assertEqual(m["visitors"], 0)
+        self.assertEqual(m["bot_hits"], 1)
+
+    def test_one_hit_is_charged_to_one_crawler(self):
+        # ChatGPT-User contains neither "GPTBot" nor "bingbot"; the break in
+        # the match loop is what keeps a UA from being double-counted if the
+        # patterns ever overlap.
+        m = self.collect(line("203.0.113.8", "/", ua=self.GPTBOT))
+        self.assertEqual(sum(m[k] for k in metrics.CRAWLER_SERIES), 1)
+
+    def test_bingbot_is_the_control(self):
+        m = self.collect(line("203.0.113.9", "/", ua="Mozilla/5.0 (compatible; bingbot/2.0)"))
+        self.assertEqual(m["crawl_bingbot"], 1)
+        self.assertEqual(m["crawl_gptbot"], 0)
+
+    def test_the_owner_is_not_a_crawler(self):
+        m = self.collect(line("192.0.2.31", "/", ua=self.GPTBOT, owner="1"))
+        self.assertEqual(m["crawl_gptbot"], 0)
+
+
 class Rotations(unittest.TestCase):
     """A backfill is only as deep as the archives it bothers to open."""
 

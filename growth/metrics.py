@@ -82,6 +82,27 @@ BOT_RE = re.compile(
     r"nemohealthcheck",
     re.I)
 
+# The crawlers whose absence would silently invalidate the whole GEO effort.
+# Every one of these is already counted in bot_hits and then forgotten, so the
+# ledger could say "1,448 bots came" without being able to say whether any of
+# them was the one that decides if NEMO appears in a ChatGPT answer. robots.txt
+# names all of them Allow, but robots.txt is a request, not a guarantee — a
+# host or CDN rule sits above it, and the log is the only place that records
+# what actually happened. Bingbot is here as the control: if it is fetching and
+# GPTBot is not, the block is AI-specific rather than the site being down.
+AI_CRAWLERS = (
+    ("gptbot", re.compile(r"GPTBot", re.I)),
+    ("oai_searchbot", re.compile(r"OAI-SearchBot", re.I)),
+    ("chatgpt_user", re.compile(r"ChatGPT-User", re.I)),
+    ("perplexitybot", re.compile(r"PerplexityBot|Perplexity-User", re.I)),
+    ("claudebot", re.compile(r"ClaudeBot|anthropic-ai|Claude-Web", re.I)),
+    ("google_extended", re.compile(r"Google-Extended", re.I)),
+    ("applebot", re.compile(r"Applebot", re.I)),
+    ("bingbot", re.compile(r"bingbot|BingPreview", re.I)),
+    ("googlebot", re.compile(r"Googlebot", re.I)),
+)
+CRAWLER_SERIES = tuple(f"crawl_{name}" for name, _ in AI_CRAWLERS)
+
 # Chrome shipped v70 in 2018 and Firefox v60 the same year. A UA claiming
 # something older is not a York County homeowner on an old laptop — those still
 # auto-update. In the audit these were single IPs making hundreds of requests
@@ -419,7 +440,8 @@ def collect(days=1, end=None, log_path=None, resolver=None, roster=None):
         if ua and ua != "-" and not BOT_RE.search(ua):
             s["uas"].add(ua)
 
-    per_day = {d: {"visitors": {}, "pages": 0, "bots": 0, "taps": set()} for d in dates}
+    per_day = {d: {"visitors": {}, "pages": 0, "bots": 0, "taps": set(),
+                   "crawlers": dict.fromkeys(CRAWLER_SERIES, 0)} for d in dates}
     for m in matches:
         d = _parse_ts(m.group("ts"))
         if d not in per_day:
@@ -431,6 +453,15 @@ def collect(days=1, end=None, log_path=None, resolver=None, roster=None):
         # point of the opt-out.
         if (d, ip) in owner_seen:
             continue
+        # Counted before the bot gates below, precisely because every one of
+        # these is a bot and would otherwise vanish into the bot_hits total.
+        # Any status counts: a 403 from the CDN is the answer T046 is asking
+        # for, and dropping it would make a blocked crawler look identical to
+        # one that never came.
+        for name, pat in AI_CRAWLERS:
+            if pat.search(ua or ""):
+                per_day[d]["crawlers"][f"crawl_{name}"] += 1
+                break
         # An empty user agent is not a browser. Every browser sends one.
         if not (ua or "").strip() or ua.strip() == "-":
             per_day[d]["bots"] += 1
@@ -486,6 +517,7 @@ def collect(days=1, end=None, log_path=None, resolver=None, roster=None):
             "referral_visitors": len(chan.get("referral", ())),
             "campaign_visitors": len(chan.get("campaign", ())),
         }
+        mm.update(per_day[d]["crawlers"])
         for slug, prefixes in prefixed:
             n = sum(1 for v in vis.values()
                     if any(p.startswith(pre) for p in v["paths"] for pre in prefixes))

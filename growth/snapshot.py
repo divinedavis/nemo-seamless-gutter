@@ -37,7 +37,7 @@ JOURNAL_PATH = os.path.join(HERE, "JOURNAL.md")
 SERIES = ("visitors", "pageviews", "organic_visitors", "local_visitors",
           "ai_visitors", "direct_visitors", "referral_visitors",
           "campaign_visitors", "bot_hits", "call_taps", "ai_calls",
-          "bookings", "phone_leads", "total_leads")
+          "bookings", "phone_leads", "total_leads") + metrics.CRAWLER_SERIES
 
 PII_PATTERNS = (
     (re.compile(r"\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b"), "phone number"),
