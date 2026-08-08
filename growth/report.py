@@ -150,11 +150,22 @@ def build_text(run_log=None, review_out=None, scout_out=None):
     L.append("")
 
     # ---- what ran ----------------------------------------------------------
+    # Only techniques that actually did something. A technique that found
+    # nothing to do is not news, and a report where nine of eleven lines say
+    # "nothing was due" buries the one line that matters. Failures always
+    # print — a step that broke is an action item even though it changed
+    # nothing.
     if run_log:
-        L.append("WHAT RAN THIS MORNING")
-        for r in run_log:
-            mark = "ok  " if r.get("ok") else "FAIL"
-            L.append(f"  [{mark}] {r['slug']:<16} {r.get('detail', '')}")
+        acted = [r for r in run_log if not r.get("noop") or not r.get("ok")]
+        if acted:
+            L.append("WHAT RAN THIS MORNING")
+            for r in acted:
+                mark = "ok  " if r.get("ok") else "FAIL"
+                L.append(f"  [{mark}] {r['slug']:<16} {r.get('detail', '')}")
+        else:
+            L.append("WHAT RAN THIS MORNING")
+            L.append(f"  Nothing needed doing — all {len(run_log)} active techniques "
+                     f"found the site already up to date.")
         L.append("")
 
     # ---- per-technique performance ----------------------------------------

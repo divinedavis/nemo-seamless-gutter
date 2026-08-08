@@ -653,14 +653,32 @@ def rebuild_sitemap(ctx):
     script = os.path.join(ctx.docroot, "seo", "gen_sitemap.py")
     if not os.path.exists(script):
         return {"ok": False, "detail": "seo/gen_sitemap.py not found"}
+
+    # The generator rewrites sitemap.xml every run whether or not the site
+    # changed, so "wrote 39 URLs" is not evidence anything happened. Compare
+    # the file either side of the run and report a no-op when it is identical,
+    # otherwise this line appears in the report every single morning.
+    sitemap = os.path.join(ctx.docroot, "sitemap.xml")
+    try:
+        before = open(sitemap, "rb").read()
+    except Exception:
+        before = None
     try:
         p = subprocess.run(["python3", script],
                            env=dict(os.environ, WEB_ROOT=ctx.docroot),
                            cwd=ctx.docroot, capture_output=True, text=True, timeout=120)
     except Exception as e:
         return {"ok": False, "detail": f"sitemap rebuild failed: {e}"}
+    try:
+        after = open(sitemap, "rb").read()
+    except Exception:
+        after = None
+
     tail = (p.stdout or p.stderr or "").strip().splitlines()
-    return {"ok": p.returncode == 0, "detail": tail[-1] if tail else "rebuilt"}
+    detail = tail[-1] if tail else "rebuilt"
+    unchanged = before is not None and after == before
+    return {"ok": p.returncode == 0, "noop": unchanged,
+            "detail": "sitemap.xml unchanged" if unchanged else detail}
 
 
 def ping_indexnow(ctx):

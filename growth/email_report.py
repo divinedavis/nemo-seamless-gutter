@@ -328,10 +328,23 @@ def _discovered_card(audience="internal"):
 
 
 def _ran_card(run_log):
+    """Only the techniques that changed something, plus anything that failed.
+
+    A no-op is not news. Listing every technique that found nothing to do
+    makes the card long enough to scroll past, which is how the one line
+    reporting a real change gets missed.
+    """
     if not run_log:
         return ""
+    acted = [r for r in run_log if not r.get("noop") or not r.get("ok")]
+    if not acted:
+        return _card(_h("What ran this morning", NAVY)
+                     + f'<div style="font:400 16px {FONT};color:{MUTED};'
+                       f'line-height:1.5">Nothing needed doing — all '
+                       f'{len(run_log)} active techniques found the site '
+                       f'already up to date.</div>')
     rows = []
-    for r in run_log:
+    for r in acted:
         ok = r.get("ok")
         chip = (f'<span style="background:{"#dcfce7" if ok else "#fee2e2"};'
                 f'color:{GOOD if ok else BAD};font:600 13px {FONT};'
