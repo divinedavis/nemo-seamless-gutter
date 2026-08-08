@@ -4880,3 +4880,26 @@ days out. Separately, and newly: if `call_taps` is still 0 on 2026-08-20 with
 more than 150 cumulative visitors since 07-30, then the bottleneck is conversion
 rather than acquisition, and the ranked list above is mostly aimed at the wrong
 half of the problem. I am recording that threshold now, before the result.
+
+## 2026-08-08 — engine run
+
+Goal: **0.7%** top-3 share of 146 tracked queries (target 50%).
+2026-08-07: 7 visitors (0 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — ok: added "Gutter Cleaning Near You in York County: Where We Work and W" to /services/gutter-cleaning-repair.html for 'gutter cleaning near me'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: no query needs its own page — the remaining gaps all belong on pages that exist, which strengthen_pages handles
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 39 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 1 URL(s), HTTP 200
+
+**Scout proposed (as candidates, not running):**
+- T048 Claim & complete the Foursquare Places listing — The ledger's AI-answer work (Brave, Bing Places, Apple, FAQ schema) assumes the engines read websites and Bing. ChatGPT's local recommendations largely don't — they come out of a licensed places datas
+- T049 Measure the phone before fixing it: GBP call clicks + tel: click tracking — '0 phone-agent leads' is the weakest number in the business and nobody actually knows what it means. Three very different failures produce the same zero: nobody taps the call button (a profile/persuas
+- T050 Appointment/booking link on the Business Profile, aimed at a free measurement — 300 profile views a month produce nothing because the profile offers exactly one action a nervous stranger has to take: phone a contractor they've never met and negotiate. Bookings is the one interact

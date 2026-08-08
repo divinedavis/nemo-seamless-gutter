@@ -1,6 +1,6 @@
 {
-  "generated": "2026-08-07T06:03:26+00:00",
-  "date": "2026-08-07",
+  "generated": "2026-08-08T06:02:43+00:00",
+  "date": "2026-08-08",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
@@ -8,11 +8,11 @@
     "share_pct": 0.7,
     "measured": true,
     "why_unmeasured": null,
-    "coverage_pct": 37.9,
-    "tracked_queries": 140,
+    "coverage_pct": 37.0,
+    "tracked_queries": 146,
     "top3": 1,
     "top10": 8,
-    "ranked_known": 22
+    "ranked_known": 23
   },
   "traffic": {
     "visitors": [
@@ -66,6 +66,10 @@
       },
       {
         "date": "2026-08-06",
+        "value": 7
+      },
+      {
+        "date": "2026-08-07",
         "value": 7
       }
     ],
@@ -121,6 +125,10 @@
       {
         "date": "2026-08-06",
         "value": 10
+      },
+      {
+        "date": "2026-08-07",
+        "value": 9
       }
     ],
     "organic_visitors": [
@@ -175,6 +183,10 @@
       {
         "date": "2026-08-06",
         "value": 1
+      },
+      {
+        "date": "2026-08-07",
+        "value": 0
       }
     ],
     "local_visitors": [
@@ -229,6 +241,10 @@
       {
         "date": "2026-08-06",
         "value": 1
+      },
+      {
+        "date": "2026-08-07",
+        "value": 0
       }
     ],
     "ai_visitors": [
@@ -282,6 +298,10 @@
       },
       {
         "date": "2026-08-06",
+        "value": 0
+      },
+      {
+        "date": "2026-08-07",
         "value": 0
       }
     ],
@@ -337,6 +357,10 @@
       {
         "date": "2026-08-06",
         "value": 3
+      },
+      {
+        "date": "2026-08-07",
+        "value": 7
       }
     ],
     "referral_visitors": [
@@ -390,6 +414,10 @@
       },
       {
         "date": "2026-08-06",
+        "value": 0
+      },
+      {
+        "date": "2026-08-07",
         "value": 0
       }
     ],
@@ -445,6 +473,10 @@
       {
         "date": "2026-08-06",
         "value": 0
+      },
+      {
+        "date": "2026-08-07",
+        "value": 0
       }
     ],
     "bot_hits": [
@@ -499,6 +531,10 @@
       {
         "date": "2026-08-06",
         "value": 1448
+      },
+      {
+        "date": "2026-08-07",
+        "value": 2252
       }
     ],
     "call_taps": [
@@ -532,6 +568,10 @@
       },
       {
         "date": "2026-08-06",
+        "value": 0
+      },
+      {
+        "date": "2026-08-07",
         "value": 0
       }
     ],
@@ -570,6 +610,10 @@
       },
       {
         "date": "2026-08-06",
+        "value": 0
+      },
+      {
+        "date": "2026-08-07",
         "value": 0
       }
     ],
@@ -625,6 +669,10 @@
       {
         "date": "2026-08-06",
         "value": 0
+      },
+      {
+        "date": "2026-08-07",
+        "value": 0
       }
     ],
     "phone_leads": [
@@ -678,6 +726,10 @@
       },
       {
         "date": "2026-08-06",
+        "value": 0
+      },
+      {
+        "date": "2026-08-07",
         "value": 0
       }
     ],
@@ -733,6 +785,10 @@
       {
         "date": "2026-08-06",
         "value": 0
+      },
+      {
+        "date": "2026-08-07",
+        "value": 0
       }
     ]
   },
@@ -744,8 +800,8 @@
   "keywords": {
     "by_town": {
       "county": {
-        "total": 79,
-        "covered": 31,
+        "total": 81,
+        "covered": 32,
         "top3": 1
       },
       "hanover": {
@@ -754,7 +810,7 @@
         "top3": 0
       },
       "dover": {
-        "total": 12,
+        "total": 13,
         "covered": 4,
         "top3": 0
       },
@@ -764,32 +820,32 @@
         "top3": 0
       },
       "dallastown": {
-        "total": 8,
+        "total": 9,
         "covered": 3,
         "top3": 0
       },
       "spring-grove": {
-        "total": 8,
+        "total": 9,
         "covered": 3,
         "top3": 0
       },
       "york": {
-        "total": 19,
+        "total": 20,
         "covered": 5,
         "top3": 0
       }
     },
     "by_intent": {
       "hire": {
-        "total": 90,
-        "covered": 45
+        "total": 94,
+        "covered": 46
       },
       "price": {
-        "total": 30,
+        "total": 31,
         "covered": 3
       },
       "diy": {
-        "total": 7,
+        "total": 8,
         "covered": 1
       },
       "check": {
@@ -811,14 +867,15 @@
       "fascia and soffit repair spring grove pa",
       "fascia and soffit repair york pa",
       "gutter cleaning dallastown pa",
-      "gutter cleaning near me",
       "gutter cleaning red lion pa",
+      "gutter cleaning spring grove pa",
       "gutter companies near dallastown pa",
       "gutter company york pa",
       "gutter contractor near me spring grove pa",
       "gutter contractor open saturday york pa",
       "gutter contractor red lion pa",
       "gutter contractors york pa",
+      "gutter guard installation dallastown pa",
       "gutter installation dover",
       "gutter installation york",
       "gutter installers dover pa",
@@ -837,8 +894,10 @@
       "ice dam damage gutter replacement york county pa",
       "schuylkill county seamless gutter",
       "seamless gutter company spring grove pa",
+      "seamless gutter installation york pa",
       "seamless gutter installers dallastown pa",
       "seamless gutter installers hanover pa",
+      "soffit and fascia repair dover pa",
       "soffit and fascia repair spring grove pa",
       "soffit and fascia repair york pa",
       "who installs gutters in dover pa",
@@ -860,6 +919,7 @@
       "gutter guard installation cost per foot",
       "gutter guard installation cost york pa",
       "gutter installation cost per foot pennsylvania",
+      "gutter overflowing during heavy rain what to do",
       "gutter overflowing in heavy rain",
       "gutter overflowing in heavy rain what to do",
       "gutter pulling away from house repair",
@@ -882,6 +942,7 @@
       "seamless gutter cost per linear foot pa",
       "seamless gutter installation cost per linear foot pennsylvania",
       "seamless gutter installation cost york pa",
+      "seamless gutters cost per foot installed pa",
       "seamless gutters vs sectional gutters",
       "what size gutters do i need",
       "why do my gutters overflow when it rains"
@@ -1130,14 +1191,14 @@
     ]
   },
   "gsc": {
-    "date": "2026-08-07",
+    "date": "2026-08-08",
     "ok": true,
     "connected": true,
-    "rows": 618,
-    "matched": 22,
+    "rows": 624,
+    "matched": 23,
     "clicks": 7,
-    "impressions": 21810,
-    "avg_position": 24.8
+    "impressions": 21963,
+    "avg_position": 24.9
   },
   "techniques": [
     {
@@ -1201,6 +1262,10 @@
         },
         {
           "date": "2026-08-06",
+          "value": 0
+        },
+        {
+          "date": "2026-08-07",
           "value": 0
         }
       ]
@@ -1266,6 +1331,10 @@
         },
         {
           "date": "2026-08-06",
+          "value": 0
+        },
+        {
+          "date": "2026-08-07",
           "value": 0
         }
       ]
@@ -1606,6 +1675,10 @@
         },
         {
           "date": "2026-08-06",
+          "value": 0
+        },
+        {
+          "date": "2026-08-07",
           "value": 0
         }
       ]
@@ -2131,6 +2204,60 @@
       "notes": "first step: Write the 20-word ask Eric says out loud at the truck before he drives away \u2014 asking the customer to mention which gutter work was done and which town they're in \u2014 and use it on the very next completed job this week. No incentive, no gating, no filtering by expected rating.\neffort: hours\ncost: free\nexpected: 13 reviews to 22-25 by end of November at a steady 2-3/month, with at least 60% of new ones naming a specific service (seamless install, guards, cleaning, half-round/copper) and a York County town in the body. Leading indicator: Google starts showing service-term justifications under the listing in search. Target 4.4+ stars and first top-3 map-pack appearances for a service-plus-town query by January.",
       "verdict": null,
       "owned_visitors": null
+    },
+    {
+      "id": "T048",
+      "slug": "foursquare_places_claim_for_ai_answers",
+      "name": "Claim & complete the Foursquare Places listing",
+      "kind": "indexing",
+      "status": "candidate",
+      "hypothesis": "The ledger's AI-answer work (Brave, Bing Places, Apple, FAQ schema) assumes the engines read websites and Bing. ChatGPT's local recommendations largely don't \u2014 they come out of a licensed places dataset most trades have never touched. A York homeowner asking ChatGPT 'who installs seamless gutters near York PA' gets a 2-3 name shortlist and dials one of them; NEMO cannot be on that shortlist if it does not exist in the dataset. One free hour of data entry (exact NAP matching the GBP, categories, hours, service area, photos) buys eligibility for a channel where the competitor set in York County is almost certainly empty.",
+      "evidence": "Reported that roughly 60-70% of the local businesses ChatGPT surfaces first are pulled from Foursquare's Places API, and that most trades businesses have never touched their Foursquare listing \u2014 https://www.hossainulsazzad.com/blog/ai-search-optimization-local-business ; corroborated at https://studiomeyer.io/en/blog/local-ai-discovery-2026 which also cites SOCi's 2026 index finding ChatGPT recommends only ~1.2% of business locations, and https://www.hossainulsazzad.com/blog/ai-search-optimization-local-business reporting AI use to find a local business jumped from 6% to 45% of consumers in a year. NAP consistency is the gating factor: BrightLocal data cited at https://bizinabox.one/blog/how-chatgpt-decides-which-local-business-to-recommend-the-answer-will-surprise-y found 73% of AI-recommended local businesses had complete, consistent NAP across major directories.",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-08",
+      "added": "2026-08-08",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Search Foursquare for 'NEMO Seamless Gutter York PA'; if an unclaimed record exists, claim it, otherwise add it \u2014 using the exact same business name, phone and service-area setup as the Google Business Profile, character for character.\neffort: hours\ncost: free\nexpected: Listing live and verified within 14 days. Baseline test first: ask ChatGPT, Gemini and Perplexity 'seamless gutter installer York PA' 5x each and record how many name NEMO (expect 0/15 today). Re-test at 30 and 60 days; success = named in at least 4/15 by day 60, and at least 1 caller who says an AI or Siri gave them the name.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T049",
+      "slug": "call_instrumentation_baseline",
+      "name": "Measure the phone before fixing it: GBP call clicks + tel: click tracking",
+      "kind": "conversion",
+      "status": "candidate",
+      "hypothesis": "'0 phone-agent leads' is the weakest number in the business and nobody actually knows what it means. Three very different failures produce the same zero: nobody taps the call button (a profile/persuasion problem), people tap and never dial (a friction problem), or people dial and the AI agent loses them (a handling problem). Each has a different fix and the ledger has candidates for all three \u2014 but with no call data Eric will spend the whole leaf season guessing which one to run. Google still reports click-to-call on the Business Profile even though call history was killed, and a tel: click event on the site costs nothing to add. This is the same move as connecting Search Console, which is the one thing already measured as WORKING: it makes the goal legible.",
+      "evidence": "Google confirms chat and call history were retired but states the Click to Call metric is unaffected \u2014 https://uberall.helpjuice.com/en_US/google/changes-to-google-business-messages-and-call-history and https://support.google.com/business/answer/14919056 . Contractor-side, call tracking is repeatedly named as the way to see which keywords and pages produce phone leads rather than traffic \u2014 https://www.builderleadconverter.com/blog/how-to-get-more-construction-leads/ . The stakes: high-intent home-services phone leads are reported converting around 46% on the call, versus ~2.6% for construction paid-search clicks \u2014 https://constructionsnapshotforghl.com/blog/construction-lead-conversion-rate/",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-08",
+      "added": "2026-08-08",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Open Business Profile \u2192 Performance, set the date range to the last 90 days, and write down the 'Calls' number per month \u2014 that single figure decides which of the ledger's call candidates gets built first.\neffort: hours\ncost: free\nexpected: Within 7 days: a weekly number for GBP 'calls' clicks (out of ~300 views), site tel: taps by page, and calls actually answered by the AI agent. Success at 30 days = the three numbers reconcile and name the leak, e.g. '11 GBP call clicks, 4 tel: taps, 2 answered calls' \u2014 which tells Eric whether to run the profile fix, the call-first fix, or the AI-agent fix. Target after the fix: GBP calls \u2265 3% of profile views (~9/mo) by 1 Nov.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T050",
+      "slug": "gbp_appointment_link_free_measurement",
+      "name": "Appointment/booking link on the Business Profile, aimed at a free measurement",
+      "kind": "conversion",
+      "status": "candidate",
+      "hypothesis": "300 profile views a month produce nothing because the profile offers exactly one action a nervous stranger has to take: phone a contractor they've never met and negotiate. Bookings is the one interaction feature Google has left switched on \u2014 chat, quote requests and call history are all dead \u2014 and the booking link sits on the profile itself, where the hire-intent searches actually land, not on a website 7 people a day visit. A dated, named, zero-commitment offer ('free 15-minute measurement, Saturday windows') gives the 8pm viewer and the who-doesn't-want-to-talk-to-a-salesman viewer somewhere to go, and every one of those is a York County homeowner already staring at their own gutters.",
+      "evidence": "Google's Business Profile help confirms customers can no longer request quotes and that chat/messaging is gone \u2014 https://support.google.com/business/answer/14919056 \u2014 while a 2026 status review finds Bookings (Reserve with Google / appointment links) is the one engagement feature genuinely live \u2014 https://www.mbadv.agency/google-business-profile/using-messaging-in-google-business-profile . Behavioural signals such as clicks, calls and direction requests rose in importance in the 2026 Whitespark ranking-factor work \u2014 https://lanternrow.com/blog/google-business-profile-optimization-for-local-service-businesses/ \u2014 so the added action may help prominence as well as bookings. Speed matters once it fires: home-services research cited at https://www.estatehub.io/articles/2026-benchmarks-lead-conversion-rates-home-services reports 78% of customers buy from the first responder.",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-08",
+      "added": "2026-08-08",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: In the Business Profile editor, add the booking widget URL (with ?utm_source=gbp) to the appointment link field, and change the widget's first slot label to 'Free 15-minute gutter measurement \u2014 York County'.\neffort: hours\ncost: free\nexpected: Appointment link live within 2 days with UTM tagging. Success = \u22656 booking-link clicks and \u22652 booked measurements per month from the profile by October, and the link becomes the second-largest source of estimates after direct calls.",
+      "verdict": null,
+      "owned_visitors": null
     }
   ],
   "scoreboard": {
@@ -2184,11 +2311,14 @@
       "T044",
       "T045",
       "T046",
-      "T047"
+      "T047",
+      "T048",
+      "T049",
+      "T050"
     ]
   },
   "last_build": {
-    "date": "2026-08-07",
+    "date": "2026-08-08",
     "log": [
       {
         "ok": true,
@@ -2210,7 +2340,7 @@
       },
       {
         "ok": true,
-        "detail": "added \"Gutter Installation Near You in York County, PA\" to /services/seamless-gutter-installation.html for 'gutter installation near me'",
+        "detail": "added \"Gutter Cleaning Near You in York County: Where We Work and W\" to /services/gutter-cleaning-repair.html for 'gutter cleaning near me'",
         "slug": "strengthen_pages"
       },
       {
@@ -2258,16 +2388,20 @@
     "changed": 1
   },
   "last_scout": {
-    "date": "2026-08-07",
+    "date": "2026-08-08",
     "ok": true,
     "techniques_added": [
-      "property_manager_fall_cleaning_contracts",
-      "ai_crawler_access_audit",
-      "review_justification_wording"
+      "foursquare_places_claim_for_ai_answers",
+      "call_instrumentation_baseline",
+      "gbp_appointment_link_free_measurement"
     ],
     "keywords_added": [
-      "gutter guard installation cost",
-      "half round gutters historic home pa"
+      "seamless gutter installation york pa",
+      "seamless gutters cost per foot installed pa",
+      "gutter guard installation dallastown pa",
+      "gutter cleaning spring grove pa",
+      "gutter overflowing during heavy rain what to do",
+      "soffit and fascia repair dover pa"
     ],
     "notes": ""
   },
