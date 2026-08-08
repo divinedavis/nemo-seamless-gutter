@@ -213,12 +213,29 @@ h3{font-family:"Archivo",sans-serif;font-weight:700}
 .footer-bottom{display:flex;justify-content:space-between;gap:16px;padding-top:22px;font-size:.85rem;color:rgba(255,255,255,.6);flex-wrap:wrap}
 
 /* ===== Floating call ===== */
-.float-call{
-  position:fixed;right:20px;bottom:20px;z-index:50;
-  width:56px;height:56px;border-radius:50%;display:none;place-items:center;
-  background:var(--orange);color:#fff;box-shadow:0 14px 30px -8px rgba(241,108,39,.7);
+/* Persistent tap-to-call bar.
+ *
+ * Replaces the round icon-only button that used to sit here. A homeowner
+ * standing in the rain looking at an overflowing gutter should not have to
+ * work out what an unlabelled circle does — the bar says "Call" and shows the
+ * number, which also means the number is readable to someone on a desktop
+ * screenshot or a printout.
+ *
+ * It appears at exactly the width where the header's call button disappears,
+ * so there is always one obvious way to ring the business and never two
+ * competing ones. tel: taps are picked up by the delegated listener in
+ * analytics.js, so this is counted in /e/call-tap like every other call link.
+ */
+.call-bar{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;
+  display:none;align-items:center;justify-content:center;gap:10px;
+  padding:14px 20px;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px));
+  background:var(--orange);color:#fff;text-decoration:none;
+  font-family:"Archivo",sans-serif;font-weight:700;font-size:1.06rem;
+  box-shadow:0 -8px 24px -10px rgba(15,23,42,.45);
 }
-.float-call svg{width:25px;height:25px}
+.call-bar svg{width:22px;height:22px;flex:none}
+.call-bar .call-bar-sub{font-weight:600;font-size:.82rem;opacity:.9}
 
 /* ===== Responsive ===== */
 @media (max-width:980px){
@@ -239,7 +256,13 @@ h3{font-family:"Archivo",sans-serif;font-weight:700}
   .features-grid,.services-grid{grid-template-columns:1fr}
   .about-stats{grid-template-columns:1fr 1fr}
   .footer-inner{grid-template-columns:1fr}
-  .float-call{display:grid}
+  .call-bar{display:flex}
+  /* Keep the bar off the footer's last line at the bottom of the scroll. */
+  body{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+  /* A fixed bottom bar sits exactly where the on-screen keyboard puts the
+   * booking form's fields. Fold it away while anything is focused so it
+   * cannot cover the input someone is typing into. */
+  body:has(input:focus,select:focus,textarea:focus) .call-bar{display:none}
   .hero-inner{padding-top:110px}
 }
 
