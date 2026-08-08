@@ -4903,3 +4903,414 @@ Goal: **0.7%** top-3 share of 146 tracked queries (target 50%).
 - T048 Claim & complete the Foursquare Places listing — The ledger's AI-answer work (Brave, Bing Places, Apple, FAQ schema) assumes the engines read websites and Bing. ChatGPT's local recommendations largely don't — they come out of a licensed places datas
 - T049 Measure the phone before fixing it: GBP call clicks + tel: click tracking — '0 phone-agent leads' is the weakest number in the business and nobody actually knows what it means. Three very different failures produce the same zero: nobody taps the call button (a profile/persuas
 - T050 Appointment/booking link on the Business Profile, aimed at a free measurement — 300 profile views a month produce nothing because the profile offers exactly one action a nervous stranger has to take: phone a contractor they've never met and negotiate. Bookings is the one interact
+
+## 2026-08-08 — review agent
+
+### Lead: the engine has two queues that grow faster than anything drains them, and the goal metric is defined so that working on it makes the number go down
+
+Yesterday's entry established that `strengthen_pages` is the only technique left
+writing content and that it writes one section per run. Today I measured the
+other side of that pipe, and the two numbers together are the story of this
+project:
+
+| | 08-01 | 08-08 | per day |
+| --- | --- | --- | --- |
+| tracked queries | 108 | **146** | **+5.4 in** |
+| covered | 44 | **54** | **+1.4 out** |
+| **uncovered backlog** | 64 | **92** | **+4.0 net** |
+| candidate techniques | 17 | **38** | **+3.0 in, 0 out** |
+
+The backlog has grown **every single day** for eight days. It is not a queue
+being worked through; it is a queue diverging.
+
+And it cannot be fixed by writing faster. `BUDGET.md` rule 2 — "One unit of work
+per technique per run" — forbids looping the queue, for two stated reasons that
+are both correct: it is how the API account got capped twice already, and it is
+what Google's scaled-content-abuse policy is aimed at. So the drain rate of 1/day
+is a deliberate, defensible ceiling. Which means **the only thing that can close
+this gap is the intake side**, and the intake side is `scout.py:27`
+(`MAX_KEYWORDS_PER_DAY = 12`), running at about 5.4/day.
+
+There is a second-order problem underneath that, and it is worse. The goal number
+is `share_pct = 100 * top3 / total` at `keywords.py:296`, where `total` is the
+**whole tracked universe**. The scout is shown that number in its own prompt
+(`scout.py:86-90`, rendered into the prompt at the `THE GOAL` block) and then
+instructed to add up to twelve more queries to the denominator. **The scout is
+graded on a number it degrades by doing its job.** If `top3` holds at 1 and
+intake holds at 5.4/day, the goal reads 0.7% today, 0.6% by 20 August and 0.5%
+by early September — with the site unchanged or better. Nobody built this on
+purpose; it is what you get when a demand map and a work queue are the same list.
+
+`scout.py`'s own docstring says new queries are "pure upside and cost nothing".
+That is the sentence I would most like struck from this repo. I struck it; see
+below.
+
+### Where the numbers stand
+
+The goal metric — tracked York County queries holding a top-3 position:
+
+| | 08-02 | 08-03 | 08-04 | 08-05 | 08-06 | 08-07 | 08-08 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **top-3 count** | 2 | 2 | 2 | 1 | 1 | 1 | **1** |
+| top-10 count | 7 | 8 | 8 | 8 | 8 | 8 | **8** |
+| `ranked_known` | 22 | 22 | 22 | 22 | 22 | 22 | **23** |
+| tracked queries | 117 | 122 | 127 | 127 | 138 | 140 | **146** |
+| share (`top3/total`) | 1.7% | 1.6% | 1.6% | 0.8% | 0.7% | 0.7% | **0.7%** |
+| honest share (`top3/ranked_known`) | 9.1% | 9.1% | 9.1% | 4.5% | 4.5% | 4.5% | **4.3%** |
+
+Top-3 flat at 1 for a fourth day. Top-10 flat at 8 for a seventh. `ranked_known`
+moved for the first time in eight days, 22 → 23 — one more tracked query that
+Search Console now returns a position for. That is the only forward movement in
+the goal block today, and it is one query. **Nothing else moved. Nothing has
+moved toward the goal in seven days.**
+
+Per town — every named town is zero and has been for all thirteen measured days:
+
+| bucket | total | covered | top-3 |
+| --- | --- | --- | --- |
+| county | 81 (+2) | 32 (+1) | **1** |
+| york | 20 (+1) | 5 | 0 |
+| dover | 13 (+1) | 4 | 0 |
+| dallastown | 9 (+1) | 3 | 0 |
+| spring-grove | 9 (+1) | 3 | 0 |
+| red-lion | 8 | 3 | 0 |
+| hanover | 6 | 4 | 0 |
+
+Intent coverage: hire **46/94**, price **3/31**, check 4/13, diy 1/8. **Price has
+now been stuck on 3 covered for ten days** while its total grew from 25 to 31.
+That is the leaf-fall problem in one row.
+
+Search Console, 28-day rolling: rows **624** (+6), matched **23** (+1), clicks
+**7** (flat, sixth day), impressions **21,963** (+153), avg position **24.9**
+(+0.1). Site-wide CTR is **0.032%**.
+
+Traffic (nginx, bots and owner IPs excluded):
+
+| | 08-02 | 08-03 | 08-04 | 08-05 | 08-06 | 08-07 |
+| --- | --- | --- | --- | --- | --- | --- |
+| visitors | 9 | 32 | 10 | 6 | 7 | **7** |
+| pageviews | 14 | 70 | 35 | 8 | 10 | **9** |
+| organic | 0 | 2 | 2 | 1 | 1 | **0** |
+| direct | 9 | 28 | 7 | 5 | 3 | **7** |
+| local (maps) | 0 | 0 | 0 | 0 | 1 | **0** |
+| AI-referred | 0 | 0 | 0 | 0 | 0 | **0** |
+| bot hits | 1,554 | 2,189 | 1,612 | 1,894 | 1,448 | **2,252** |
+
+`call_taps` **0 for nine days**. `ai_calls` 0 for seven. `bookings` 0 since 07-30.
+All-time: **1 booking, 0 phone leads.** Cumulative visitors since 07-30: **90**.
+
+The engine itself is healthy. Eleven build steps, all `ok`, one section written
+(`gutter cleaning near me` onto `/services/gutter-cleaning-repair.html`), sitemap
+39 URLs, IndexNow HTTP 200, scout ran clean and filed T048–T050. **No billing
+block today** — neither failure mode in `BUDGET.md` is present.
+
+### Did previous changes work?
+
+**The Philadelphia impression block is a frozen historical spike, not an ongoing
+flood — and when it expires it will make the numbers look worse for no reason.**
+This is the finding I most want on the record before it happens.
+`discovered_untracked` is **byte-identical for three days running** — same 40
+queries, same positions to the decimal, same 11,930 impressions, same 0 clicks
+(08-06, 08-07, 08-08) — while site-wide rows moved 604 → 624 and impressions
+moved 21,729 → 21,963. That is not a stale feed; it is what a one-day event looks
+like sitting inside a 28-day window. Tracing `gsc.impressions` across every
+published snapshot pins the day exactly:
+
+| snapshot | 07-31 | 08-01 | 08-02 | 08-03 | **08-04** | 08-05 | 08-08 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| impressions | 975 | 1,167 | 1,588 | 1,677 | **20,196** | 21,390 | **21,963** |
+| rows | 189 | 219 | 277 | 287 | **493** | 590 | **624** |
+
+`LAG_DAYS = 3` and `WINDOW_DAYS = 28` (`gsc.py:44-45`), so the 08-04 snapshot's
+window ends **2026-08-01**: roughly 18,500 impressions arrived on that single
+data-day. The window start passes 08-01 on **2026-09-01**, and on that morning
+the block drops out.
+
+**Direction matters and is counter-intuitive.** The 40 rows I can see carry
+11,930 impressions at an impression-weighted average position of **21.3**, which
+means the remaining 10,033 impressions average **29.1**. The block leaving is
+*better positioned than what stays.* So the prediction, recorded before the fact:
+**on or about 2026-09-01, `gsc.impressions` falls by something on the order of
+15,000–18,500, `gsc.rows` falls by roughly 200, and `gsc.avg_position` gets
+WORSE — moving from ~25 up toward 29 or beyond, not back to the pre-flood 21.**
+Nobody should read that as a penalty, a regression, or the effect of any change
+made between now and then. Equally, nobody should credit any change for the
+impression count "normalising".
+
+**Scaled content abuse — I went looking for a problem and did not find one.**
+Today's research (below) says Google's enforcement targets "template-with-variable
+substitution at scale". This engine generates town pages from a template, so I
+measured it instead of assuming. Stripping tags, normalising all fifteen town
+names to `TOWN`, and comparing 8-gram shingles pairwise across all 15 area pages:
+**median Jaccard similarity 0.08, maximum 0.16** (hallam vs wrightsville). Even
+with shared nav, footer and CTA boilerplate counted in, the pages are
+overwhelmingly distinct prose. **Verdict: the area pages are not
+template-with-variables, and the scaled-content risk here is low.** Recording the
+method so a future run can re-measure rather than re-argue it.
+
+**The 0-call-taps zero, calibrated instead of alarmed at.** Yesterday's entry
+verified the instrumentation chain end to end and concluded the zero is real. It
+is — but "real" and "damning" are different claims, and yesterday's framing leaned
+toward damning. Today's benchmark research puts the median contractor site at
+**2–4% of visitors converting to a tracked call or form fill**. At 90 visitors
+since 07-30, the probability of seeing zero is **16% at p=0.02, 6.4% at p=0.03,
+2.5% at p=0.04**. So 0/90 is on the unlucky side of median performance but is
+**not yet statistically distinguishable from a merely-below-average site**.
+Yesterday's threshold turns out to be very well chosen: at **150 visitors** those
+probabilities fall to 4.8% / 1.0% / 0.2%. **The 2026-08-20 test stands and will
+be decisive.** At 7 visitors/day, 150 arrives around 16 August.
+
+**08-02's prediction — 7-day median daily `organic_visitors` ≥ 2 by 2026-08-16 —
+still failing.** Median over 08-01…08-07, `[0,0,2,2,1,1,0]`, is **1.0**,
+unchanged for a fourth day. Eight days left. **Too early to call formally; I
+would bet against it**, with the standing caveat that three billing-blocked days
+sit inside the window, so a failure reads "inconclusive, rerun" rather than
+"content does not work".
+
+**08-06 rec 2 / 08-07 rec 2 (sync `growth/` to the droplet) — NOT done, day 6.**
+Verified three ways against the repo's own `snapshot.py`: `keywords.ranked` is
+emitted at `snapshot.py:138` and absent from today's output; `gsc.pages` is
+emitted at `snapshot.py:147` and absent; `discovered_untracked` is exactly 40
+rows, the old `out[:40]` rather than the widened `_select_discoveries`. Add the
+missing crawler series from yesterday's change and the droplet is running
+`growth/` code from **2026-08-04 or earlier**. **This is now the tenth stranded
+change and the third consecutive review blocked by it.** The `gsc.pages` deadline
+of 2026-08-17 is nine days out.
+
+**08-07 rec 1 / 08-06 rec 5 (leaf-fall queue reorder) — NOT done, day 10.**
+`order = {"hire": 0, "price": 1, "check": 2, "diy": 3}` unchanged at
+`techniques.py:435` and `:879`. Today's divergence finding makes this *more*
+urgent, not less: if the queue can never be drained, then **the order is the only
+thing that determines what ever gets written**. Ordering matters most in a queue
+that has no end. Price coverage is on day ten at 3.
+
+**08-07 rec 3 / 08-06 rec 1 (homepage title) — NOT done, day 8.** `index.html:16`
+is still `Gutter Installer &amp; Contractor | NEMO Seamless Gutter` and `:17`
+still names no place. The 30-day prediction attached to it has not started
+because the change has not been made.
+
+**08-07 rec 6 (merge the two schema blocks) — NOT done, day 5.** `index.html:49`
+and `:180` still share `@id` `.../#business`, `:48`/`:179` both declare
+`RoofingContractor`, and `:54`/`:184` still give `eric@` and `enemo@`.
+
+**08-07 recs 4, 5, 7, 8 (LSA decision T011, GBP category audit T016,
+`?utm_source=gbp`, answer T007) — all NOT done**, at days 13, 13, 6 and 13.
+T011 and T016 remain `status: candidate, activated: null`.
+
+**A ledger fact nobody has stated: no technique has ever been activated.** All
+eleven `active` techniques date from the seed on 2026-07-27 (ten carry
+`activated: 2026-07-27`; T014 is `active` with `activated: null`, which is a
+small bookkeeping bug worth noting). Of the **38 candidates** — mean age 6.2
+days, oldest 12 — **zero have ever been turned on, and zero have ever been
+rejected**. The scoreboard reads 1 works, 0 does-not-work, 49 not-yet-judged.
+**Idea supply is not this project's constraint. Decision throughput is.** The
+scout has produced 38 plausible, well-formed, correctly-scoped ideas and the
+system has consumed none of them.
+
+**Prompt corrections.** The scheduled prompt still describes 2026-07-28 — "77
+rows, 17 matched, 3 clicks, 429 impressions, avg position 12.4" and "the county
+bucket was 2 of 50". Today: 624 rows, 23 matched, 7 clicks, 21,963 impressions,
+avg position 24.9, county 1 of 81. It also says to expect the scout blocked on a
+spend cap until 2026-08-01; the scout has run clean for eight days. And it names
+`by_town.top3 / total` as the goal metric — per the lead above, that ratio is now
+dominated by denominator growth and should be read alongside `top3/ranked_known`
+(**1/23 = 4.3%**). Sixth day this has needed saying; per the prompt's own
+instruction, the data wins.
+
+### What I researched today
+
+- **Map-pack weighting: review signals dominate, and Google shifted further
+  toward interaction.** 2026 round-ups put review variables (count, velocity,
+  keyword mentions, rating) at roughly 70% of the top-20 ordinal correlations
+  with map-pack position, behind primary category and proximity
+  ([Local SEO Citation Builder](https://localseocitationbuilder.com/blog/map-pack-ranking-factors),
+  [SEOLocale](https://seolocale.com/google-map-pack-ranking-in-2026-how-the-local-3-pack-really-works/)),
+  and 2026 reporting describes Google leaning further on *popularity* signals —
+  photo views, review reads, Q&A clicks, website visits — rather than prominence
+  alone ([Explore Digital](https://www.exploredigital.com/blog/top-8-biggest-changes-to-google-business-profile-in-2026-so-far/),
+  [PinMeTo](https://www.pinmeto.com/blog/google-business-profile-updates-2026/)).
+  **Why this matters here:** it is the third independent source in a week putting
+  category + reviews above everything the engine can touch from the website side,
+  and the interaction shift means a profile nobody clicks stays invisible. It
+  strengthens T016 and T007, both untouched for thirteen days. It proposes
+  nothing new — every mechanism named is already a candidate in the ledger.
+- **Contractor conversion benchmarks.** Median contractor site converts **2–4%**
+  of visitors to a tracked call or form; top decile 8–12%. Phone leads close at
+  ~46% versus web forms, and ~78% of customers hire whoever responds first
+  ([Pipeline On](https://pipelineon.com/blog/contractor-conversion-rate-optimization/),
+  [Pipeline On benchmarks](https://pipelineon.com/blog/home-service-marketing-benchmarks-2026/)).
+  **Why this matters here:** this is the number that let me calibrate 0/90 above
+  instead of just calling it alarming, and it makes yesterday's 08-20 threshold
+  scoreable. Treat the specific figures as vendor-adjacent marketing; the 2–4%
+  median is consistent across the sources and is all I lean on.
+- **Scaled content abuse, current status.** No new Google spam policy on this in
+  2026; the 2024 guidance still governs, and enforcement patterns are mass AI
+  generation without editorial review, pure template-with-variable substitution,
+  and value-free aggregation
+  ([Digital Applied](https://www.digitalapplied.com/blog/programmatic-seo-after-march-2026-surviving-scaled-content-ban)).
+  **Why this matters here:** it is the policy `BUDGET.md` rule 2 is protecting
+  against, and it is why "just write five sections a day" is not the answer to
+  the divergence. I measured this site against the middle pattern and it passes —
+  see the similarity numbers above.
+- **Rejected — a 2024 change being resold as 2026 news.** A search summary told
+  me Google Business Profile chat ends 31 July 2026, replaced by WhatsApp. It
+  does not: **Business Messages shut down 31 July 2024** — new conversations
+  stopped 15 July 2024 ([Google for Developers](https://developers.google.com/business-communications/business-messages/resources/release-notes/update-on-gbm),
+  [Google Business Profile Help](https://support.google.com/business/answer/14919056?hl=en)).
+  Several 2026 SEO blogs recycle it with the year swapped. There is a real
+  adjacent thing — an account-gated SMS/WhatsApp contact button on the profile —
+  which is a lower-friction second action and reinforces T050 and T027 rather
+  than being new. Logging the false version explicitly so a future run does not
+  spend an afternoon on it.
+- **Also rejected:** adding towns to the GBP service area (rejected 08-07, does
+  not affect rank); GBP posting cadence as a ranking lever (08-05); paid "AI
+  visibility" packages (tenth time); extending `TOWN_QUEUE` (seventh); the
+  unsourced "AI assistants recommend you at 150+ reviews" claim (08-06); geo-grid
+  rank tracking, which is already **T038**, not a new idea. Nothing in today's
+  research is a 51st technique, and I am not filing one.
+
+### Recommendations
+
+**Everything below needs a droplet action before it does anything.**
+`/var/www/nemo-seamless-gutter` is not a git checkout and `publish_state.sh`
+copies droplet → repo only. Nothing in this commit is live.
+
+1. **Sync `growth/` to the droplet.** *(Divine — minutes. Day 6.)* Promoted to
+   rec 1 because it now gates three separate things: rec 2 is inert without it,
+   `gsc.pages` has a **nine-day fuse** to 2026-08-17, and today's scout fix only
+   takes effect at the next 06:00 run after a sync. Ten stranded changes. Whoever
+   does it should say so in the journal — nothing in the snapshot confirms a sync.
+   *Checked:* today's `keywords` block has no `ranked` key (emitted at
+   `snapshot.py:138`), `gsc` has no `pages` key (`snapshot.py:147`),
+   `discovered_untracked` is exactly 40 rows, and the nine crawler series added
+   yesterday are absent from `traffic`.
+2. **Reorder the content queue for leaf-fall.** *(Divine — two dictionary
+   literals at `techniques.py:435` and `:879`. Free. Day 10.)* Put `price` ahead
+   of `hire` until 30 November. New argument for an old recommendation: the queue
+   is not merely long, it is **diverging at +4.0/day**, so the 27 price queries
+   behind 46 hire ones will not be reached by working through them — order is the
+   only lever. Price coverage has been frozen at 3 for ten days while its total
+   grew 25 → 31. *How you would know:* `keywords.by_intent.price.covered` moves
+   off 3 within a week of deployment. *Checked:* `techniques.py:411-427`,
+   `:860-905`, `:435`, `:879`; intent split computed from today's snapshot.
+3. **Eric: clear the candidate backlog — pick three, kill the rest.** *(Eric — one
+   sitting, maybe 30 minutes. Free. New today.)* Thirty-eight candidates, mean age
+   6.2 days, **none ever activated and none ever rejected**, growing 3/day. This
+   is the single largest unworked asset in the project and it is not an
+   information problem — every candidate carries a hypothesis, a first step, an
+   effort and a cost estimate. My three, on today's evidence: **T016** (GBP
+   primary category — highest-weight controllable factor, five minutes),
+   **T007** (review engine — reviews are ~70% of map-pack correlations, profile
+   has 13), and **T011** (Local Services Ads — costed yesterday at ~$53/lead, the
+   only identified route to a call *inside* leaf-fall). Rejecting the other 35
+   costs nothing and is worth as much as activating three, because it turns the
+   scoreboard's `does_not_work` column from empty into a real filter for the
+   scout. *Checked:* every technique with `activated` set carries `2026-07-27`;
+   `scoreboard.does_not_work` is `[]`.
+4. **Fix the goal metric's denominator, or stop reporting the headline number.**
+   *(Divine — small change in `keywords.py`/`snapshot.py`. New today.)* As built,
+   `share_pct` (`keywords.py:296`) falls whenever the scout works, so it cannot
+   show progress. Either freeze the denominator to a dated cohort (e.g. the 108
+   queries tracked on 2026-08-01, so "did we improve" becomes answerable), or
+   report `top3/ranked_known` as the headline and demote `top3/total` to a
+   coverage stat. I did **not** make this change today — it redefines the number
+   Eric is being judged against, which is a decision, not a diagnostic.
+   *Checked:* `keywords.py:296`, `scout.py:86-90`, `snapshot.py:127`.
+5. **Put York back in the homepage title and description.** *(Divine — minutes on
+   the droplet. Free. Day 8.)* Unchanged and still correct on its own merits; the
+   site's most important page names no place. Still rec 5 rather than rec 1
+   because 08-07 surfaced a competing explanation for the impression flood, and
+   today's finding that the flood was a **single day** in August makes the
+   title-CTR story weaker still — a placeless title does not switch on and off in
+   24 hours. *Checked:* `index.html:16-17`.
+6. **Audit the GBP primary category — T016.** *(Eric — five minutes. Free. Day
+   13.)* Screenshot the current primary category; do not change it blind. Third
+   week of research putting category first. *Checked:* T016 `status: candidate`.
+7. **Fix the two schema blocks.** *(Eric decides the hours; Divine merges — 10
+   minutes, droplet. Day 5.)* Two `@id`-identical blocks, two emails, two
+   opening-hours sets, one page. *Checked:* `index.html:49` vs `:180`, `:54` vs
+   `:184`, `:79` vs `:202`.
+8. **Add `?utm_source=gbp` to the Business Profile website URL.** *(Eric — two
+   minutes. Free. Day 6.)* *Checked:* `metrics.py:63`, `:273-301` — no code change
+   needed.
+9. **Carried, unchanged, not restated:** the Akron/Lancaster paragraph at
+   `services/gutter-guards.html:163` (day 11), T008's false hypothesis, the ~30-page
+   town cap, `schuylkill county seamless gutter` inflating the tracked universe by
+   one (seventh mention, droplet-owned), and T014's missing `activated` date.
+
+### What I changed in this repo today
+
+Three files, one change, in `growth/scout.py` and its caller. **159 tests pass**
+(152 before, 7 new). Stranded until rec 1 happens, and rec 1 still matters more
+than this does.
+
+- **`growth/scout.py` — the scout now counts the site instead of remembering
+  it.** `build_prompt()` hardcoded "four service pages, five town service-area
+  pages, three guides" from seed day. The real figures are **7, 15 and 15**, so
+  for twelve days every scout run reasoned about a site a third of its actual
+  size — which is a plausible cause of proposals for pages that already exist.
+  New `_page_counts(docroot)` reads the directories; `run()` and
+  `growth_daily.cmd_scout` thread `--docroot` through. A missing or empty docroot
+  reads **0**, deliberately: an empty string would have joined to a relative path
+  and counted whatever sits in the developer's cwd, which is this repo's own copy
+  of the site and would have looked entirely plausible in the prompt. My own test
+  caught that; it is why the guard is explicit.
+- **`growth/scout.py` — the prompt now states the backlog and the denominator
+  cost.** Task 3 tells the model how many tracked queries are already uncovered
+  (92 today), that the engine covers exactly one a day, and that every added
+  query enlarges the goal's denominator. This is information, not a cap — I did
+  **not** touch `MAX_KEYWORDS_PER_DAY`, because changing intake is a decision and
+  belongs in rec 4. And I struck the docstring's "New queries are pure upside and
+  cost nothing", replacing it with the measured reason that is false.
+- **`growth/test_scout.py` — 7 tests, no network, no droplet state.** Real counts
+  from a tmpdir; non-HTML files in `areas/` do not count as pages; a missing
+  directory and a `None` docroot read 0 rather than crashing or borrowing the
+  cwd; the prompt names 7/15/15 and no longer says "four service pages"; the
+  prompt states the 92-deep backlog; and the goal line survives the addition.
+
+I did not touch `techniques.json`, `keywords.json`, `results.jsonl` or
+`state.json`; did not activate, retire or re-status any technique; did not edit
+`index.html` or anything under `areas/`, `guides/` or `services/`, all of which
+are copied droplet → repo each morning and would be reverted tomorrow. I did not
+reorder the sort dicts (rec 2) or change the goal denominator (rec 4) — both
+change what the engine does or how the business is scored, and those are
+decisions rather than diagnostics.
+
+### Reasoning and uncertainties
+
+**Day thirteen. One top-3 query, zero top-3 in any of the seven named towns, zero
+call taps in nine days across 90 visitors, one booking ever, zero phone leads
+ever.** The engine ran perfectly this morning and the business is no closer to
+the goal than it was on 1 August.
+
+**What I think is actually wrong, and it is not the SEO.** For thirteen days this
+project has had excellent supply and no throughput. The scout supplies ideas: 38
+of them, none used. The writer supplies pages: 40 of them, holding a Search
+Console position on 23 of the 146 tracked York County queries. The reviews supply recommendations: eight open, aged 5 to 13 days, all
+cheap, several free, none done. The bottleneck is not knowledge and has not been
+for a week — it is that nothing crosses from "recommended" to "deployed", and the
+one action that would unblock ten stranded changes is a file copy that has been
+outstanding for six days.
+
+**Where I am least confident.** The divergence arithmetic assumes intake stays at
+~5.4/day; the scout's cap is 12 and it has never hit it, so the rate could move
+either way, and today's prompt change may well lower it by itself — which would
+be the cheapest possible partial fix and I will check on 09 August whether
+`keywords_added` drops below 5. I am also aware I have now argued *for* a change
+whose whole purpose is to make the scout produce less, which sits oddly beside
+recommending Eric act on more of what it has already produced. I think both are
+right — the ledger is saturated with good untried ideas, so more ideas have low
+marginal value while the untried pile has high value — but that is a judgement,
+not a measurement, and I would drop the throttle argument entirely if the
+candidate backlog started clearing.
+
+**What would change my mind.** Three tests are now live and dated. (1) 7-day
+median daily `organic_visitors` ≥ 2 by **2026-08-16** — currently 1.0, failing,
+I would bet against. (2) `call_taps` still 0 on **2026-08-20** with >150
+cumulative visitors since 07-30 — that would put the probability of an
+at-median site producing this at ~1% and would move the bottleneck decisively
+from acquisition to conversion. (3) New today: on **2026-09-01** the August-1
+impression block ages out of the Search Console window; expect impressions to
+fall by 15,000–18,500 and `avg_position` to get **worse**, toward 29 — and if it
+instead improves toward 21, my reading of the flood is wrong and the site's
+non-flood positions are better than the arithmetic above implies.

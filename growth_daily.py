@@ -163,7 +163,7 @@ def cmd_build(args):
 
 def cmd_scout(args):
     log("scout:")
-    return scout.run(dry_run=args.dry_run)
+    return scout.run(dry_run=args.dry_run, docroot=args.docroot)
 
 
 # ------------------------------------------------------------------ report

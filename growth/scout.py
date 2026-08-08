@@ -13,13 +13,26 @@ What it will and will not do:
              is a deliberate act, which is what keeps a bad idea from deploying
              itself at 6am on a Sunday.
   expands    the tracked keyword universe — the thing the >50% goal is measured
-             against. New queries are pure upside and cost nothing.
+             against. This used to say "pure upside and cost nothing". That is
+             false, and the 2026-08-08 review showed why. A new query is the
+             DENOMINATOR of the goal (`keywords.py:296` — share_pct is
+             top3/total over the whole universe), so adding one lowers the goal
+             number even on a day the site got better. And an uncovered query
+             joins a write queue that `strengthen_pages` drains at exactly one
+             a day by design (BUDGET.md rule 2, which exists because looping
+             the queue is both a billing risk and what Google calls scaled
+             content abuse). Intake has run at ~5.4 queries/day against that
+             drain of 1, so the backlog went 64 -> 92 in the week to 08-08 and
+             has grown every single day. Propose queries because they are real
+             demand worth knowing about, not because they are free. They are
+             not free.
   will NOT   write code, spend money, contact customers, or activate itself.
 
 The techniques that DO change the live site are the ones in techniques.py, which
 were reviewed by a human before they were seeded as active.
 """
 import json
+import os
 
 from . import keywords, ledger, llm, review
 
@@ -71,7 +84,31 @@ Return ONLY valid JSON, no prose:
 }"""
 
 
-def build_prompt():
+DEFAULT_DOCROOT = os.environ.get("WEB_ROOT", "/var/www/nemo-seamless-gutter")
+
+
+def _page_counts(docroot):
+    """How many pages the site actually has, counted rather than remembered.
+
+    The BUSINESS block used to hardcode "four service pages, five town
+    service-area pages, three guides". By 2026-08-08 the real figures were 7,
+    15 and 15 — so for twelve days the scout proposed against a site a third
+    of the real size, which is a good way to get told to write a page that
+    already exists.
+    """
+    out = {}
+    for sub in ("areas", "guides", "services"):
+        # An empty docroot must NOT fall through to a relative path — that
+        # counts whatever happens to sit in the cwd, which on the developer's
+        # machine is this repo's own copy of the site and looks entirely
+        # plausible in the prompt. Zero is the honest answer.
+        d = os.path.join(docroot, sub) if docroot else None
+        out[sub] = (len([f for f in os.listdir(d) if f.endswith(".html")])
+                    if d and os.path.isdir(d) else 0)
+    return out
+
+
+def build_prompt(docroot=None):
     techs = ledger.load_techniques()
     running = [f"- {t['name']} [{t['status']}] — {t['hypothesis'][:150]}" for t in techs]
     sb = review.scoreboard()
@@ -88,14 +125,17 @@ def build_prompt():
              f"UNMEASURED (no Search Console). Coverage proxy: {kw['coverage_pct']}% "
              f"of {kw['total']} tracked queries have a page targeting them")
 
+    pages = _page_counts(docroot or DEFAULT_DOCROOT)
+    backlog = kw["total"] - kw["covered"]
+
     return f"""Today is {ledger.today()}.
 
 BUSINESS
 NEMO Seamless Gutter, nemoseamlessgutter.com — seamless gutter contractor in York, PA.
 Google Business Profile is live: 4.2 stars, 13 reviews, roughly 300 profile views a month.
-The site has a homepage with an online booking widget, four service pages, five town
-service-area pages, three guides, and an AI phone agent that answers calls and captures
-leads when Eric is on a roof.
+The site has a homepage with an online booking widget, {pages['services']} service pages,
+{pages['areas']} town service-area pages, {pages['guides']} guides, and an AI phone agent
+that answers calls and captures leads when Eric is on a roof.
 
 CURRENT NUMBERS (yesterday unless noted)
 - visitors: {last('visitors')}
@@ -126,13 +166,20 @@ TASK
    Prefer sources from the last 6 months.
 2. Propose at most {MAX_NEW_PER_DAY} techniques NOT already in the ledger. Fewer, better.
 3. Propose up to {MAX_KEYWORDS_PER_DAY} search queries to add to the tracked universe —
-   real things York County homeowners type about gutters.
+   real things York County homeowners type about gutters. Propose FEWER than the
+   maximum unless they are genuinely good. {backlog} tracked queries are already
+   uncovered, and the engine writes content for exactly ONE of them per day, so a
+   query added today joins the back of a queue roughly {max(1, backlog)} days long.
+   Every query you add also enlarges the denominator of the goal number above, which
+   means a weak query makes the business look worse without helping it. Add a query
+   because a York County homeowner really types it and it is worth winning — never to
+   fill the quota.
 
 The weakest number is the phone ringing, so at least one technique must target calls or
 booked estimates directly rather than traffic."""
 
 
-def run(dry_run=False):
+def run(dry_run=False, docroot=None):
     try:
         key = llm.load_key()
     except Exception:
@@ -144,7 +191,7 @@ def run(dry_run=False):
         return {"ok": False, "detail": msg}
 
     try:
-        data = llm.call_json(SYSTEM, build_prompt(), max_tokens=8000,
+        data = llm.call_json(SYSTEM, build_prompt(docroot), max_tokens=8000,
                              tools=llm.WEB_SEARCH, key=key)
     except Exception as e:
         print(f"  scout call failed: {e}")
