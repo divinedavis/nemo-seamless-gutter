@@ -598,30 +598,59 @@ def local_schema(ctx):
     blob = _ld({
         "@context": "https://schema.org", "@type": "RoofingContractor",
         "@id": f"{SITE}/#business", "name": BRAND, "url": f"{SITE}/",
+        "description": (
+            "Seamless gutter installation, gutter guards, downspouts, plus gutter "
+            "cleaning and repair across York County, PA. Gutters are custom-formed "
+            "on-site to fit your home exactly."),
+        "slogan": "Seamless gutters done right.",
         "telephone": PHONE_E164, "email": "enemo@nemoseamlessgutter.com",
         "image": f"{SITE}/assets/logo-4k.png", "logo": f"{SITE}/assets/logo-4k.png",
         "priceRange": "$$",
+        # The Business Profile link. Google treats a sameAs pointing at the
+        # verified GBP as corroboration that the site and the profile are the
+        # same business, which is the whole game in the map pack.
+        "sameAs": ["https://share.google/mz6rp77bqHB1a7GW"],
         "address": {"@type": "PostalAddress", "streetAddress": "808 W Mason Ave",
                     "addressLocality": "York", "addressRegion": "PA",
                     "postalCode": "17401", "addressCountry": "US"},
+        "geo": {"@type": "GeoCoordinates",
+                "latitude": 39.9556, "longitude": -76.7470},
         "areaServed": [{"@type": "AdministrativeArea",
                         "name": "York County, Pennsylvania"}],
-        "openingHoursSpecification": [{
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-            "opens": "07:00", "closes": "18:00"}],
+        "knowsAbout": ["seamless gutters", "gutter installation", "gutter guards",
+                       "leaf protection", "downspouts", "gutter cleaning",
+                       "gutter repair", "fascia and soffit"],
+        # Hours come from the hand-written block these were merged from, which
+        # was authored from what Eric said, rather than from the placeholder
+        # this technique used to emit. Saturday is kept: the AI phone agent
+        # answers, so a Saturday search that finds the business open reaches
+        # someone. Still unconfirmed against the Business Profile — see the
+        # hours item in the growth backlog.
+        "openingHoursSpecification": [
+            {"@type": "OpeningHoursSpecification",
+             "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+             "opens": "07:30", "closes": "18:00"},
+            {"@type": "OpeningHoursSpecification",
+             "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "14:00"}],
         "hasOfferCatalog": {
             "@type": "OfferCatalog", "name": "Gutter services",
             "itemListElement": [
                 {"@type": "Offer",
-                 "itemOffered": {"@type": "Service", "name": n, "url": f"{SITE}{u}"}}
+                 "itemOffered": {"@type": "Service", "name": n,
+                                 **({"url": f"{SITE}{u}"} if u else {})}}
                 for n, u in (
                     ("Seamless gutter installation",
                      "/services/seamless-gutter-installation.html"),
                     ("Gutter guards", "/services/gutter-guards.html"),
                     ("Gutter cleaning and repair",
                      "/services/gutter-cleaning-repair.html"),
-                    ("Half-round gutters", "/services/half-round-gutters.html"))]},
+                    ("Half-round gutters", "/services/half-round-gutters.html"),
+                    ("Emergency gutter repair",
+                     "/services/emergency-gutter-repair.html"),
+                    ("Fascia and soffit replacement",
+                     "/services/gutter-soffit-fascia-replacement.html"),
+                    ("Commercial gutters", "/services/commercial-gutters.html"),
+                    ("Downspouts", None))]},
     })
 
     marker = LB_MARKER
