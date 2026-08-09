@@ -1,6 +1,6 @@
 {
-  "generated": "2026-08-08T06:02:43+00:00",
-  "date": "2026-08-08",
+  "generated": "2026-08-09T06:03:31+00:00",
+  "date": "2026-08-09",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
@@ -8,8 +8,8 @@
     "share_pct": 0.7,
     "measured": true,
     "why_unmeasured": null,
-    "coverage_pct": 37.0,
-    "tracked_queries": 146,
+    "coverage_pct": 36.2,
+    "tracked_queries": 152,
     "top3": 1,
     "top10": 8,
     "ranked_known": 23
@@ -71,6 +71,10 @@
       {
         "date": "2026-08-07",
         "value": 7
+      },
+      {
+        "date": "2026-08-08",
+        "value": 3
       }
     ],
     "pageviews": [
@@ -129,6 +133,10 @@
       {
         "date": "2026-08-07",
         "value": 9
+      },
+      {
+        "date": "2026-08-08",
+        "value": 4
       }
     ],
     "organic_visitors": [
@@ -186,6 +194,10 @@
       },
       {
         "date": "2026-08-07",
+        "value": 0
+      },
+      {
+        "date": "2026-08-08",
         "value": 0
       }
     ],
@@ -245,6 +257,10 @@
       {
         "date": "2026-08-07",
         "value": 0
+      },
+      {
+        "date": "2026-08-08",
+        "value": 0
       }
     ],
     "ai_visitors": [
@@ -302,6 +318,10 @@
       },
       {
         "date": "2026-08-07",
+        "value": 0
+      },
+      {
+        "date": "2026-08-08",
         "value": 0
       }
     ],
@@ -361,6 +381,10 @@
       {
         "date": "2026-08-07",
         "value": 7
+      },
+      {
+        "date": "2026-08-08",
+        "value": 3
       }
     ],
     "referral_visitors": [
@@ -418,6 +442,10 @@
       },
       {
         "date": "2026-08-07",
+        "value": 0
+      },
+      {
+        "date": "2026-08-08",
         "value": 0
       }
     ],
@@ -477,6 +505,10 @@
       {
         "date": "2026-08-07",
         "value": 0
+      },
+      {
+        "date": "2026-08-08",
+        "value": 0
       }
     ],
     "bot_hits": [
@@ -535,6 +567,10 @@
       {
         "date": "2026-08-07",
         "value": 2252
+      },
+      {
+        "date": "2026-08-08",
+        "value": 2380
       }
     ],
     "call_taps": [
@@ -572,6 +608,10 @@
       },
       {
         "date": "2026-08-07",
+        "value": 0
+      },
+      {
+        "date": "2026-08-08",
         "value": 0
       }
     ],
@@ -614,6 +654,10 @@
       },
       {
         "date": "2026-08-07",
+        "value": 0
+      },
+      {
+        "date": "2026-08-08",
         "value": 0
       }
     ],
@@ -673,6 +717,10 @@
       {
         "date": "2026-08-07",
         "value": 0
+      },
+      {
+        "date": "2026-08-08",
+        "value": 0
       }
     ],
     "phone_leads": [
@@ -730,6 +778,10 @@
       },
       {
         "date": "2026-08-07",
+        "value": 0
+      },
+      {
+        "date": "2026-08-08",
         "value": 0
       }
     ],
@@ -789,6 +841,10 @@
       {
         "date": "2026-08-07",
         "value": 0
+      },
+      {
+        "date": "2026-08-08",
+        "value": 0
       }
     ]
   },
@@ -800,22 +856,22 @@
   "keywords": {
     "by_town": {
       "county": {
-        "total": 81,
+        "total": 83,
         "covered": 32,
         "top3": 1
       },
       "hanover": {
-        "total": 6,
+        "total": 7,
         "covered": 4,
         "top3": 0
       },
       "dover": {
-        "total": 13,
-        "covered": 4,
+        "total": 14,
+        "covered": 5,
         "top3": 0
       },
       "red-lion": {
-        "total": 8,
+        "total": 9,
         "covered": 3,
         "top3": 0
       },
@@ -825,7 +881,7 @@
         "top3": 0
       },
       "spring-grove": {
-        "total": 9,
+        "total": 10,
         "covered": 3,
         "top3": 0
       },
@@ -837,11 +893,11 @@
     },
     "by_intent": {
       "hire": {
-        "total": 94,
-        "covered": 46
+        "total": 97,
+        "covered": 47
       },
       "price": {
-        "total": 31,
+        "total": 33,
         "covered": 3
       },
       "diy": {
@@ -849,11 +905,12 @@
         "covered": 1
       },
       "check": {
-        "total": 13,
+        "total": 14,
         "covered": 4
       }
     },
     "uncovered": [
+      "best gutter company spring grove pa",
       "best gutter company york pa",
       "copper gutter installation york pa",
       "copper half round gutters pennsylvania",
@@ -876,9 +933,9 @@
       "gutter contractor red lion pa",
       "gutter contractors york pa",
       "gutter guard installation dallastown pa",
-      "gutter installation dover",
       "gutter installation york",
       "gutter installers dover pa",
+      "gutter installers red lion pa",
       "gutter installers york",
       "gutter installers york pa",
       "gutter repair dallastown pa",
@@ -894,6 +951,7 @@
       "ice dam damage gutter replacement york county pa",
       "schuylkill county seamless gutter",
       "seamless gutter company spring grove pa",
+      "seamless gutter installation hanover pa",
       "seamless gutter installation york pa",
       "seamless gutter installers dallastown pa",
       "seamless gutter installers hanover pa",
@@ -924,11 +982,13 @@
       "gutter overflowing in heavy rain what to do",
       "gutter pulling away from house repair",
       "gutter pulling away from house repair cost",
+      "gutter replacement cost dover pa",
       "gutter replacement cost per foot pa",
       "gutter replacement cost york pa",
       "gutter replacement estimate spring grove pa",
       "gutters overflowing in heavy rain",
       "half round gutter cost per foot",
+      "half round gutters cost per foot",
       "half round gutters historic home pennsylvania",
       "how much do new gutters cost in pa",
       "how much does a gutter guard cost per foot",
@@ -945,6 +1005,7 @@
       "seamless gutters cost per foot installed pa",
       "seamless gutters vs sectional gutters",
       "what size gutters do i need",
+      "when should gutters be cleaned in pennsylvania",
       "why do my gutters overflow when it rains"
     ],
     "discovered_untracked": [
@@ -1191,13 +1252,13 @@
     ]
   },
   "gsc": {
-    "date": "2026-08-08",
+    "date": "2026-08-09",
     "ok": true,
     "connected": true,
-    "rows": 624,
+    "rows": 631,
     "matched": 23,
-    "clicks": 7,
-    "impressions": 21963,
+    "clicks": 9,
+    "impressions": 22045,
     "avg_position": 24.9
   },
   "techniques": [
@@ -1267,6 +1328,10 @@
         {
           "date": "2026-08-07",
           "value": 0
+        },
+        {
+          "date": "2026-08-08",
+          "value": 0
         }
       ]
     },
@@ -1335,6 +1400,10 @@
         },
         {
           "date": "2026-08-07",
+          "value": 0
+        },
+        {
+          "date": "2026-08-08",
           "value": 0
         }
       ]
@@ -1679,6 +1748,10 @@
         },
         {
           "date": "2026-08-07",
+          "value": 0
+        },
+        {
+          "date": "2026-08-08",
           "value": 0
         }
       ]
@@ -2258,6 +2331,60 @@
       "notes": "first step: In the Business Profile editor, add the booking widget URL (with ?utm_source=gbp) to the appointment link field, and change the widget's first slot label to 'Free 15-minute gutter measurement \u2014 York County'.\neffort: hours\ncost: free\nexpected: Appointment link live within 2 days with UTM tagging. Success = \u22656 booking-link clicks and \u22652 booked measurements per month from the profile by October, and the link becomes the second-largest source of estimates after direct calls.",
       "verdict": null,
       "owned_visitors": null
+    },
+    {
+      "id": "T051",
+      "slug": "gbp_service_area_geography_pass",
+      "name": "Set the GBP service-area list to the real York County towns",
+      "kind": "distribution",
+      "status": "candidate",
+      "hypothesis": "NEMO has five town pages on the site, but the Business Profile itself may still be a single York pin with no declared service area \u2014 which means a homeowner searching in Hanover, Dover, Red Lion, Dallastown or Spring Grove never sees the listing at all, no matter how good the town page is. This is the map-pack half of the same coverage problem the town pages solve organically, it is a 15-minute settings change, and the map pack is where the hire-intent calls land. It also cannot be measured by Search Console, which is why it has stayed invisible.",
+      "evidence": "Google's own help documentation states that setting a service area helps people find the Business Profile and shows customers where services are provided <cite index=\"50-1,50-2\">When you set your service area, it helps people find your Business Profile. Your service area shows customers where you can provide your products and services.</cite> (https://support.google.com/business/answer/9157481). A July 2026 map-pack write-up calls the service-area setting the mechanism for ranking beyond your address: <cite index=\"29-20,29-21,29-22\">set your Service Area \u2014 the radius or list of cities you serve, configured in profile settings \u2014 this is the mechanism behind ranking beyond your physical address. Skip it, and you're invisible to searchers three towns over</cite> (https://www.deangarland.com/insights/win-the-map-pack/). 2026 guidance also caps this at 20 areas and warns it is not a ranking trick <cite index=\"46-2,46-3\">Current guidance still points to 20 service areas as the limit on one profile. Avoid the 'ranking trick' mentality: defining a wide geographic territory does not force Google to rank your business higher</cite> (https://www.dmnetsolutions.com/google-business-service-areas/).",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-09",
+      "added": "2026-08-09",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Open the Business Profile, go to Edit profile > Location > Service area, and enter the towns Eric genuinely drives to \u2014 York, Hanover, Dover, Red Lion, Dallastown, Spring Grove \u2014 plus York County; do not exceed towns he will actually service, and do not touch the business name or address in the same session.\neffort: hours\ncost: free\nexpected: Within 30-45 days, GBP 'searches' breakdown shows impressions from at least 3 towns other than York; the coordinate-grid check (already a ledger candidate) shows NEMO appearing anywhere on the grid outside a 2-mile York radius, versus zero today; target +40 profile views/mo and the first non-York map-pack call.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T052",
+      "slug": "town_route_day_calendar",
+      "name": "Published town route days \u2014 'Eric is in Dallastown Thursday, 4 slots'",
+      "kind": "conversion",
+      "status": "candidate",
+      "hypothesis": "The site and profile currently give a stranger no reason to call TODAY \u2014 booking a slot with an unknown contractor is an open-ended commitment. A dated, capacity-limited route day ('I'm in Red Lion on Sept 17, four gutter-cleaning slots and free measurements while I'm on the street') converts a browsing homeowner into a phone call because the deadline is real and the price of hesitating is another two weeks. It also fixes Eric's worst economics \u2014 windshield time \u2014 and gives every town page and weekly GBP post a fresh, honest, dated, town-specific reason to exist. Leaf season starts in six weeks, which is exactly when this offer is most credible.",
+      "evidence": "Gutter-industry guidance says pre-season outreach four to six weeks ahead works because planners respond to priority scheduling and availability, not discounts: <cite index=\"41-6,41-7,41-8\">pre-season campaigns should focus on homeowners who plan ahead; these homeowners are less price-sensitive, easier to schedule, and should be reached four to six weeks before spring and fall with messaging that emphasizes priority scheduling and avoiding the rush</cite> (https://nevermisshq.com/blog/gutter-seasonal-marketing-automation). Timing matters: <cite index=\"35-18,35-19\">Time marketing efforts with demand patterns. Launch fall campaigns in early September, targeting leaf cleanup.</cite> (https://www.upperinc.com/blog/how-to-start-a-gutter-cleaning-business/). Route density is also a margin lever for a one-truck operator \u2014 <cite index=\"35-9,35-10\">efficient scheduling and route optimization directly impact profitability; poor routing can reduce daily capacity by 30-40%</cite>. And speed/clarity on the resulting call is what wins it: <cite index=\"36-8,36-9\">most homeowners contact more than one contractor; the one who responds first with a clear, confident, specific reply anchors the comparison</cite> (https://myquoteiq.com/top-10-best-scheduling-software-for-gutter-cleaning-businesses-in-2026/).",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-09",
+      "added": "2026-08-09",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Pick the first three real dates Eric can commit to (one per town), add a dated 'Next Dallastown route day: <date> \u2014 4 slots, call <number>' block to the top of that town's page, and publish the matching GBP post \u2014 only for dates he will actually drive.\neffort: days\ncost: free\nexpected: Publish 2 route days/week for the 12 weeks from Aug 25 to Nov 15. Success = 3-6 inbound calls per published route day within 72 hours of the GBP post, 8+ booked cleanings in September, and at least 2 of those cleanings converting to a seamless-gutter or guard estimate \u2014 i.e. first month with double-digit calls instead of zero.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T053",
+      "slug": "buildzoom_trade_verification_profiles",
+      "name": "Claim BuildZoom and the trade-verification profiles AI engines check",
+      "kind": "distribution",
+      "status": "candidate",
+      "hypothesis": "Zero AI-answer-engine visitors with the GEO work already done on-site suggests the problem is not how the pages read but that the engines have nothing to verify NEMO against. When a York homeowner asks ChatGPT 'who installs copper gutters in York PA', the model wants a licence/permit-verified contractor record, not a marketing site. BuildZoom and the trade-credential directories are a different asset class from the generic NAP citations already in the ledger: they carry contractor licence and permit history, which is exactly the trust layer AI answers lean on for trades \u2014 and this is a free, one-time, honest claim of records that already exist.",
+      "evidence": "A 2026 contractor audit found BuildZoom in the citation set for every trade tested: <cite index=\"17-15,17-16,17-17\">BuildZoom has become one of the most heavily weighted citation sources for trades; in a 2026 local service audit it appeared in ChatGPT citations for 100% of the trades tested, and AI engines rely on it to verify contractor license classifications, permit histories, and active project data</cite>, and the same source notes local citation thresholds are far lower than publisher thresholds \u2014 <cite index=\"17-6,17-9\">for location-specific queries consistent citations appear with as few as 1,000-2,000 referring domains, and a mention on BuildZoom or a local news outlet carries more weight than fifty citations from low-authority directories</cite> (https://www.biziq.com/blog/why-chatgpt-recommends-one-contractor-over-another-and-how-to-be-the-one/). The scale of the opportunity: <cite index=\"20-11,20-12,20-13\">SOCi's 2026 Local Visibility Index analysed over 350,000 business locations across 2,751 brands and found ChatGPT currently recommends just 1.2% of all local business locations</cite>, with <cite index=\"20-19,20-20\">only a 45% overlap between brands that perform well in traditional local search and those that appear in AI recommendations</cite> (https://www.marketingcode.com/chatgpt-recommends-1-percent-local-businesses-contractors/). Trust signals must be cross-platform: <cite index=\"19-1\">SOCi's 2026 index found AI-recommended businesses averaged 4.3-star ratings with consistent, verifiable trust signals across Google Maps, Yelp, the BBB and their own website</cite> (https://core6.marketing/blog/why-chatgpt-recommends-your-competitor-not-you/).",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-09",
+      "added": "2026-08-09",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Search BuildZoom for the business name and PA licence/permit records, claim the existing listing, and make name, address, phone and service list byte-identical to the Google Business Profile \u2014 no keyword-stuffed name, no claimed credentials Eric does not hold.\neffort: hours\ncost: free\nexpected: Claimed, accurate BuildZoom record plus one free trade profile inside 2 weeks; first non-zero AI-answer-engine referral within 60 days; NEMO named in at least 1 of 5 test prompts ('gutter installer York PA', 'copper gutters York PA') run monthly from a logged-out session.",
+      "verdict": null,
+      "owned_visitors": null
     }
   ],
   "scoreboard": {
@@ -2314,11 +2441,14 @@
       "T047",
       "T048",
       "T049",
-      "T050"
+      "T050",
+      "T051",
+      "T052",
+      "T053"
     ]
   },
   "last_build": {
-    "date": "2026-08-08",
+    "date": "2026-08-09",
     "log": [
       {
         "ok": true,
@@ -2340,7 +2470,7 @@
       },
       {
         "ok": true,
-        "detail": "added \"Gutter Cleaning Near You in York County: Where We Work and W\" to /services/gutter-cleaning-repair.html for 'gutter cleaning near me'",
+        "detail": "added \"What Gutter Installation in Dover Looks Like, Start to Finis\" to /areas/seamless-gutters-dover-pa.html for 'gutter installation dover'",
         "slug": "strengthen_pages"
       },
       {
@@ -2375,6 +2505,7 @@
       },
       {
         "ok": true,
+        "noop": false,
         "detail": "[gen_sitemap] wrote 39 URLs to sitemap.xml",
         "slug": "rebuild_sitemap"
       },
@@ -2388,22 +2519,22 @@
     "changed": 1
   },
   "last_scout": {
-    "date": "2026-08-08",
+    "date": "2026-08-09",
     "ok": true,
     "techniques_added": [
-      "foursquare_places_claim_for_ai_answers",
-      "call_instrumentation_baseline",
-      "gbp_appointment_link_free_measurement"
+      "gbp_service_area_geography_pass",
+      "town_route_day_calendar",
+      "buildzoom_trade_verification_profiles"
     ],
     "keywords_added": [
-      "seamless gutter installation york pa",
-      "seamless gutters cost per foot installed pa",
-      "gutter guard installation dallastown pa",
-      "gutter cleaning spring grove pa",
-      "gutter overflowing during heavy rain what to do",
-      "soffit and fascia repair dover pa"
+      "seamless gutter installation hanover pa",
+      "gutter installers red lion pa",
+      "half round gutters cost per foot",
+      "gutter replacement cost dover pa",
+      "when should gutters be cleaned in pennsylvania",
+      "best gutter company spring grove pa"
     ],
-    "notes": ""
+    "notes": "Priority order: route days first (it is the only one of the three that can make the phone ring this month), service-area setting second (15 minutes, and it silently caps every other map-pack effort in the ledger until it is done), BuildZoom third. Sequencing warning on the GBP edit: change the service area on its own and leave name, address and phone alone for at least a fortnight \u2014 2026 guidance names frequent edits to high-impact fields as a suspension trigger, and a suspension costs more than any of this earns. Honesty guardrails on route days: publish only dates Eric will actually drive, and only slot counts that are real; if a day fills, say so rather than leaving it up. Do not promise a price on a page \u2014 promise a range and a date.\n\nConsidered and rejected. (1) Paid lead marketplaces (Angi/Thumbtack shared leads) \u2014 legal but the wrong economics for a one-truck operator; construction and contractor paid-search leads are reported converting around 2.6%, the worst of any trade, while an inbound phone lead in home services converts near 46%, so the money belongs in making the phone ring, not in buying shared inboxes. (2) EDDM postcards to leafy carrier routes \u2014 legal and seasonally sensible, but it duplicates the door-hanger candidate already in the ledger at roughly 10x the cost with worse attribution; revisit only if route days prove demand exists and Eric wants to widen the funnel. (3) Geo-tagged/EXIF-manipulated photos, CTR-boosting bots and 'cloud stacking' \u2014 these appear in 2026 write-ups explicitly on the noise-and-spam list, not the works list; they are also exactly what gets a profile flagged. (4) Any incentivised or gated review scheme \u2014 beyond Google's policy, the FTC's fake-review rule has carried civil penalties per violation since October 2024, and review gating is named in it. Ask everyone, neutral wording, no incentive, ever. (5) A second GBP listing or a virtual address in Hanover to beat proximity \u2014 listed among the top suspension causes; the legitimate version of that idea is the service-area setting plus a genuinely useful Hanover page. (6) Keyword-stuffed profile name ('NEMO Seamless Gutter York PA Installation') \u2014 triggers policy enforcement and lowers customer trust; not worth discussing again.\n\nOne measurement note: none of the three can be judged by Search Console. Technique 1 shows up in the GBP performance report (searches by term, calls, direction requests) and the grid check; technique 2 shows up as calls and booked route slots \u2014 have Eric keep a paper tally per route day; technique 3 shows up only in monthly logged-out prompt tests plus any AI referrer in analytics. Do not let a Search Console number decide whether these worked."
   },
   "pages": {
     "areas": [

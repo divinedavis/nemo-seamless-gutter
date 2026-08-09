@@ -5314,3 +5314,26 @@ impression block ages out of the Search Console window; expect impressions to
 fall by 15,000–18,500 and `avg_position` to get **worse**, toward 29 — and if it
 instead improves toward 21, my reading of the flood is wrong and the site's
 non-flood positions are better than the arithmetic above implies.
+
+## 2026-08-09 — engine run
+
+Goal: **0.7%** top-3 share of 152 tracked queries (target 50%).
+2026-08-08: 3 visitors (0 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — ok: added "What Gutter Installation in Dover Looks Like, Start to Finis" to /areas/seamless-gutters-dover-pa.html for 'gutter installation dover'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: no query needs its own page — the remaining gaps all belong on pages that exist, which strengthen_pages handles
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 39 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 1 URL(s), HTTP 200
+
+**Scout proposed (as candidates, not running):**
+- T051 Set the GBP service-area list to the real York County towns — NEMO has five town pages on the site, but the Business Profile itself may still be a single York pin with no declared service area — which means a homeowner searching in Hanover, Dover, Red Lion, Dall
+- T052 Published town route days — 'Eric is in Dallastown Thursday, 4 slots' — The site and profile currently give a stranger no reason to call TODAY — booking a slot with an unknown contractor is an open-ended commitment. A dated, capacity-limited route day ('I'm in Red Lion on
+- T053 Claim BuildZoom and the trade-verification profiles AI engines check — Zero AI-answer-engine visitors with the GEO work already done on-site suggests the problem is not how the pages read but that the engines have nothing to verify NEMO against. When a York homeowner ask
