@@ -5337,3 +5337,418 @@ Goal: **0.7%** top-3 share of 152 tracked queries (target 50%).
 - T051 Set the GBP service-area list to the real York County towns — NEMO has five town pages on the site, but the Business Profile itself may still be a single York pin with no declared service area — which means a homeowner searching in Hanover, Dover, Red Lion, Dall
 - T052 Published town route days — 'Eric is in Dallastown Thursday, 4 slots' — The site and profile currently give a stranger no reason to call TODAY — booking a slot with an unknown contractor is an open-ended commitment. A dated, capacity-limited route day ('I'm in Red Lion on
 - T053 Claim BuildZoom and the trade-verification profiles AI engines check — Zero AI-answer-engine visitors with the GEO work already done on-site suggests the problem is not how the pages read but that the engines have nothing to verify NEMO against. When a York homeowner ask
+
+## 2026-08-09 — review agent
+
+### Lead: something finally shipped, and it was only half of it
+
+For eleven days this journal has recorded recommendations that were never
+deployed. Last night that broke. Between 19:28 and 19:35 ET on 2026-08-08,
+Divine committed four changes and **put the site half of them on the droplet**:
+
+- **`index.html` — the duplicate LocalBusiness schema is merged and live.** This
+  was 08-08 rec 7 / 08-07 rec 6, open for five days. It is the first
+  recommendation in this project's history to reach production.
+- **A bottom call bar reading "Call (717) 578-0073 · Free estimate" is live on
+  all 39 pages**, replacing a 56px orange circle containing a phone glyph and
+  nothing else.
+- `growth/techniques.py` and `growth/templates.py` shipped with them.
+
+**How I know it deployed rather than merely committed.** `publish_state.sh:36`
+does `git reset --hard origin/main` and then copies the droplet's `index.html`
+over the top, so the droplet always wins. This morning's publish (`e091c02`)
+touched four files and `index.html` was not among them — meaning the droplet's
+copy is now byte-identical to the merged version. Stronger still: `local_schema`
+ran at 06:00 and reported noop, "LocalBusiness schema already current". That
+comparison (`techniques.py:669`, `out == src`) can only come out equal if the
+droplet's `local_schema` generates the *new* payload — eight offers, `sameAs`,
+`geo`, `slogan`, `knowsAbout`. An old copy would have rewritten the file back to
+four offers and the revert would be sitting in today's commit. Same for the
+pages: `publish_state.sh:71` rsyncs `areas/ guides/ services/` droplet → repo,
+and only Dover changed today, with its call bar intact.
+
+**And here is the other half.** Four engine files did not go across:
+
+| file | committed | evidence it is still stale | strength |
+| --- | --- | --- | --- |
+| `growth/scout.py` | 08-08 | T051's hypothesis, filed by the scout **this morning**, opens "NEMO has **five** town pages on the site". The site has **15**. "five town service-area pages" is the exact string the pre-08-08 prompt hardcoded. | proven |
+| `growth/snapshot.py` | 08-05/06/07 | `keywords.ranked` (`snapshot.py:139`) and `gsc.pages` (`:147`) are emitted unconditionally and both are absent from today's file. | proven |
+| `growth/gsc.py` | 08-05/06 | `discovered_untracked` is **exactly 40** rows — the old `out[:40]`, not `_select_discoveries`. | proven |
+| `growth_daily.py` | 08-08 | Same commit as `scout.py`; a new `growth_daily` calling the old `scout.run()` with `--docroot` would raise `TypeError`, and the scout ran clean. | proven |
+| `growth/metrics.py` | 08-07 | No `crawl_*` series. Not independent — `SERIES` is built in `snapshot.py` — but same commit as a proven-stale file. | presumed |
+| `growth/keywords.py` | 08-05 | Not observable from the snapshot at all. Same commit as `gsc.py`. | presumed |
+
+So the deploy was **the files in last night's own four commits**, not the
+accumulated backlog. That is an entirely understandable way to deploy and it is
+the worst case to detect: the engine now runs a mixture of 2026-08-08 and
+2026-08-04 code, and nothing in the snapshot says so. I spent the first half of
+this review establishing it by forensics. I have made that unnecessary from now
+on — see "What I changed" below.
+
+**One thing this makes newly true and it matters more than the rest of this
+entry:** the deploy path is now *proven to work*. Every "Divine — minutes on the
+droplet" recommendation below stopped being theoretical last night.
+
+### Where the numbers stand
+
+The goal metric — tracked York County queries holding a top-3 position:
+
+| | 08-03 | 08-04 | 08-05 | 08-06 | 08-07 | 08-08 | 08-09 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **top-3 count** | 2 | 2 | 1 | 1 | 1 | 1 | **1** |
+| top-10 count | 8 | 8 | 8 | 8 | 8 | 8 | **8** |
+| `ranked_known` | 22 | 22 | 22 | 22 | 22 | 23 | **23** |
+| tracked queries | 122 | 127 | 127 | 138 | 140 | 146 | **152** |
+| share (`top3/total`) | 1.6% | 1.6% | 0.8% | 0.7% | 0.7% | 0.7% | **0.7%** |
+| honest share (`top3/ranked_known`) | 9.1% | 9.1% | 4.5% | 4.5% | 4.5% | 4.3% | **4.3%** |
+
+**Top-3 flat at 1 for five days. Top-10 flat at 8 for eight. `ranked_known` flat
+at 23. Nothing in the goal block moved today, and nothing has moved toward the
+goal in eight days.**
+
+Per town — every named town is zero and has been for all fourteen measured days:
+
+| bucket | total | covered | top-3 |
+| --- | --- | --- | --- |
+| county | 83 (+2) | 32 | **1** |
+| york | 20 | 5 | 0 |
+| dover | 14 (+1) | 5 (+1) | 0 |
+| spring-grove | 10 (+1) | 3 | 0 |
+| dallastown | 9 | 3 | 0 |
+| red-lion | 9 (+1) | 3 | 0 |
+| hanover | 7 (+1) | 4 | 0 |
+
+Intent coverage: hire **47/97**, price **3/33**, check 4/14, diy 1/8. **Price is
+on its eleventh day stuck at 3 covered** while its total went 25 → 33 in a week.
+
+The divergence measured yesterday continued exactly as described: tracked 146 →
+152 (+6 in), covered 54 → 55 (+1 out), **uncovered backlog 92 → 97 (+5 net)**.
+Ninth consecutive day of growth. Note this was *not* affected by yesterday's
+scout change, because that change is not deployed — the +6 is the old scout
+behaving normally, and yesterday's prediction that intake would fall below 5 is
+**void, not failed**. It cannot be tested until `scout.py` ships.
+
+Search Console, 28-day rolling: rows **631** (+7), matched **23** (flat), clicks
+**7 → 9**, impressions **22,045** (+82), avg position **24.9** (flat).
+
+**The clicks number is the one genuinely new thing in the data and I am going to
+under-claim it deliberately.** Nine clicks over 28 days against 22,045
+impressions is a site-wide CTR of 0.041%. It is the first movement in six days
+and it is +2 clicks. Two clicks is not a signal; it is two people. It also
+cannot be the call bar — the bar went live at ~19:35 on 08-08 and this window
+ends 2026-08-06 (`gsc.py:44-45`, `LAG_DAYS = 3`). Recorded, not celebrated.
+
+Traffic (nginx, bots and owner IPs excluded):
+
+| | 08-03 | 08-04 | 08-05 | 08-06 | 08-07 | 08-08 |
+| --- | --- | --- | --- | --- | --- | --- |
+| visitors | 32 | 10 | 6 | 7 | 7 | **3** |
+| pageviews | 70 | 35 | 8 | 10 | 9 | **4** |
+| organic | 2 | 2 | 1 | 1 | 0 | **0** |
+| direct | 28 | 7 | 5 | 3 | 7 | **3** |
+| local (maps) | 0 | 0 | 0 | 1 | 0 | **0** |
+| AI-referred | 0 | 0 | 0 | 0 | 0 | **0** |
+| bot hits | 2,189 | 1,612 | 1,894 | 1,448 | 2,252 | **2,380** |
+
+**3 visitors is the lowest since the site started being measured**, and organic
+is 0 for a second consecutive day. `call_taps` **0 for ten days**. `ai_calls` 0
+for eight. `bookings` 0 since 07-30. All-time: **1 booking, 0 phone leads.**
+Cumulative visitors since 07-30: **93**.
+
+Engine health: eleven build steps, all `ok`, one section written (Dover, "What
+Gutter Installation in Dover Looks Like, Start to Finish"), sitemap 39 URLs,
+IndexNow HTTP 200, scout clean and filed T051–T053. **No billing block.** The
+prompt's warning about a spend cap until 2026-08-01 has been stale for nine days.
+
+### Did previous changes work?
+
+**08-08 rec 7 (merge the schema blocks) — DONE, and it is live.** Verified in
+`index.html`: one `@id` at `:115`, one email, eight `Offer` entries, `sameAs`
+pointing at the Business Profile, `geo`, `knowsAbout`. Effect on rank so far:
+**none measurable, and none should be expected yet** — it deployed 11 hours
+before this snapshot and today's Search Console window closes 2026-08-06. The
+honest read is that this fixes a spec violation and adds the GBP `sameAs`
+corroboration; whether that is worth anything is a question for September, and
+against a base of 8 top-10 queries I doubt it will ever be separable from noise.
+I would rather record that now than let someone claim it later.
+
+**The call bar — a real intervention, and now a dated test.** This is the first
+change ever made on this project aimed at the conversion half rather than the
+acquisition half, and it lands directly on the metric that has been stuck at
+zero longest. I checked the measurement chain before trusting it:
+`analytics.js:42` delegates with `e.target.closest('a[href^="tel:"], a[href^="sms:"]')`,
+so a tap landing on the inner `<span class="call-bar-sub">` still counts — that
+is exactly the bug a bar-with-child-elements would have introduced over the old
+single-glyph button, and it is not present.
+
+  **Prediction, recorded before the fact.** Treat 2026-08-09 as day 0 of a new
+  cohort — the 93 visitors before it saw a different page and must not be pooled
+  in. **By 2026-09-01, with 150+ cohort visitors, `call_taps` > 0.** If it is
+  still 0 at 150 visitors, the probability of that under the 2–4% contractor
+  median is 0.2–4.8%, and the bottleneck moves decisively from "nobody sees the
+  button" to "the traffic is not buyers". If it is 0 at 150 visitors *and*
+  `ai_calls` is also 0, I would stop recommending on-site conversion work
+  entirely and put everything behind the map pack.
+
+**08-08 rec 1 (sync `growth/`) — half done, and the half that shipped was the
+half I ranked second.** The site files went; the four measurement files did not.
+The `gsc.pages` deadline is **eight days out** (2026-08-17).
+
+**08-08 rec 2 (leaf-fall queue reorder) — NOT done, day 11.** `order = {"hire":
+0, "price": 1, "check": 2, "diy": 3}` unchanged at `techniques.py:435` and
+`:926` (the second moved from `:879` when the schema merge added lines).
+**Newly important:** `techniques.py` is now the file that *did* deploy, so this
+is a two-literal edit on a path proven to work last night. Price coverage day 11
+at 3, total now 33.
+
+**08-08 prediction on scout intake — void.** See above; the change is not
+running. Re-arm when `scout.py` ships.
+
+**08-02's prediction (7-day median daily `organic_visitors` ≥ 2 by 2026-08-16) —
+still failing and getting worse.** Window 08-02…08-08 is `[0,2,2,1,1,0,0]`,
+median **1.0**, fifth day unchanged, with two zeros now at the recent end. Seven
+days left. I would bet against it. Standing caveat: three billing-blocked days
+sit inside the causal window, so a failure reads "inconclusive, rerun".
+
+**The 2026-09-01 impression-block prediction — still on track.**
+`discovered_untracked` is byte-identical for a **fourth** consecutive day
+(md5 `40b32de6` on 08-06, 08-07, 08-08, 08-09) while site-wide rows moved 604 →
+631. Unchanged forecast: on or about 2026-09-01, impressions fall 15,000–18,500,
+rows fall ~200, and **`avg_position` gets worse**, toward 29. Not a penalty, not
+a regression, and not creditable to anything anybody does between now and then.
+
+**Still not done, with ages:** 08-08 rec 5 / 08-06 rec 1 homepage title
+(`index.html:16-17` still `Gutter Installer & Contractor | NEMO Seamless Gutter`,
+still names no place) — **day 9**. 08-08 rec 3 clear the candidate backlog —
+day 1, and the pile grew from 38 to **41**. 08-08 rec 4 goal denominator — day 1.
+T016 GBP category audit — **day 14**. T011 LSA decision — day 14. T007 review
+engine — day 14. `?utm_source=gbp` — day 7. Carried without restating: the
+Akron/Lancaster paragraph at `services/gutter-guards.html:163` (day 12), T008's
+false hypothesis, `schuylkill county seamless gutter` inflating the tracked
+universe by one, T014's missing `activated` date.
+
+**The ledger fact from yesterday, updated:** 41 candidates, **zero ever
+activated, zero ever rejected**, `scoreboard.does_not_work` still `[]`. Three
+more arrived today. Idea supply is not the constraint; it has not been for two
+weeks.
+
+**Prompt corrections, seventh day.** The scheduled prompt still describes
+2026-07-28 — "77 rows, 17 matched, 3 clicks, 429 impressions, avg position 12.4",
+"the county bucket was 2 of 50", and a spend cap "until 2026-08-01". Today: 631
+rows, 23 matched, 9 clicks, 22,045 impressions, avg position 24.9, county 1 of
+83, and nine consecutive clean scout runs. Per the prompt's own rule, the data
+wins.
+
+### What I researched today
+
+- **Service areas: the repo's own earlier research was right, and today's scout
+  proposal is half wrong.** T051 argues that without a declared service area a
+  Hanover searcher "never sees the listing at all, no matter how good the town
+  page is". The 2026 sources agree on the mechanism the 08-02 entry already
+  recorded: service areas decide *where you are eligible to appear*, not *how
+  well you rank*, distance is computed from the hidden verified address or the
+  service-area centroid, and **padding the list actively hurts** — five to ten
+  towns is described as the sweet spot for a single-truck contractor, and
+  claiming far more reads as spam
+  ([Map Ranks](https://www.mapranks.com/2026/06/29/google-maps-optimization-service-area-businesses/),
+  [RankAI](https://rankai.ai/articles/service-area-business-google-business-profile-guide),
+  [SEOLocale](https://seolocale.com/google-map-pack-ranking-in-2026-how-the-local-3-pack-really-works/)).
+  **What this changes here:** T051's rank claim should be struck, but its
+  *setup* question — is the profile even configured as a service-area business,
+  or is it a storefront pin at 808 W Mason Ave — has never been looked at by
+  anyone, and it is a sixty-second look. It is not a separate project from T016;
+  it is the same twenty minutes in the same settings screen. Also note these
+  sources put GBP signals at **32%** of local-pack weight, ahead of on-page at
+  19% — i.e. ahead of everything this engine can touch.
+- **Foursquare is why the AI-referral number is zero, and this is the one piece
+  of research that changed my ranking.** OpenAI licensed Foursquare's Places
+  dataset in December 2024; Foursquare is reported as the single dominant source
+  behind ChatGPT's local business answers, with Yelp second and the Google
+  Business Profile third
+  ([KailxLabs](https://www.kailxlabs.co/guides/foursquare-for-ai-search-citation),
+  [Surface Local](https://www.surfacelocal.com/blog/how-chatgpt-finds-local-businesses),
+  [Pleiades](https://www.pleiadesconsultancy.com/blog/foursquare-chatgpt-connection)).
+  **Why this matters here:** `ai_visitors` is 0 for all 15 measured days despite
+  the answer-first GEO pass being complete on every ranking page. That is the
+  shape of a business that is *absent from the index the assistant reads*, not
+  one that reads badly. **This is not a new technique — it is T048, filed by the
+  scout on 08-08 and sitting at `candidate`.** I am promoting it, not filing it.
+  I treat the "70%" figure as vendor-blog arithmetic; the OpenAI–Foursquare
+  partnership underneath it is the part I lean on.
+- **Conversion benchmarks, second source.** Home-service phone leads convert at
+  **46%**, 37% of those on the first call, and responding within 60 seconds is
+  reported to lift conversion sharply; sticky mobile call CTAs are named
+  explicitly as current best practice
+  ([WebFX](https://www.webfx.com/blog/home-services/home-services-marketing-benchmarks/),
+  [LSEO](https://lseo.com/blog/search-engine-optimization/mobile-seo/mobile-optimization-for-local-search-success-in-2026/)).
+  **Why this matters here:** it is independent corroboration that last night's
+  call bar is the right *kind* of change, and it is the second source for the
+  2–4% median I used to set the 09-01 threshold above.
+- **Rejected, with reasons.** (1) *Adding the fifteen towns to the GBP service
+  area* — rejected 08-07, and today's sources give the additional reason that
+  over-claiming demotes. Rejected for the third time. (2) *Filing Foursquare as
+  a new technique* — it is T048; filing it again would be the exact mistake this
+  prompt warns about. Likewise Yelp is T035, Apple/Bing Places is T029, NAP
+  citations is T009, geo-grid checking is T038. (3) *Anything from the "AI
+  visibility package" vendor tier* — eleventh time. (4) *Chasing the 31 of 40
+  Philadelphia-suburb discovered queries* — they are a frozen one-day artifact
+  (above) and Glenside is 90 miles from a one-truck operator in York. **Nothing
+  in today's research is a 54th technique and I am not filing one.**
+
+### Recommendations
+
+**Everything below needs a droplet action before it does anything** —
+`/var/www/nemo-seamless-gutter` is not a git checkout and `publish_state.sh`
+copies droplet → repo only. Nothing in this commit is live. The difference from
+every previous entry is that we now know the deploy path works, because it was
+used last night.
+
+1. **Finish last night's deploy — copy the four measurement files across.**
+   *(Divine — minutes.)* `growth/snapshot.py`, `growth/gsc.py`,
+   `growth/metrics.py`, `growth/keywords.py`, plus `growth/scout.py` and
+   `growth_daily.py` **together** (they must move as a pair or the scout raises
+   `TypeError`). This unblocks the `gsc.pages` fuse on **2026-08-17**, re-arms
+   the void scout-intake test, and lands today's version stamp so this review
+   never has to do forensics again. *How you would know:* tomorrow's snapshot
+   has a `code_version` block, a `keywords.ranked` list, `gsc.pages`, `crawl_*`
+   series, and more than 40 `discovered_untracked` rows. *Checked:* the evidence
+   table in the lead, each row against the emitting line.
+2. **Reorder the content queue for leaf-fall.** *(Divine — two dictionary
+   literals, `techniques.py:435` and `:926`. Free. Day 11.)* Put `price` ahead
+   of `hire` until 30 November. The argument is stronger than yesterday on two
+   counts: the backlog is still diverging (+5 net today, ninth straight day), so
+   order is the only lever that decides what ever gets written; and
+   `techniques.py` is now the file that demonstrably deploys. *How you would
+   know:* `keywords.by_intent.price.covered` moves off 3 within a week.
+   *Checked:* `techniques.py:411-427`, `:435`, `:907-952`, `:926`.
+3. **Eric: one twenty-minute sitting with the Business Profile.** *(Eric. Free.
+   T016 is day 14.)* Do these three in one session, and nothing else:
+   (a) screenshot the **primary category** — do not change it blind, three weeks
+   of research have put it first; (b) check whether the profile is configured as
+   a **service-area business** or a storefront pin, and if a service area is set,
+   what is in it — this is T051's only defensible half, and nobody has ever
+   looked; (c) confirm the **hours**, because `index.html` now publishes Mon–Fri
+   07:30–18:00 plus Sat 08:00–14:00 and those came from what Eric said, not from
+   the profile — today's AI-citation research is blunt that one inconsistent
+   detail across sources is enough for a machine to pick a safer answer.
+   **Then change at most one high-impact field, and leave name, address and
+   phone alone for a fortnight** — the scout's own sequencing warning, and a
+   suspension costs more than everything in this journal combined. *Checked:*
+   T016 and T051 both `status: candidate, activated: null`;
+   `techniques.py:629-634` for the hours now published.
+4. **Eric: claim Foursquare — T048.** *(Eric — under an hour, free. Filed 08-08,
+   promoted today.)* Name, address, phone and category byte-identical to the
+   Business Profile. This is the first mechanism anyone has produced for why
+   `ai_visitors` has been 0 for fifteen days that is not "the pages read badly",
+   and the pages demonstrably do not read badly — `geo_answer_first_content_pass`
+   has reported "every ranking page already opens with a direct answer" for days.
+   *How you would know:* first non-zero `ai_visitors` day, and NEMO named in a
+   logged-out ChatGPT run of "gutter installer York PA" — the monthly test T053
+   already specifies. *Checked:* T048 exists at `status: candidate`; I did not
+   file a duplicate.
+5. **Put York back in the homepage title and description.** *(Divine — minutes.
+   Free. Day 9.)* `index.html:16-17`; the site's most important page names no
+   place. Ranked fifth rather than first for the same reason as yesterday — the
+   impression flood has a better explanation — but `index.html` is now proven
+   deployable, so the objection "it would only sit in the repo" is gone.
+   *Checked:* `index.html:16-17`, unchanged.
+6. **Eric: clear the candidate backlog — pick three, kill the rest.** *(Eric —
+   one sitting. Free. Day 2, pile grew 38 → 41.)* Unchanged from yesterday and I
+   will keep restating it until it happens or someone tells me to stop. On
+   today's evidence my three are **T016** (in rec 3 above), **T048** (rec 4), and
+   **T007** (the review engine — reviews are ~16% of local-pack weight in today's
+   sources and the profile has 13). Rejecting the other 38 is worth as much as
+   activating three: it would put the first entry ever into
+   `scoreboard.does_not_work`, which is what the scout needs to stop re-proposing
+   neighbours of ideas nobody wanted.
+7. **Fix the goal metric's denominator, or demote it.** *(Divine — small change
+   in `keywords.py`/`snapshot.py`. Day 2.)* `share_pct` at `keywords.py:296`
+   falls whenever the scout works, so it cannot show progress; today it read
+   0.7% on a day the site got strictly better. Freeze the denominator to a dated
+   cohort, or promote `top3/ranked_known` (**1/23 = 4.3%**) to the headline. Not
+   done by me: it redefines the number Eric is judged against, which is his
+   decision, not a diagnostic.
+
+### What I changed in this repo today
+
+One change, in `growth/snapshot.py`, plus its tests. **167 tests pass** (159
+before, 8 new).
+
+- **`growth/snapshot.py` — the snapshot now says which version of the engine
+  produced it.** New `_code_fingerprint()` records `sha256[:12]` of every
+  non-test `.py` in `growth/` plus `../growth_daily.py`, published as
+  `code_version`. The reviewer hashes the same files in its checkout and diffs;
+  "is the droplet running what is on main" stops being an inference. This is
+  worth eight tests because the alternative cost the first half of today's
+  review, and cost the previous three reviews the same tax while giving them a
+  *worse* answer — absence-of-a-key only detects changes that happened to add a
+  key, and it could not have seen last night's partial deploy at all. Content
+  hashes rather than a git revision because the docroot has no git metadata.
+  Tests are excluded from the digest: they never run on the droplet, so they
+  would differ for reasons that mean nothing.
+- **`growth/test_snapshot.py` — 8 tests, no network, no droplet state.** The
+  digest names the engine modules and excludes `test_*` and non-`.py` files
+  (`snapshot.json` and `JOURNAL.md` live in that directory and change every
+  morning — including them would make the stamp differ on every run and mean
+  nothing); it names `growth_daily.py`; the hashes really are file content, so
+  the far side of the comparison is computable; `combined` moves when a module
+  moves and is stable across calls; **an unreadable file or a missing CLI is
+  skipped rather than fatal** — this diagnostic must never be the reason the
+  bridge goes down; and the digest survives `scrub()` untouched, because a
+  12-hex string near the PII patterns deserved a test rather than a glance.
+
+I did not touch `techniques.json`, `keywords.json`, `results.jsonl` or
+`state.json`; did not activate, retire or re-status any technique; and did not
+edit `index.html`, `styles.css` or anything under `areas/`, `guides/` or
+`services/`. I did not make recs 2, 5 or 7 — the queue order and the goal
+denominator change what the engine does and how the business is scored, and
+those are decisions rather than diagnostics.
+
+### Reasoning and uncertainties
+
+**Day fourteen. One top-3 query, zero top-3 in any of the seven named towns,
+zero call taps in ten days across 93 visitors, one booking ever, zero phone
+leads ever, and yesterday was the quietest day the site has ever recorded at
+three visitors.** None of that improved today.
+
+**What did improve is the thing that has been broken longest.** For eleven days
+the finding was always the same — good supply, no throughput, nothing crosses
+from recommended to deployed. Last night something crossed. That is worth more
+than any single metric in this entry, because it is the constraint every other
+recommendation sits behind, and it means recs 1, 2 and 5 are now cheap rather
+than hypothetical.
+
+**Where I am least confident.** Three things.
+
+First, I am wary of the story I have just told myself. "The deploy happened, so
+the project is unblocked" is exactly the kind of narrative that feels like
+progress and produces none — one night's deploy is one data point, and the four
+files that did *not* go across are the ones the measurement depends on. The
+honest version is: the path is proven, the backlog is not cleared.
+
+Second, my Foursquare argument rests on a licensing partnership plus a "70%"
+figure that comes from vendor blogs citing each other. The partnership is real
+and the mechanism is coherent — an assistant answering "gutter installer near
+me" reads a places index, and NEMO is not in the dominant one. But if T048 gets
+claimed and `ai_visitors` is still 0 in sixty days, the explanation is wrong and
+the answer is probably that a one-truck operator with 13 reviews simply does not
+clear the bar for a recommendation in any index. I would want that written down
+now rather than argued then.
+
+Third, I have again ranked "sync the files" above everything that could make the
+phone ring, on a day when the phone has not rung in fifteen. I think that is
+right — the measurement files are what make every other verdict in this journal
+trustworthy, and `gsc.pages` has a dated fuse — but if Eric reads only one line
+of this entry, it should be rec 3, not rec 1. The Business Profile is 32% of
+local-pack weight, it has never been looked at by anyone in fourteen days, and
+it costs twenty minutes.
+
+**What would change my mind, dated.** (1) 7-day median `organic_visitors` ≥ 2 by
+**2026-08-16** — currently 1.0 and worsening, I would bet against. (2) New today:
+`call_taps` > 0 by **2026-09-01** with 150+ visitors counted from 08-09 forward;
+a zero there moves the bottleneck from acquisition to traffic quality and I
+would stop recommending on-site conversion work. (3) On **2026-09-01** the
+August-1 impression block ages out: expect impressions down 15,000–18,500 and
+`avg_position` **worse**, toward 29. If it improves toward 21 instead, my
+reading of the flood is wrong. (4) Re-armed once `scout.py` deploys: does daily
+`keywords_added` fall below 5.

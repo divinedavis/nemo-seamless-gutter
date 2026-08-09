@@ -14,6 +14,7 @@ like a phone number, email or street address before the file is written,
 recording each hit under `redactions` so it is visible rather than silent.
 """
 import datetime
+import hashlib
 import json
 import os
 import re
@@ -100,6 +101,56 @@ def _series(metric, days=45):
             for d, v in ledger.series("__site__", metric)[-days:]]
 
 
+def _code_fingerprint():
+    """Which version of the engine actually produced this snapshot.
+
+    The droplet's docroot is not a git checkout, so a change committed to the
+    repository is not running until somebody copies the file across. Three
+    consecutive reviews have had to work that out by forensics — inferring the
+    deployed version from which optional keys were missing from this file —
+    and on 2026-08-09 that inference had to resolve a *partial* deploy, where
+    techniques.py and templates.py were live but snapshot.py, gsc.py,
+    metrics.py and scout.py were four days stale. Absence-of-a-key is a poor
+    signal for that: it only exists where a change happened to add a key, it
+    says nothing about changes that altered behaviour in place, and it goes
+    quiet the moment the two versions agree on their output shape.
+
+    A digest per module is the direct measurement. The reviewer can hash the
+    same files in its checkout and compare, so "is the droplet running what is
+    on main" stops being an inference and becomes a diff. Content hashes
+    rather than a git revision because the docroot has no git metadata to read.
+
+    Tests are excluded: they never run on the droplet, so a difference there
+    would be noise in exactly the comparison this exists to make.
+    """
+    modules = {}
+    for name in sorted(os.listdir(HERE)):
+        if not name.endswith(".py") or name.startswith("test_"):
+            continue
+        try:
+            with open(os.path.join(HERE, name), "rb") as fh:
+                modules[name] = hashlib.sha256(fh.read()).hexdigest()[:12]
+        except OSError:
+            continue
+
+    # The CLI entry point lives beside the package, not inside it, and it is a
+    # file the deploy can miss on its own — 2026-08-08's scout change needed
+    # both growth_daily.py and growth/scout.py to move together.
+    cli = os.path.join(os.path.dirname(HERE), "growth_daily.py")
+    try:
+        with open(cli, "rb") as fh:
+            modules["../growth_daily.py"] = hashlib.sha256(fh.read()).hexdigest()[:12]
+    except OSError:
+        pass
+
+    joined = "".join(f"{k}:{v}" for k, v in sorted(modules.items()))
+    return {"modules": modules,
+            "combined": hashlib.sha256(joined.encode()).hexdigest()[:12],
+            "note": ("sha256[:12] of each engine source file as it exists on the "
+                     "machine that ran it. Hash the same files in the repository "
+                     "to see what is deployed and what is still only committed.")}
+
+
 def build(docroot):
     kw = keywords.summary()
     sb = review.scoreboard()
@@ -165,6 +216,9 @@ def build(docroot):
         "last_build": ledger.get_state("last_build"),
         "last_scout": ledger.get_state("scout_last"),
         "pages": _page_inventory(docroot),
+        # See _code_fingerprint(): what the droplet is actually running, so the
+        # reviewer can diff it against the repository instead of deducing it.
+        "code_version": _code_fingerprint(),
     }
     snap, redactions = scrub(snap)
     snap["redactions"] = {
