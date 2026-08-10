@@ -924,7 +924,17 @@ def strengthen_pages(ctx):
     kws = keywords.load()
 
     order = {"hire": 0, "price": 1, "check": 2, "diy": 3}
-    todo = sorted((k for k in kws if not k.get("covered")),
+    # `_names_other_market` guarded `adopt_queries`, so nothing new that names
+    # somebody else's market gets into the tracked universe. It did not guard
+    # this queue, and on 2026-08-10 the difference cost us a page: 'schuylkill
+    # county seamless gutter' was adopted before that filter existed, sat in
+    # the uncovered list ever since, reached the front of the queue, and put
+    # three paragraphs about Pottsville, Frackville and the coal region onto
+    # /services/seamless-gutter-installation.html — the site's main money page.
+    # Filtering at intake only protects the queries that arrive after the
+    # filter; the queue has to be filtered where it is read.
+    todo = sorted((k for k in kws if not k.get("covered")
+                   and not _names_other_market(k["query"])),
                   key=lambda k: order.get(k.get("intent"), 9))
 
     done = set(ledger.get_state("strengthened", []))
@@ -962,10 +972,29 @@ def strengthen_pages(ctx):
                 break
             continue
 
+        # The query being in-area does not make the answer in-area. This is the
+        # same check `geo_answer_first_content_pass` runs on what comes back
+        # from the model, for the same reason: a confident "<Name> County"
+        # written into a service page reads as local knowledge and tells a York
+        # County searcher the business is somewhere else. Rejecting costs one
+        # candidate's worth of a day; shipping it costs a page until a human
+        # notices.
+        off = _off_area_prose(" ".join(
+            [data["h2"]] + list(data["paragraphs"])
+            + list(data.get("bullets") or [])))
+        if off:
+            errors.append(f"rejected section for '{kw['query']}': names "
+                          f"{off!r}, which is not York County")
+            if len(errors) >= MAX_ITEM_FAILURES:
+                break
+            continue
+
         block = _render_sections([{
             "h2": data["h2"], "paragraphs": data["paragraphs"],
             "bullets": data.get("bullets")}])
         faq = data.get("faq") or {}
+        if faq.get("q") and _off_area_prose(f'{faq["q"]} {faq.get("a", "")}'):
+            faq = {}
         if faq.get("q"):
             block += (f'\n      <h3>{_esc(faq["q"])}</h3>'
                       f'\n      <p>{_esc(faq.get("a", ""))}</p>')

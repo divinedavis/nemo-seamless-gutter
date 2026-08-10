@@ -5775,3 +5775,436 @@ Goal: **1.2%** top-3 share of 161 tracked queries (target 50%).
 - T054 24/7 instant gutter price calculator with call-to-lock CTA — 13 visitors and 300 GBP views a day/month are producing zero contacts because every action on the site asks a nervous stranger to either book an unknown slot or phone a contractor blind. A York homeow
 - T055 Written $100 referral reward, asked on day 5, tracked — Eric's inbound channels are 8-12 weeks from working, but he has already finished enough jobs to have earned 13 reviews — that is 13+ York County households who liked the work and have never been given
 - T056 Get named on the third-party 'best gutter company in York PA' lists AI reads — The site has zero AI-answer visitors and 1.3% top-3 coverage because when a York homeowner asks ChatGPT or Gemini 'who's the best gutter company in York PA', the engines answer from third-party compar
+
+## 2026-08-10 — review agent
+
+### Lead: the engine published Schuylkill County onto the main money page this morning
+
+`strengthen_pages` ran clean, reported `ok`, and added three paragraphs and an
+FAQ about **Pottsville, Schuylkill Haven, Orwigsburg, Frackville, Minersville,
+Tamaqua, Pine Grove, Ashland and Mahanoy City** to
+`/services/seamless-gutter-installation.html` — the single most important
+commercial page on this site. It is live. It commits a one-truck York County
+contractor, in writing, to a county **85 miles north** across the Susquehanna,
+and it volunteers the reason a reader should not call: *"Because it's a haul
+from our York County shop, we group Schuylkill County estimates and installs
+together rather than making two separate trips."*
+
+**This is the second time this exact failure has shipped, through a different
+door.** On 2026-07-29 `geo_answer_first_content_pass` wrote *"homes in Akron, PA
+and the surrounding Lancaster and York County area"* onto
+`/services/gutter-guards.html`. That produced two guards in `techniques.py`:
+`_names_other_market()` (line 1262) filters the query going in, `_off_area_prose()`
+(line 1295) filters the prose coming back. I grepped for every call site:
+
+```
+1487:  queries = [q for q in queries if not _names_other_market(q["query"])]
+1523:  off = _off_area_prose(answer)
+1552:  and not _off_area_prose(f"{f['q']} {f['a']}")]
+```
+
+**All three are inside `geo_answer_first_content_pass`. `strengthen_pages` had
+neither.** It read the uncovered queue raw at `:926-928` and wrote the model's
+reply straight to disk at `:979`.
+
+And the query it chose was one the journal has been carrying as a known
+contaminant for days: **`schuylkill county seamless gutter`**, adopted before
+`_names_other_market` existed, sitting in the uncovered list ever since, noted
+in three previous entries as "inflating the tracked universe by one" and
+otherwise ignored. Filtering at intake only ever protected the queries that
+arrived *after* the filter. The already-adopted one waited eleven days for its
+turn at the front of the queue and then took it. The code comment at `:1281`
+literally names this query as the reason the intake filter exists — nobody
+checked whether the one that got in before the fix was still queued.
+
+I have fixed the code path (see "What I changed"). **I cannot fix the live
+page** — `/var/www/nemo-seamless-gutter` is not a git checkout and
+`publish_state.sh` copies droplet → repo only. Deleting those paragraphs is rec 1
+and it is a two-minute job for Divine.
+
+### Where the numbers stand
+
+The goal metric — tracked York County queries holding a top-3 position:
+
+| | 08-04 | 08-05 | 08-06 | 08-07 | 08-08 | 08-09 | 08-10 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **top-3 count** | 2 | 1 | 1 | 1 | 1 | 1 | **2** |
+| top-10 count | 8 | 8 | 8 | 8 | 8 | 8 | **8** |
+| `ranked_known` | 22 | 22 | 22 | 22 | 23 | 23 | **23** |
+| tracked queries | 127 | 127 | 138 | 140 | 146 | 152 | **161** |
+| share (`top3/total`) | 1.6% | 0.8% | 0.7% | 0.7% | 0.7% | 0.7% | **1.2%** |
+| honest share (`top3/ranked_known`) | 9.1% | 4.5% | 4.5% | 4.5% | 4.3% | 4.3% | **8.7%** |
+
+**Top-3 moved for the first time in six days: 1 → 2.** I want to be careful
+about why this is real rather than an intake artifact, because the obvious
+worry is that one of the nine keywords the scout added today simply arrived
+already ranking. It did not: `ranked_known` is **flat at 23**, so no new query
+picked up a known position. Top-10 is also flat at 8. The only arrangement that
+produces +1 top-3 with both of those flat is **an already-tracked, already-ranked
+query moving up from the 4–10 band into the top 3.** That is a genuine
+improvement in the goal metric, and it is the first one since 2026-08-04.
+
+**I cannot tell you which query it was, and that is a direct cost of rec 1 not
+being done.** `keywords.ranked` is emitted unconditionally by `snapshot.py:139`
+and is still absent from today's file. So is `code_version`, the fingerprint I
+added yesterday specifically so this review would stop doing forensics.
+**`growth/snapshot.py` still has not been copied to the droplet — day 2.**
+Same for `gsc.py`: `discovered_untracked` is still exactly 40 rows, still the
+old `out[:40]`.
+
+Per town — six of seven named towns still zero, and zero for all fifteen
+measured days:
+
+| bucket | total | covered | top-3 |
+| --- | --- | --- | --- |
+| county | 87 (+4) | 33 (+1) | **2 (+1)** |
+| york | 23 (+3) | 5 | 0 |
+| dover | 14 | 5 | 0 |
+| dallastown | 10 (+1) | 3 | 0 |
+| spring-grove | 10 | 3 | 0 |
+| red-lion | 9 | 3 | 0 |
+| hanover | 8 (+1) | 4 | 0 |
+
+Intent coverage: hire **48/101** (+1 covered), price **3/35**, check 4/17, diy 1/8.
+**Price is on its twelfth day stuck at 3 covered** while its total went 33 → 35.
+The one covered query this morning was the Schuylkill one, i.e. the day's only
+coverage gain is the thing I am asking to have deleted.
+
+Backlog divergence, **tenth consecutive day**: tracked 152 → 161 (+9 in),
+covered 55 → 56 (+1 out), uncovered **97 → 105 (+8 net)**. Still the old scout —
+`scout.py` has not deployed either, so yesterday's void intake test stays void.
+
+Search Console, 28-day rolling: rows **637** (+6), matched **23** (flat), clicks
+**9** (flat), impressions **22,149** (+104), avg position **24.9** (flat).
+Site-wide CTR 0.041%.
+
+**A correction to yesterday's finding on `discovered_untracked`.** I said it was
+byte-identical for four days. Today its md5 changed (`40b32de6` → `352ec1a2`), so
+the streak technically broke — but the entire difference is **one row moving
+from 248 to 250 impressions** (`seamless gutter horsham pa`), against a block
+total of 11,932. No rows added, none removed, no position changed. It is not
+refreshing; it is functionally frozen and the 2026-09-01 forecast stands
+unchanged. I am recording the md5 change rather than repeating "byte-identical",
+because a claim stated that precisely should be corrected when it stops being
+precisely true.
+
+Traffic (nginx, bots and owner IPs excluded):
+
+| | 08-04 | 08-05 | 08-06 | 08-07 | 08-08 | 08-09 |
+| --- | --- | --- | --- | --- | --- | --- |
+| visitors | 10 | 6 | 7 | 7 | 3 | **13** |
+| pageviews | 35 | 8 | 10 | 9 | 4 | **21** |
+| organic | 2 | 1 | 1 | 0 | 0 | **0** |
+| direct | 7 | 5 | 3 | 7 | 3 | **12** |
+| local (maps) | 0 | 0 | 1 | 0 | 0 | **0** |
+| AI-referred | 0 | 0 | 0 | 0 | 0 | **0** |
+| bot hits | 1,612 | 1,894 | 1,448 | 2,252 | 2,380 | **1,356** |
+
+13 visitors is up off Saturday's all-time low of 3, and 12 of the 13 are
+**direct** — not search. **Organic is 0 for a third consecutive day.**
+`call_taps` **0 for eleven days**. `ai_calls` 0 for nine. `ai_visitors` 0 for
+all sixteen measured days.
+
+**One number moved that nobody predicted: `lead_totals.bookings_all_time` went
+1 → 2.** The daily `bookings` series is 0 on every day from 07-25 to 08-09, so
+this booking is either dated before the window or landed this morning before the
+06:03 snapshot. **I cannot date it from the repo and I am not going to guess.**
+It is the first movement in the lead totals since 2026-07-30 and it is one
+booking. `phone_leads_all_time` is still **0**.
+
+Engine health: eleven build steps, all `ok`, no billing block, sitemap 39 URLs,
+IndexNow HTTP 200, scout clean and filed T054–T056. **The prompt's warning about
+a spend cap "until 2026-08-01" is now ten days stale** — that is the eighth
+consecutive entry making this correction.
+
+### Did previous changes work?
+
+**08-09 rec 1 (copy the measurement files to the droplet) — NOT done, day 2.**
+No `code_version`, no `keywords.ranked`, no `gsc.pages`, no `crawl_*` series,
+`discovered_untracked` still capped at exactly 40. This cost something concrete
+today rather than hypothetically: the goal metric moved and **I cannot name the
+query that moved it.** The `gsc.pages` fuse is now **seven days out (2026-08-17)**.
+
+**The call bar — cohort day 1, and it is far too early.** 08-09 was the first
+full day: **13 visitors, 0 call taps.** The prediction was `call_taps > 0 by
+2026-09-01 with 150+ cohort visitors`. We are at 13 of 150. Zero taps out of 13
+is completely unremarkable at a 2–4% median — the expected count is 0.3. **No
+verdict is available and none will be for weeks.** Recording the counter, not a
+conclusion.
+
+**08-08 rec 7 (merge the LocalBusiness schema) — deployed 08-08, still no
+measurable effect and none is due.** `local_schema` reported noop again this
+morning, which continues to prove the droplet holds the merged version. Today's
+Search Console window closes 2026-08-07, one day before the deploy landed.
+Unchanged from yesterday: this is a September question and against 8 top-10
+queries I doubt it will ever separate from noise.
+
+**08-09 rec 2 / 08-08 rec 2 (leaf-fall queue reorder) — NOT done, day 12.**
+`order = {"hire": 0, "price": 1, "check": 2, "diy": 3}` unchanged at
+`techniques.py:435` and `:926`. Price coverage day 12 at 3 of 35.
+**Today makes this argument worse, not better, and I am demoting it** — see
+recommendations. The queue is not just mis-ordered, it is mis-*filtered*, and
+reordering an unfiltered queue only changes which wrong thing gets written first.
+
+**08-02's prediction (7-day median daily `organic_visitors` ≥ 2 by 2026-08-16) —
+effectively dead.** Window 08-03…08-09 is `[2,2,1,1,0,0,0]`, median **1.0**,
+sixth consecutive day unchanged, with **three zeros at the recent end**. Six days
+left and it would need a run of 2+ every remaining day. I called this against
+yesterday and I am calling it against harder today. Standing caveat unchanged:
+three billing-blocked days sit inside the causal window, so the honest reading of
+the failure is "inconclusive, rerun" rather than "the content does not work".
+
+**The 2026-09-01 impression-block prediction — on track, fifth day.** See the
+`discovered_untracked` correction above. Forecast unchanged: impressions fall
+15,000–18,500, rows fall ~200, `avg_position` gets **worse** toward 29, and none
+of it is creditable to anything anybody does between now and then.
+
+**08-09 rec 5 (York in the homepage title) — NOT done, day 10.**
+`index.html:16` still `Gutter Installer &amp; Contractor | NEMO Seamless Gutter`.
+
+**08-09 rec 6 (clear the candidate backlog) — NOT done, day 2, and the pile grew
+41 → 44.** T054, T055, T056 arrived this morning. **Zero techniques have ever
+been activated by a human, zero have ever been rejected,
+`scoreboard.does_not_work` is still `[]` on day fifteen.**
+
+**08-09 rec 3 (GBP sitting), rec 4 (Foursquare/T048), rec 7 (goal denominator) —
+all NOT done, day 2.** T016 is day 15. T011 LSA day 15. T007 review engine day 15.
+`?utm_source=gbp` day 8. **The Akron paragraph at `services/gutter-guards.html:163`
+is day 13** — and it is no longer a stale carry-over item, it is half of a live
+pattern. Two off-area passages are now on this site, written by two different
+techniques, twelve days apart.
+
+**Nothing I have recommended in fifteen days has been actioned except the schema
+merge and the call bar, both of which Divine did on 08-08.**
+
+### What I researched today
+
+- **Proximity is ~55% of map-pack weight and an oversized service area does not
+  extend reach.** 2026 sources are consistent that Google ranks from the verified
+  address or service-area centroid, and that padding the region list does not buy
+  distance
+  ([SEOLocale](https://seolocale.com/google-map-pack-ranking-in-2026-how-the-local-3-pack-really-works/),
+  [Wolfpack](https://wolfpackadvising.com/blog/how-to-rank-higher-on-google-maps/),
+  [ClickRank](https://www.clickrank.ai/local-seo-ranking-factors/)).
+  **Why it matters here:** third independent confirmation of the 08-07 and 08-09
+  rejections of "add fifteen towns to the GBP service area", and it is the same
+  physics that makes today's Schuylkill page pointless as well as dishonest —
+  no volume of prose about Pottsville moves a pin in York.
+- **"Open at time of search" is now named as roughly the fifth most important
+  individual Local Pack factor** — hours have graduated from profile hygiene to
+  a ranking and filtering input
+  ([multiwebteam](https://www.multiwebteam.com/google-maps-ranking-factors-9-that-matter-most-in-2026),
+  [SEOLocale](https://seolocale.com/google-map-pack-ranking-in-2026-how-the-local-3-pack-really-works/)).
+  **Why it matters here:** this is **T042**, filed 08-06 and sitting at
+  `candidate`, and it is also step (c) of yesterday's rec 3. It is not a new
+  technique and I have not filed one. It does justify moving hours from "while
+  you are in there" to a named reason to go in.
+- **Google's April 2026 review-policy update, enforced globally May–June with
+  retroactive sweeps — this changes a technique already in the ledger.** The
+  update explicitly bans **soliciting reviews that name a staff member**, review
+  gating, incentivisation, and reviews taken on shared or on-premises devices;
+  Google is removing batches and applying public warning banners
+  ([Birdeye](https://birdeye.com/blog/google-review-policy/),
+  [Launchcodex](https://launchcodex.com/blog/seo-geo-ai/google-business-profile-review-policy-update/),
+  [Three Chapter Media](https://www.threechaptermedia.com/blog/google-review-policy-2026)).
+  **Why it matters here: T047 needs its method narrowed before anyone runs it.**
+  T047 is "coach each review to name the service and the town". Asking a customer
+  to *mention the service* is still explicitly fine and still generates the review
+  justification T047 is built on. But "coach" is one drafting decision away from
+  scripting, the enforcement wave is live *now*, and this profile has 13 reviews
+  it cannot afford to lose. The safe version is a **memory prompt, not a script**:
+  "it helps if you mention what we did and where" — never sample text, never a
+  staff name, never a device Eric is holding. I am not filing this as a new
+  technique; it is a correction to T047's method and it belongs next to T007.
+- **Only ~1.2% of local businesses are ever named in an AI recommendation, and
+  the overlap between map-pack winners and AI-recommended businesses is about
+  45%** — more than half the businesses winning the 3-pack are absent from AI
+  answers entirely
+  ([evolveamz](https://evolveamz.com/local-business-ai-search-guide/),
+  [JWeis](https://jweis.com/blog/ai-search-geo-contractors/)). Consistency of
+  name/area/trade across GBP, site and Yelp is named as the dominant citation
+  lever.
+  **Why it matters here:** it is the strongest argument yet for deleting the
+  Schuylkill section, and it retro-justifies `_off_area_prose` existing at all.
+  The site currently tells a machine that NEMO serves York County *and* Lancaster
+  County *and* Schuylkill County; the GBP presumably says York. That is precisely
+  the mismatched-service-area shape these sources blame for missing citations —
+  and `ai_visitors` has been 0 for sixteen days.
+- **Rejected, with reasons.** (1) *Adding towns to the GBP service area* —
+  rejected for the fourth time, now with a proximity figure attached. (2) *Filing
+  today's research as new techniques* — hours is T042, reviews are T007/T033/T047,
+  AI consistency is T048/T053/T056, Yelp is T035. **I filed nothing.** (3) *GBP
+  WhatsApp contact* (a real 2026 feature) — a second inbound channel for a
+  one-owner business that is not answering the first one is a worse idea than it
+  sounds; revisit if `call_taps` ever goes positive. (4) *Chasing the 40
+  Philadelphia-suburb discovered queries* — frozen artifact, 90 miles away, and
+  today is a live demonstration of what happens when this site writes about places
+  it does not serve. (5) *Anything from the "AI visibility package" vendor tier* —
+  twelfth time.
+
+### Recommendations
+
+**Everything below needs a droplet action before it does anything.** Nothing in
+this commit is live.
+
+1. **Delete the Schuylkill County section from the live page.** *(Divine — two
+   minutes. Free.)* `services/seamless-gutter-installation.html`, lines **227–236**
+   on the droplet: the `<h2>Seamless Gutter Installation in Schuylkill County, PA</h2>`
+   block, its three paragraphs, and the `<h3>Do you actually service Schuylkill
+   County…</h3>` FAQ pair. While you are in that file, `services/gutter-guards.html:163`
+   is day 13 — change "homes in Akron, PA and the surrounding Lancaster and York
+   County area" to "homes across York County, Pennsylvania". **Do both in one
+   sitting; they are the same bug.** *How you would know:* the strings are gone
+   and `grep -ri "schuylkill\|akron\|lancaster county" services/` is empty.
+   *Checked:* both passages read directly out of the working tree today, quoted
+   above verbatim.
+2. **Copy the six engine files to the droplet.** *(Divine — minutes. Day 2.)*
+   `growth/techniques.py` (**now carrying today's fix — without it the engine
+   picks the next off-area query in the queue tomorrow morning**), plus
+   `snapshot.py`, `gsc.py`, `metrics.py`, `keywords.py`, and `scout.py` +
+   `growth_daily.py` **as a pair** or the scout raises `TypeError`. This is
+   yesterday's rec 1 with a new and more urgent reason attached: rec 1 above
+   cleans up the damage, this is what stops it recurring. *How you would know:*
+   tomorrow's snapshot carries `code_version`, `keywords.ranked`, `gsc.pages`,
+   `crawl_*`, and more than 40 `discovered_untracked` rows. *Checked:* absence of
+   `code_version` and `keywords.ranked` in today's `snapshot.json` against
+   `snapshot.py:139`; `len(discovered_untracked) == 40` against the old `out[:40]`.
+3. **Eric: one twenty-minute sitting with the Business Profile.** *(Eric. Free.
+   T016 is day 15.)* Unchanged from yesterday and I will keep restating it. In one
+   session: (a) screenshot the **primary category**, change nothing blind;
+   (b) check whether the profile is a **service-area business or a storefront
+   pin**, and what is in the area list — T051's only defensible half, and nobody
+   has looked in fifteen days; (c) confirm the **hours** against what
+   `index.html` now publishes (Mon–Fri 07:30–18:00, Sat 08:00–14:00), which came
+   from what Eric said rather than from the profile. Today's research promoted (c)
+   from hygiene to the fifth-ranked Local Pack factor. **Then change at most one
+   field and leave name, address and phone alone for a fortnight.** *Checked:*
+   T016 and T051 both `status: candidate, activated: null`;
+   `techniques.py:629-634` for the published hours.
+4. **Eric: claim Foursquare — T048.** *(Eric — under an hour, free. Promoted
+   08-09, unchanged.)* Name, address, phone, category byte-identical to the GBP.
+   Sixteen days of `ai_visitors: 0` with every ranking page already opening with a
+   direct answer is the shape of absence from the index, not bad prose — and
+   today's 45%-overlap figure says map-pack presence would not fix it either.
+   **Caveat now attached:** do rec 1 first. Claiming a listing that says York
+   while the site says Schuylkill is worse than claiming nothing.
+   *Checked:* T048 exists at `candidate`; no duplicate filed.
+5. **Eric: pick three from the backlog, reject the rest.** *(Eric — one sitting.
+   Free. Day 3, pile 41 → 44.)* My three today are **T016** (rec 3), **T048**
+   (rec 4), **T007** (reviews) — with T047's method narrowed per today's research:
+   a memory prompt, never sample text, never a staff name, never Eric's phone. The
+   rejections matter as much as the picks: 41 candidates with **zero ever
+   rejected** is why the scout keeps proposing neighbours of ideas nobody wanted,
+   and it filed three more this morning.
+6. **Put York back in the homepage title.** *(Divine — minutes. Free. Day 10.)*
+   `index.html:16`. *Checked:* line read today, unchanged.
+7. **Leaf-fall queue reorder — deliberately demoted from rec 2 to rec 7.**
+   *(Divine — two literals, `techniques.py:435` and `:926`.)* I ranked this second
+   for four days. Today changed my mind: an unfiltered queue writing pages in a
+   better order is still an unfiltered queue, and my fix in rec 2 has to land
+   first or reordering just changes which off-area query reaches the front. Do
+   this **after** rec 2, not instead of it.
+8. **Fix the goal denominator, or promote `top3/ranked_known`.** *(Divine. Day 3.)*
+   Today is the cleanest illustration yet: `share_pct` read 1.2% and
+   `top3/ranked_known` read 8.7%, for the same single query moving. Not done by
+   me — it redefines the number Eric is judged against.
+
+### What I changed in this repo today
+
+One change in `growth/techniques.py` plus tests. **174 tests pass** (167 before,
+7 new).
+
+- **`strengthen_pages` now applies both geo guards.** The queue comprehension at
+  `:926-928` drops any uncovered query where `_names_other_market()` is true, so
+  the pre-filter contaminants that were adopted before that function existed can
+  never reach the front. And the model's reply is checked with `_off_area_prose()`
+  across the heading, paragraphs and bullets **before** the block is rendered,
+  with the FAQ pair checked separately and dropped on its own — mirroring exactly
+  what `geo_answer_first_content_pass` has done since 08-03. A rejection is a
+  failed candidate, so the step moves to the next query rather than losing the day.
+  The heading is included in the checked text deliberately: the section that
+  shipped this morning had its county name **in the `<h2>`**, so a check reading
+  only the paragraphs would have passed it.
+- **`growth/test_techniques.py` — `StrengthenPagesGeoGuardTest`, 7 tests.** The
+  query that shipped is rejected by the queue filter; four real York County
+  queries still pass it (a filter that quietly emptied the build queue would be a
+  worse bug than the one it fixes); the exact `<h2>` and the exact FAQ question
+  that shipped are both caught by the prose guard; a clean Dover section survives
+  both. Two tests assert the wiring against the source text, the same technique
+  the existing `test_the_guard_is_wired_into_the_answer_first_pass` uses and for
+  the same reason — the path between the two guards is a live model call, so a
+  unit test cannot reach it end to end, and a guard nothing calls is a guard that
+  does not exist. That is precisely the failure being fixed: `_off_area_prose` has
+  existed and passed its tests since 08-03 while the caller that needed it did not
+  have it.
+
+I made this change rather than only recommending it because it is a defect fix
+with a live example, not a decision about the business. I did **not** touch
+`techniques.json`, `keywords.json`, `results.jsonl` or `state.json`; did not
+activate, retire or re-status any technique; and did not edit `index.html`,
+`styles.css` or anything under `areas/`, `guides/` or `services/` — including the
+Schuylkill page, which is rec 1 for Divine because editing it here would only
+create a conflict the next `publish_state.sh` would overwrite.
+
+### Reasoning and uncertainties
+
+**Day fifteen. Two top-3 queries, zero top-3 in any of the seven named towns,
+zero call taps in eleven days, zero organic visitors in three, zero AI visitors
+ever, zero phone leads ever, and two bookings all time.**
+
+Two things genuinely moved today and I want them separated clearly, because one
+is good and one is bad and the bad one is larger.
+
+**The good:** the goal metric went 1 → 2 by the only mechanism that counts as
+real — an already-ranked query climbing into the top 3 with `ranked_known` and
+top-10 both flat. And `bookings_all_time` went 1 → 2. Neither is a trend. One
+query and one booking are, at this volume, two events.
+
+**The bad:** the engine damaged the site's most valuable page and reported `ok`.
+That is worse than a day of no output, and it is the second instance of the same
+class of failure, which means the first fix was applied to the door the problem
+happened to walk through rather than to the room. I have now filtered the second
+door. **I am not confident there is not a third.** `service_pages`, `money_pages`
+and `area_pages` all generate prose from a queue, and I have not audited them the
+way I audited `strengthen_pages` — they were reporting `noop` today so nothing was
+at risk this morning, but "their queues happen to be empty" is not a guard.
+**That audit is the first thing I will do tomorrow** and I am writing it down so
+the next run holds me to it.
+
+**Where I am least confident.** Three things.
+
+First, the top-3 improvement. My argument that it is real rests entirely on
+`ranked_known` being flat, and `ranked_known` is computed by the same stale
+`snapshot.py` that will not tell me which query moved. The inference is sound
+given the numbers I have; I would like to check it against `keywords.ranked`, and
+I cannot until rec 2 lands. If it turns out an intake artifact can hold
+`ranked_known` flat, I am wrong and I would want that on the record.
+
+Second, I have again put two engineering-hygiene items above everything that
+could make the phone ring, on day fifteen of a phone that has not rung. I think
+rec 1 is genuinely first — a page actively telling York County searchers the
+business is in the coal region is a bleeding wound, not a tidy-up — but rec 3 is
+still the one with the most upside per minute spent, and if Eric reads one line
+of this entry it should be that one. GBP signals are ~36% of local-pack weight
+and nobody has opened the settings screen in fifteen days.
+
+Third, and I want to say this plainly rather than bury it: **the constraint on
+this project has not been ideas or engine uptime for two weeks — it is that
+recommendations do not get actioned.** Forty-four candidates, zero ever
+activated, zero ever rejected. Two of roughly forty recommendations have ever
+been carried out. I can keep writing better entries and it will not change that
+number. If the honest answer is that Eric does not have twenty minutes for the
+Business Profile in August, that is a legitimate answer for a man running a truck
+in his busy season — but then the ledger should say so, the candidates should be
+rejected rather than accumulating, and this review should stop restating them
+daily as though the next repetition is the one that works.
+
+**What would change my mind, dated.** (1) 7-day median `organic_visitors` ≥ 2 by
+**2026-08-16** — currently 1.0 with three trailing zeros; I am calling it lost
+barring a surprise. (2) `call_taps` > 0 by **2026-09-01** with 150+ cohort
+visitors from 08-09 forward — at **13 of 150**, no information yet. (3) On
+**2026-09-01** the impression block ages out: impressions down 15,000–18,500,
+`avg_position` worse toward 29. If it improves toward 21 instead, my reading of
+the flood is wrong. (4) Re-armed once `scout.py` deploys: does daily
+`keywords_added` fall below 5. (5) New today: does a third technique turn out to
+generate prose without the geo guard. I expect at least one does.

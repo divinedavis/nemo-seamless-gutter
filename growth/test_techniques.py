@@ -206,6 +206,68 @@ class OffAreaProseTest(unittest.TestCase):
         self.assertIn("_off_area_prose(f\"{f['q']} {f['a']}\")", body)
 
 
+class StrengthenPagesGeoGuardTest(unittest.TestCase):
+    """strengthen_pages read the uncovered queue without the geo filter.
+
+    On 2026-08-10 it took 'schuylkill county seamless gutter' — adopted before
+    `_names_other_market` existed, so the intake filter never saw it — off the
+    front of the queue and wrote three paragraphs about Pottsville, Frackville
+    and Mahanoy City onto /services/seamless-gutter-installation.html, the
+    site's main money page. The build log said "ok".
+
+    Both halves are tested here because they fail differently: the queue filter
+    stops an out-of-area *query* being chosen, and the prose filter stops an
+    in-area query whose *answer* wanders. Neither can be reached end to end by a
+    unit test — the path between them is a live model call — so the wiring is
+    asserted against the source, the way the answer-first guard already is.
+    """
+
+    def _body(self):
+        src = open(os.path.join(os.path.dirname(__file__), "techniques.py")).read()
+        body = src[src.index("def strengthen_pages"):]
+        return body[:body.index("# ----------------------------------------------------------- service pages")]
+
+    def test_the_query_that_shipped_is_rejected_by_the_queue_filter(self):
+        self.assertTrue(T._names_other_market("schuylkill county seamless gutter"))
+
+    def test_york_county_queries_still_pass_the_queue_filter(self):
+        for q in ("gutter repair dover pa", "seamless gutter installation york pa",
+                  "half round gutter installation york county",
+                  "how much to replace gutters on a 1500 sq ft house"):
+            self.assertFalse(T._names_other_market(q), msg=q)
+
+    def test_the_queue_filter_is_wired_into_the_build_queue(self):
+        self.assertIn('_names_other_market(k["query"])', self._body())
+
+    def test_the_prose_guard_is_wired_into_the_generated_section(self):
+        body = self._body()
+        self.assertIn("_off_area_prose", body)
+        # The heading is the part that becomes an <h2> and gets quoted; a check
+        # that only read the paragraphs would have passed the section that
+        # shipped, whose h2 was "Seamless Gutter Installation in Schuylkill
+        # County, PA".
+        self.assertIn('data["h2"]', body[body.index("_off_area_prose"):])
+
+    def test_the_heading_that_shipped_is_caught_by_the_prose_guard(self):
+        self.assertEqual(
+            T._off_area_prose("Seamless Gutter Installation in Schuylkill County, PA"),
+            "Schuylkill County")
+
+    def test_the_faq_that_shipped_is_caught_by_the_prose_guard(self):
+        self.assertEqual(
+            T._off_area_prose(
+                "Do you actually service Schuylkill County, or just the York area? "
+                "We service both."),
+            "Schuylkill County")
+
+    def test_a_clean_york_county_section_survives_both_guards(self):
+        text = ("What Gutter Repair in Dover Looks Like, Start to Finish "
+                "We re-hang sagging runs across York County with hidden hangers "
+                "spaced to the roof pitch.")
+        self.assertIsNone(T._off_area_prose(text))
+        self.assertFalse(T._names_other_market("gutter repair dover pa"))
+
+
 class DuplicateBusinessNodeTest(unittest.TestCase):
     """local_schema appended a second business node instead of noticing one.
 
