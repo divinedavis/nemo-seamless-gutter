@@ -5752,3 +5752,26 @@ August-1 impression block ages out: expect impressions down 15,000–18,500 and
 `avg_position` **worse**, toward 29. If it improves toward 21 instead, my
 reading of the flood is wrong. (4) Re-armed once `scout.py` deploys: does daily
 `keywords_added` fall below 5.
+
+## 2026-08-10 — engine run
+
+Goal: **1.2%** top-3 share of 161 tracked queries (target 50%).
+2026-08-09: 13 visitors (0 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — ok: added "Seamless Gutter Installation in Schuylkill County, PA" to /services/seamless-gutter-installation.html for 'schuylkill county seamless gutter'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: no query needs its own page — the remaining gaps all belong on pages that exist, which strengthen_pages handles
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 39 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 1 URL(s), HTTP 200
+
+**Scout proposed (as candidates, not running):**
+- T054 24/7 instant gutter price calculator with call-to-lock CTA — 13 visitors and 300 GBP views a day/month are producing zero contacts because every action on the site asks a nervous stranger to either book an unknown slot or phone a contractor blind. A York homeow
+- T055 Written $100 referral reward, asked on day 5, tracked — Eric's inbound channels are 8-12 weeks from working, but he has already finished enough jobs to have earned 13 reviews — that is 13+ York County households who liked the work and have never been given
+- T056 Get named on the third-party 'best gutter company in York PA' lists AI reads — The site has zero AI-answer visitors and 1.3% top-3 coverage because when a York homeowner asks ChatGPT or Gemini 'who's the best gutter company in York PA', the engines answer from third-party compar
