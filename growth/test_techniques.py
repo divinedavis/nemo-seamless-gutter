@@ -268,6 +268,197 @@ class StrengthenPagesGeoGuardTest(unittest.TestCase):
         self.assertFalse(T._names_other_market("gutter repair dover pa"))
 
 
+class WholePageGeoGuardTest(unittest.TestCase):
+    """The 2026-08-11 audit of the three techniques that build whole pages.
+
+    2026-08-10 fixed `strengthen_pages`, which writes a *section*. The entry
+    that day promised to check whether the same hole existed in the techniques
+    that write *pages*, and it did:
+
+      - `money_pages` read `keywords.load()` with only a "does this query need
+        its own page" filter — no `_names_other_market` on the queue and no
+        `_off_area_prose` on the reply. It was noop that morning only because
+        no gap happened to qualify, which is luck, not a guard. It is the worse
+        of the two failures: it writes a whole guide and records it as the
+        query's target.
+      - `area_pages` and `service_pages` read hand-written queues, so their
+        input was never at risk — but neither checked what came back, and what
+        comes back is what put Akron, PA on /services/gutter-guards.html.
+
+    None of the three can be driven end to end by a unit test, because the step
+    between the two guards is a live model call. So the guard functions are
+    tested against the strings that actually shipped, and the wiring is
+    asserted against the source — a guard nothing calls is a guard that does
+    not exist, which is precisely how `_off_area_prose` passed its own tests
+    for eleven days while the caller that needed it did not have it.
+    """
+
+    SRC = open(os.path.join(os.path.dirname(__file__), "techniques.py")).read()
+
+    def _body(self, start, end):
+        body = self.SRC[self.SRC.index(start):]
+        return body[:body.index(end)]
+
+    # --- the flattener the three pages share ---------------------------------
+
+    def test_generated_prose_reads_headings_not_only_paragraphs(self):
+        data = {"h1": "Seamless Gutters in Pottsville, PA",
+                "sections": [{"h2": "Serving Schuylkill County, PA",
+                              "paragraphs": ["We work across the region."]}]}
+        self.assertEqual(T._off_area_prose(T._generated_prose(data)),
+                         "Schuylkill County")
+
+    def test_generated_prose_reads_bullets_and_faqs(self):
+        for data in ({"sections": [{"h2": "Areas", "bullets": ["Akron, PA"]}]},
+                     {"sections": [], "faqs": [{"q": "Do you cover Berks County?",
+                                                "a": "We do."}]}):
+            self.assertIsNotNone(T._off_area_prose(T._generated_prose(data)),
+                                 msg=repr(data))
+
+    def test_generated_prose_survives_a_malformed_reply(self):
+        # The model returns a bare string or a number where a dict belongs
+        # often enough that a guard which raises on it is a guard that takes
+        # the build down instead of rejecting one page.
+        data = {"title": None, "h1": 7, "sections": ["not a dict", {"h2": "Ok"}],
+                "faqs": ["nope", {"q": "Q", "a": None}]}
+        self.assertEqual(T._generated_prose(data), "Ok Q")
+
+    def test_a_clean_york_county_page_passes_the_flattener(self):
+        data = {"title": "Gutter Replacement Cost in York County, PA",
+                "h1": "What New Gutters Cost in York County",
+                "lede": "Honest ranges for a York, PA home.",
+                "sections": [{"h2": "What drives the number",
+                              "paragraphs": ["Roof pitch and linear feet."],
+                              "bullets": ["Free on-site estimate"]}],
+                "faqs": [{"q": "Do you serve Dover?", "a": "Yes, and Red Lion."}]}
+        self.assertIsNone(T._off_area_prose(T._generated_prose(data)))
+
+    # --- money_pages: the contaminable queue ---------------------------------
+
+    def _money(self):
+        return self._body("def money_pages", "# ------------------------------------------------------------- the link mesh")
+
+    def test_money_pages_filters_its_queue(self):
+        body = self._money()
+        self.assertIn('_names_other_market(k["query"])', body)
+        # The filter has to sit on the comprehension that builds `gaps`, not
+        # somewhere later — `strengthen_pages` shipped with `_off_area_prose`
+        # defined and uncalled, and this is the same mistake one line over.
+        self.assertIn("_needs_its_own_page(k) and not _names_other_market", body)
+
+    def test_money_pages_checks_what_comes_back(self):
+        self.assertIn("_off_area_prose(_generated_prose(", self._money())
+
+    def test_money_pages_rejects_a_candidate_without_losing_the_day(self):
+        # A rejection must `continue` to the next gap. Returning would hand a
+        # bad model reply the power to stop the only technique that can open a
+        # new ranking page.
+        body = self._money()
+        after = body[body.index("_off_area_prose(_generated_prose("):]
+        self.assertIn("continue", after[:400])
+        self.assertNotIn("return", after[:after.index("continue")])
+
+    def test_the_query_that_shipped_would_not_reach_money_pages(self):
+        self.assertTrue(T._names_other_market("schuylkill county seamless gutter"))
+
+    def test_the_fall_price_queue_still_passes_the_money_filter(self):
+        # A filter that quietly emptied this queue would be a worse bug than
+        # the one it fixes, and these are the queries the autumn season needs.
+        for q in ("gutter cleaning cost per foot pennsylvania",
+                  "gutter guard installation cost york pa",
+                  "gutter replacement cost per foot york pa",
+                  "how much do new gutters cost in pa",
+                  "when should gutters be cleaned in pennsylvania"):
+            self.assertFalse(T._names_other_market(q), msg=q)
+
+
+    # --- area_pages and service_pages: safe queue, unchecked reply -----------
+
+    def test_area_pages_checks_what_comes_back(self):
+        body = self._body("def area_pages", "# ------------------------------------------------------------------ money pages")
+        self.assertIn("_off_area_prose(_generated_prose(", body)
+
+    def test_service_pages_checks_what_comes_back(self):
+        body = self._body("def service_pages", "# ------------------------------------------------------------ click-through")
+        self.assertIn("_off_area_prose(_generated_prose(", body)
+
+    def test_the_akron_sentence_is_caught_wherever_it_appears(self):
+        # Still live on /services/gutter-guards.html at the time of writing;
+        # this asserts the guard would now stop it being written again.
+        data = {"sections": [{"h2": "Gutter Guards", "paragraphs": [
+            "NEMO Seamless Gutter installs gutter guards on homes in Akron, PA "
+            "and the surrounding Lancaster and York County area."]}]}
+        self.assertEqual(T._off_area_prose(T._generated_prose(data)), "akron")
+
+class StatewideQueryTest(unittest.TestCase):
+    """"Names Pennsylvania, names none of our towns" was not out of area.
+
+    The rule read: a query that bothers to name a state and names none of our
+    towns names someone else's. That is true of "seamless gutters perkasie pa"
+    and false of "how much do new gutters cost in pa", because York County is
+    *in* Pennsylvania.
+
+    Found on 2026-08-11 by the test above, which was written to check that the
+    filter being added to `money_pages` did not empty its own queue. It did:
+    19 of the 104 queries in the live uncovered queue were being rejected as
+    somebody else's market, 13 of them price-intent, including nearly the whole
+    autumn cleaning-and-guards cluster. `strengthen_pages` picked the same
+    filter up on 2026-08-10, so the regression was already written and waiting
+    on a deploy — its own "does the filter empty the queue" test happened to
+    choose four queries that all named a York County town.
+    """
+
+    STATEWIDE = ("how much do new gutters cost in pa",
+                 "gutter guard cost pa",
+                 "when should gutters be cleaned in pennsylvania",
+                 "gutter cleaning cost per foot pennsylvania",
+                 "seamless gutter cost per linear foot pa",
+                 "copper half round gutters pennsylvania",
+                 "ice dam gutter damage repair pa",
+                 "gutter guards worth it pennsylvania leaves",
+                 "cost to replace gutters on a ranch house pa",
+                 "how much does it cost to replace gutters on a house in pa")
+
+    ELSEWHERE = ("seamless gutters perkasie pa",
+                 "seamless gutter contractors glenside pa",
+                 "seamless gutter company royersford pa",
+                 "seamless gutter contractor upper merion pa",
+                 "seamless gutter contractors willow grove pa",
+                 "seamless gutter company spring city pa",
+                 "seamless gutter installation companies radnor pa",
+                 "gutter installer new hope pa",
+                 "schuylkill county seamless gutter",
+                 "gutter repair lancaster county pa")
+
+    def test_a_statewide_shopping_search_is_ours_to_answer(self):
+        for q in self.STATEWIDE:
+            self.assertFalse(T._names_other_market(q), msg=q)
+
+    def test_naming_the_state_and_a_place_is_still_somebody_elses(self):
+        for q in self.ELSEWHERE:
+            self.assertTrue(T._names_other_market(q), msg=q)
+
+    def test_spring_grove_is_ours_but_spring_city_is_not(self):
+        # The near-miss that makes a plain town-name substring test dangerous:
+        # "spring grove" is in SERVICE_AREA_WORDS and "spring city" is 80 miles
+        # away, and they share their first word.
+        self.assertFalse(T._names_other_market("gutter repair spring grove pa"))
+        self.assertTrue(T._names_other_market("gutter repair spring city pa"))
+
+    def test_a_geo_neutral_search_is_untouched(self):
+        # The site's largest single source of impressions names no place at
+        # all, and the rule must not start reading "no place" as "wrong place".
+        for q in ("gutter installer", "gutter guys near me",
+                  "seamless vs sectional gutters", "are gutter guards worth it"):
+            self.assertFalse(T._names_other_market(q), msg=q)
+
+    def test_an_unknown_word_fails_towards_rejection(self):
+        # The documented failure mode, asserted so it stays deliberate: a trade
+        # word missing from STATEWIDE_WORDS costs one query from a build queue
+        # rather than letting an unrecognised town through.
+        self.assertTrue(T._names_other_market("zincalume gutters pa"))
+
+
 class DuplicateBusinessNodeTest(unittest.TestCase):
     """local_schema appended a second business node instead of noticing one.
 

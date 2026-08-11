@@ -6226,3 +6226,466 @@ Goal: **1.2%** top-3 share of 161 tracked queries (target 50%).
 - `local_schema` — ok: LocalBusiness schema already current
 - `rebuild_sitemap` — ok: [gen_sitemap] wrote 39 URLs to sitemap.xml
 - `ping_indexnow` — ok: submitted 1 URL(s), HTTP 200
+
+## 2026-08-11 — review agent
+
+### Lead: I did the audit I promised, found the third door, and the fix I wrote for it uncovered a live defect in yesterday's fix
+
+Yesterday's entry ended: *"`service_pages`, `money_pages` and `area_pages` all
+generate prose from a queue, and I have not audited them… That audit is the
+first thing I will do tomorrow."* I did it. Two findings, and the second is the
+bigger one.
+
+**Finding 1 — `money_pages` is the third door, and it is the widest.** It read
+the tracked universe raw at `techniques.py:427`:
+
+```python
+gaps = [k for k in kws if _needs_its_own_page(k)]
+```
+
+No `_names_other_market` on the queue, no `_off_area_prose` on the reply. That is
+the identical hole that put Schuylkill County onto the main service page through
+`strengthen_pages` yesterday, except `money_pages` writes a **whole guide** and
+then records it as the query's `target` in `keywords.json`. It reported `noop`
+this morning only because `_needs_its_own_page` happened to return False for
+every gap. That is luck, not a guard.
+
+`area_pages` and `service_pages` are the narrower version: both read hand-written
+queues (`TOWN_QUEUE`, `SERVICE_QUEUE`), so their **input** was never at risk — but
+neither checked what came back, and what comes back is exactly what put "homes in
+Akron, PA and the surrounding Lancaster and York County area" on
+`/services/gutter-guards.html` on 2026-07-29. So: one door wide open, two ajar.
+I closed all three.
+
+**Finding 2 — the filter I added to `money_pages` would have deleted the autumn
+season from the build queue, and yesterday's fix already shipped that
+regression.** I wrote a test asserting the new filter did not empty its own queue
+— the same precaution yesterday's entry took — and it failed. Run against the
+live uncovered list, `_names_other_market` rejected **19 of the 104 queries** as
+"somebody else's market":
+
+```
+gutter guard cost pa                              how much do new gutters cost in pa
+gutter cleaning cost per foot pennsylvania        when should gutters be cleaned in pennsylvania
+gutter guards worth it pennsylvania leaves        how often should gutters be cleaned in pa
+seamless gutter cost per linear foot pa           ice dam gutter damage repair pa
+gutter installation cost per foot pennsylvania    copper half round gutters pennsylvania
+   … 9 more
+```
+
+None of those is somebody else's market. They are Pennsylvania-wide shopping
+searches, and **York County is in Pennsylvania.** The rule read "names the state,
+names none of our towns, therefore names someone else's town" — true of "seamless
+gutters perkasie pa", false of "how much do new gutters cost in pa". Eleven of the
+19 are cost-and-price wording and they are close to the entire autumn
+cleaning-and-guards cluster, in the month the autumn cluster needs writing.
+
+**This matters beyond my own change.** `strengthen_pages` picked this filter up
+yesterday and `geo_answer_first_content_pass` has had it since 08-03. The
+regression is already written and waiting on a deploy. Yesterday's guard-test
+chose four queries to prove the filter did not empty the queue — and all four
+named a York County town, so the statewide case went unseen. I do not say that to
+score a point off my own previous entry; I say it because **the same test, aimed
+one inch differently, is what caught it.** I have fixed the rule and measured it
+against both live corpora (see "What I changed").
+
+### Where the numbers stand
+
+The goal metric — tracked York County queries holding a top-3 position:
+
+| | 08-05 | 08-06 | 08-07 | 08-08 | 08-09 | 08-10 | 08-11 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **top-3 count** | 1 | 1 | 1 | 1 | 1 | 2 | **2** |
+| top-10 count | 8 | 8 | 8 | 8 | 8 | 8 | **7** |
+| `ranked_known` | 22 | 22 | 22 | 23 | 23 | 23 | **23** |
+| tracked queries | 127 | 138 | 140 | 146 | 152 | 161 | **161** |
+| share (`top3/total`) | 0.8% | 0.7% | 0.7% | 0.7% | 0.7% | 1.2% | **1.2%** |
+| honest share (`top3/ranked_known`) | 4.5% | 4.5% | 4.5% | 4.3% | 4.3% | 8.7% | **8.7%** |
+
+**Top-3 held at 2. Top-10 fell 8 → 7, the first movement in that number in
+seven days, and it is downward.** With `ranked_known` flat at 23 and top-3 flat
+at 2, a query left the 4–10 band without leaving the ranked set — it slipped
+past position 10. I cannot name it, for the same reason as yesterday:
+`keywords.ranked` is still absent from the snapshot (`snapshot.py:190` emits it unconditionally). Against 7 ranked queries at
+an average position drawn from very few impressions, one query crossing the
+position-10 line is a coin landing on its edge, not a trend. I am recording it,
+not interpreting it.
+
+Per town — six of seven named towns still zero top-3, on every one of sixteen
+measured days:
+
+| bucket | total | covered | top-3 |
+| --- | --- | --- | --- |
+| county | 87 | 33 | **2** |
+| york | 23 | 5 | 0 |
+| dover | 14 | 6 (+1) | 0 |
+| dallastown | 10 | 3 | 0 |
+| spring-grove | 10 | 3 | 0 |
+| red-lion | 9 | 3 | 0 |
+| hanover | 8 | 4 | 0 |
+
+Intent coverage: hire **49/101** (+1), price **3/35**, check 4/17, diy 1/8.
+**Price is on its thirteenth day stuck at 3 covered.** Today's one coverage gain
+was the Dover repair section — an in-area query, on the right page. After
+yesterday, that is worth saying plainly: the engine did the correct thing this
+morning.
+
+**The backlog stopped diverging for the first time in eleven days** — tracked flat
+at 161, covered 56 → 57, uncovered **105 → 104**. But the cause is not drainage;
+it is that `scout.py` filed **zero** keywords and **zero** techniques this morning,
+the first empty scout in the record. One clean day of arithmetic from a silent
+scout is not the queue turning a corner, and I would not read it as one until it
+repeats.
+
+Search Console, 28-day rolling: rows **645** (+8), matched **23** (flat), clicks
+**10** (+1), impressions **22,242** (+93), avg position **24.9** (flat, sixth day).
+Site-wide CTR **0.045%**. Only **23 of 645** queries the site appears for map onto
+the tracked universe — 96% of this site's search visibility is for queries the
+engine does not track and mostly cannot serve.
+
+`discovered_untracked`, **sixth day**: still exactly 40 rows, still capped by the
+old `out[:40]`, and again functionally frozen — the entire day-over-day delta is
+**one row moving one impression** (`seamless gutter devon pa`, 273 → 274) against
+a block total of 11,933. Same shape as yesterday. The 2026-09-01 forecast stands.
+
+Traffic (nginx, bots and owner IPs excluded):
+
+| | 08-05 | 08-06 | 08-07 | 08-08 | 08-09 | 08-10 |
+| --- | --- | --- | --- | --- | --- | --- |
+| visitors | 6 | 7 | 7 | 3 | 13 | **11** |
+| pageviews | 8 | 10 | 9 | 4 | 21 | **17** |
+| organic | 1 | 1 | 0 | 0 | 0 | **2** |
+| direct | 5 | 3 | 7 | 3 | 12 | **9** |
+| local (maps) | 0 | 1 | 0 | 0 | 0 | **0** |
+| AI-referred | 0 | 0 | 0 | 0 | 0 | **0** |
+| bot hits | 1,894 | 1,448 | 2,252 | 2,380 | 1,356 | **1,243** |
+
+Organic came off the floor: **2 on 08-10**, after three consecutive zeros.
+`call_taps` **0 for twelve days**. `ai_visitors` 0 for all seventeen measured days.
+
+**Yesterday's open question is closed: the second booking landed on 2026-08-10.**
+I wrote yesterday that `bookings_all_time` had gone 1 → 2 and that I could not
+date it from the repo and would not guess. Today's daily series carries
+`2026-08-10: 1 booking`, and `bookings_all_time` is unchanged at 2 — so the
+booking arrived early on 08-10, before the 06:04 snapshot, which is why it showed
+in the total before it showed in the series. Two bookings all time.
+`phone_leads_all_time` is still **0**.
+
+**On the call-tap measurement, which I have not previously checked end to end.**
+Twelve days of zero is the shape the prompt warns about, so I traced it rather
+than assuming small samples: `analytics.js` pings `/e/call-tap` from a delegated
+listener on every `a[href^="tel:"]`, `deploy/nginx-nemo-seamless-gutter.conf:27`
+answers it, `metrics.py:207` matches the same path and counts unique tappers on a
+2xx. All 37 generated pages carry both `analytics.js` and the call bar. **The
+counter is wired correctly; the zero is real, not an artifact.** It is also
+uninformative: the call bar is mobile-only (`styles.css:262`, ≤680px), and the
+cohort since it deployed is 24 visitors across two days. At a 2–4% tap rate the
+expected count is under one.
+
+Engine health: eleven build steps, all `ok`, no billing block, sitemap 39 URLs,
+IndexNow HTTP 200. **The prompt's warning about a spend cap "until 2026-08-01" is
+now ten days stale and this is the ninth consecutive entry correcting it** — the
+API has been healthy since 08-01 and the content techniques run daily. The
+prompt's other stale figures, for the record: it cites 77 GSC rows / 429
+impressions / position 12.4 and "2 of 50" for the county bucket; today those are
+645 / 22,242 / 24.9 and 2 of 87.
+
+### Did previous changes work?
+
+**08-10 rec 2 / 08-09 rec 1 (copy the engine files to the droplet) — NOT done,
+day 3.** No `code_version`, no `keywords.ranked`, no `gsc.pages`, no `crawl_*`,
+`discovered_untracked` still exactly 40. It cost the same thing it cost
+yesterday: top-10 moved and I cannot name the query. **The reason to do it has
+changed character today, and this is the single most important sentence in this
+entry: `growth/techniques.py` as of yesterday's commit contains a regression that
+drops 19 in-area queries from the build queue. Deploying yesterday's file without
+today's ships that regression into the autumn season.** They must go together.
+The `gsc.pages` fuse is now **six days out (2026-08-17)**.
+
+**08-10's own fix (`strengthen_pages` geo guard) — the technique behaved
+correctly this morning, but that is not evidence the fix works.** It wrote an
+in-area Dover section for an in-area query, which the unfixed code would also
+have done. The fix is not deployed, so what ran this morning was the old code
+choosing a safe query. No verdict available; the guard has not yet been tested by
+a contaminated queue in production, and after today's finding it should not be
+deployed in yesterday's form at all.
+
+**The call bar — cohort day 2. 24 visitors, 0 taps.** Prediction was `call_taps > 0
+by 2026-09-01 with 150+ cohort visitors`. At 24 of 150 the expected count so far
+is under one. **No information.** Recording the counter.
+
+**08-02's prediction (7-day median daily `organic_visitors` ≥ 2 by 2026-08-16) —
+still failing, and I am softening yesterday's wording by exactly one notch.**
+Window 08-04…08-10 is `[2,1,1,0,0,0,2]`, median **1.0**, seventh consecutive day
+unchanged. Yesterday I called it "effectively dead" on the strength of three
+trailing zeros; 08-10 came in at 2, so arithmetically it is alive — the window
+ending 08-16 would need four of its seven days at ≥2 and currently has one, with
+six days to supply three more. On the trailing base rate (two qualifying days in
+the last seven) that is unlikely but not closed. **Still expected to fail; no
+longer dead.** The standing caveat is unchanged: three billing-blocked days sit
+inside the causal window, so the honest reading of a failure is "inconclusive,
+rerun", not "the content does not work".
+
+**08-08 rec 7 (merge the LocalBusiness schema) — deployed 08-08, no effect due
+yet.** `local_schema` reported noop again, which continues to confirm the droplet
+holds the merged version. Today's GSC window closes 08-08, the day it landed.
+September question.
+
+**The 2026-09-01 impression-block prediction — on track, sixth day.** Block frozen
+at 11,933 impressions across 40 rows. Forecast unchanged: impressions fall
+15,000–18,500, rows fall ~200, `avg_position` gets **worse** toward 29.
+
+**Not actioned, with day counts:** 08-10 rec 1 (delete the live Schuylkill
+section) **day 2**; the Akron paragraph at `services/gutter-guards.html:163`
+**day 14**; York in the homepage title (`index.html:16`) **day 11**; T016 GBP
+sitting **day 16**; T048 Foursquare **day 16**; T007 review engine **day 16**;
+`?utm_source=gbp` **day 9**; the leaf-fall queue reorder **day 13**; the goal
+denominator **day 4**. Candidate pile **44, unchanged** — no new techniques filed
+today, and still **zero ever activated, zero ever rejected**,
+`scoreboard.does_not_work` still `[]` on day sixteen.
+
+### What I researched today
+
+- **Impressions in the 8–30 band convert at effectively zero, and AI surfaces now
+  generate impressions that can never become clicks**
+  ([Sort the Clicks](https://sorttheclicks.com/insights/impressions-but-no-clicks/),
+  [Local SEO Tactics](https://www.localseotactics.com/how-to-fix-high-impression-and-low-click-pages-in-google-search-console/),
+  [Brodie Clark](https://brodieclark.com/impression-spike-google-search-console/)).
+  **Why it matters here:** this is the arithmetic of this site's Search Console
+  panel. 22,242 impressions at average position 24.9 producing 10 clicks is not
+  an anomaly to be fixed, it is what position 25 looks like. It also kills any
+  temptation to read the impression count as progress — and it is the third
+  independent reason not to chase the 40 Philadelphia-suburb queries.
+- **Proximity is measured from the verified address, not the service-area list,
+  for service-area businesses specifically**
+  ([rankai](https://rankai.ai/articles/service-area-business-google-business-profile-guide),
+  [Wolfpack](https://wolfpackadvising.com/blog/how-to-rank-higher-on-google-maps/),
+  [HomeGuru](https://www.homeguru.com/news/how-to-rank-1-on-google-maps-for-home-services-in-2026/)).
+  **Why it matters here:** fourth independent confirmation of the standing
+  rejection of "add towns to the GBP service area". Sources are consistent that a
+  business without a storefront compensates through prominence — reviews, brand
+  searches, citations — not through geography it declares.
+- **The fall window opens now, and this is the one genuinely time-critical thing
+  in today's research.** Gutter contractors take 60–70% of annual revenue in the
+  spring and fall peaks, and the consistent advice is to start fall guard and
+  cleaning campaigns **6–8 weeks ahead of peak leaf-drop**
+  ([Elev8](https://www.elev8operations.com/guides/how-to-get-more-gutter-leads-2026),
+  [Frizerly](https://blog.frizerly.com/18919/gutter_installation_seo_seasonal_content_that_wins_spring_and_fall_demand),
+  [Alta Vista](https://www.altavistasp.com/fall-marketing-tips-contractors/)).
+  Peak leaf-drop in south-central PA is late October to early November, which puts
+  the start of the window at **early-to-mid September** — four to five weeks away,
+  before indexing lag is counted. **Why it matters here:** see rec 3. This is the
+  first research finding in sixteen days that carries its own deadline.
+- **GBP posts do not move pack position; category, reviews and proximity do**
+  ([Blue Interactive](https://blueinteractiveagency.com/seo-blog/2026/06/google-business-profile-optimization-in-2026/),
+  [Digital Applied](https://www.digitalapplied.com/blog/google-business-profile-guide-every-feature-2026),
+  [Brand Hopper](https://thebrandhopper.com/learning-resources/local-seo-google-business-profile-best-practices-for-2026/)).
+  Posts lift click-through within the panel and feed freshness to the AI summary
+  layer, but the sources are explicit that they are not a ranking lever, and that
+  **primary category is the highest-leverage single field on the profile**.
+  **Why it matters here:** it sharpens rec 4 rather than adding to it. If Eric
+  gets one screen of attention, it goes on the category, not on posting a photo.
+  I did **not** file "post to GBP weekly" as a technique.
+- **Rejected, with reasons.** (1) *Adding towns to the GBP service area* —
+  rejected a fourth time. (2) *Chasing the 40 Philadelphia-suburb queries* —
+  rejected a second time, now with the position-band arithmetic attached as well
+  as the 90-mile distance and yesterday's live demonstration of what happens when
+  this site writes about places it does not serve. (3) *Call-tracking numbers /
+  agency conversion setups* — real advice, and the sources quote $1,500–3,500 plus
+  $200–400 a month; this business has a first-party beacon that already works and
+  two bookings all time. Absurd at this scale. (4) *A second inbound channel
+  (WhatsApp, chat widget)* — rejected a second time; the first channel has not
+  rung. (5) *Filing today's research as new techniques* — category is T016,
+  reviews are T007/T033/T047, seasonality is the queue order. **I filed nothing.**
+  The pile is 44 with zero ever picked; adding to it is not help.
+
+### Recommendations
+
+**Nothing in this commit is live.** Every item below needs a deploy or a human.
+
+1. **Deploy `growth/techniques.py` — today's version, not yesterday's — with the
+   other engine files.** *(Divine — minutes. Day 3.)* This has moved to the top
+   because it is now a correctness issue rather than an instrumentation one:
+   yesterday's commit added a filter that drops 19 in-area queries, today's fixes
+   it, and **deploying yesterday's without today's removes most of the autumn
+   price cluster from the build queue in the month it is needed.** Ship
+   `techniques.py` + `snapshot.py` + `gsc.py` + `metrics.py` + `keywords.py`, and
+   `scout.py` + `growth_daily.py` **as a pair** or the scout raises `TypeError`.
+   *How you would know:* tomorrow's snapshot carries `code_version`,
+   `keywords.ranked`, `gsc.pages`, `crawl_*`, and more than 40
+   `discovered_untracked` rows. *Checked:* absence of `code_version` and
+   `keywords.ranked` in today's snapshot against `snapshot.py:190`;
+   `len(discovered_untracked) == 40` against the old `out[:40]`; the 19-query
+   rejection measured directly against today's `keywords.uncovered`.
+2. **Delete the two off-area passages from the live site.** *(Divine — five
+   minutes, free. Day 2 and day 14.)* On the droplet:
+   `services/seamless-gutter-installation.html`, the
+   `<h2>Seamless Gutter Installation in Schuylkill County, PA</h2>` block with its
+   three paragraphs and the "Do you actually service Schuylkill County…" FAQ pair;
+   and `services/gutter-guards.html:163`, "homes in Akron, PA and the surrounding
+   Lancaster and York County area" → "homes across York County, Pennsylvania".
+   Same bug, one sitting. *How you would know:*
+   `grep -ri "schuylkill\|akron\|lancaster county" services/` is empty.
+   *Checked:* both passages read out of the working tree again today.
+3. **Reorder the build queue to price-first, and do it in the same deploy as
+   rec 1.** *(Divine — two literals, `techniques.py:455` and `:966`:
+   `order = {"hire": 0, "price": 1, "check": 2, "diy": 3}`.)* **I demoted this to
+   rec 7 yesterday and I am promoting it back, because today gave it a deadline
+   and removed the objection.** The objection was that reordering an unfiltered
+   queue only changes which wrong thing gets written first — rec 1 filters it, so
+   that is answered. The deadline is arithmetic: 104 uncovered, 52 of them `hire`,
+   `strengthen_pages` writes at most one section a day and `money_pages` is noop,
+   so at `hire: 0` **the first price query is not reached until roughly 2026-10-02**
+   — after peak leaf-drop, before which nothing it writes will have indexed.
+   Research today puts the fall window opening in early-to-mid September.
+   *Caveat I want on the record:* the 52 figure assumes every `hire` query has a
+   host page to strengthen; those without one are skipped, so the real date is
+   earlier than October by an amount I cannot compute without `keywords.json`,
+   which is gitignored. The direction of the argument does not change.
+   *How you would know:* `keywords.by_intent.price.covered` starts moving off 3
+   within a week. *Checked:* `order` literals read today at both call sites;
+   uncovered-by-intent computed from today's snapshot (52/32/13/7 summing to 104).
+4. **Eric: twenty minutes with the Business Profile, and spend it on the primary
+   category.** *(Eric. Free. T016 is day 16.)* Unchanged in substance, sharpened by
+   today's research: category is named as the single highest-leverage field, so if
+   only one thing gets looked at, that is it. While the screen is open:
+   (a) screenshot the primary category, change nothing blind; (b) note whether the
+   profile is a service-area business or a storefront pin, and what is in the area
+   list; (c) check hours against what `index.html` publishes (Mon–Fri 07:30–18:00,
+   Sat 08:00–14:00). **Then change at most one field and leave name, address and
+   phone alone for a fortnight.** *Checked:* T016 and T051 both
+   `status: candidate, activated: null`; `techniques.py:669-672` for the hours.
+5. **Eric: claim Foursquare — T048.** *(Eric — under an hour, free. Day 16.)*
+   Name, address, phone, category byte-identical to the GBP. Seventeen days of
+   `ai_visitors: 0` with every ranking page already opening with a direct answer
+   looks like absence from the index rather than bad prose. **Do rec 2 first** — a
+   listing that says York while the site says Schuylkill is worse than no listing.
+   *Checked:* T048 exists at `candidate`; no duplicate filed.
+6. **Eric: pick three from the backlog and reject the rest.** *(Eric — one
+   sitting. Free. Day 4, pile flat at 44.)* Mine today are T016 (rec 4), T048
+   (rec 5), T007 (reviews, with T047's method narrowed to a memory prompt — never
+   sample text, never a staff name, never Eric's phone, per the April 2026 review
+   policy noted on 08-10). The rejections matter as much as the picks.
+7. **Put York back in the homepage title.** *(Divine — minutes. Free. Day 11.)*
+   `index.html:16` still `Gutter Installer &amp; Contractor | NEMO Seamless
+   Gutter`. *Checked:* line read today, unchanged.
+8. **Fix the goal denominator, or promote `top3/ranked_known`.** *(Divine. Day 4.)*
+   Not done by me — it redefines the number Eric is judged against.
+
+### What I changed in this repo today
+
+`growth/techniques.py` and its tests. **191 tests pass** (174 before, 17 new).
+I did **not** touch `techniques.json`, `keywords.json`, `results.jsonl` or
+`state.json`; did not activate, retire or re-status any technique; and did not
+edit `index.html` or anything under `areas/`, `guides/` or `services/` —
+including the two off-area passages, which are rec 2 for Divine because editing
+them here would only create a conflict the next `publish_state.sh` overwrites.
+
+- **`_names_other_market` no longer reads a bare state mention as a foreign
+  market.** New `STATEWIDE_WORDS`: the trade, money, measurement and grammar
+  vocabulary a Pennsylvania-wide shopping search is built from. A query naming
+  the state is rejected only if something is left over after those words and our
+  own service area are removed — because whatever is left over is a place name.
+  Measured on live data both ways: **0 of 104** uncovered queries now wrongly
+  rejected (was 19), and **39 of 40** `discovered_untracked` Philadelphia-suburb
+  queries still rejected. The fortieth is `gutter installer`, which names no place
+  at all and which the function's docstring has always said must pass — it is the
+  site's largest single source of impressions. The known failure mode is
+  documented at the constant and asserted in a test: an unrecognised word means
+  "place", so a genuinely new trade word costs one query from a build queue rather
+  than letting an unknown town through.
+- **`_generated_prose(data)`** — flattens a whole-page payload (title, meta_desc,
+  h1, lede, section headings, paragraphs, bullets, FAQ pairs) into one string for
+  the geo guard. Headings included deliberately: the block that shipped on 08-10
+  carried its county name in the `<h2>`. Non-string values are dropped rather
+  than coerced, so a malformed model reply rejects a page instead of taking the
+  build down.
+- **`money_pages`** — `_names_other_market` on the queue comprehension,
+  `_off_area_prose(_generated_prose(...))` on the reply, and the single-shot
+  `gaps[0]` replaced with a candidate loop bounded by `MAX_ITEM_FAILURES`, so a
+  rejection costs one candidate rather than the day. This mirrors what
+  `area_pages` has always done and what `strengthen_pages` was given yesterday.
+- **`area_pages` and `service_pages`** — output guard only; their queues are
+  hand-written, so the input was never at risk. `area_pages` falls through to the
+  next town; `service_pages` has no next candidate and so returns a failure, which
+  is the cheaper side of that trade.
+- **`growth/test_techniques.py` — `WholePageGeoGuardTest` (12) and
+  `StatewideQueryTest` (5).** The wiring assertions read the source, the same
+  technique the existing guard tests use and for the same reason: the path between
+  the two guards is a live model call, so a unit test cannot reach it end to end,
+  and a guard nothing calls is a guard that does not exist — which is precisely
+  how `_off_area_prose` passed its own tests for eleven days while the caller that
+  needed it did not have it. `StatewideQueryTest` carries the ten statewide
+  queries that must pass and the ten located ones that must not, including the
+  near-miss that makes a plain substring test dangerous: **"spring grove" is ours
+  and "spring city" is eighty miles away, and they share their first word.**
+
+I made these changes rather than only recommending them because they are defect
+fixes with live examples, not decisions about the business.
+
+### Reasoning and uncertainties
+
+**Day sixteen. Two top-3 queries, zero top-3 in any of the seven named towns,
+zero call taps in twelve days, zero AI visitors ever, zero phone leads ever, two
+bookings all time — the second of which I can now date to 2026-08-10.**
+
+The honest summary of today is that the engine had a clean morning and I spent
+the day on the engine rather than on the phone ringing. I think that was right,
+narrowly: the audit was promised, it found what it was looking for, and the thing
+it found on the way — a filter about to delete the autumn season from the build
+queue — is worth more than anything else I could have written today. But I want
+to name the pattern rather than let it pass. **Three of the last three review days
+have been spent fixing the engine's geo guards.** That is a good use of a day when
+the alternative is a page about Pottsville, and a bad use of sixteen of them.
+
+**Where I am least confident.** Four things.
+
+First, `STATEWIDE_WORDS` is a word list, and word lists rot. It is right on today's
+104 queries and today's 40 discovered ones, which is the best evidence available,
+but the first genuinely new vocabulary word the scout adopts will cost a query
+silently. I chose fail-towards-rejection deliberately — the cost of a false
+reject is one query skipped, which is what all 19 were already costing, and the
+cost of a false accept is a page about somewhere else. I would rather be told I
+was too cautious. **If someone wants this properly fixed, the answer is a York
+County gazetteer, not a longer word list, and I did not write one because guessing
+at municipal boundaries is exactly the kind of thing this engine should not do
+unsupervised.**
+
+Second, the top-10 slip from 8 to 7. My reading — a query crossing the position-10
+line — is the only arrangement consistent with `ranked_known` and top-3 both flat,
+but it is the same inference I made yesterday in the other direction, from the
+same stale snapshot, and I still cannot name the query. Two single-query moves in
+two days, one up and one down, across a site averaging position 24.9 on 22,242
+impressions, is noise with a narrative attached. **I do not think anything has
+changed about this site's ranking in the last week.**
+
+Third, whether rec 3 is right. Promoting the queue reorder one day after demoting
+it looks like flip-flopping and I want the reason on the record: the demotion was
+conditional on the queue being unfiltered, that condition is now met, and today's
+research added a date the previous argument did not have. If the reorder lands and
+price coverage still does not move off 3 within two weeks, the problem is not the
+order — it is that `strengthen_pages` cannot find host pages for those queries, and
+that is a different fix.
+
+Fourth, and unchanged, the real constraint. **Forty-four candidates, zero ever
+activated, zero ever rejected. Two of roughly fifty recommendations carried out in
+sixteen days, both by Divine, both engineering.** Nothing on Eric's side has been
+touched. I said yesterday that if Eric does not have twenty minutes for the
+Business Profile in August then the ledger should say so and the candidates should
+be rejected rather than restated daily. I still think that, and I note that
+today's arithmetic makes it sharper: the fall window opens in four to five weeks,
+it is the season that carries most of a gutter contractor's year, and the highest-
+leverage thing available before it opens is a category field on a profile nobody
+has opened in sixteen days.
+
+**What would change my mind, dated.** (1) 7-day median `organic_visitors` ≥ 2 by
+**2026-08-16** — 1.0 with one qualifying day in the window; expected to fail, not
+dead. (2) `call_taps` > 0 by **2026-09-01** with 150+ cohort visitors from 08-09
+forward — at **24 of 150**, no information. (3) On **2026-09-01** the impression
+block ages out: impressions down 15,000–18,500, `avg_position` worse toward 29.
+If it improves toward 21 instead, my reading of the flood is wrong. (4) Re-armed
+once `scout.py` deploys: does daily `keywords_added` fall below 5 — today it was
+0, from the old scout, which is a data point I did not expect and cannot yet
+explain. (5) New today: if `techniques.py` deploys and `keywords.by_intent.price`
+is still at 3 covered two weeks later, the queue order was never the binding
+constraint and rec 3 was wrong.

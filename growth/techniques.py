@@ -309,6 +309,18 @@ def area_pages(ctx):
             errors.append(f"model returned no sections for {c_town}")
             data = None
             continue
+        # TOWN_QUEUE is a hand-written list of York County municipalities, so
+        # unlike `money_pages` there is nothing wrong with what goes in. What
+        # comes back is a different question: this is the same model, given the
+        # same freedom, that opened /services/gutter-guards.html with "homes in
+        # Akron, PA and the surrounding Lancaster and York County area". A town
+        # rejected here stays queued for tomorrow.
+        off = _off_area_prose(_generated_prose(data))
+        if off:
+            errors.append(f"rejected {c_town} page: names {off!r}, "
+                          f"which is not York County")
+            data = None
+            continue
         slug, town, lat, lon = c_slug, c_town, c_lat, c_lon
         break
 
@@ -424,7 +436,15 @@ def money_pages(ctx):
         host = _host_page(ctx, k)
         return host in (None, "/index.html")
 
-    gaps = [k for k in kws if _needs_its_own_page(k)]
+    # `adopt_queries` filters what enters the tracked universe, but only from
+    # the day that filter was written. Anything adopted before it stays in the
+    # universe forever, and this queue reads the universe raw — the same hole
+    # that put the coal region onto the main service page through
+    # `strengthen_pages` on 2026-08-10. Here it would be worse: this technique
+    # writes a whole guide and records it as the query's target, so the site
+    # would gain a permanent page about somewhere it does not serve.
+    gaps = [k for k in kws
+            if _needs_its_own_page(k) and not _names_other_market(k["query"])]
     if not gaps:
         return {"ok": True, "noop": True,
                 "detail": "no query needs its own page — the remaining gaps all "
@@ -434,26 +454,46 @@ def money_pages(ctx):
     # that earn links and AI citations.
     order = {"hire": 0, "price": 1, "check": 2, "diy": 3}
     gaps.sort(key=lambda k: order.get(k.get("intent"), 9))
-    target = gaps[0]
-    query = target["query"]
 
-    slug = re.sub(r"[^a-z0-9]+", "-", query.lower()).strip("-")[:70]
-    filename = f"{slug}.html"
-    if ctx.read(f"guides/{filename}") is not None:
-        return {"ok": True, "noop": True,
-                "detail": f"'{query}' already has a page at /guides/{filename}"}
+    # A candidate whose copy comes back naming somewhere else costs that
+    # candidate, not the day — the next gap is just as worth writing, and the
+    # rejected one stays in the queue for tomorrow.
+    target = query = filename = data = None
+    errors = []
+    for cand in gaps[:MAX_ITEM_FAILURES]:
+        c_query = cand["query"]
+        c_slug = re.sub(r"[^a-z0-9]+", "-", c_query.lower()).strip("-")[:70]
+        c_filename = f"{c_slug}.html"
+        if ctx.read(f"guides/{c_filename}") is not None:
+            return {"ok": True, "noop": True,
+                    "detail": f"'{c_query}' already has a page at /guides/{c_filename}"}
+        try:
+            c_data = llm.call_json(MONEY_SYSTEM, (
+                f'Write the page that should rank for the search query: "{c_query}".\n\n'
+                f"Search intent: {cand.get('intent')}. Service area: York County, "
+                f"Pennsylvania. Phone {PHONE}."), max_tokens=4000)
+        except Exception as e:
+            errors.append(f"content generation failed for '{c_query}': {e}")
+            continue
+        if not c_data.get("sections"):
+            errors.append(f"model returned no sections for '{c_query}'")
+            continue
+        # An in-area query does not guarantee an in-area answer. Same check
+        # `strengthen_pages` and `geo_answer_first_content_pass` run on what
+        # comes back from the model, for the same reason.
+        off = _off_area_prose(_generated_prose(c_data))
+        if off:
+            errors.append(f"rejected page for '{c_query}': names {off!r}, "
+                          f"which is not York County")
+            continue
+        target, query, filename, data = cand, c_query, c_filename, c_data
+        break
+
+    if data is None:
+        return {"ok": False,
+                "detail": f"{len(errors)} candidate(s) failed, last: {errors[-1]}"}
 
     canonical = f"{SITE}/guides/{filename}"
-    try:
-        data = llm.call_json(MONEY_SYSTEM, (
-            f'Write the page that should rank for the search query: "{query}".\n\n'
-            f"Search intent: {target.get('intent')}. Service area: York County, "
-            f"Pennsylvania. Phone {PHONE}."), max_tokens=4000)
-    except Exception as e:
-        return {"ok": False, "detail": f"content generation failed for '{query}': {e}"}
-    if not data.get("sections"):
-        return {"ok": False, "detail": f"model returned no sections for '{query}'"}
-
     h1 = data.get("h1") or query.title()
     article_ld = _ld({
         "@context": "https://schema.org", "@type": "Article",
@@ -1072,6 +1112,16 @@ def service_pages(ctx):
         return {"ok": False, "detail": f"generation failed for {title}: {e}"}
     if not data.get("sections"):
         return {"ok": False, "detail": f"model returned no sections for {title}"}
+    # SERVICE_QUEUE is hand-written, so the input is safe; the reply is not.
+    # There is no next candidate to fall through to here — the queue is three
+    # services deep and each one is a different page — so a rejection costs the
+    # day and the service stays queued. That is the cheap side of the trade: a
+    # service page naming the wrong county is live until a human reads it.
+    off = _off_area_prose(_generated_prose(data))
+    if off:
+        return {"ok": False,
+                "detail": f"rejected {title} page: names {off!r}, "
+                          f"which is not York County"}
 
     h1 = data.get("h1") or title
     service_ld = _ld({
@@ -1287,6 +1337,37 @@ OUT_OF_AREA = ("perkasie", "yorkville", "york sc", "york ne", "york me",
                "new york", "yorktown", "york uk", "york maine",
                "akron", "essington", "crum lynne", "myerstown", "newmanstown")
 
+STATE_WORDS = frozenset(("pa", "penna", "pennsylvania"))
+
+# The vocabulary a Pennsylvania-wide shopping search is built from: trade,
+# money, measurement and grammar. Nothing here is a place.
+#
+# This exists because the state rule below used to read "names Pennsylvania,
+# names none of our towns, therefore names somebody else's town" — which is
+# true of "seamless gutters perkasie pa" and false of "how much do new gutters
+# cost in pa", because York County is *in* Pennsylvania. On 2026-08-11 that
+# mistake covered 19 of the 104 queries in the uncovered queue — eleven of them
+# cost-and-price wording, including most of the autumn cleaning-and-guards
+# cluster the season is about to ask for.
+#
+# The known failure mode is a York County municipality whose name is spelled
+# out of these words. It fails safe: an unrecognised word means "place", so a
+# genuinely new trade word costs one query from the build queue — which is what
+# all 19 already cost — rather than putting a page about Montgomery County on
+# the site.
+STATEWIDE_WORDS = frozenset("""
+a about an and are as at bad be best by can cheap clean cleaned cleaning
+companies company contractor contractors copper cost costs dam damage damaged
+diy do does downspout downspouts eavestrough estimate feet fascia fix foot for
+from ft get good guard guards gutter gutters half historic home homes house
+houses how i ice in install installation installations installed installer
+installers installing is it leaf leafguard leaks leaking leaves linear me
+metal much my near need needs new of off often on or per price prices pro pros
+pull pulling quote rain ranch replace replaced replacement replacing repair
+repairs round sagging seamless sectional service services should signs size sq
+storm the to vs water what when where which who why with worth your
+""".split())
+
 
 def _names_other_market(query):
     """True if a search explicitly names somewhere this business does not serve.
@@ -1306,7 +1387,15 @@ def _names_other_market(query):
         return True
     ours = any(w in q for w in SERVICE_AREA_WORDS)
     if not ours and re.search(r"\b(pa|penna|pennsylvania)\b", q):
-        return True
+        # Naming the state is not on its own a reason to reject: York County is
+        # in Pennsylvania, so "gutter guard cost pa" is this business's search
+        # to win. What makes a query somebody else's is naming the state *and*
+        # a place — and after the trade, money and grammar words are removed,
+        # whatever is left over is that place. See STATEWIDE_WORDS.
+        elsewhere = [w for w in re.findall(r"[a-z]+", q)
+                     if w not in STATE_WORDS and w not in STATEWIDE_WORDS]
+        if elsewhere:
+            return True
     # "county" alone used to count as in-area, which let "schuylkill county
     # seamless gutter" into the tracked universe and the goal's denominator.
     if "county" in q and "york county" not in q:
@@ -1352,6 +1441,36 @@ def _off_area_prose(text):
         if m.group(1).lower() != "york":
             return m.group(0)
     return None
+
+
+def _generated_prose(data):
+    """Every human-readable string in a whole-page payload, as one blob.
+
+    `strengthen_pages` assembles this by hand because it returns one section.
+    The three techniques that build entire pages return the same shape as each
+    other — title, h1, lede, sections, faqs — and all three need the geo guard
+    reading all of it, headings included: the block that shipped on 2026-08-10
+    carried "Schuylkill County" in its `<h2>`, and a check that read only body
+    paragraphs would have waved it through.
+
+    Non-string values are dropped rather than coerced. The model occasionally
+    returns a number or a nested object where a string belongs, and `str()` on
+    those would put `{'q': ...}` into the text the guard searches — harmless
+    for the guard, but it is the kind of thing that later gets rendered.
+    """
+    parts = [data.get(k) for k in ("title", "meta_desc", "h1", "lede")]
+    for s in data.get("sections") or []:
+        if not isinstance(s, dict):
+            continue
+        parts.append(s.get("h2"))
+        parts.extend(s.get("paragraphs") or [])
+        parts.extend(s.get("bullets") or [])
+    for f in data.get("faqs") or []:
+        if not isinstance(f, dict):
+            continue
+        parts.append(f.get("q"))
+        parts.append(f.get("a"))
+    return " ".join(p for p in parts if isinstance(p, str))
 
 
 def adopt_queries(ctx):
