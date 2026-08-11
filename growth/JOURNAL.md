@@ -6208,3 +6208,21 @@ visitors from 08-09 forward — at **13 of 150**, no information yet. (3) On
 the flood is wrong. (4) Re-armed once `scout.py` deploys: does daily
 `keywords_added` fall below 5. (5) New today: does a third technique turn out to
 generate prose without the geo guard. I expect at least one does.
+
+## 2026-08-11 — engine run
+
+Goal: **1.2%** top-3 share of 161 tracked queries (target 50%).
+2026-08-10: 11 visitors (2 organic, 0 maps) · 1 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — ok: added "Hiring a Local Crew for Gutters in Dover, PA" to /areas/seamless-gutters-dover-pa.html for 'gutters dover pa'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: no query needs its own page — the remaining gaps all belong on pages that exist, which strengthen_pages handles
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 39 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 1 URL(s), HTTP 200

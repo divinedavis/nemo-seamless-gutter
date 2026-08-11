@@ -1,6 +1,6 @@
 {
-  "generated": "2026-08-10T06:03:30+00:00",
-  "date": "2026-08-10",
+  "generated": "2026-08-11T06:04:08+00:00",
+  "date": "2026-08-11",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
@@ -8,10 +8,10 @@
     "share_pct": 1.2,
     "measured": true,
     "why_unmeasured": null,
-    "coverage_pct": 34.8,
+    "coverage_pct": 35.4,
     "tracked_queries": 161,
     "top3": 2,
-    "top10": 8,
+    "top10": 7,
     "ranked_known": 23
   },
   "traffic": {
@@ -79,6 +79,10 @@
       {
         "date": "2026-08-09",
         "value": 13
+      },
+      {
+        "date": "2026-08-10",
+        "value": 11
       }
     ],
     "pageviews": [
@@ -145,6 +149,10 @@
       {
         "date": "2026-08-09",
         "value": 21
+      },
+      {
+        "date": "2026-08-10",
+        "value": 17
       }
     ],
     "organic_visitors": [
@@ -211,6 +219,10 @@
       {
         "date": "2026-08-09",
         "value": 0
+      },
+      {
+        "date": "2026-08-10",
+        "value": 2
       }
     ],
     "local_visitors": [
@@ -276,6 +288,10 @@
       },
       {
         "date": "2026-08-09",
+        "value": 0
+      },
+      {
+        "date": "2026-08-10",
         "value": 0
       }
     ],
@@ -343,6 +359,10 @@
       {
         "date": "2026-08-09",
         "value": 0
+      },
+      {
+        "date": "2026-08-10",
+        "value": 0
       }
     ],
     "direct_visitors": [
@@ -409,6 +429,10 @@
       {
         "date": "2026-08-09",
         "value": 12
+      },
+      {
+        "date": "2026-08-10",
+        "value": 9
       }
     ],
     "referral_visitors": [
@@ -474,6 +498,10 @@
       },
       {
         "date": "2026-08-09",
+        "value": 0
+      },
+      {
+        "date": "2026-08-10",
         "value": 0
       }
     ],
@@ -541,6 +569,10 @@
       {
         "date": "2026-08-09",
         "value": 1
+      },
+      {
+        "date": "2026-08-10",
+        "value": 0
       }
     ],
     "bot_hits": [
@@ -607,6 +639,10 @@
       {
         "date": "2026-08-09",
         "value": 1356
+      },
+      {
+        "date": "2026-08-10",
+        "value": 1243
       }
     ],
     "call_taps": [
@@ -652,6 +688,10 @@
       },
       {
         "date": "2026-08-09",
+        "value": 0
+      },
+      {
+        "date": "2026-08-10",
         "value": 0
       }
     ],
@@ -702,6 +742,10 @@
       },
       {
         "date": "2026-08-09",
+        "value": 0
+      },
+      {
+        "date": "2026-08-10",
         "value": 0
       }
     ],
@@ -769,6 +813,10 @@
       {
         "date": "2026-08-09",
         "value": 0
+      },
+      {
+        "date": "2026-08-10",
+        "value": 1
       }
     ],
     "phone_leads": [
@@ -834,6 +882,10 @@
       },
       {
         "date": "2026-08-09",
+        "value": 0
+      },
+      {
+        "date": "2026-08-10",
         "value": 0
       }
     ],
@@ -901,6 +953,10 @@
       {
         "date": "2026-08-09",
         "value": 0
+      },
+      {
+        "date": "2026-08-10",
+        "value": 1
       }
     ]
   },
@@ -923,7 +979,7 @@
       },
       "dover": {
         "total": 14,
-        "covered": 5,
+        "covered": 6,
         "top3": 0
       },
       "red-lion": {
@@ -950,7 +1006,7 @@
     "by_intent": {
       "hire": {
         "total": 101,
-        "covered": 48
+        "covered": 49
       },
       "price": {
         "total": 35,
@@ -1001,7 +1057,6 @@
       "gutter repair hanover pa",
       "gutter repair near me york pa",
       "gutter replacement dover pa",
-      "gutters dover pa",
       "half round copper gutter installers york pa",
       "half round copper gutters near me",
       "half round copper gutters york pa",
@@ -1177,8 +1232,8 @@
       },
       {
         "query": "seamless gutter devon pa",
-        "position": 29.4,
-        "impressions": 273,
+        "position": 29.3,
+        "impressions": 274,
         "clicks": 0
       },
       {
@@ -1316,13 +1371,13 @@
     ]
   },
   "gsc": {
-    "date": "2026-08-10",
+    "date": "2026-08-11",
     "ok": true,
     "connected": true,
-    "rows": 637,
+    "rows": 645,
     "matched": 23,
-    "clicks": 9,
-    "impressions": 22149,
+    "clicks": 10,
+    "impressions": 22242,
     "avg_position": 24.9
   },
   "techniques": [
@@ -1400,6 +1455,10 @@
         {
           "date": "2026-08-09",
           "value": 0
+        },
+        {
+          "date": "2026-08-10",
+          "value": 0
         }
       ]
     },
@@ -1476,6 +1535,10 @@
         },
         {
           "date": "2026-08-09",
+          "value": 0
+        },
+        {
+          "date": "2026-08-10",
           "value": 0
         }
       ]
@@ -1829,6 +1892,10 @@
         {
           "date": "2026-08-09",
           "value": 1
+        },
+        {
+          "date": "2026-08-10",
+          "value": 0
         }
       ]
     },
@@ -2581,7 +2648,7 @@
     ]
   },
   "last_build": {
-    "date": "2026-08-10",
+    "date": "2026-08-11",
     "log": [
       {
         "ok": true,
@@ -2603,7 +2670,7 @@
       },
       {
         "ok": true,
-        "detail": "added \"Seamless Gutter Installation in Schuylkill County, PA\" to /services/seamless-gutter-installation.html for 'schuylkill county seamless gutter'",
+        "detail": "added \"Hiring a Local Crew for Gutters in Dover, PA\" to /areas/seamless-gutters-dover-pa.html for 'gutters dover pa'",
         "slug": "strengthen_pages"
       },
       {
@@ -2652,25 +2719,11 @@
     "changed": 1
   },
   "last_scout": {
-    "date": "2026-08-10",
+    "date": "2026-08-11",
     "ok": true,
-    "techniques_added": [
-      "instant_linear_foot_price_calculator",
-      "day5_referral_reward_tracked",
-      "york_best_of_listicle_placement"
-    ],
-    "keywords_added": [
-      "gutter replacement cost per foot york pa",
-      "how much to replace gutters on a 1500 sq ft house",
-      "best gutter company in york county pa",
-      "gutter overflowing in heavy rain who to call",
-      "copper half round gutters historic home pennsylvania",
-      "gutter cleaning near me hanover pa",
-      "seamless gutter installer dallastown pa",
-      "gutter guards worth it pennsylvania leaves",
-      "ice dam damaged gutters replace or repair york pa"
-    ],
-    "notes": "Sequencing for the season: the referral texts go out this week (leaf season is six weeks away and a referred call needs no ranking), the calculator ships before 15 Sept, listicle outreach runs in the background because AI citations lag 90-180 days. Two cautions on the calculator: (1) it partly overlaps the ledger's 'Text a photo, get a price range today' \u2014 run the calculator as the 24/7 self-serve path and keep the photo-text as the human path for odd roofs, do not build two prices that disagree, and (2) the number must be a stated range with 'final price after measurement' visible on screen, because a quoted number Eric then walks back is worse for trust than no number at all. On the referral reward: pay only on a completed job, never for a lead and absolutely never for a review \u2014 a $100 card attached to a review request would violate Google's policy and the FTC rule and is not worth the profile. The 4.2-star average is the quiet drag under all three of these; a calculator and a referral card both work harder once the average moves, so the ledger's review candidates should not sit idle behind this. Considered and rejected: buying Angi/HomeAdvisor or Thumbtack leads (sends Eric's money to the aggregators already outranking him, shared leads, poor close rate on a $2,400 ticket); EDDM saturation mail to York County ZIPs (legal but $600+ per drop with no targeting \u2014 the ledger's door hangers next to finished jobs beat it per dollar); publishing NEMO's own 'best gutter companies in York' list with itself at #1 (a real 2026 AI-visibility tactic, but for a one-truck contractor ranking its own business first is dishonest and reputationally stupid locally); cold SMS or bulk email to purchased homeowner lists (illegal under TCPA/CAN-SPAM); Nextdoor and Facebook paid ads (viable later, but the ledger's free organic plays in both places are untested and cost nothing); and an AI-prompt-set tracker to measure LLM mentions monthly \u2014 worth adding once there is anything to measure, but it is instrumentation, not a ringing phone, and the brief asked for fewer and better."
+    "techniques_added": [],
+    "keywords_added": [],
+    "notes": ""
   },
   "pages": {
     "areas": [
