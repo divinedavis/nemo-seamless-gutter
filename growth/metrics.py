@@ -79,7 +79,11 @@ BOT_RE = re.compile(
     # the site monitoring its own uptime is not an audience.
     r"zgrab|libredtail|masscan|nuclei|censys|expanse|internet-measurement|"
     r"python-httpx|httpx/|aiohttp|java/|libwww|perl|ruby|axios|node-fetch|"
-    r"nemohealthcheck",
+    r"nemohealthcheck|"
+    # Self-declared scanners with none of the substrings above — ModatScanner
+    # and a Münster university research scanner were both counted as visitors
+    # in the 2026-08-11 check despite saying "scanner" in their UA.
+    r"scanner",
     re.I)
 
 # The crawlers whose absence would silently invalidate the whole GEO effort.
@@ -136,10 +140,17 @@ MAX_UAS_PER_IP_PER_DAY = 3
 HOSTING_RE = re.compile(
     r"(amazonaws\.com|compute\.internal|googleusercontent|googlebot|"
     r"digitalocean|linode|akamai|cloudflare|azure|msn\.com|oracle(cloud)?|"
-    r"ovh\.net|hetzner|scaleway|vultr|contabo|leaseweb|datapacket|"
+    r"ovh\.|hetzner|scaleway|vultr|contabo|leaseweb|datapacket|"
     r"binaryedge|shodan|censys|shadowserver|rwth-aachen|internet-census|"
     r"stretchoid|alphastrike|driftnet|netsystemsresearch|securitytrails|"
-    r"bufferover|onyphe|intrinsec|recyber|palo-?alto|expanse)", re.I)
+    r"bufferover|onyphe|intrinsec|recyber|palo-?alto|expanse|"
+    # 2026-08-11: VPS hosts counted as visitors because only their exact
+    # rDNS suffix was missing here (ovh.us vs ovh.net, lnvps.cloud,
+    # colocrossing, cybeservers, modat.io). The vps/vm tokens catch the
+    # naming convention itself so the next small host doesn't need a release:
+    # residential PTRs say things like c-73-101-34-78.hsd1.pa.comcast.net,
+    # never vm-1527 or vps-98c597da.
+    r"lnvps|colocrossing|cybeservers|modat\.io|\bvps\b|\bvm-\d)", re.I)
 
 # PTR lookups are network calls, and `collect()` runs behind a live dashboard
 # endpoint as well as the 6am job. Results are cached in the ledger forever

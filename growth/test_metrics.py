@@ -26,9 +26,9 @@ def line(ip, path, ua=BROWSER, ref="-", status=200, owner=None):
     return base + (f' "{owner}"' if owner is not None else "") + "\n"
 
 
-def visit(ip, owner=None):
+def visit(ip, owner=None, ua=BROWSER):
     """A page plus its stylesheet — what a real browser does."""
-    return line(ip, "/", owner=owner) + line(ip, "/styles.css", owner=owner)
+    return line(ip, "/", ua=ua, owner=owner) + line(ip, "/styles.css", ua=ua, owner=owner)
 
 
 
@@ -150,6 +150,27 @@ class HostingExclusion(unittest.TestCase):
         log = visit("203.0.113.21")
         m = self.collect(log, resolver=lambda ip: "prod-boron-us-central-25.li.binaryedge.ninja")
         self.assertEqual(m["visitors"], 0)
+
+    def test_small_vps_hosts_are_excluded(self):
+        # 2026-08-11: these exact PTRs were counted as visitors because only
+        # their rDNS suffix was missing from HOSTING_RE — ovh.us (only ovh.net
+        # was listed), lnvps.cloud, colocrossing, cybeservers — plus the
+        # generic vm-NNNN / vps-XXXX naming convention hosts use.
+        for ptr in ("vps-98c597da.vps.ovh.us",
+                    "vm-1527.lnvps.cloud",
+                    "107-173-171-201-host.colocrossing.com",
+                    "194-231-192-68.cybeservers.com"):
+            m = self.collect(visit("203.0.113.30"), resolver=lambda ip: ptr)
+            self.assertEqual(m["visitors"], 0, ptr)
+
+    def test_self_declared_scanner_ua_is_a_bot(self):
+        # UAs that literally say "scanner" but contain none of the classic
+        # bot substrings; both were counted as visitors on 2026-08-11.
+        for ua in ("Mozilla/5.0 (compatible; ModatScanner/1.2; +https://modat.io)",
+                   "fhms-its-research-scanner/1.0 (+https://fb02itsscan02.fh-muenster.de)"):
+            log = visit("203.0.113.31", ua=ua)
+            m = self.collect(log, resolver=lambda ip: "")
+            self.assertEqual(m["visitors"], 0, ua)
 
     def test_residential_isp_is_kept(self):
         # The customer this site exists for. Comcast/Verizon PTRs must survive.
