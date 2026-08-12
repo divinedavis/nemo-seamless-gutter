@@ -6709,3 +6709,402 @@ Goal: **1.2%** top-3 share of 161 tracked queries (target 50%).
 - `ping_indexnow` — ok: nothing new to submit
 
 **Scout did not run:** anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CdxLuGrHuxaAx7yowK99D"}
+
+## 2026-08-12 — review agent
+
+### Lead: the engine wrote nothing today, and on the evidence it has nothing left to write
+
+Two blockers, one of them structural.
+
+**The Anthropic credit balance is empty again.** `strengthen_pages` burned three
+candidates and `scout` never ran, both on
+`invalid_request_error: "Your credit balance is too low"`. Today's build is
+`new=0, changed=0` — the first day since 2026-08-05 that the engine produced
+literally nothing. This is billing, not a bug, and I am not debugging it.
+
+**A correction to this prompt, because the data disagrees with it.** The prompt
+says to expect the *self-imposed usage cap* ("regain access 2026-08-01") and to
+read the error text rather than repeat the history. I did. That cap expired on
+schedule — 08-06 through 08-11 all ran clean. What has happened *since* is a
+different failure with the same effect: the account has run dry twice, on
+**2026-08-05** and again **today**, both times with the credit-balance error, not
+the usage cap. Whoever tops this account up is topping it up in amounts that last
+about a week. That is the fact worth carrying forward, and the prompt's billing
+section is now describing a resolved problem.
+
+**The structural finding is in the other nine lines of the build log.** Nine of
+eleven techniques reported `noop`, and read their reasons together:
+
+```
+adopt_queries        no new in-area searches worth tracking
+improve_ctr          no page is due a snippet rewrite
+geo_answer_first     every ranking page already opens with a direct answer
+service_pages        every queued service already has a page
+area_pages           every queued town already has a page
+money_pages          no query needs its own page
+internal_links       refreshed nearby-links on 0 page(s)
+local_schema         LocalBusiness schema already current
+rebuild_sitemap      sitemap.xml unchanged
+ping_indexnow        nothing new to submit
+```
+
+That is not a stalled engine. That is a **finished** one. I checked the surface
+it is responsible for and it is saturated: 32 `FAQPage` blocks, 34
+`RoofingContractor` nodes, 30 `Service`/`Offer` pairs, 104 Q&A pairs,
+`BreadcrumbList`, `Article`, `areaServed`, `priceRange` on the homepage node,
+real dollar figures on the cost guides ($1,500–$4,000 installs, $7–$14/ft), an
+explicit "we serve all of York County" answer, and a `robots.txt` that already
+allows GPTBot, OAI-SearchBot, PerplexityBot, ClaudeBot, Applebot and
+meta-externalagent by name. Every on-page thing today's research says an AI
+answer engine looks for is **already shipped**. `strengthen_pages` is the only
+technique with work left, and it is the one the billing killed.
+
+The conclusion I want on the record: **the automated half of this project is
+done, and has been for about a week.** Everything that remains is off-site or
+human. Seventeen days, roughly fifty recommendations, two carried out — both
+engineering, both by Divine. Nothing on Eric's side has been touched.
+
+### Where the numbers stand
+
+**The goal metric: `top3` = 2 of 161 tracked queries (1.2%). Unchanged from
+yesterday, and unchanged in absolute terms for twelve days.** Target is 50%.
+
+Per town, today vs. 2026-08-11 — the keyword block is **byte-identical**, which
+is what `changed=0` looks like from the other end:
+
+| bucket | total | covered | top3 |
+|---|---|---|---|
+| county | 87 | 33 | **2** |
+| york | 23 | 5 | 0 |
+| dover | 14 | 6 | 0 |
+| dallastown | 10 | 3 | 0 |
+| spring-grove | 10 | 3 | 0 |
+| red-lion | 9 | 3 | 0 |
+| hanover | 8 | 4 | 0 |
+
+**Zero top-3 positions in all seven named towns, on day seventeen.** Both of the
+site's top-3 queries are in the county bucket.
+
+**The denominator is eating the headline number, and it does so precisely when
+the engine works.** `top3` has sat at 1 or 2 since 08-01 while `tracked_queries`
+went 108 → 161, so `share_pct` fell **1.9% → 1.2%** without a single position
+changing. `coverage_pct` fell 40.7 → 35.4 the same way. This has been flagged
+since 08-08 (day 5) and is unactioned. It means **the number Eric is judged
+against goes down as a direct result of the scout doing its job.** I have not
+changed it, for the reason the last two entries gave: redefining the goal metric
+is not mine to do. But it should not survive another week.
+
+**Search Console — frozen.** 650 rows / 23 matched / 10 clicks / 22,338
+impressions / avg position **25.0**. Yesterday: 645 / 23 / 10 / 22,242 / 24.9.
+`matched` and `ranked_known` have both been stuck at 23 since 08-08. `top10`
+slipped 8 → 7 on 08-11 and stayed at 7 — two days stable now, which is
+consistent with the single-query reading the last entry gave it and equally
+consistent with noise. **I still cannot name the query and I still do not think
+anything has changed about this site's ranking in the last week.**
+
+**Traffic — down, and small enough that I will not pretend that means anything.**
+7-day median visitors 7 (previous 7: 9). Organic median 1 (previous: 2).
+Pageviews median 10 (previous: 14). Every one of those is a one-or-two-visitor
+move on a site averaging under ten a day. **Noise.**
+
+**Leads — the one genuinely new fact, and it is good news.** A **third booking
+landed on 2026-08-11**. `bookings_all_time` is now 3, dated 07-30, 08-10 and
+08-11. Two of the three arrived in the last three days, after none for eleven
+days. I want to be careful here: three events is not a trend, and I cannot see
+the bookings database to know what these were or whether they closed. But the
+booking form works and something is finding it.
+
+Against that: **`phone_leads` all-time is still 0, `call_taps` has been 0 for
+fifteen consecutive days, `ai_visitors` is 0 for the entire series, and the AI
+phone agent has taken 2 calls ever, both on 07-30.** The phone has not rung. The
+form has rung three times. That gap is now the most interesting thing in the
+dataset and nobody has looked at it.
+
+### Did previous changes work?
+
+**Prediction 1 — 7-day median `organic_visitors` ≥ 2 by 2026-08-16.** Window
+08-05→08-11 is `[1,1,0,0,0,2,3]`, median **1**. Needs four of seven days at ≥2
+by Friday; only two days have ever qualified. **On track to fail, not yet
+decided.** Four days left.
+
+**Prediction 2 — `call_taps` > 0 by 2026-09-01 with 150+ cohort visitors.**
+Cohort from 08-09 is 12+9+15 = **36 of 150**. **No information yet.**
+
+**Prediction 3 — the impression block ages out of the 28-day window on
+2026-09-01** (impressions down 15,000–18,500, rows down ~200, `avg_position`
+worse toward 29). Block still frozen: +96 impressions and +5 rows day-over-day.
+**On track, seventh day, 20 days to the test.**
+
+**Prediction 4 — daily `keywords_added` below 5 once the new scout deploys.**
+**Cannot evaluate:** the scout did not run at all today, and it is not deployed.
+`adopt_queries` added 0 again.
+
+**Prediction 5 — `keywords.by_intent.price.covered` moves off 3 once the queue
+reorder deploys.** **Cannot evaluate:** not deployed. Still 3 of 35.
+
+**The deploy itself — recommendation 1 on 08-10, 08-11 and now 08-12. Still not
+done, day 4.** I can prove the droplet is running stale code without touching it:
+today's snapshot has **no `code_version`** (emitted at `snapshot.py:221`), **no
+`keywords.ranked`** (`snapshot.py:190`), **no `gsc.pages`** (`snapshot.py:198`),
+no `crawl_*` series (`metrics.py:108`), and `discovered_untracked` is still
+capped at exactly **40** rows. The droplet is running code from on or before
+2026-08-09.
+
+**And that changes yesterday's framing, so I am correcting it.** Yesterday I
+promoted the deploy to rec 1 on the grounds that shipping 08-10's commit without
+08-11's would delete 19 in-area queries from the build queue in the month they
+are needed. That risk **never materialised, because nothing shipped at all** —
+the fix landed in git before the regression could reach the droplet, and the two
+now deploy together or not at all. The deploy still matters, but it is back to
+being instrumentation plus geo-guards, not an emergency. Which means the two
+off-area passages below outrank it, because those are live and wrong today.
+
+**Not actioned, with day counts:** the live Schuylkill County section **day 3**;
+the Akron paragraph at `services/gutter-guards.html:163` **day 15**; the engine
+deploy **day 4**; York in the homepage title (`index.html:16`) **day 12**; T016
+GBP category **day 17**; T048 Foursquare **day 17**; T007 reviews **day 17**;
+`?utm_source=gbp` **day 10**; the goal denominator **day 5**. Candidate pile
+**44, unchanged**. `scoreboard.does_not_work` is still `[]` on day seventeen —
+**zero techniques ever activated, zero ever rejected.**
+
+### What I researched today
+
+- **Primary GBP category is the single highest-weighted individual ranking factor
+  in the 2026 Whitespark report** — 47 practitioners scoring 187 factors, with GBP
+  signals at 32% of local-pack weight, reviews ~20% (up from 16% in 2023) and
+  on-page at 19%
+  ([Whitespark](https://whitespark.ca/local-search-ranking-factors/),
+  [Wolfpack](https://wolfpackadvising.com/blog/how-to-rank-higher-on-google-maps/),
+  [SEOLocale](https://seolocale.com/google-map-pack-ranking-in-2026-how-the-local-3-pack-really-works/)).
+  The concrete case is an HVAC business that **fell from position 1 to position 31**
+  in the local pack after switching from a specific category to a broader one.
+  **Why it matters here:** T016 has been sitting for seventeen days as "worth a
+  look". It is not — it is the highest-weighted field on the highest-weighted
+  surface, and a wrong value on it is worth thirty positions. This is the same
+  recommendation as yesterday with a number attached.
+- **Service-area padding is now a documented negative, not merely useless**
+  ([Wolfpack](https://wolfpackadvising.com/blog/how-to-rank-higher-on-google-maps/),
+  [NewTradeLeads](https://newtradeleads.com/articles/how-to-rank-google-map-pack-service-area)).
+  Google tightened proximity in competitive categories, and *more* declared service
+  areas correlates with *worse* rankings because padding is detected and
+  de-prioritised. **Why it matters here:** this is the fifth rejection of "add
+  towns to the GBP service area", and it upgrades T051 from an optimisation to a
+  possible **harm removal**. Given this site spent three days writing about
+  Schuylkill County and Akron unprompted, an over-broad service-area list on the
+  profile is a live hypothesis, not a hypothetical one. Nobody has looked.
+- **Review recency beats review volume, and replies count as an engagement
+  signal** ([Whitespark](https://whitespark.ca/local-search-ranking-factors/),
+  [SOCi](https://www.soci.ai/blog/local-memo-local-ranking-factors-of-2026-have-arrived/),
+  [Reputation](https://reputation.com/resources/articles/whitespark-2026-three-insights-every-brand-should-know)).
+  Sources are consistent that 60 reviews in 90 days outranks 300 lifetime with 4
+  recent, and that profiles which "look alive" — recent photos, answered reviews,
+  consistent updates — capture disproportionate engagement weight. **Why it
+  matters here:** this reframes T033 from housekeeping into a ranking action, and
+  it is the only Eric-side item that requires **no customer contact at all** — the
+  reviews are already written and sitting there. See rec 3.
+- **AI-citation for local trades is an off-site problem once the on-page work is
+  done** ([SearchMonster](https://www.searchmonster.io/post/how-home-service-businesses-win-in-ai-search-the-2026-geo-aeo-playbook),
+  [Fulcrum](https://www.fulcrumconcepts.com/how-local-businesses-show-up-in-ai-answers/),
+  [MarketMovers](https://www.marketmovers.ai/marketing-tips/ai-search-2026-home-services)).
+  The checklist is: direct-answer first paragraphs, LocalBusiness/Service/FAQ
+  schema, real price ranges, explicit service-area facts, third-party directory
+  and review-platform citations — and citation takes **4–6 months** to build.
+  **Why it matters here: I checked all five against the code and the first four
+  are already shipped** (see the Lead). The only unshipped item is the third-party
+  citations — T009, T029, T048, T053 — all candidates, none activated, on day
+  seventeen of a four-to-six-month clock. Seventeen days of `ai_visitors: 0` is
+  not a prose problem.
+- **Fall timing, confirmed a second time** ([Elev8](https://www.elev8operations.com/guides/how-to-get-more-gutter-leads-2026),
+  [ServiceTitan](https://www.servicetitan.com/blog/gutter-leads)) — start 6–8 weeks
+  before peak leaf-drop, which for south-central PA puts the window at
+  **early-to-mid September, four to five weeks out**, before indexing lag.
+- **Rejected, with reasons.** (1) *Adding `aggregateRating`/`Review` schema to our
+  own pages* — the AI-citation sources list "Review schema" in their checklists and
+  a naive reading would ship it; it is **self-serving review markup, which Google's
+  structured-data guidelines have disallowed for LocalBusiness since 2019**. It
+  risks a manual action for zero upside. Do not do this. (2) *Buying exclusive
+  leads at ~$100 each* — the lead-gen sources make an honest arithmetic case, but
+  this business has three bookings all-time and no measured close rate to divide
+  by; it is also spending money, which is Eric's call and not mine. (3) *Meta ad
+  spend 3–4 weeks before peak at 25–40% cheaper CPCs* — same objection, plus the
+  free channels have not rung yet. (4) *"AI answering in under 10 seconds"* —
+  already have one; it has taken two calls ever, which is a demand problem, not a
+  latency problem. (5) *Adding towns to the GBP service area* — fifth rejection,
+  now with evidence it actively hurts. (6) *Filing any of today's research as new
+  techniques* — **I filed nothing.** Category is T016, service area is T051,
+  reviews are T007/T033/T047, citations are T009/T029/T048/T053, seasonality is the
+  queue order. The pile is 44 with zero ever picked; adding to it is not help.
+
+### Recommendations
+
+**Nothing in this commit is live.** The live site runs from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout, and
+`publish_state.sh` only copies droplet → repo. Every item below needs a deploy or
+a human.
+
+1. **Top up the Anthropic account, and top it up for a season rather than a
+   week.** *(Divine / whoever owns billing — minutes.)* The account has run dry
+   twice in eight days. `strengthen_pages` is now the **only** technique with work
+   left to do, so an empty balance is no longer a partial outage — it is the whole
+   engine. The fall window opens in four to five weeks and indexing lag sits on top
+   of that. *How you would know:* tomorrow's `last_build` shows `changed=1` and
+   `last_scout.ok` is `true`. *Checked:* today's `last_build.log` and `last_scout`
+   in `snapshot.json`, and the same error on 2026-08-05; nine of eleven techniques
+   `noop` for lack of work, not for lack of credit.
+2. **Delete the two off-area passages from the live site.** *(Divine — five
+   minutes, free. Day 3 and day 15.)* On the droplet:
+   `services/seamless-gutter-installation.html` lines 227–230 and the
+   "Do you actually service Schuylkill County…" FAQ pair at 235–236; and
+   `services/gutter-guards.html:163`, "homes in Akron, PA and the surrounding
+   Lancaster and York County area" → "homes across York County, Pennsylvania".
+   **This is now above the deploy** because it is live and wrong today, while the
+   deploy is instrumentation. It also gates rec 5. *How you would know:*
+   `grep -ri "schuylkill\|akron\|lancaster county" services/` returns nothing.
+   *Checked:* both passages read out of the working tree again today at the line
+   numbers given.
+3. **Eric: answer every existing Google review. One sitting, no customer contact,
+   free.** *(Eric — T033, day 17.)* **This is the new top Eric-side item and it
+   displaces nothing, because nothing has been done.** Today's research puts review
+   signals at ~20% of local-pack weight and is explicit that answered reviews and a
+   profile that "looks alive" carry engagement weight independent of star average.
+   Unlike T007 this needs no customer to be contacted, no timing, no script, and
+   carries **zero suspension risk** — replying to reviews is behaviour Google
+   actively encourages. Reply in Eric's own words, name the service and the town
+   where the review already mentions them, and answer any low rating factually
+   rather than defensively. *How you would know:* it is a leading indicator, not a
+   traffic one — the test is whether `top3` in any named town moves off 0 over the
+   following month, currently 0 in all seven. *Checked:* T033 is
+   `status: candidate, activated: null` in the ledger; no site-side change is
+   involved so there is nothing in the code to conflict with; I did **not** file a
+   duplicate technique.
+4. **Eric: twenty minutes with the Business Profile — the primary category first,
+   the service-area list second.** *(Eric. Free. T016 day 17, T051 day 17.)*
+   Sharpened twice by today's research and now carrying a number: category is the
+   highest-weighted individual factor in the 2026 report, and the documented failure
+   case is position 1 → 31. (a) Screenshot the primary category before touching
+   anything. (b) **Read the service-area list and count it** — padding is now a
+   documented negative, and this business has demonstrated a taste for claiming
+   places it does not serve. (c) Check hours against what `index.html` publishes
+   (Mon–Fri 07:30–18:00, Sat 08:00–14:00). **Then change at most one field, and
+   leave name, address and phone alone for a fortnight.** *Checked:* T016 and T051
+   both `candidate`/`activated: null`; hours at `techniques.py:669-672`.
+5. **Eric: claim Foursquare (T048), then Apple Business and Bing Places (T029).**
+   *(Eric — under an hour each, free. Day 17.)* Promoted from "worth doing" because
+   today's research identifies third-party citations as **the only unshipped item**
+   on the AI-citation checklist — the other four are already in the HTML — and puts
+   the payback at 4–6 months, which means September starts are already late for the
+   spring. NAP byte-identical to the GBP. **Do rec 2 first;** a listing that says
+   York while the site says Schuylkill is worse than no listing. *Checked:* T048 and
+   T029 both `candidate`; `robots.txt` already names every AI crawler and 32
+   `FAQPage` blocks are already live, so the on-site half needs nothing.
+6. **Deploy the engine code.** *(Divine — minutes. Day 4, demoted from rec 1.)*
+   Ship `techniques.py` + `snapshot.py` + `gsc.py` + `metrics.py` + `keywords.py`,
+   and `scout.py` + `growth_daily.py` **as a pair** or the scout raises
+   `TypeError`. Demoted because the regression it was racing never reached
+   production. *How you would know:* tomorrow's snapshot carries `code_version`,
+   `keywords.ranked`, `gsc.pages`, `crawl_*`, and more than 40
+   `discovered_untracked` rows. *Checked:* all five fields absent from today's
+   snapshot against `snapshot.py:190/198/221` and `metrics.py:108`;
+   `len(discovered_untracked) == 40` exactly.
+7. **Eric: pick three candidates and reject the rest.** *(Eric — one sitting. Day 5,
+   pile flat at 44.)* Mine today are T033 (rec 3), T016+T051 (rec 4), T048 (rec 5).
+   **The rejections matter as much as the picks** — a ledger with 44 candidates and
+   an empty `does_not_work` column after seventeen days is not a backlog, it is a
+   list nobody reads.
+8. **Put York back in the homepage title.** *(Divine — minutes. Free. Day 12.)*
+   `index.html:16` is still `Gutter Installer &amp; Contractor | NEMO Seamless
+   Gutter`. *Checked:* line read today, unchanged.
+9. **Fix the goal denominator, or promote `top3/ranked_known` to the headline.**
+   *(Day 5.)* Not done by me — it redefines the number Eric is judged against — but
+   the perverse incentive is now measurable: share fell 1.9% → 1.2% purely from
+   the scout adding queries.
+
+### What I changed in this repo today
+
+**Nothing but this entry.** No code, no page copy, no keyword lists.
+
+The last three review days were each spent fixing the engine's geo guards, and
+yesterday's entry named that pattern as "a good use of a day when the alternative
+is a page about Pottsville, and a bad use of sixteen of them." Today the engine
+has no work left to do and the code from those three days is still not deployed.
+Writing a fourth day of undeployed engine code would be the same mistake with
+better excuses. I did not touch `techniques.json`, `keywords.json`,
+`results.jsonl` or `state.json`; did not activate, retire or re-status any
+technique; and did not edit the two off-area passages, which remain rec 2 for
+Divine because editing them here only creates a conflict the next
+`publish_state.sh` overwrites.
+
+### Reasoning and uncertainties
+
+**Day seventeen. Two top-3 queries county-wide, zero in any of the seven named
+towns, zero call taps in fifteen days, zero AI visitors ever, zero phone leads
+ever — and three bookings, two of them in the last three days.**
+
+The honest shape of this project has changed, and today is the day to say it. For
+sixteen days the story was "the engine is building, give it time to index." That
+story is over: the engine has built everything it knows how to build, its
+remaining technique is blocked on a credit card, and every on-page item on the
+2026 AI-citation checklist is already in the HTML. **The bottleneck is no longer
+capacity, indexing lag, or code quality. It is that nobody has opened the Google
+Business Profile in seventeen days**, on a surface that today's research says
+carries 32% of local-pack weight, with its single highest-weighted field
+unexamined.
+
+I have written some version of that sentence for two weeks. I do not think
+writing it again tomorrow helps. So the concrete change in today's
+recommendations is rec 3: **the cheapest possible Eric-side action, requiring no
+customer contact, no money, no scheduling and no risk** — answer the reviews that
+already exist. If twenty minutes on the profile has not happened in seventeen
+days, the recommendation was too big, and the right response is a smaller one
+rather than a louder one.
+
+**The bookings deserve a caveat and not a victory lap.** Two in three days after
+eleven days of none is the most encouraging number in the file, and it is also
+exactly the shape random arrivals take at this volume. Three events. I cannot see
+the bookings database, I do not know whether these were York County homeowners or
+what they were worth, and I would not spend a dollar on the strength of them.
+What I would do is ask Eric what those two jobs were — that is a question with a
+free answer and it would tell us more than the entire Search Console panel has.
+
+**Where I am least confident. Four things.**
+
+First, the claim that the on-page work is finished. I verified it by grepping the
+generated HTML for schema types, price figures and service-area statements, and
+by reading the noop reasons in the build log. What I cannot verify from here is
+**quality** — whether those 104 FAQ answers are any good, whether the direct
+answers actually answer the question. `improve_ctr` says no page is due a rewrite,
+but a rewriter judging its own output is not evidence. If someone reads five
+guide pages and finds them thin, my "saturated" conclusion is wrong and the
+engine has plenty left to do.
+
+Second, whether the phone/form gap means anything. Three bookings and zero calls
+could be a broken tel: path, a beacon that never fires, an audience that prefers
+forms, or three coin flips. `call_taps` at 0 for fifteen days with the beacon
+present in every page is the kind of number that is either very informative or
+entirely an instrumentation artifact, and **I cannot tell which without the
+droplet.** T049 exists for exactly this and has never been activated.
+
+Third, the top-10 slip from 8 to 7, now two days old. Unchanged reading:
+consistent with one query crossing the line, equally consistent with noise on 10
+clicks. I still cannot name it.
+
+Fourth, and unchanged: **44 candidates, zero ever activated, zero ever rejected.**
+If the answer is that Eric does not have twenty minutes for this in August, that
+is a legitimate answer for a one-owner contractor in his busy season — but then
+the ledger should record it as a rejection and stop generating recommendations
+against a person who is not going to act on them, and this review should be
+weekly rather than daily until the fall.
+
+**What would change my mind, dated.** (1) 7-day median `organic_visitors` ≥ 2 by
+**2026-08-16** — at 1, expected to fail. (2) `call_taps` > 0 by **2026-09-01**
+with 150+ cohort visitors from 08-09 — at **36 of 150**, no information.
+(3) On **2026-09-01** the impression block ages out: impressions down
+15,000–18,500, `avg_position` worse toward 29. If it improves toward 21 instead,
+my reading of the flood is wrong. (4) Re-armed, pending deploy: does daily
+`keywords_added` fall below 5. (5) Pending deploy: if `keywords.by_intent.price`
+is still at 3 covered two weeks after the queue reorder ships, the order was never
+the binding constraint. (6) **New today:** if the credit is topped up and
+`strengthen_pages` still finds nothing to write within three days, then "the
+engine is finished" is not a conclusion about today — it is permanent, and this
+project needs to stop being an SEO engine and start being a reminder service for
+four off-site listings.
