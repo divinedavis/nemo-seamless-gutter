@@ -18,7 +18,59 @@ import statistics
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+import html as _html
+
 from . import keywords, ledger, review
+
+SITE = "https://nemoseamlessgutter.com"
+
+# Both email builders show this many "waiting on you" candidates; the full
+# list lives on a standalone page so the report stays readable as it grows.
+WAITING_EMAIL_CAP = 5
+WAITING_PAGE = "reports/waiting-on-you.html"
+
+
+def write_waiting_page(items):
+    """Write the full 'waiting on you' list into the docroot, return its URL.
+
+    noindex, and seo/gen_sitemap.py never sees it, so it stays out of search.
+    Returns None when the docroot isn't there (a laptop run), in which case
+    the emails show everything rather than pointing at a page that was never
+    written.
+    """
+    root = os.environ.get("WEB_ROOT", "/var/www/nemo-seamless-gutter")
+    if not os.path.isdir(root):
+        return None
+    rows = []
+    for t in items:
+        notes = _html.escape((t.get("notes") or "").strip()).replace("\n", "<br>")
+        rows.append(
+            f'<article style="border-left:3px solid #F16C27;background:#fff7f2;'
+            f'border-radius:8px;padding:14px 16px;margin:0 0 12px">'
+            f'<h2 style="margin:0 0 6px;font-size:16px;color:#243C94">'
+            f'{_html.escape(t.get("name", ""))}</h2>'
+            f'<p style="margin:0;font-size:14px;line-height:1.55;color:#1a1a1a">'
+            f'{notes}</p></article>')
+    page = (
+        '<!doctype html><html lang="en"><head><meta charset="utf-8">'
+        '<meta name="robots" content="noindex,nofollow">'
+        '<meta name="viewport" content="width=device-width,initial-scale=1">'
+        '<title>Waiting on you — NEMO growth</title></head>'
+        '<body style="margin:0;background:#f4f5f7;font-family:-apple-system,'
+        'BlinkMacSystemFont,Segoe UI,Roboto,sans-serif">'
+        '<main style="max-width:680px;margin:0 auto;padding:28px 16px">'
+        '<h1 style="font-size:20px;color:#243C94">Waiting on you — '
+        'these cannot run until someone acts</h1>'
+        f'<p style="font-size:13px;color:#6b7280">{len(items)} candidate(s) · '
+        f'generated {ledger.today()} by the growth engine</p>'
+        + "".join(rows) + "</main></body></html>")
+    path = os.path.join(root, WAITING_PAGE)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        f.write(page)
+    os.replace(tmp, path)
+    return f"{SITE}/{WAITING_PAGE}"
 
 BAR = "=" * 58
 
@@ -231,11 +283,19 @@ def build_text(run_log=None, review_out=None, scout_out=None):
     # ---- blocked on a human ------------------------------------------------
     blocked = [t for t in cands if t.get("notes")]
     if blocked:
+        try:
+            url = write_waiting_page(blocked)
+        except Exception:
+            url = None
+        # only cap when the overflow has somewhere to live
+        shown = blocked[:WAITING_EMAIL_CAP] if url else blocked
         L.append("WAITING ON YOU — these cannot run until someone acts")
-        for t in blocked:
+        for t in shown:
             first = (t.get("notes") or "").strip().split("\n")[0]
             L.append(f"  {t['id']} {t['name']}")
             L.append(f"       {first}")
+        if len(blocked) > len(shown):
+            L.append(f"  … {len(blocked) - len(shown)} more: {url}")
         L.append("")
 
     # ---- content roadmap ---------------------------------------------------

@@ -30,7 +30,7 @@ import html
 import re
 import statistics
 
-from . import keywords, ledger, review
+from . import keywords, ledger, report, review
 
 NAVY = "#243C94"
 ORANGE = "#F16C27"
@@ -436,8 +436,14 @@ def _waiting_card():
              if t.get("status") == "candidate" and t.get("notes")]
     if not cands:
         return ""
+    try:
+        url = report.write_waiting_page(cands)
+    except Exception:
+        url = None
+    # only cap when the overflow has somewhere to live
+    shown = cands[:report.WAITING_EMAIL_CAP] if url else cands
     rows = []
-    for t in cands:
+    for t in shown:
         first = (t.get("notes") or "").strip().split("\n")[0]
         first = first.replace("first step:", "").strip()
         rows.append(
@@ -445,6 +451,11 @@ def _waiting_card():
             f'<div style="font:600 17px {FONT};color:{INK}">{_e(t["name"])}</div>'
             f'<div style="font:400 16px {FONT};color:{MUTED};margin-top:3px;'
             f'line-height:1.5">{_e(first)[:260]}</div></div>')
+    if len(cands) > len(shown):
+        rows.append(
+            f'<div style="padding:12px 0 2px;border-top:1px solid {LINE}">'
+            f'<a href="{_e(url)}" style="font:600 16px {FONT};color:{NAVY};'
+            f'text-decoration:none">See all {len(cands)} waiting items &rarr;</a></div>')
     return _card(
         _h("Waiting on you — these cannot run until someone acts", ORANGE)
         + "".join(rows))
