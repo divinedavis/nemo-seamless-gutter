@@ -1,6 +1,6 @@
 {
-  "generated": "2026-08-12T06:00:09+00:00",
-  "date": "2026-08-12",
+  "generated": "2026-08-13T06:00:09+00:00",
+  "date": "2026-08-13",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
@@ -87,6 +87,10 @@
       {
         "date": "2026-08-11",
         "value": 15
+      },
+      {
+        "date": "2026-08-12",
+        "value": 9
       }
     ],
     "pageviews": [
@@ -161,6 +165,10 @@
       {
         "date": "2026-08-11",
         "value": 26
+      },
+      {
+        "date": "2026-08-12",
+        "value": 11
       }
     ],
     "organic_visitors": [
@@ -235,6 +243,10 @@
       {
         "date": "2026-08-11",
         "value": 3
+      },
+      {
+        "date": "2026-08-12",
+        "value": 2
       }
     ],
     "local_visitors": [
@@ -309,6 +321,10 @@
       {
         "date": "2026-08-11",
         "value": 1
+      },
+      {
+        "date": "2026-08-12",
+        "value": 0
       }
     ],
     "ai_visitors": [
@@ -382,6 +398,10 @@
       },
       {
         "date": "2026-08-11",
+        "value": 0
+      },
+      {
+        "date": "2026-08-12",
         "value": 0
       }
     ],
@@ -457,6 +477,10 @@
       {
         "date": "2026-08-11",
         "value": 11
+      },
+      {
+        "date": "2026-08-12",
+        "value": 7
       }
     ],
     "referral_visitors": [
@@ -530,6 +554,10 @@
       },
       {
         "date": "2026-08-11",
+        "value": 0
+      },
+      {
+        "date": "2026-08-12",
         "value": 0
       }
     ],
@@ -605,6 +633,10 @@
       {
         "date": "2026-08-11",
         "value": 0
+      },
+      {
+        "date": "2026-08-12",
+        "value": 0
       }
     ],
     "bot_hits": [
@@ -679,6 +711,10 @@
       {
         "date": "2026-08-11",
         "value": 2677
+      },
+      {
+        "date": "2026-08-12",
+        "value": 1590
       }
     ],
     "call_taps": [
@@ -741,6 +777,10 @@
       {
         "date": "2026-08-11",
         "value": 0
+      },
+      {
+        "date": "2026-08-12",
+        "value": 1
       }
     ],
     "ai_calls": [
@@ -798,6 +838,10 @@
       },
       {
         "date": "2026-08-11",
+        "value": 0
+      },
+      {
+        "date": "2026-08-12",
         "value": 0
       }
     ],
@@ -873,6 +917,10 @@
       {
         "date": "2026-08-11",
         "value": 1
+      },
+      {
+        "date": "2026-08-12",
+        "value": 0
       }
     ],
     "phone_leads": [
@@ -946,6 +994,10 @@
       },
       {
         "date": "2026-08-11",
+        "value": 0
+      },
+      {
+        "date": "2026-08-12",
         "value": 0
       }
     ],
@@ -1021,6 +1073,10 @@
       {
         "date": "2026-08-11",
         "value": 1
+      },
+      {
+        "date": "2026-08-12",
+        "value": 0
       }
     ]
   },
@@ -1211,6 +1267,12 @@
         "clicks": 0
       },
       {
+        "query": "gutter installer",
+        "position": 1,
+        "impressions": 471,
+        "clicks": 0
+      },
+      {
         "query": "seamless gutter contractors plymouth meeting pa",
         "position": 14.2,
         "impressions": 462,
@@ -1226,12 +1288,6 @@
         "query": "seamless gutter eagleville pa",
         "position": 17.6,
         "impressions": 441,
-        "clicks": 0
-      },
-      {
-        "query": "gutter installer",
-        "position": 1,
-        "impressions": 439,
         "clicks": 0
       },
       {
@@ -1435,14 +1491,14 @@
     ]
   },
   "gsc": {
-    "date": "2026-08-12",
+    "date": "2026-08-13",
     "ok": true,
     "connected": true,
-    "rows": 650,
+    "rows": 797,
     "matched": 23,
     "clicks": 10,
-    "impressions": 22338,
-    "avg_position": 25.0
+    "impressions": 24032,
+    "avg_position": 24.8
   },
   "techniques": [
     {
@@ -1526,6 +1582,10 @@
         },
         {
           "date": "2026-08-11",
+          "value": 0
+        },
+        {
+          "date": "2026-08-12",
           "value": 0
         }
       ]
@@ -1611,6 +1671,10 @@
         },
         {
           "date": "2026-08-11",
+          "value": 0
+        },
+        {
+          "date": "2026-08-12",
           "value": 0
         }
       ]
@@ -1972,6 +2036,10 @@
         {
           "date": "2026-08-11",
           "value": 3
+        },
+        {
+          "date": "2026-08-12",
+          "value": 0
         }
       ]
     },
@@ -2724,7 +2792,7 @@
     ]
   },
   "last_build": {
-    "date": "2026-08-12",
+    "date": "2026-08-13",
     "log": [
       {
         "ok": true,
@@ -2746,7 +2814,7 @@
       },
       {
         "ok": false,
-        "detail": "3 candidate(s) failed, last: generation failed for 'gutter installation york': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdxLuF1AoZHVwZc7MazXm\"}",
+        "detail": "3 candidate(s) failed, last: generation failed for 'gutter installation york': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdzEi9nPkrvpx3H1UyrrW\"}",
         "slug": "strengthen_pages"
       },
       {
@@ -2796,9 +2864,9 @@
     "changed": 0
   },
   "last_scout": {
-    "date": "2026-08-12",
+    "date": "2026-08-13",
     "ok": false,
-    "detail": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdxLuGrHuxaAx7yowK99D\"}"
+    "detail": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdzEiBmT6vUrDkjNvtFwm\"}"
   },
   "pages": {
     "areas": [
