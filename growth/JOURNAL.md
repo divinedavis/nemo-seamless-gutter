@@ -7128,3 +7128,428 @@ Goal: **1.2%** top-3 share of 161 tracked queries (target 50%).
 - `ping_indexnow` — ok: nothing new to submit
 
 **Scout did not run:** anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CdzEiBmT6vUrDkjNvtFwm"}
+
+## 2026-08-13 — review agent
+
+### Lead: somebody tapped the call button, and the flood that has been "stable" for a week just tripled the site's query surface overnight
+
+Three things happened worth writing down, and one of them is good.
+
+**A human tapped the call button on 2026-08-12.** `call_taps` has been 0 for
+fifteen consecutive days and today's series reads
+`... 08-10: 0, 08-11: 0, 08-12: 1`. That is one unique tapper
+(`metrics.py:493-496` de-duplicates on `ip|ua`, so it is one person, not one
+tap). It is a single event and I am not going to call it a trend. But it kills a
+specific hypothesis that has been live since 08-08: **the beacon is not broken.**
+The tel: path fires and `metrics.py` records it. Fifteen days of zeros were
+fifteen days of nobody tapping, not an instrumentation artifact.
+
+**The Anthropic credit balance is still empty — day two consecutive, third dry
+spell in nine days.** `strengthen_pages` burned three candidates on
+`invalid_request_error: "Your credit balance is too low"`; `scout` never ran, same
+error. `last_build` is `new=0, changed=0` for the second day running. Billing, not
+a bug, not debugging it. The pattern from yesterday's entry holds and hardens: dry
+on **08-05**, **08-12**, **08-13**. Whoever tops this account up is topping it up
+in week-sized amounts, and `strengthen_pages` is the only technique with work
+left, so an empty balance is now the entire engine.
+
+**The Philadelphia flood is not frozen. It re-accelerated overnight, and I was
+wrong-footed by yesterday's reading of it as stable.** Search Console rows went
+**650 → 797 (+147)** and impressions **22,338 → 24,032 (+1,694)**. The seven days
+before that ran +6, +14, +7, +6, +7, +8, +5 rows and +81 to +153 impressions. This
+is a **twenty-fold jump in daily row growth** and it is the first genuinely new
+fact in the Search Console panel since 08-04.
+
+### Where the numbers stand
+
+**The goal metric: `top3` = 2 of 161 tracked queries, `share_pct` 1.2%. Unchanged
+for thirteen days.** Target is 50%.
+
+Per town, byte-identical to 08-11 and 08-12:
+
+| bucket | total | covered | top3 |
+|---|---|---|---|
+| county | 87 | 33 | **2** |
+| york | 23 | 5 | 0 |
+| dover | 14 | 6 | 0 |
+| dallastown | 10 | 3 | 0 |
+| spring-grove | 10 | 3 | 0 |
+| red-lion | 9 | 3 | 0 |
+| hanover | 8 | 4 | 0 |
+
+**Zero top-3 positions in all seven named towns, on day eighteen.** Both top-3
+queries live in the county bucket. `coverage_pct` 35.4, `ranked_known` 23, `top10`
+7 — all flat, `matched` stuck at 23 since 08-08.
+
+**The denominator problem is unchanged and still unactioned (day 6).** `top3` has
+been 1 or 2 since 08-01 while `tracked_queries` went 108 → 161, so `share_pct`
+fell 1.9% → 1.2% without a single position moving. The number Eric is judged
+against goes *down* when the scout works.
+
+**Search Console, and the part that is new.** 797 rows / 23 matched / 10 clicks /
+24,032 impressions / avg position 24.8 (yesterday 25.0 — a 0.2 move on 10 clicks
+is not a signal). Clicks have not moved in four days. Site-wide CTR is
+10/24,032 = **0.042%**.
+
+The `discovered_untracked` top-40 is **byte-identical to yesterday's** — same 40
+queries, no additions, no drops. It is still 100% out-of-area: Glenside, Audubon,
+Wayne, Plymouth Meeting, Royersford, Eagleville, Phoenixville, Horsham,
+Norristown, Abington, Malvern, Exton, Upper Merion, Radnor, Devon — Montgomery and
+Chester County, ninety-odd miles east. Those 40 rows alone carry **11,968 of
+24,032 impressions and zero clicks**. Zero of the 40 name a York County town.
+
+So the +147 new rows landed **below the 40-row cap**, in a long tail I cannot see.
+That matters: the cap is not just cosmetic any more, it is actively hiding the
+only part of the dataset that is moving. `out[:40]` sorted by impressions was
+flagged as a blind spot on 08-05 and the fix is in the undeployed batch.
+
+**Traffic — flat, small, noise.** 7-day median visitors 9 (previous 7: 7).
+Pageviews 11 (14). Organic 1 (1). Every one of those is a one-or-two-visitor move
+on a site averaging nine a day. `ai_visitors` remains **0 for the entire
+nineteen-day series**.
+
+**Leads.** `bookings_all_time` 3, dated 07-30, 08-10, 08-11 — nothing on 08-12.
+`phone_leads_all_time` **0**. `ai_calls` 0 since the two on 07-30.
+
+**And here is the uncomfortable adjacency:** on 08-12 there was one call tap and
+**zero recorded calls**. `call_taps: 1`, `ai_calls: 0`, `phone_leads: 0`, same
+day. One event, so this proves nothing. But it is the first time this particular
+leak has been *visible* at all, and it has exactly three explanations worth
+distinguishing: the tapper dialled and hung up; the call landed somewhere the
+`calls.py` fetch does not see (Eric's cell rather than the AI agent line); or
+`is_own_call` (`calls.py:237`) filtered it. **Only Eric or Divine can tell these
+apart, and it is a five-minute question.**
+
+### Did previous changes work?
+
+**Prediction 2 — `call_taps` > 0 by 2026-09-01 with a 150+ visitor cohort from
+08-09. RESOLVED YES, twenty days early and at less than a third of the cohort.**
+Cohort 08-09→08-12 is 12+9+15+9 = **45 visitors**, and the tap came at 45, not
+150. Verdict: **the call affordance works.** What it does *not* tell us is whether
+it converts — one tap on 45 visitors is 2.2%, which is a plausible rate and also a
+single coin flip. The instrumentation question is settled; the conversion question
+is not even started.
+
+**Prediction 1 — 7-day median `organic_visitors` ≥ 2 by 2026-08-16. Yesterday's
+entry called this "on track to fail." That was wrong and I am correcting it.** The
+window that gets tested on 08-16 is 08-10→08-16, and three of its seven days are
+already banked: 08-10 = 2, 08-11 = 3, 08-12 = 2. A median of 2 needs four of seven
+at ≥2, so it needs **one more qualifying day out of the four remaining**
+(08-13/14/15/16). Yesterday's read used the 08-05→08-11 window, which was the
+right window yesterday and the wrong one for a deadline three days out. Verdict:
+**genuinely live, roughly even odds.** Still noise-sized either way — this is a
+prediction about whether a number that has been 0-3 lands on 2 or 1.
+
+**Prediction 3 — the 08-04 impression block ages out of the 28-day window on
+2026-09-01 (impressions down 15,000-18,500, rows down ~200, avg position worse
+toward 29). Now in serious doubt, and today is the first evidence against it.**
+The prediction assumed a one-time block from 08-01 that would roll off 28 days
+later. Today's +147 rows and +1,694 impressions say this is not a block sitting
+still — it is an **accrual that is still accruing**, and freshly. If new
+out-of-area rows keep arriving at this rate, the 09-01 rolloff nets out to much
+less than predicted and could net out to nothing. Verdict: **too early to call the
+prediction failed, but its central assumption — that the flood is a finished
+event — is contradicted by today's data.** I am leaving the 09-01 test armed
+because it is still the cleanest test available, with the caveat now on record.
+
+**Prediction 4 — daily `keywords_added` below 5 once the new scout deploys.**
+**Cannot evaluate, fifth day.** Not deployed; the scout did not run at all.
+
+**Prediction 5 — `keywords.by_intent.price.covered` moves off 3 once the queue
+reorder deploys.** **Cannot evaluate, fifth day.** Still **3 of 35** — the worst
+covered intent in the file by a wide margin (`hire` is 49 of 101).
+
+**Prediction 6 (new yesterday) — if credit is topped up and `strengthen_pages`
+still finds nothing within three days, "the engine is finished" is permanent.**
+**Cannot evaluate: the credit was not topped up.** Day 1 of 3 not started.
+
+**The deploy — recommendation 1 on 08-10, then 08-11, 08-12. Still not done, day
+5.** Same proof as yesterday, re-verified against today's snapshot: no
+`code_version` (`snapshot.py:221`), no `keywords.ranked` (`snapshot.py:190`), no
+`gsc.pages` (`snapshot.py:198`), no `crawl_*` series (`metrics.py:108`), and
+`len(discovered_untracked) == 40` exactly. The droplet is running code from on or
+before 2026-08-09.
+
+**Not actioned, with day counts:** Anthropic credit **day 2**; the live Schuylkill
+County section **day 4**; the Akron paragraph at `services/gutter-guards.html:163`
+**day 16**; the engine deploy **day 5**; York in the homepage title **day 13**;
+T016 GBP category **day 18**; T048 Foursquare **day 18**; T007 reviews **day 18**;
+T033 review replies **day 2**; `?utm_source=gbp` **day 11**; the goal denominator
+**day 6**. Candidate pile **44, unchanged**. `scoreboard.does_not_work` is still
+`[]` — **eighteen days, zero techniques activated, zero rejected.**
+
+### The finding I think matters most today: the flood is blocking the fix
+
+This is new, it is causal, and it is checkable in the code.
+
+`"gutter installer"` sits at **position 1 with 471 impressions and zero clicks**
+over the 28-day window. It was 439 impressions yesterday and **258** when the
+comment at `techniques.py:1285-1294` was written. The homepage title is
+`Gutter Installer &amp; Contractor | NEMO Seamless Gutter` (`index.html:16`) —
+`improve_ctr` rewrote it that way on 2026-07-27, and it names no place. The site
+is winning, decisively, a geo-agnostic national query worth nothing to a York
+County contractor, and the entry ticket is a title that tells a York searcher
+nothing.
+
+The engine already knows this is bad. `GEO_ANCHOR` at `techniques.py:1295-1299`
+now **refuses** any snippet whose title and description both fail to name York or
+PA, with the 07-27 incident written up as the reason. That guard prevents the next
+mistake. It does not undo this one.
+
+And `improve_ctr` cannot undo it either, for a reason that is worth stating
+plainly: `gsc.underperformers()` (`growth/gsc.py:388`) filters on
+`position <= 15.0`, tested against the **page's average position across every
+query Google shows it for**. The Philadelphia rows land on the homepage at
+positions 10-35 and drag that average past 15, so the homepage **falls out of the
+candidate list** and `improve_ctr` reports `"no page is due a snippet rewrite"` —
+which is exactly what today's build log says, for the second day running.
+
+I did not deduce this from scratch; `_classify_pages` (`growth/gsc.py:411-431`)
+was written on 08-06 to prove precisely this and its docstring predicts "the
+homepage appears here with `ctr_candidate` false and 'average position below the
+cutoff' as its only reason." Its output lands in the snapshot as `gsc.pages`
+(`snapshot.py:198`) — **which is absent, because the droplet is on stale code.**
+
+So: the out-of-market flood is not merely a reporting nuisance. It has switched
+off the one technique that could fix the one on-page defect I can name precisely,
+on the site's most important page, and the diagnostic that would confirm it is
+sitting undeployed five days after it was written. **The fix, however, needs no
+deploy at all** — it is one line of HTML on the droplet.
+
+### What I researched today
+
+- **The March 2026 core update's hit on templated location pages, plus a broad
+  core update expected in August or September on the 2026 cadence**
+  ([Scorpion](https://www.scorpion.co/articles/news/industry-trends-news/googles-march-2026-core-update-what-local-servic/),
+  [DigitalApplied](https://www.digitalapplied.com/blog/local-seo-march-2026-core-update-gbp-optimization-guide),
+  [mean.ceo](https://blog.mean.ceo/local-seo-news-august-2026/)). Sources are
+  consistent that the March update went after "sites built on templated location
+  pages that swap in city names but don't offer anything unique." **Why it matters
+  here:** this site has **15 generated area pages** (`snapshot.pages.areas`) built
+  from one template. The journal already logged this risk on 08-02 and 08-05, so I
+  am not filing it as new — what *is* new is the timing: another core update is
+  expected inside the next six weeks, which is also the fall window. This raises
+  the cost of the two off-area passages, because "we also serve Schuylkill County"
+  on a templated page is the exact profile the update targets.
+- **Incentivized-review enforcement tightened again** — Google is testing a Maps
+  prompt asking visitors whether the business offered a reward for a review, on
+  top of the April 2026 policy update and Gemini-powered enforcement
+  ([DAC](https://www.dacgroup.com/insights/local-search-news/google-enforcement-incentivized-reviews/),
+  [Launchcodex](https://launchcodex.com/blog/seo-geo-ai/google-business-profile-review-policy-update/),
+  [DigitalShift](https://digitalshiftmedia.com/google-review-policy-changes-2026-home-services/)).
+  292 million reviews removed in a year; civil penalties cited up to $51,744 per
+  violation. **Why it matters here:** the April policy is already in the journal
+  (08-11). This is a guardrail update, not a new idea: it makes **T033 (reply to
+  existing reviews)** even more clearly the right first move versus **T007 (ask for
+  new ones)**, because replying carries zero policy surface and asking now carries
+  a live enforcement probe.
+- **Review recency and owner response rate over raw volume; GBP signals ~32% of
+  local-pack weight, reviews ~20%** — confirmed a third time
+  ([DigitalApplied](https://www.digitalapplied.com/blog/local-seo-march-2026-core-update-gbp-optimization-guide),
+  [Wolfpack](https://wolfpackadvising.com/blog/how-to-rank-higher-on-google-maps/)).
+  Nothing new; I am recording the confirmation and not re-deriving the
+  recommendation.
+- **Zero-click rates: ~60% of classic searches, 83% with AI Overviews, 93% inside
+  AI Mode** ([PinMeTo](https://www.pinmeto.com/blog/how-ai-changes-google-search-ranking/),
+  [ClickRank](https://www.clickrank.ai/local-seo-ranking-factors/)). **Why it
+  matters here:** it is a partial, honest explanation for 24,032 impressions and 10
+  clicks that does *not* require the site to be doing anything wrong. It does not
+  explain the geography.
+- **Rejected, with reasons.** (1) *Chasing the Search Console Generative AI report
+  to explain the flood* — already rejected on 08-05 and re-confirmed today: the
+  data is **UI-only, not in the API**, `searchanalytics.query` still accepts only
+  `web/image/video/news/discover/googleNews`, and as of the June rollout it was
+  limited to a subset of UK-based site owners
+  ([Pragma-Code](https://www.pragma-code.de/en/blog-search-console-generative-ai-performance),
+  [PinMeTo](https://www.pinmeto.com/news/google-search-console-generative-ai-reports-2026/)).
+  Nothing in `gsc.py` can be built against it. (2) *Adding Montgomery/Chester
+  County towns to the site to capture the flood* — this is the doorway-page
+  playbook, the business does not serve those towns, and it is the same instinct
+  that produced the Schuylkill section. Hard no. (3) *GBP posting cadence as a
+  ranking lever* — rejected 08-05, re-rejected here. (4) *Adding towns to the GBP
+  service area* — sixth rejection. (5) *Filing any of today's research as new
+  techniques* — **I filed nothing.** Location-page risk is the existing area-page
+  set, reviews are T007/T033, category is T016. The pile is 44 with zero ever
+  picked.
+
+### Recommendations
+
+**Nothing in this commit is live.** The live site runs from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout, and
+`publish_state.sh` copies droplet → repo only — it `rsync`s `areas/`, `guides/`,
+`services/` and `cp`s `index.html` **into** the repo, so any HTML I edited here
+would be silently overwritten tomorrow morning. Every item below needs a human on
+the droplet or a deploy.
+
+1. **Put York in the homepage title. On the droplet, today.** *(Divine — one line,
+   five minutes, free. Day 13, and promoted to rec 1 on new evidence.)*
+   `/var/www/nemo-seamless-gutter/index.html:16` reads
+   `<title>Gutter Installer &amp; Contractor | NEMO Seamless Gutter</title>`.
+   Make it name York — e.g. `Seamless Gutters in York, PA | NEMO Seamless Gutter`
+   (49 chars, inside the 65-char limit the engine enforces at
+   `techniques.py:1281`). *Why it moved to the top:* 471 impressions at **position
+   1** for `"gutter installer"` with **zero clicks**, up from 258 when the engine
+   itself wrote that number down. This is the cheapest identified defect on the
+   site's most important page, and the engine **cannot** fix it — see the section
+   above. *Expected effect:* lose the worthless position-1 national query, gain
+   relevance on the York queries where the site holds 0 of 23 top-3. *How you would
+   know:* homepage impressions for `"gutter installer"` fall, and `york` bucket
+   `covered`/`top3` move off 5/0 within a month. *Checked:* `index.html:16` read
+   today; `GEO_ANCHOR` at `techniques.py:1295-1299` already refuses placeless
+   snippets, so this change agrees with the engine's own policy rather than
+   fighting it; `improve_ctr` returned `noop` again today.
+2. **Top up the Anthropic account, for a season rather than a week.** *(Divine /
+   billing owner — minutes.)* Day 2 dry, third dry spell in nine days.
+   `strengthen_pages` is the only technique with work left; the fall window opens
+   in four weeks and indexing lag sits on top. *How you would know:* tomorrow's
+   `last_build` shows `changed≥1` and `last_scout.ok` is `true`. *Checked:*
+   today's `last_build.log` and `last_scout` in `snapshot.json`; nine of eleven
+   techniques `noop` for lack of work, not lack of credit.
+3. **Delete the two off-area passages from the live site.** *(Divine — five
+   minutes, free. Day 4 and day 16.)* On the droplet:
+   `services/seamless-gutter-installation.html` lines 227-230 and the
+   "Do you actually service Schuylkill County…" FAQ at 235-236; and
+   `services/gutter-guards.html:163`, "homes in Akron, PA and the surrounding
+   Lancaster and York County area" → "homes across York County, Pennsylvania".
+   *Sharpened today:* `git log` puts the Schuylkill section in the repo on
+   **2026-08-10** — three days before the flood re-accelerated. That is a loose
+   timing match, not proof, but it is the only on-site change in the window and it
+   is the site telling Google in prose that it serves places outside York County.
+   With another core update expected inside six weeks and templated location pages
+   its stated target, this is worth doing regardless of whether the flood
+   hypothesis is right. *How you would know:*
+   `grep -ri "schuylkill\|akron\|lancaster county" services/` returns nothing;
+   then watch whether daily row growth falls back toward +7. *Checked:* both
+   passages read out of the working tree today at the line numbers given; the geo
+   guards that would prevent a recurrence (`_off_area_prose`,
+   `techniques.py:1413`; `SERVICE_AREA_WORDS`, `techniques.py:1328`) exist in git
+   but are **not deployed**, so the droplet can still write more of this.
+4. **Ask one question about the 08-12 call tap.** *(Eric or Divine — five minutes,
+   free. NEW.)* On 2026-08-12 one person tapped the call button and no call was
+   recorded (`call_taps: 1`, `ai_calls: 0`, `phone_leads: 0`). Did the phone ring?
+   If yes, `calls.py` is not seeing calls that happen — probably because they land
+   on Eric's cell rather than the agent line, or because `is_own_call`
+   (`calls.py:237`) is over-filtering — and `phone_leads_all_time: 0` has been a
+   measurement artifact all along. If no, the site now has a measured drop-off
+   point for the first time. *Expected effect:* none directly; it converts the
+   single most confusing number in the dataset into a fact. *Checked:*
+   `metrics.py:493-496` counts unique tappers, so this is one person, not a
+   double-fire; T049 exists for this and has never been activated.
+5. **Deploy the engine code.** *(Divine — minutes. Day 5.)* Ship `techniques.py` +
+   `snapshot.py` + `gsc.py` + `metrics.py` + `keywords.py`, and `scout.py` +
+   `growth_daily.py` **as a pair** or the scout raises `TypeError`. *Sharpened
+   today:* this now buys three specific things rather than generic
+   instrumentation — the geo guards that stop rec 3 recurring, the
+   `discovered_untracked` cap lift that would show the +147 rows I currently
+   cannot see, and `gsc.pages`, which confirms or kills the diagnosis in the
+   section above. *How you would know:* tomorrow's snapshot carries
+   `code_version`, `keywords.ranked`, `gsc.pages`, `crawl_*`, and more than 40
+   `discovered_untracked` rows. *Checked:* all five absent from today's snapshot
+   against `snapshot.py:190/198/221` and `metrics.py:108`;
+   `len(discovered_untracked) == 40` exactly.
+6. **Eric: answer every existing Google review. One sitting, no customer contact,
+   free.** *(Eric — T033, day 2 as a recommendation, day 18 as a candidate.)*
+   Unchanged from yesterday and strengthened by today's enforcement research:
+   replying carries **zero** policy surface at a moment when Google is actively
+   probing businesses about review incentives, while T007 (asking for new reviews)
+   now sits next to a live enforcement probe. Reply in Eric's own words, name the
+   service and town where the review already does. *Checked:* T033 is
+   `status: candidate, activated: null`; no site-side change involved; I filed no
+   duplicate technique.
+7. **Eric: twenty minutes with the Business Profile — primary category first,
+   service-area list second.** *(Eric. Free. T016/T051, day 18.)* Category is the
+   highest-weighted individual factor in the 2026 report and the documented failure
+   case is position 1 → 31. Screenshot before touching anything; **count the
+   service-area list**, because padding is a documented negative and this business
+   has demonstrated a taste for claiming places it does not serve; check hours
+   against `techniques.py:669-672`. Change at most one field. *Checked:* T016 and
+   T051 both `candidate`/`activated: null`.
+8. **Eric: claim Foursquare (T048), then Apple Business and Bing Places (T029).**
+   *(Eric — under an hour each, free. Day 18.)* Third-party citations remain the
+   only unshipped item on the AI-citation checklist, at 4-6 months payback, with
+   `ai_visitors` at 0 for nineteen straight days. **Do rec 3 first.** *Checked:*
+   both `candidate`; `robots.txt` already names every AI crawler; 32 `FAQPage`
+   blocks already live.
+9. **Fix the goal denominator, or promote `top3/ranked_known` to the headline.**
+   *(Day 6.)* Not done by me — it redefines the number Eric is judged against —
+   but share fell 1.9% → 1.2% purely from the scout adding queries.
+10. **Eric: pick three candidates and reject the rest.** *(Day 6, pile flat at 44,
+    `does_not_work` still `[]` after eighteen days.)*
+
+### What I changed in this repo today
+
+**Nothing but this entry.** No code, no page copy, no keyword lists. I did not
+touch `techniques.json`, `keywords.json`, `results.jsonl` or `state.json`, and did
+not activate, retire or re-status any technique.
+
+I was tempted by one code change: `underperformers()` (`gsc.py:388`) judging a
+page on its **in-area** query positions rather than a global average would undo
+the blocking effect described above at the source. I did not write it, for the
+reason yesterday's entry gave and today makes stronger — there are already five
+days of undeployed engine code sitting in `main`, and a sixth commit nobody ships
+is not help, it is inventory. The precise change is recorded here so it can ride
+along with rec 5 whenever that happens.
+
+### Reasoning and uncertainties
+
+**Day eighteen. Two top-3 queries county-wide, zero in any named town, zero AI
+visitors ever, zero phone leads ever — one call tap, three bookings, and an
+out-of-market impression count that grew by 1,694 overnight.**
+
+Yesterday's entry concluded the automated half of this project is finished and the
+bottleneck is entirely human. I still think that is right, and eighteen days with
+zero techniques activated and zero rejected is the evidence. But today adds
+something that changes the *shape* of the ask: for the first time there is a
+concrete, mechanical, sub-five-minute fix with a number attached — 471 impressions
+at position 1 for zero clicks — and it does not require Eric, does not require the
+deploy, does not require money, and does not require the Anthropic account to have
+credit. If eighteen days of "spend twenty minutes on the Business Profile" has not
+landed, the right response is a still smaller ask, and rec 1 is the smallest
+useful thing anyone has been asked to do since this started.
+
+**Where I am least confident. Four things.**
+
+First, the causal chain in the flood section. I am confident about each link
+independently: the filter is at `gsc.py:388`, it tests the page average, the
+Philadelphia rows sit at 10-35, the homepage carries them, and `improve_ctr`
+reports `noop`. What I have **not** got is `gsc.pages` showing the homepage with
+`ctr_candidate: false` and "average position below the cutoff" — that is what
+would turn this from a well-supported inference into a confirmed one, and it
+requires the deploy. If the deploy lands and the homepage shows up as a candidate
+after all, my diagnosis is wrong and the `noop` has some other cause.
+
+Second, the Schuylkill-section-caused-the-flood hypothesis. Timing fits loosely
+(published 08-10, flood re-accelerated 08-13) and the mechanism is plausible — the
+site now says in prose that it travels outside its county. Against it: the flood
+started on **08-04**, six days *before* that section existed, so at best this
+explains the re-acceleration and not the original event. And prior entries
+established that no page mentions the Montgomery County towns by name. I would put
+this at maybe 30%. It does not change rec 3, which is worth doing on its own.
+
+Third, the call tap. One event. The most likely reading is "one person out of 45
+tapped the button", which is unremarkable and good. The gap between the tap and
+the zero recorded calls is the interesting bit and it is exactly one data point
+wide. I would not build anything on it; I would spend five minutes asking.
+
+Fourth, and unchanged: I cannot judge the **quality** of the 104 FAQ answers and
+32 FAQ blocks from here. "The on-page work is saturated" rests on counting schema
+blocks and reading the engine's own `noop` reasons, and a rewriter judging its own
+output is not evidence. If someone reads five guide pages and finds them thin,
+the "engine is finished" conclusion collapses and there is plenty of work left.
+
+**What would change my mind, dated.** (1) 7-day median `organic_visitors` ≥ 2 by
+**2026-08-16** — needs one more day at ≥2 out of four; live. (2) **Prediction 3
+under revision:** on **2026-09-01** the 08-01→08-04 block ages out. Original call
+was impressions down 15,000-18,500. Today's accrual makes that unlikely; I now
+expect the net fall to be smaller, and **if impressions are still above 20,000 on
+09-01 the flood is an ongoing process, not an event, and every "it will age out"
+sentence in this journal is wrong.** (3) **New:** if rec 1 ships and
+`"gutter installer"` impressions do not fall within three weeks, the homepage
+title was not what was winning that query. (4) **New:** if rec 3 ships and daily
+row growth stays above +100, the off-area prose was not the cause. (5) Re-armed,
+pending deploy: does daily `keywords_added` fall below 5. (6) Pending deploy: if
+`by_intent.price.covered` is still 3 of 35 two weeks after the queue reorder
+ships, the order was never the constraint. (7) Pending credit: if
+`strengthen_pages` is topped up and still finds nothing within three days, "the
+engine is finished" is permanent and this project should become a reminder service
+for four off-site listings — and this review should go weekly.
