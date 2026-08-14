@@ -7553,3 +7553,26 @@ ships, the order was never the constraint. (7) Pending credit: if
 `strengthen_pages` is topped up and still finds nothing within three days, "the
 engine is finished" is permanent and this project should become a reminder service
 for four off-site listings — and this review should go weekly.
+
+## 2026-08-14 — engine run
+
+Goal: **1.2%** top-3 share of 170 tracked queries (target 50%).
+2026-08-13: 17 visitors (2 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — ok: added "What to Ask Gutter Installers in York County Before You Hire" to /services/seamless-gutter-installation.html for 'gutter installers york'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: no query needs its own page — the remaining gaps all belong on pages that exist, which strengthen_pages handles
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 40 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 1 URL(s), HTTP 200
+
+**Scout proposed (as candidates, not running):**
+- T060 Yard sign at every job, left 14 days — Gutter work is visible from the street for exactly one day, then Eric drives away and the street forgets him. A staked sign at the curb keeps the job earning for two weeks in a York County neighborhoo
+- T061 Honest same-street pricing: 3 houses, one visit — The one-truck cost structure is real: driving to Dallastown twice costs Eric an hour of daylight, and three houses on one street costs him almost nothing extra in travel or setup. A published, genuine
+- T062 Radius-targeted Meta ads with a Call button, Sept–Nov — Organic and map-pack fixes in the ledger are 8–12 weeks out; leaf-fall in York County starts in six. Google call-only ads catch the homeowner who is already searching — but in August most York County 

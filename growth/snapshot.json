@@ -1,6 +1,6 @@
 {
-  "generated": "2026-08-13T06:00:09+00:00",
-  "date": "2026-08-13",
+  "generated": "2026-08-14T06:03:59+00:00",
+  "date": "2026-08-14",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
@@ -8,8 +8,8 @@
     "share_pct": 1.2,
     "measured": true,
     "why_unmeasured": null,
-    "coverage_pct": 35.4,
-    "tracked_queries": 161,
+    "coverage_pct": 34.1,
+    "tracked_queries": 170,
     "top3": 2,
     "top10": 7,
     "ranked_known": 23
@@ -91,6 +91,10 @@
       {
         "date": "2026-08-12",
         "value": 9
+      },
+      {
+        "date": "2026-08-13",
+        "value": 17
       }
     ],
     "pageviews": [
@@ -169,6 +173,10 @@
       {
         "date": "2026-08-12",
         "value": 11
+      },
+      {
+        "date": "2026-08-13",
+        "value": 28
       }
     ],
     "organic_visitors": [
@@ -246,6 +254,10 @@
       },
       {
         "date": "2026-08-12",
+        "value": 2
+      },
+      {
+        "date": "2026-08-13",
         "value": 2
       }
     ],
@@ -325,6 +337,10 @@
       {
         "date": "2026-08-12",
         "value": 0
+      },
+      {
+        "date": "2026-08-13",
+        "value": 0
       }
     ],
     "ai_visitors": [
@@ -402,6 +418,10 @@
       },
       {
         "date": "2026-08-12",
+        "value": 0
+      },
+      {
+        "date": "2026-08-13",
         "value": 0
       }
     ],
@@ -481,6 +501,10 @@
       {
         "date": "2026-08-12",
         "value": 7
+      },
+      {
+        "date": "2026-08-13",
+        "value": 13
       }
     ],
     "referral_visitors": [
@@ -558,6 +582,10 @@
       },
       {
         "date": "2026-08-12",
+        "value": 0
+      },
+      {
+        "date": "2026-08-13",
         "value": 0
       }
     ],
@@ -637,6 +665,10 @@
       {
         "date": "2026-08-12",
         "value": 0
+      },
+      {
+        "date": "2026-08-13",
+        "value": 0
       }
     ],
     "bot_hits": [
@@ -715,6 +747,10 @@
       {
         "date": "2026-08-12",
         "value": 1590
+      },
+      {
+        "date": "2026-08-13",
+        "value": 2823
       }
     ],
     "call_taps": [
@@ -781,6 +817,10 @@
       {
         "date": "2026-08-12",
         "value": 1
+      },
+      {
+        "date": "2026-08-13",
+        "value": 0
       }
     ],
     "ai_calls": [
@@ -842,6 +882,10 @@
       },
       {
         "date": "2026-08-12",
+        "value": 0
+      },
+      {
+        "date": "2026-08-13",
         "value": 0
       }
     ],
@@ -921,6 +965,10 @@
       {
         "date": "2026-08-12",
         "value": 0
+      },
+      {
+        "date": "2026-08-13",
+        "value": 0
       }
     ],
     "phone_leads": [
@@ -998,6 +1046,10 @@
       },
       {
         "date": "2026-08-12",
+        "value": 0
+      },
+      {
+        "date": "2026-08-13",
         "value": 0
       }
     ],
@@ -1077,6 +1129,10 @@
       {
         "date": "2026-08-12",
         "value": 0
+      },
+      {
+        "date": "2026-08-13",
+        "value": 0
       }
     ]
   },
@@ -1088,8 +1144,8 @@
   "keywords": {
     "by_town": {
       "county": {
-        "total": 87,
-        "covered": 33,
+        "total": 92,
+        "covered": 34,
         "top3": 2
       },
       "hanover": {
@@ -1098,7 +1154,7 @@
         "top3": 0
       },
       "dover": {
-        "total": 14,
+        "total": 15,
         "covered": 6,
         "top3": 0
       },
@@ -1118,18 +1174,18 @@
         "top3": 0
       },
       "york": {
-        "total": 23,
+        "total": 26,
         "covered": 5,
         "top3": 0
       }
     },
     "by_intent": {
       "hire": {
-        "total": 101,
-        "covered": 49
+        "total": 105,
+        "covered": 50
       },
       "price": {
-        "total": 35,
+        "total": 37,
         "covered": 3
       },
       "diy": {
@@ -1137,7 +1193,7 @@
         "covered": 1
       },
       "check": {
-        "total": 17,
+        "total": 20,
         "covered": 4
       }
     },
@@ -1156,6 +1212,7 @@
       "fascia and soffit repair dover pa",
       "fascia and soffit repair spring grove pa",
       "fascia and soffit repair york pa",
+      "fascia board rot gutter replacement york pa",
       "gutter cleaning dallastown pa",
       "gutter cleaning near me hanover pa",
       "gutter cleaning red lion pa",
@@ -1170,19 +1227,21 @@
       "gutter installation york",
       "gutter installers dover pa",
       "gutter installers red lion pa",
-      "gutter installers york",
       "gutter installers york pa",
       "gutter overflowing in heavy rain who to call",
       "gutter repair dallastown pa",
       "gutter repair hanover pa",
       "gutter repair near me york pa",
       "gutter replacement dover pa",
+      "gutters overflowing during rain who to call",
       "half round copper gutter installers york pa",
       "half round copper gutters near me",
       "half round copper gutters york pa",
       "half round gutter installation york county",
       "half round gutters historic home pa",
+      "half round gutters near me",
       "ice dam damage gutter replacement york county pa",
+      "ice dam damaged gutters repair pa",
       "seamless gutter company spring grove pa",
       "seamless gutter installation hanover pa",
       "seamless gutter installation york pa",
@@ -1207,6 +1266,8 @@
       "gutter cleaning cost per foot pennsylvania",
       "gutter cleaning cost red lion pa",
       "gutter cleaning york pa cost",
+      "gutter companies dover pa reviews",
+      "gutter companies york pa reviews",
       "gutter guard cost pa",
       "gutter guard installation cost",
       "gutter guard installation cost per foot",
@@ -1238,13 +1299,16 @@
       "ice dam gutter damage repair pa",
       "leaffilter vs local gutter guard cost",
       "seamless gutter cost per foot installed pa",
+      "seamless gutter cost per foot installed pennsylvania",
       "seamless gutter cost per linear foot pa",
+      "seamless gutter installation cost per foot",
       "seamless gutter installation cost per linear foot pennsylvania",
       "seamless gutter installation cost york pa",
       "seamless gutters cost per foot installed pa",
       "seamless gutters vs sectional gutters",
       "what size gutters do i need",
       "when should gutters be cleaned in pennsylvania",
+      "when should i clean my gutters in pennsylvania",
       "why do my gutters overflow when it rains"
     ],
     "discovered_untracked": [
@@ -1263,7 +1327,7 @@
       {
         "query": "seamless gutter company wayne pa",
         "position": 17.2,
-        "impressions": 497,
+        "impressions": 499,
         "clicks": 0
       },
       {
@@ -1275,37 +1339,37 @@
       {
         "query": "seamless gutter contractors plymouth meeting pa",
         "position": 14.2,
-        "impressions": 462,
+        "impressions": 467,
         "clicks": 0
       },
       {
         "query": "seamless gutter company royersford pa",
         "position": 17.5,
-        "impressions": 451,
+        "impressions": 456,
         "clicks": 0
       },
       {
         "query": "seamless gutter eagleville pa",
         "position": 17.6,
-        "impressions": 441,
+        "impressions": 445,
+        "clicks": 0
+      },
+      {
+        "query": "seamless gutter company horsham pa",
+        "position": 14.6,
+        "impressions": 443,
         "clicks": 0
       },
       {
         "query": "seamless gutter company phoenixville pa",
         "position": 16.4,
-        "impressions": 438,
+        "impressions": 440,
         "clicks": 0
       },
       {
         "query": "seamless gutter contractor wayne pa",
         "position": 16.7,
-        "impressions": 434,
-        "clicks": 0
-      },
-      {
-        "query": "seamless gutter company horsham pa",
-        "position": 14.5,
-        "impressions": 433,
+        "impressions": 436,
         "clicks": 0
       },
       {
@@ -1317,7 +1381,7 @@
       {
         "query": "seamless gutter contractors wayne pa",
         "position": 20.3,
-        "impressions": 328,
+        "impressions": 337,
         "clicks": 0
       },
       {
@@ -1328,14 +1392,14 @@
       },
       {
         "query": "seamless gutter company eagleville pa",
-        "position": 18.4,
-        "impressions": 304,
+        "position": 18.5,
+        "impressions": 306,
         "clicks": 0
       },
       {
         "query": "seamless gutter contractors abington pa",
         "position": 23.9,
-        "impressions": 291,
+        "impressions": 294,
         "clicks": 0
       },
       {
@@ -1347,13 +1411,19 @@
       {
         "query": "seamless gutter contractors eagleville pa",
         "position": 24.7,
-        "impressions": 282,
+        "impressions": 283,
         "clicks": 0
       },
       {
         "query": "seamless gutter devon pa",
         "position": 29.3,
-        "impressions": 274,
+        "impressions": 277,
+        "clicks": 0
+      },
+      {
+        "query": "seamless gutter contractor upper merion pa",
+        "position": 28.5,
+        "impressions": 266,
         "clicks": 0
       },
       {
@@ -1364,20 +1434,14 @@
       },
       {
         "query": "seamless gutter contractor exton pa",
-        "position": 25.5,
-        "impressions": 261,
-        "clicks": 0
-      },
-      {
-        "query": "seamless gutter contractor upper merion pa",
-        "position": 28.3,
-        "impressions": 261,
+        "position": 25.6,
+        "impressions": 263,
         "clicks": 0
       },
       {
         "query": "seamless gutter installation abington pa",
-        "position": 27.8,
-        "impressions": 253,
+        "position": 27.9,
+        "impressions": 257,
         "clicks": 0
       },
       {
@@ -1393,21 +1457,27 @@
         "clicks": 0
       },
       {
+        "query": "seamless gutter company east norriton pa",
+        "position": 35.1,
+        "impressions": 236,
+        "clicks": 0
+      },
+      {
         "query": "seamless gutter company upper merion pa",
         "position": 27.6,
-        "impressions": 230,
+        "impressions": 231,
         "clicks": 0
       },
       {
         "query": "seamless gutter installation companies abington pa",
         "position": 27.3,
-        "impressions": 227,
+        "impressions": 228,
         "clicks": 0
       },
       {
-        "query": "seamless gutter company east norriton pa",
-        "position": 35.5,
-        "impressions": 222,
+        "query": "seamless gutter contractors upper merion pa",
+        "position": 33.9,
+        "impressions": 220,
         "clicks": 0
       },
       {
@@ -1417,15 +1487,9 @@
         "clicks": 0
       },
       {
-        "query": "seamless gutter contractors upper merion pa",
-        "position": 33.9,
-        "impressions": 217,
-        "clicks": 0
-      },
-      {
         "query": "seamless gutter contractors phoenixville pa",
-        "position": 34.0,
-        "impressions": 214,
+        "position": 34.1,
+        "impressions": 216,
         "clicks": 0
       },
       {
@@ -1435,27 +1499,27 @@
         "clicks": 0
       },
       {
+        "query": "seamless gutter installation companies eagleville pa",
+        "position": 30.8,
+        "impressions": 213,
+        "clicks": 0
+      },
+      {
         "query": "seamless gutter contractor lower gwynedd pa",
         "position": 33.2,
         "impressions": 208,
         "clicks": 0
       },
       {
+        "query": "seamless gutter contractor phoenixville pa",
+        "position": 29.8,
+        "impressions": 205,
+        "clicks": 0
+      },
+      {
         "query": "seamless gutter contractor malvern pa",
         "position": 31.2,
         "impressions": 204,
-        "clicks": 0
-      },
-      {
-        "query": "seamless gutter installation companies eagleville pa",
-        "position": 31.7,
-        "impressions": 203,
-        "clicks": 0
-      },
-      {
-        "query": "seamless gutter contractor phoenixville pa",
-        "position": 29.6,
-        "impressions": 202,
         "clicks": 0
       },
       {
@@ -1471,33 +1535,33 @@
         "clicks": 0
       },
       {
+        "query": "seamless gutter company spring city pa",
+        "position": 31.0,
+        "impressions": 191,
+        "clicks": 0
+      },
+      {
         "query": "seamless gutter contractor willow grove pa",
         "position": 33.8,
         "impressions": 190,
         "clicks": 0
       },
       {
-        "query": "seamless gutter company spring city pa",
-        "position": 31.0,
-        "impressions": 186,
-        "clicks": 0
-      },
-      {
-        "query": "seamless gutter contractors collegeville pa",
-        "position": 34.6,
-        "impressions": 186,
+        "query": "seamless gutter installation companies devon pa",
+        "position": 32.4,
+        "impressions": 187,
         "clicks": 0
       }
     ]
   },
   "gsc": {
-    "date": "2026-08-13",
+    "date": "2026-08-14",
     "ok": true,
     "connected": true,
-    "rows": 797,
+    "rows": 840,
     "matched": 23,
-    "clicks": 10,
-    "impressions": 24032,
+    "clicks": 11,
+    "impressions": 24745,
     "avg_position": 24.8
   },
   "techniques": [
@@ -1587,6 +1651,10 @@
         {
           "date": "2026-08-12",
           "value": 0
+        },
+        {
+          "date": "2026-08-13",
+          "value": 0
         }
       ]
     },
@@ -1675,6 +1743,10 @@
         },
         {
           "date": "2026-08-12",
+          "value": 0
+        },
+        {
+          "date": "2026-08-13",
           "value": 0
         }
       ]
@@ -2040,6 +2112,10 @@
         {
           "date": "2026-08-12",
           "value": 0
+        },
+        {
+          "date": "2026-08-13",
+          "value": 3
         }
       ]
     },
@@ -2726,6 +2802,114 @@
       "notes": "first step: Search 'best gutter companies york pa', 'gutter installers york county pa' and 'top rated seamless gutter york pa' in Google, ChatGPT and Perplexity, and write down every third-party page that appears in the answers \u2014 that list, in ranked order, is the outreach target list; start with the ones that offer a free business claim.\neffort: days\ncost: free\nexpected: 10 target pages identified, 10 outreach emails or free claims sent within 2 weeks; 4-6 placements live by 31 Oct. Measured by: NEMO named in ChatGPT/Gemini/Perplexity answers for 'best gutter company york pa' in at least 1 of 3 engines by December, plus referral traffic from at least 2 of those pages.",
       "verdict": null,
       "owned_visitors": null
+    },
+    {
+      "id": "T057",
+      "slug": "eddm_leaf_route_saturation",
+      "name": "EDDM postcard on 2 hand-picked leaf-heavy carrier routes",
+      "kind": "distribution",
+      "status": "candidate",
+      "hypothesis": "Every inbound channel NEMO owns is 8-12 weeks from working, and leaf-fall starts in about six. EDDM is the one channel where Eric can pick the exact York County streets \u2014 older, tree-lined blocks in Springettsbury, Dover and Dallastown where 5-inch aluminium is full of maple seed every October \u2014 and put a flat cleaning price and a 717 number physically on the kitchen counter of 900 homes without a mailing list, a permit, or a gatekeeper. The postcard is a call ask, not a traffic ask, so it is measured in rings. It also seeds the install work: half the people who call for a $X cleaning have a sagging, seam-leaking 30-year-old gutter Eric can quote while he is on the ladder.",
+      "evidence": "EDDM is USPS saturation mail to every address on a chosen carrier route with no list required, and EDDM Retail needs only a free USPS business account, no permit; setup runs about 1-3 weeks from route selection to in-home. <cite index=\"30-10\">Every Door Direct Mail (EDDM) is a United States Postal Service program that lets businesses deliver a single mail piece to every active address on selected USPS carrier routes without buying or maintaining a mailing list.</cite> <cite index=\"30-13,30-21\">Plan on 1 to 3 weeks from route selection to drop... For EDDM Retail, no permit is required.</cite> On timing and response: <cite index=\"28-9\">Mail 4 to 6 weeks before the homeowner starts thinking about the service so your piece lands before they call someone else.</cite> <cite index=\"26-9\">Direct mail generates response rates between 2.7% and 4.4% for prospecting campaigns, compared to 0.6% for email and 0.2% for paid search.</cite> One vendor names this trade specifically: <cite index=\"32-12\">EDDM is cheaper per piece and works for high-volume services (tree, lawn, gutters).</cite> Response timing: <cite index=\"32-8,32-9,32-10\">Mail hits homes 5-10 days after drop. First calls start that week. The bulk of response comes in weeks 2-4 after the mail arrives.</cite> Cost: <cite index=\"28-5\">A 6x9 EDDM postcard campaign runs roughly $0.41 to $0.57 per piece for 5,000 pieces including printing and 2026 EDDM</cite>. Sources: https://www.mailpro.org/post/every-door-direct-mail-eddm/ , https://www.mailpro.org/industries/home-services/ , https://www.homeservicedirect.net/direct-mail/",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-13",
+      "added": "2026-08-13",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Open eddm.usps.com, filter York County ZIPs by carrier route, and pick the two routes with the oldest average home age and highest owner-occupancy that Eric can service in one day \u2014 then write the one offer that goes on the card: flat fall cleaning price, 717 number, 'York, PA \u2014 Eric forms the gutter on your driveway.'\neffort: days\ncost: more\nexpected: Two routes \u2248 900 homes, ~$400 per drop all-in (print + $0.247-ish EDDM postage). Drop #1 in home by 8 Sept, drop #2 by 6 Oct. Target 0.7-1.5% call rate = 6-13 tracked calls per drop, 4-8 booked cleanings at the published flat price, and 2+ gutter-replacement quotes generated off those ladders. Break-even is roughly two cleanings and one install. Kill it if drop #1 produces fewer than 3 calls.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T058",
+      "slug": "new_mover_deed_letters",
+      "name": "First-class letter to last month's York County home buyers",
+      "kind": "lifecycle",
+      "status": "candidate",
+      "hypothesis": "The single highest-propensity gutter buyer in York County is someone who closed on a house 30 days ago: their inspection report almost certainly flagged gutter pitch, seams or a missing downspout extension, they have a to-do list and a budget open, and they have no contractor yet. York County deed transfers are public record and published weekly, so Eric can reach these people without waiting on a realtor or an inspector to remember him \u2014 which is what makes this different from the referral-loop candidate already in the ledger: no gatekeeper, no permission, no split. 60-80 real letters a month is one evening's work and lands under $100. It is postal mail to a named homeowner about their own property, so it is not bulk email or SMS and breaks nobody's terms.",
+      "evidence": "Targeted mail to a defined homeowner segment outperforms saturation for higher-ticket work: <cite index=\"32-13\">Targeted mail is more expensive per piece but produces 2-3x the response for higher-ticket services (windows, flooring, roofing).</cite> New movers are named as a core home-services mail segment: <cite index=\"26-11\">Best for: Seasonal tune-up offers, new mover introductions, radius mailings around completed jobs, EDDM neighborhood saturation.</cite> Targeted first-class piece economics: <cite index=\"32-5\">Targeted first-class is about $0.55-$0.70 per piece.</cite> And the reason mail beats another email blast to these people: <cite index=\"27-1\">Research shows that 78% of direct mail pieces are handled or opened by recipients.</cite> Sources: https://www.mailpro.org/post/direct-mail-for-home-services/ , https://www.homeservicedirect.net/direct-mail/ , https://wemailamerica.com/direct-mail-for-home-services-2026-growth-strategy-guide/",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-13",
+      "added": "2026-08-13",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Pull last month's residential deed transfers for York County from the Recorder of Deeds public index (or the property-transfers list the local papers publish), filter to owner-occupied single-family in the towns Eric already services, and hand-address 40 letters this week \u2014 one page, plain, honest: 'Your inspection probably mentioned the gutters. Here's what pitch, seams and downspout extensions actually cost to fix in York County, and my number.'\neffort: hours\ncost: under $100/mo\nexpected: 60-80 letters a month at ~$0.90 each \u2248 $55-70/mo. Target 2-4% response = 2-3 calls a month, of which new-mover jobs skew toward full replacement rather than cleaning. Two installs a year off this pays for a decade of stamps. Measure with a distinct extension or 'mention this letter' line, not a guess.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T059",
+      "slug": "signable_quote_before_leaving_driveway",
+      "name": "Signable, two-option quote texted before the truck leaves the driveway",
+      "kind": "conversion",
+      "status": "candidate",
+      "hypothesis": "Three bookings all time is not a top-of-funnel number \u2014 it is the sound of quotes going cold on a counter. Every lever already in the ledger (EDDM, LSAs, reviews, the AI agent) increases the number of homeowners Eric stands in front of; none of them changes what happens in the 90 seconds after he says the price. A quote the homeowner can tap and sign on their phone while Eric is still packing the ladder converts at the moment of maximum warmth, before the spouse conversation and before the second and third contractors show up. Two options \u2014 repair/clean now, or full seamless replacement \u2014 let them say yes to something rather than yes-or-no to $2,400. This also fixes the follow-up cadence candidate's biggest weakness: there is nothing to follow up on if the quote was a number said out loud on a lawn.",
+      "evidence": "<cite index=\"41-11\">Contractors who send digital estimates that clients can sign immediately report close rates 20-30% higher than those still relying on paper.</cite> The cooling-off mechanism is the point: <cite index=\"42-1\">If on-the-spot signing lifts the close rate by even 8 percentage points \u2014 a conservative figure when the homeowner can approve before they cool off \u2014 that is roughly 1 extra closed job per week</cite>. Delay is measurable: <cite index=\"46-8\">Roofing close rate drops approximately 45% when follow-up is delayed beyond 24 hours, according to the Roofing Contractors Association of America (RCAA) 2024 Sales Metrics Report (2024).</cite> Templated quoting also raises throughput: <cite index=\"48-5\">According to Jobber's 2024 State of Home Services report, electrical contractors using template-based quoting close 34% more estimates per week than those building quotes from scratch per job.</cite> Solo-operator pricing is real: <cite index=\"43-15\">Jobber starts at $39/month (annual) with quote-approval signing via Client Hub.</cite> E-signatures are binding: <cite index=\"46-6\">eSignatures are legally binding for standard roofing contracts under the federal Electronic Signatures in Global and National Commerce (E-SIGN) Act, according to the Federal Trade Commission (2024).</cite> Sources: https://projul.com/features/esignatures/ , https://myquoteiq.com/best-e-signature-software-roofing-contractors-2026/ , https://ustechautomations.com/resources/blog/automate-best-esignature-software-for-roofing-companies-2026",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-13",
+      "added": "2026-08-13",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Build one reusable quote template tonight \u2014 seamless 5\" K-style aluminium priced per linear foot, downspouts each, guard per foot, half-round and copper as separate line items \u2014 inside Jobber's $39/mo tier (or a Square/Stripe-linked PDF if he wants to test it free this week), and send it to the very next estimate before pulling off the kerb.\neffort: days\ncost: under $100/mo\nexpected: Every estimate leaves as a texted link within 10 minutes of the measurement, with real line items (linear feet, 5\" vs 6\" K-style, downspout count, guard add-on) and two prices. Target: 100% of quotes sent same-visit; 30%+ signed within 48 hours; time-from-quote-to-decision under 2 days instead of never. Track quotes-given vs quotes-signed weekly \u2014 that ratio is the number that turns every other technique in this ledger into money.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T060",
+      "slug": "jobsite_yard_sign_neighbor_proof",
+      "name": "Yard sign at every job, left 14 days",
+      "kind": "distribution",
+      "status": "candidate",
+      "hypothesis": "Gutter work is visible from the street for exactly one day, then Eric drives away and the street forgets him. A staked sign at the curb keeps the job earning for two weeks in a York County neighborhood where every house on the block has the same 25-year-old white aluminum gutters and the same maples about to drop leaves. It is the only channel here that costs nothing per impression, needs no algorithm, and puts a phone number in front of hundreds of households a quarter-mile from a truck that already has to drive there anyway. It converts to calls, not traffic, and it compounds with the door-hanger play already in the ledger \u2014 sign for the drive-bys, hanger for the doorstep.",
+      "evidence": "A contractor reporting real numbers on ContractorTalk: <cite index=\"26-2,26-3\">\"We average slightly over 1 phone call per sign placement\"</cite> \u2014 with the honest caveat that some jobs produce several and some none, and that the calls match the work being looked at (a roofing/siding sign never produced a cross-trade lead). https://www.contractortalk.com/threads/yard-sign-results.138145/ . Placement, not design, is the variable: <cite index=\"30-5,30-6,30-15\">a sign buried in a fence line or on a property with no street traffic generates almost nothing; it should go at the street edge of the property, angled toward oncoming traffic</cite>, and <cite index=\"30-21,30-22\">a sign left up two weeks is seen by every driver and pedestrian passing that house \u2014 often hundreds of households within a quarter mile in a tight residential neighborhood</cite>. https://www.yardsignplus.com/blog/contractor-marketing-ideas . Practical spec: <cite index=\"31-16,31-17,31-18,31-20\">name, service, phone, website; five words or less; 18x24 inches; always get owner permission</cite>. https://www.zooprint.com/learn/how-contractors-use-lawn-signs-to-get-more-leads-real-examples-and-strategies.html",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-14",
+      "added": "2026-08-14",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Order 20 18x24 corrugated signs with H-stakes today: six words maximum \u2014 'SEAMLESS GUTTER \u00b7 NEMO \u00b7 <phone>' in the largest type that fits, phone number readable at 40 ft from a car, plus a small 'Installed here for the Smiths, Aug 2026' is optional but only if the homeowner agrees. Add one line to the job-close checklist: ask the homeowner 'may I leave a sign at the curb for two weeks?' and set a calendar reminder to retrieve it.\neffort: hours\ncost: under $100/mo\nexpected: 20 signs \u2248 $120 one-time with stakes. Place on every install and every cleaning job Aug\u2013Nov (target 30+ placements). At the reported ~1 call per placement, expect 15\u201330 inbound calls over the season, 5\u201310 of them estimates. Track with a distinct phone number or a short vanity URL on the sign so the ledger can score it against door hangers and EDDM.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T061",
+      "slug": "same_street_route_day_pricing",
+      "name": "Honest same-street pricing: 3 houses, one visit",
+      "kind": "conversion",
+      "status": "candidate",
+      "hypothesis": "The one-truck cost structure is real: driving to Dallastown twice costs Eric an hour of daylight, and three houses on one street costs him almost nothing extra in travel or setup. A published, genuine discount for neighbours who book the same week turns that real saving into a reason to phone TODAY \u2014 which is the thing the site and profile currently do not give a stranger. It also flips the sign and the door hanger from 'here is a number' into 'here is a number and a deadline', and it recruits the customer to sell for Eric ('I'm getting mine done Thursday, if two of you join we all save'), which is the only free distribution channel a 13-review business actually has. It is not an incentivised review and not a kickback: it is a volume discount disclosed in writing and honoured for every house on the list.",
+      "evidence": "Sign-driven demand naturally arrives in blocks: <cite index=\"30-11,30-12\">contractors who sign every job report the same pattern \u2014 one job on a street leads to a neighbour inquiry, which leads to another job, which leads to another sign on the same block</cite>. https://www.yardsignplus.com/blog/contractor-marketing-ideas . And the payoff for putting the offer on the phone rather than in a form is large: <cite index=\"13-8\">construction paid-search leads convert at about 2.61%, while high-intent home-services phone leads convert at roughly 46% on the call (Invoca, 2025)</cite>. https://constructionsnapshotforghl.com/blog/construction-lead-conversion-rate/ . Speed matters once it rings: <cite index=\"16-12,16-13\">CallRail's 2026 home services research found responding within 60 seconds lifts conversion 391%, and waiting five minutes cuts qualifying odds by 80%</cite>. https://pipelineon.com/blog/contractor-website-conversion-rate/",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-14",
+      "added": "2026-08-14",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Write the offer in one honest sentence with a real number and a real cut-off \u2014 e.g. '$40 off per house when three or more homes on the same street book the same visit week; ask me who else on your block has booked' \u2014 put it on the quote PDF and the fall cleaning page, and say it out loud to the next customer while the ladder is still on the truck.\neffort: hours\ncost: free\nexpected: One printed line on the yard sign / door hanger / quote and one paragraph on the fall-cleaning page. Success by 30 Nov: at least 4 streets with 2+ jobs booked in the same week, average travel time per job down, and 8\u201312 calls that cite the neighbour offer. Even a 10% discount pays for itself if it turns one drive into three invoices.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T062",
+      "slug": "meta_radius_call_ads_leaf_season",
+      "name": "Radius-targeted Meta ads with a Call button, Sept\u2013Nov",
+      "kind": "distribution",
+      "status": "candidate",
+      "hypothesis": "Organic and map-pack fixes in the ledger are 8\u201312 weeks out; leaf-fall in York County starts in six. Google call-only ads catch the homeowner who is already searching \u2014 but in August most York County homeowners have not searched yet, they just glance up at a maple over the porch. A $3\u20135/day geo-fenced feed ad to homeowners 35+ inside a 12-mile radius of York, with the objective set to phone calls and a photo of Eric's brake forming aluminium on a real York street, creates the intent instead of waiting for it, at a price a one-truck business can stop any morning. It is the cheapest second bid for the same fall season, and it does not compete with the Google budget for the same click.",
+      "evidence": "Contractor demand is where the homeowners already sit: <cite index=\"11-11,11-12,11-13\">social marketing for construction is about being where the ideal clients are \u2014 for most contractors that means Facebook and Instagram</cite>, with the caution that <cite index=\"11-14,11-16\">the creative needs a prominent call-to-action and the site needs click-to-call buttons behind it</cite>. https://www.builderleadconverter.com/blog/how-to-get-more-construction-leads/ . The conversion economics argue for a call objective over a click objective: <cite index=\"13-9\">a good rate ranges from under 3% for cold paid-search clicks to nearly 50% for high-intent phone calls</cite>. https://constructionsnapshotforghl.com/blog/construction-lead-conversion-rate/ . And 2026 trust guidance says the raw phone-shot beats polish: <cite index=\"12-9\">a raw 30-second cell phone video from a happy customer is worth more than a dozen five-star text reviews</cite>. https://www.bullseyemarketingconsultants.com/marketing/high-converting-contractor-websites-the-2026-lead-generation-checklist/",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-14",
+      "added": "2026-08-14",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Shoot one 20-second vertical phone video of the brake running aluminium at a real York job, with the fall cleaning flat price spoken out loud, then build a single Meta campaign with the Calls objective, 12-mile radius around York PA, age 35+, no interest targeting, $3/day, and the business line as the call destination \u2014 nothing else until it has run 14 days.\neffort: days\ncost: under $100/mo\nexpected: $90/mo ($3/day) from 1 Sept to 30 Nov. Target 25\u201360 calls or Messenger threads over the season at $4\u201310 per contact; 10\u201320 estimates. Kill switch: if cost per real conversation exceeds $25 after two weeks, shut it off and move the budget to the Google call-only campaign already in the ledger.",
+      "verdict": null,
+      "owned_visitors": null
     }
   ],
   "scoreboard": {
@@ -2788,11 +2972,17 @@
       "T053",
       "T054",
       "T055",
-      "T056"
+      "T056",
+      "T057",
+      "T058",
+      "T059",
+      "T060",
+      "T061",
+      "T062"
     ]
   },
   "last_build": {
-    "date": "2026-08-13",
+    "date": "2026-08-14",
     "log": [
       {
         "ok": true,
@@ -2813,8 +3003,8 @@
         "slug": "geo_answer_first_content_pass"
       },
       {
-        "ok": false,
-        "detail": "3 candidate(s) failed, last: generation failed for 'gutter installation york': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdzEi9nPkrvpx3H1UyrrW\"}",
+        "ok": true,
+        "detail": "added \"What to Ask Gutter Installers in York County Before You Hire\" to /services/seamless-gutter-installation.html for 'gutter installers york'",
         "slug": "strengthen_pages"
       },
       {
@@ -2849,24 +3039,34 @@
       },
       {
         "ok": true,
-        "noop": true,
-        "detail": "sitemap.xml unchanged",
+        "noop": false,
+        "detail": "[gen_sitemap] wrote 40 URLs to sitemap.xml",
         "slug": "rebuild_sitemap"
       },
       {
         "ok": true,
-        "noop": true,
-        "detail": "nothing new to submit",
+        "detail": "submitted 1 URL(s), HTTP 200",
         "slug": "ping_indexnow"
       }
     ],
     "new": 0,
-    "changed": 0
+    "changed": 1
   },
   "last_scout": {
-    "date": "2026-08-13",
-    "ok": false,
-    "detail": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdzEiBmT6vUrDkjNvtFwm\"}"
+    "date": "2026-08-14",
+    "ok": true,
+    "techniques_added": [
+      "jobsite_yard_sign_neighbor_proof",
+      "same_street_route_day_pricing",
+      "meta_radius_call_ads_leaf_season"
+    ],
+    "keywords_added": [
+      "seamless gutter installation cost per foot",
+      "half round gutters near me",
+      "when should i clean my gutters in pennsylvania",
+      "gutter companies dover pa reviews"
+    ],
+    "notes": ""
   },
   "pages": {
     "areas": [
