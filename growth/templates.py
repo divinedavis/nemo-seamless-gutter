@@ -23,7 +23,7 @@ HEAD = """<!DOCTYPE html>
     gtag('js', new Date());
     gtag('config', '{ga}');
   </script>
-  <script src="/analytics.js?v=1" defer></script>
+  <script src="/analytics.js?v=2" defer></script>
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />

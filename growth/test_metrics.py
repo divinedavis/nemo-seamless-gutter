@@ -15,20 +15,39 @@ from . import metrics
 
 DAY = "27/Jul/2026:12:00:00 +0000"
 DATE = "2026-07-27"
+# A day on the beacon side of metrics.PV_START, when a visitor means "ran our
+# JavaScript" rather than "fetched HTML convincingly".
+PV_DAY = "20/Aug/2026:12:00:00 +0000"
+PV_DATE = "2026-08-20"
 BROWSER = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 "
            "(KHTML, like Gecko) Version/17.0 Safari/605.1.15")
 
 
-def line(ip, path, ua=BROWSER, ref="-", status=200, owner=None):
+def line(ip, path, ua=BROWSER, ref="-", status=200, owner=None, day=DAY):
     """One access-log line. owner=None writes the pre-2026-07-28 format."""
-    base = (f'{ip} - - [{DAY}] "GET {path} HTTP/1.1" {status} 500 '
+    base = (f'{ip} - - [{day}] "GET {path} HTTP/1.1" {status} 500 '
             f'"{ref}" "{ua}"')
     return base + (f' "{owner}"' if owner is not None else "") + "\n"
 
 
-def visit(ip, owner=None, ua=BROWSER):
+def visit(ip, owner=None, ua=BROWSER, day=DAY):
     """A page plus its stylesheet — what a real browser does."""
-    return line(ip, "/", ua=ua, owner=owner) + line(ip, "/styles.css", ua=ua, owner=owner)
+    return (line(ip, "/", ua=ua, owner=owner, day=day)
+            + line(ip, "/styles.css", ua=ua, owner=owner, day=day))
+
+
+def pv(ip, vid="a", p="/", r="", ua=BROWSER, status=204, owner=None, day=PV_DAY):
+    """The pageview beacon analytics.js fires once per page load.
+
+    vid=None writes a beacon with no v param — a browser whose cookie AND
+    localStorage were blocked.
+    """
+    q = f"p={p}" if vid is None else f"v={vid}&p={p}"
+    if r:
+        q += f"&r={r}"
+    base = (f'{ip} - - [{day}] "POST /e/pv?{q} HTTP/1.1" {status} 0 '
+            f'"-" "{ua}"')
+    return base + (f' "{owner}"' if owner is not None else "") + "\n"
 
 
 
@@ -60,14 +79,14 @@ class BaseCollect(unittest.TestCase):
     fixtures use TEST-NET addresses, whose lookups would hang on the resolver
     timeout and make a fast unit suite take seconds.
     """
-    def collect(self, log_text, state=None, resolver=lambda ip: ""):
+    def collect(self, log_text, state=None, resolver=lambda ip: "", date=DATE):
         fd, path = tempfile.mkstemp()
         with os.fdopen(fd, "w") as f:
             f.write(log_text)
         try:
             return metrics.collect(days=1,
-                                   end=datetime.date.fromisoformat(DATE),
-                                   log_path=path, resolver=resolver)[DATE]
+                                   end=datetime.date.fromisoformat(date),
+                                   log_path=path, resolver=resolver)[date]
         finally:
             os.unlink(path)
 
@@ -336,6 +355,86 @@ class Rotations(unittest.TestCase):
         self.touch("nemo-access.log.old")
         got = [os.path.basename(p) for p in metrics.rotations(self.log)]
         self.assertEqual(got, ["nemo-access.log"])
+
+
+class PageviewBeacon(BaseCollect):
+    """From PV_START, a visitor is a browser that fired /e/pv.
+
+    The raw-log heuristics kept counting scanners with perfect Chrome UAs
+    (2026-08-11 audit: ~5–8 humans in ~20 counted). Requiring JS execution
+    plus a cookie id is the bar Find A Crib's numbers are already held to,
+    and these tests pin the two dashboards to counting the same thing.
+    """
+
+    def test_beacon_counts_unique_vids(self):
+        log = (visit("198.51.100.10", day=PV_DAY)
+               + pv("198.51.100.10", vid="alice")
+               + pv("198.51.100.10", vid="alice", p="/services.html")
+               + visit("203.0.113.55", day=PV_DAY)
+               + pv("203.0.113.55", vid="bob"))
+        m = self.collect(log, date=PV_DATE)
+        self.assertEqual(m["visitors"], 2, "two cookies = two people")
+        self.assertEqual(m["pageviews"], 3, "three beacon fires = three views")
+
+    def test_html_fetch_without_js_is_not_a_visitor(self):
+        # The exact traffic that inflated the old numbers: page + asset with a
+        # real UA, but nothing ever executed our script.
+        log = visit("198.51.100.10", day=PV_DAY)
+        m = self.collect(log, date=PV_DATE)
+        self.assertEqual(m["visitors"], 0)
+        self.assertEqual(m["log_visitors"], 1,
+                         "the raw-log tally must stay visible as a cross-check")
+
+    def test_legacy_days_still_count_from_the_log(self):
+        m = self.collect(visit("198.51.100.10"))
+        self.assertEqual(m["visitors"], 1)
+        self.assertNotIn("log_visitors", m,
+                         "pre-beacon history keeps its original single series")
+
+    def test_headless_browser_beacon_is_a_bot(self):
+        ua = BROWSER.replace("Safari", "HeadlessChrome")
+        log = visit("198.51.100.10", day=PV_DAY, ua=ua) \
+            + pv("198.51.100.10", vid="h", ua=ua)
+        m = self.collect(log, date=PV_DATE)
+        self.assertEqual(m["visitors"], 0,
+                         "headless Chrome executes JS; the UA gate must still hold")
+
+    def test_owner_device_beacon_not_counted(self):
+        log = visit("198.51.100.10", day=PV_DAY, owner="1") \
+            + pv("198.51.100.10", vid="own", owner="1")
+        m = self.collect(log, date=PV_DATE)
+        self.assertEqual(m["visitors"], 0)
+
+    def test_datacenter_beacon_not_counted(self):
+        # A dedicated IP, like every hosting test: the ptr_cache in the ledger
+        # is warm from earlier runs, and a cached "" would mask the resolver.
+        log = visit("203.0.113.40", day=PV_DAY) + pv("203.0.113.40", vid="ec2")
+        m = self.collect(log, date=PV_DATE,
+                         resolver=lambda ip: "ec2-3-81-75-163.compute-1.amazonaws.com")
+        self.assertEqual(m["visitors"], 0,
+                         "browser automation on a cloud box runs JS too")
+
+    def test_referrer_rides_in_the_query(self):
+        # The beacon request's own Referer header is always our page, so the
+        # channel must come from the r param or every visit reads internal.
+        log = (visit("198.51.100.10", day=PV_DAY)
+               + pv("198.51.100.10", vid="s",
+                    r="https%3A%2F%2Fwww.google.com%2F"))
+        m = self.collect(log, date=PV_DATE)
+        self.assertEqual(m["organic_visitors"], 1)
+        self.assertEqual(m["direct_visitors"], 0)
+
+    def test_blocked_storage_falls_back_to_ip_ua(self):
+        log = visit("198.51.100.10", day=PV_DAY) + pv("198.51.100.10", vid=None)
+        m = self.collect(log, date=PV_DATE)
+        self.assertEqual(m["visitors"], 1,
+                         "no cookie must degrade to the old proxy, not drop the person")
+
+    def test_beacon_lines_do_not_inflate_log_pageviews(self):
+        log = visit("198.51.100.10", day=PV_DAY) + pv("198.51.100.10", vid="a")
+        m = self.collect(log, date=PV_DATE)
+        self.assertEqual(m["log_pageviews"], 1,
+                         "a beacon fire is not a page fetch")
 
 
 if __name__ == "__main__":

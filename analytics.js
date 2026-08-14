@@ -37,6 +37,38 @@
     } catch (e) { /* never let measurement break the tap */ }
   }
 
+  // --- first-party pageview beacon --------------------------------------
+  // Raw log lines can't tell a person from a scraper with a Chrome UA — a
+  // 2026-08 audit found most counted "visitors" were scanners. So a visitor
+  // is now something that ran this script: growth/metrics.py counts unique
+  // people from /e/pv hits only (same bar as Find A Crib's numbers).
+  //
+  // The id comes from the nemo_vid cookie nginx sets on the HTML response
+  // (a script-written cookie dies in 7 days under Safari ITP; a server-set
+  // one doesn't), with localStorage as the fallback. The page's own referrer
+  // rides along because the beacon request's Referer header is always us.
+  (function pageview() {
+    try {
+      if (navigator.webdriver) return; // driven browsers are not visitors
+      if (/bot|crawl|spider|headless|lighthouse|prerender|slurp/i.test(navigator.userAgent)) return;
+      var vid = (document.cookie.match(/(?:^|;\s*)nemo_vid=([^;]+)/) || [])[1] || '';
+      if (!vid) {
+        try {
+          vid = localStorage.getItem('nemo_vid') || '';
+          if (!vid) {
+            vid = 'ls-' + Math.random().toString(16).slice(2) + Date.now().toString(16);
+            localStorage.setItem('nemo_vid', vid);
+          }
+        } catch (e) { vid = ''; } // blocked storage still counts, via ip|ua on the server
+      }
+      var u = '/e/pv?v=' + encodeURIComponent(vid) +
+              '&p=' + encodeURIComponent(location.pathname + location.search) +
+              '&r=' + encodeURIComponent(document.referrer || '');
+      if (navigator.sendBeacon && navigator.sendBeacon(u)) return;
+      new Image().src = u + '&t=' + Date.now();
+    } catch (e) { /* measurement must never break the page */ }
+  })();
+
   // --- phone + text taps -----------------------------------------------
   document.addEventListener('click', function (e) {
     var a = e.target && e.target.closest ? e.target.closest('a[href^="tel:"], a[href^="sms:"]') : null;

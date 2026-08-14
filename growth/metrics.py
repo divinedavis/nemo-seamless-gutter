@@ -217,6 +217,28 @@ ASSET_RE = re.compile(
 # site opened the dialer".
 CALL_TAP_PATH = "/e/call-tap"
 
+# The pageview beacon, fired by analytics.js on every page load with the
+# visitor's nemo_vid cookie, the page path and the page's referrer. From
+# PV_START onward it is the ONLY thing a visitor or a pageview is counted
+# from, which changes what "visitor" means here: a browser that executed our
+# JavaScript, not an address that fetched HTML. The raw-log heuristics above
+# (asset shape, UA rotation, PTR records) were the best a static log could do,
+# and the 2026-08-11 audit still put only ~5–8 humans in a day's ~20 counted
+# "visitors" — datacenter addresses with no PTR are kept by design. Requiring
+# JS execution plus a cookie is the same bar Find A Crib's numbers are held
+# to, so the two dashboards finally count the same kind of person.
+#
+# The beacon carries its own referrer (`r`) because the HTTP Referer on the
+# beacon request itself is always our own page, which would classify every
+# visit as internal.
+PV_PATH = "/e/pv"
+
+# Days before this date predate the beacon: no site JS was pinging /e/pv, so
+# counting from it would rewrite real history to zero. They keep the legacy
+# raw-log counting; days from here on count beacon hits only. Env-overridable
+# for tests.
+PV_START = os.environ.get("NEMO_PV_START", "2026-08-14")
+
 LOG_RE = re.compile(
     r'^(?P<ip>\S+) \S+ \S+ \[(?P<ts>[^\]]+)\] '
     r'"(?P<method>\S+) (?P<path>\S+) [^"]*" '
@@ -436,7 +458,7 @@ def collect(days=1, end=None, log_path=None, resolver=None, roster=None):
             continue
         if (d, m.group("ip")) in owner_seen:
             continue
-        if m.group("path").split("?")[0] == CALL_TAP_PATH:
+        if m.group("path").split("?")[0] in (CALL_TAP_PATH, PV_PATH):
             continue
         s = shape.setdefault((d, m.group("ip")),
                              {"assets": 0, "pages": 0, "uas": set()})
@@ -452,6 +474,7 @@ def collect(days=1, end=None, log_path=None, resolver=None, roster=None):
             s["uas"].add(ua)
 
     per_day = {d: {"visitors": {}, "pages": 0, "bots": 0, "taps": set(),
+                   "pv_visitors": {}, "pv_pages": 0,
                    "crawlers": dict.fromkeys(CRAWLER_SERIES, 0)} for d in dates}
     for m in matches:
         d = _parse_ts(m.group("ts"))
@@ -495,6 +518,28 @@ def collect(days=1, end=None, log_path=None, resolver=None, roster=None):
             if m.group("status").startswith("2"):
                 per_day[d]["taps"].add(f"{ip}|{ua[:60]}")
             continue
+        if path.split("?")[0] == PV_PATH:
+            # A pageview attested by our own JavaScript. Sits after every gate
+            # above on purpose: headless Chrome executes JS happily, and it is
+            # the UA/shape/PTR rules that keep it out even here.
+            if not m.group("status").startswith("2"):
+                continue
+            try:
+                q = urllib.parse.parse_qs(urllib.parse.urlparse(path).query)
+            except Exception:
+                q = {}
+            # No cookie and no localStorage (blocked, or a first paint racing
+            # the header) degrades to the old ip|ua proxy rather than dropping
+            # the person.
+            vid = (q.get("v", [""])[0] or "").strip() or f"{ip}|{ua[:60]}"
+            pv_path = q.get("p", [""])[0] or "/"
+            per_day[d]["pv_pages"] += 1
+            v = per_day[d]["pv_visitors"].setdefault(
+                vid, {"paths": [], "channel": None})
+            v["paths"].append(pv_path)
+            if v["channel"] is None:
+                v["channel"] = classify(q.get("r", [""])[0], pv_path)
+            continue
         if m.group("method") != "GET" or ASSET_RE.search(path.split("?")[0]):
             continue
         if not m.group("status").startswith("2"):
@@ -512,13 +557,18 @@ def collect(days=1, end=None, log_path=None, resolver=None, roster=None):
 
     out = {}
     for d in dates:
-        vis = per_day[d]["visitors"]
+        # From PV_START the beacon is the count; the raw-log tallies are still
+        # recorded alongside (log_*) so a broken beacon reads as "log says 12,
+        # beacon says 0" instead of as a quiet day. ISO dates compare as
+        # strings.
+        beacon_era = d >= PV_START
+        vis = per_day[d]["pv_visitors"] if beacon_era else per_day[d]["visitors"]
         chan = {}
         for vid, v in vis.items():
             chan.setdefault(v["channel"] or "direct", set()).add(vid)
         mm = {
             "visitors": len(vis),
-            "pageviews": per_day[d]["pages"],
+            "pageviews": per_day[d]["pv_pages"] if beacon_era else per_day[d]["pages"],
             "bot_hits": per_day[d]["bots"],
             "call_taps": len(per_day[d]["taps"]),
             "organic_visitors": len(chan.get("organic", ())),
@@ -528,6 +578,9 @@ def collect(days=1, end=None, log_path=None, resolver=None, roster=None):
             "referral_visitors": len(chan.get("referral", ())),
             "campaign_visitors": len(chan.get("campaign", ())),
         }
+        if beacon_era:
+            mm["log_visitors"] = len(per_day[d]["visitors"])
+            mm["log_pageviews"] = per_day[d]["pages"]
         mm.update(per_day[d]["crawlers"])
         for slug, prefixes in prefixed:
             n = sum(1 for v in vis.values()
