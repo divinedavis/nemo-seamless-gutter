@@ -165,17 +165,22 @@ def _ptr_cache():
     return dict(ledger.get_state("ptr_cache", {}) or {})
 
 
-def hosting_skipper(resolver=None):
+def hosting_skipper(resolver=None, max_lookups=None):
     """Build `is_hosting(ip) -> bool`, memoised across runs via the ledger.
 
     `resolver` is injectable so the tests never touch DNS. A lookup that fails
     caches an empty string: unresolvable is not evidence of hosting, and
     retrying it every morning would spend the whole budget on the same dead
     addresses.
+
+    `max_lookups` caps how many NEW addresses this run may resolve; 0 means
+    cache-only. An address skipped for budget is judged "not hosting" and NOT
+    cached, so a later run with budget still gets to resolve it — unlike a
+    null resolver, which would poison the forever-cache with empty strings.
     """
     import socket
     cache = _ptr_cache()
-    budget = [MAX_NEW_PTR_LOOKUPS]
+    budget = [MAX_NEW_PTR_LOOKUPS if max_lookups is None else max_lookups]
     dirty = []
 
     def lookup(ip):
@@ -185,8 +190,16 @@ def hosting_skipper(resolver=None):
         try:
             if resolver is not None:
                 return resolver(ip)
+            # gethostbyaddr has no per-call timeout, so the global default is
+            # borrowed and put back — leaving it at 1.5s would silently apply
+            # to every later default-timeout socket in this process (the
+            # dashboard imports this module inside gunicorn).
+            prev = socket.getdefaulttimeout()
             socket.setdefaulttimeout(PTR_TIMEOUT)
-            return socket.gethostbyaddr(ip)[0]
+            try:
+                return socket.gethostbyaddr(ip)[0]
+            finally:
+                socket.setdefaulttimeout(prev)
         except Exception:
             return ""
 
@@ -409,7 +422,8 @@ def read_log(dates, path=None):
     return hits
 
 
-def collect(days=1, end=None, log_path=None, resolver=None, roster=None):
+def collect(days=1, end=None, log_path=None, resolver=None, roster=None,
+            ptr_lookups=None):
     """Measure the last `days` complete days. Returns {date: {metric: value}}.
 
     Default is yesterday only — today is still in progress, and a partial day
@@ -426,9 +440,14 @@ def collect(days=1, end=None, log_path=None, resolver=None, roster=None):
     start = end - datetime.timedelta(days=days - 1)
     dates = [(start + datetime.timedelta(days=i)).isoformat() for i in range(days)]
 
+    # `ptr_lookups` bounds how many uncached addresses this call may resolve
+    # (0 = cache-only). The live dashboard passes 0: a PTR lookup against a
+    # dead address blocks for PTR_TIMEOUT, and a burst of new scanner IPs was
+    # freezing the dashboard's site switcher for 5-10s. The 6am job and
+    # background refreshes keep the default full budget and fill the cache.
     matches = read_log(dates, log_path)
     skip_owner = ip_skipper()
-    is_hosting = hosting_skipper(resolver)
+    is_hosting = hosting_skipper(resolver, max_lookups=ptr_lookups)
 
     techs = ledger.load_techniques()
     prefixed = [(t["slug"], t.get("prefixes") or []) for t in techs if t.get("prefixes")]
