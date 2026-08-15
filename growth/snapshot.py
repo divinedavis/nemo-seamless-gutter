@@ -35,7 +35,17 @@ JOURNAL_PATH = os.path.join(HERE, "JOURNAL.md")
 # measured from here" about metrics that were already being collected. Counts
 # are aggregates — the caller numbers stay in the gitignored cache — so they
 # pass _assert_no_pii unchanged.
-SERIES = ("visitors", "pageviews", "organic_visitors", "local_visitors",
+# `log_visitors`/`log_pageviews` exist for the same reason. From
+# metrics.PV_START the headline `visitors` count comes from the JS beacon, and
+# metrics.collect() records the raw-log tallies alongside it precisely so that a
+# beacon which stops firing reads as "log says 12, beacon says 0" rather than as
+# a quiet day (metrics.py:579-602). That guarantee only holds for someone who
+# can see both numbers, and the review agent cannot: it reads this file. Without
+# them, the 2026-08-14 cutover looks from here like traffic falling 17 -> 2
+# overnight. They are absent for every date before PV_START, which is correct —
+# pre-cutover history was never counted that way and cannot be reconstructed.
+SERIES = ("visitors", "pageviews", "log_visitors", "log_pageviews",
+          "organic_visitors", "local_visitors",
           "ai_visitors", "direct_visitors", "referral_visitors",
           "campaign_visitors", "bot_hits", "call_taps", "ai_calls",
           "bookings", "phone_leads", "total_leads") + metrics.CRAWLER_SERIES

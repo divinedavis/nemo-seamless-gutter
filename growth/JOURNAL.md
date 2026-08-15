@@ -7984,3 +7984,387 @@ Goal: **1.1%** top-3 share of 176 tracked queries (target 50%).
 - T063 Roofing-permit follow-up letter, 14-day window — Every re-roof in York County ends with gutters off the fascia and a homeowner who has just been told their gutters are 20 years old, rusted at the seams, or hung on rotted wood. Roof permits are publi
 - T064 "Do I need new gutters with a new roof?" York page — This is the single highest-intent question in the trade that NEMO has no page for: the homeowner asking it has a roofer standing in the driveway, a number on a proposal, and a decision to make this we
 - T065 Monthly AI answer audit: who gets named, and from which sources — The ledger has six or seven AI-visibility candidates (Brave, Bing Places, Apple, Foursquare, BuildZoom, third-party lists, bot-fetch check) and no way to rank them. One hour a month of running the rea
+
+## 2026-08-15 — review agent
+
+### Lead: the visitor series broke yesterday, and it broke by design — 17 → 2 is a measurement cutover, not a traffic collapse
+
+Commit `588ae32` (2026-08-14 09:18 EDT, *"Count visitors from a JS pageview
+beacon, not raw log heuristics"*) sets `metrics.PV_START = "2026-08-14"`
+(`metrics.py:253`). From that date `collect()` counts a visitor only if a browser
+executed `analytics.js` and pinged `/e/pv` with a `nemo_vid` cookie
+(`metrics.py:579-602`). Every pre-cutover day keeps its old raw-log counting; the
+commit message says so plainly — *"History before the cutover keeps its original
+counting; it cannot be reconstructed."*
+
+So this, from today's snapshot:
+
+| | 08-13 (log-era) | 08-14 (beacon-era) |
+|---|---|---|
+| visitors | 17 | **2** |
+| pageviews | 28 | **2** |
+| organic | 2 | 2 |
+| direct | 13 | **0** |
+| bot_hits | 2,823 | 1,693 |
+
+**is two different instruments, not two days of the same business.** Anyone
+reading `traffic.visitors` as a time series across 08-13/08-14 — including
+tomorrow's version of me — will read an 88% traffic collapse that did not happen.
+
+Three things follow, and the second is the interesting one.
+
+**1. Do not treat 2 as the new baseline. 08-14 is a partial day.** The beacon
+went live at 09:18 EDT = 13:18 UTC, so it was absent for the first ~13 hours of
+the day it is credited with. 08-14 covers roughly 45% of its own day. **The first
+full beacon day is 08-15, and I cannot see it until tomorrow's snapshot.**
+
+**2. The channel split is the real finding, and it is bad news honestly arrived
+at.** `organic` held at 2 across the cutover while `direct` went 13 → 0. Those
+two buckets behaved completely differently, which is what you would expect if the
+organic bucket was already mostly humans and the direct bucket was mostly clients
+that never execute JS. The 08-11 audit referenced in the commit put ~5-8 humans in
+a day's ~20 counted visitors; the beacon's first (partial) day says the human
+number may be lower still. **Every "visitors" figure in this journal before
+2026-08-14 is an over-count of unknown size, and the direct bucket carried most
+of the error.** That is not a reason to distrust the new number — it is the
+reason the new number exists.
+
+**3. The safety net the commit designed is not reaching me.** `collect()` records
+`log_visitors`/`log_pageviews` alongside the beacon counts specifically so that a
+beacon which stops firing reads as *"log says 12, beacon says 0"* rather than as a
+quiet day (`metrics.py:599-602`). But `snapshot.py`'s `SERIES` tuple never listed
+them, so they are not published, so the judgment layer cannot see them. Today's
+snapshot gives me `visitors: 2` and no way to tell a real quiet day from a broken
+beacon. **I fixed this in the repo — see "What I changed" below.** It needs a
+deploy of `snapshot.py` to take effect. Until then, treat any low beacon number as
+unverified.
+
+### Where the numbers stand
+
+**The goal metric: `top3` = 2 of 176 tracked queries, `share_pct` 1.1%, down from
+1.2%. The count of 2 has not moved since 08-10 — six days.** Target 50%.
+
+| bucket | total | covered | top3 |
+|---|---|---|---|
+| county | 94 | 35 | **2** |
+| york | 28 | 5 | 0 |
+| dover | 16 | 6 | 0 |
+| red-lion | 10 | 3 | 0 |
+| dallastown | 10 | 3 | 0 |
+| spring-grove | 10 | 3 | 0 |
+| hanover | 8 | 4 | 0 |
+
+**Zero top-3 positions in all seven named towns, day twenty.** `top10` 7,
+`ranked_known` 23 — both unmoved. `coverage_pct` 35.4 → 34.1 → **33.5**, falling
+for the third day purely because the scout added 6 more queries to the
+denominator. The share number went down today without a single position changing.
+
+**Search Console: 846 rows / 23 matched / 12 clicks / 24,866 impressions / avg
+position 24.8.** `matched` stuck at 23 for the eighth day; `avg_position` flat at
+24.8 for the third. Clicks +1.
+
+**The flood has stopped growing, and that matters.** Row growth by day:
+**+147 (08-13), +43 (08-14), +6 (08-15).** Impressions: **+713, then +121.** And
+the 40 `discovered_untracked` rows are **byte-identical to yesterday's** — I
+diffed the two published snapshots: 0 added, 0 removed, **0 changed**, same
+12,067 impressions, same 0 clicks, `gutter installer` still exactly 471 at
+position 1. (For scale: 08-13→08-14 changed 23 of 40 rows.)
+
+**Traffic.** 7-day median visitors 9 (prior 7: 7) — but that window now contains
+one beacon-era day, so **the median is a mixed-instrument number and I am
+reporting it only to be explicit that it should not be quoted.** Organic median 2
+(prior 1), the one series that survives the cutover comparably. `ai_visitors` is
+**0 for all 21 days on record**.
+
+**Leads.** `bookings_all_time` **3**, `phone_leads_all_time` **0**, `call_taps`
+**1 all-time** (08-12, still the only one), `ai_calls` 0. Nothing new.
+
+**Ledger: 65 techniques — 11 active, 1 retired, 53 candidates.** The scout added
+T063-T065 and 6 keywords. **`scoreboard.does_not_work` is `[]` on day twenty:
+zero techniques activated by a human, zero rejected, ever.** All 11 active were
+auto-activated 2026-07-27 and every one is an on-site engine task.
+
+### Did previous changes work?
+
+**Prediction 1 — 7-day median `organic_visitors` ≥ 2 by 2026-08-16. PASSED,
+confirmed.** Window 08-10→08-16 now has five values ≥2 banked (2,3,2,2,2); a
+7-value median cannot fall below 2. As stated when I made it: this was a
+prediction about whether a number that oscillates 0-3 lands on 2 rather than 1.
+It is not evidence that anything worked.
+
+**Prediction 3 — the impression flood. Both the original prediction and
+yesterday's revision are wrong, and I can now show it is an arithmetic error, not
+a judgement call.** The original (08-12) said the 08-04 block would age out by
+**2026-09-01**, impressions down 15,000-18,500. Yesterday I revised it to
+"impressions stay above 18,000 on 09-01" on the theory of a recurring daily bot
+job. **Neither test is valid, because 09-01 is the wrong date.** `gsc.py:44-45`
+sets `WINDOW_DAYS = 28`, `LAG_DAYS = 3`, and `fetch_queries` builds the window as
+`[today-30, today-3]` (`gsc.py:170-171`). Therefore:
+
+| review date | window | 08-04 inside? | 08-12 inside? |
+|---|---|---|---|
+| 2026-08-15 (today) | 07-16 → 08-12 | yes | yes |
+| **2026-09-01** | 08-02 → 08-29 | **yes** | **yes** |
+| 2026-09-04 | 08-05 → 09-01 | no | yes |
+| 2026-09-12 | 08-13 → 09-09 | no | no |
+
+**On 09-01 the entire burst is still inside the window.** Nothing ages out that
+day. The burst starts leaving on **09-04** and is fully clear on **09-12**. Three
+consecutive entries in this journal have set 09-01 as the test date and every one
+was reasoning from a window it never computed. **Corrected test: impressions
+should fall sharply between 09-04 and 09-12, and be back near 6,000-9,000 by
+09-13.** If they are still above 18,000 on 09-13, it is an ongoing process and the
+bot reading needs rethinking again.
+
+**And on yesterday's "recurring daily job" theory specifically — today's data
+argues against it.** A job running daily would keep adding impressions to a
+28-day window that is only 9 days into the burst. Instead the 40 out-of-area rows
+did not move by a single impression, and net window growth fell to +121. Reading
+the deltas as per-day contributions: 08-11 contributed ~713, 08-12 contributed
+~121. **The burst looks like it ran roughly 08-04 → 08-11 and stopped.** I called
+it a recurring job yesterday on one day's deceleration; that was over-reading a
+delta, which is the second day running I have done that. The bot *diagnosis*
+(21×7 town-template matrix, 12,067 impressions, exactly zero clicks) still stands
+— what changes is that it was an event, not a subscription.
+
+**Predictions 4 and 5 (`keywords_added` < 5 after the scout deploys;
+`by_intent.price.covered` moves off 3). Cannot evaluate, seventh day — still not
+deployed.** Today: `keywords_added` = 6; `price` = **3 of 38** (was 3 of 37, 3 of
+35). The numerator has not moved in three weeks while the denominator has grown
+three times. Worst-covered intent in the file; `hire` is 51 of 109.
+
+**The deploy — recommended 08-10 through 08-14. It happened, partially, and the
+half that shipped is not the half I asked for.** `metrics.py` **is** now current
+on the droplet — the beacon is live and counting, which is the whole subject of
+the lead section. But:
+
+| file | droplet state | evidence | gap |
+|---|---|---|---|
+| `metrics.py` | **current (08-14)** | beacon counting active on 08-14 | 0 days |
+| `snapshot.py` | predates 08-07 | no `crawl_*` series in `traffic` (added `727deec`, 08-07); no `code_version` (added `870a3dc`, 08-09) | **8 days** |
+| `gsc.py` | predates 08-04 | no `gsc.tracked` block (`tracked_totals` added `9479b5c`, 08-04) | **11 days** |
+
+So the file that changed what the numbers *mean* went out, and the file that
+would let me read the numbers *correctly* did not. `gsc.tracked` — clicks,
+impressions and average position over the tracked York County universe only,
+with the Montgomery County rows discarded — has existed in `main` for eleven days
+and still nobody can see it. Every rank figure above is an average over a dataset
+roughly half of which is a machine ninety miles away.
+
+**Not actioned, with day counts:** `snapshot.py`/`gsc.py` deploy **day 7**; York
+in the homepage title **day 15**; the live Schuylkill passages **day 6**; the
+Akron paragraph **day 18**; the 08-12 call-tap question **day 2**; T016 GBP
+category **day 20**; T007 reviews **day 20**; T033 review replies **day 4**;
+T011 LSA decision **day 17**; `?utm_source=gbp` **day 13**; the goal denominator
+**day 8**.
+
+I re-read both off-area passages out of the working tree today and they are still
+there: `services/seamless-gutter-installation.html:228,236` (Schuylkill County,
+naming Pottsville, Frackville, Mahanoy City and six more) and
+`services/gutter-guards.html:163` (*"homes in Akron, PA and the surrounding
+Lancaster and York County area"*). `publish_state.sh` rsyncs `areas/`, `guides/`
+and `services/` **docroot → repo**, so what I am reading is the live site.
+
+### What I researched today
+
+- **Pennsylvania HICPA advertising requirement — new, and it produced
+  recommendation 2.** Contractors performing ≥$5,000/year of home improvement
+  must register with the PA Attorney General, and the registration number must
+  appear **on all advertisements distributed in Pennsylvania, including contracts,
+  estimates and proposals**
+  ([PA OAG](https://www.attorneygeneral.gov/resources/home-improvement-contractor-registration/),
+  [PA OAG contractor FAQ](https://www.attorneygeneral.gov/resources/home-improvement-contractor-registration/contractor-frequently-asked-questions/),
+  [Act 132 text, 73 P.S. § 517.1 et seq.](https://cdn.attorneygeneral.gov/wp-content/uploads/HIC-Act-132.pdf),
+  [CGA Law, York PA](https://www.cgalaw.com/pa-home-improvement-consumer-protection-act/)).
+  **I grepped the whole site for it and it is not there** — see rec 2.
+  **This has never appeared in this journal in twenty days.** The scout raised it
+  in today's `last_scout.notes` as a precondition for the outbound techniques; it
+  is broader than that, because the website is itself advertising.
+- **Direct mail is outside TCPA, and the response benchmarks support T063.** TCPA
+  governs calls, texts and faxes; postal mail is not covered
+  ([FTC Telemarketing Sales Rule](https://www.ftc.gov/business-guidance/resources/complying-telemarketing-sales-rule)).
+  Home-services direct mail averages ~3.75%, with radius mailings around a
+  finished job at 3-5% and new-homeowner mailings 4-6%
+  ([Mailpro 2026 benchmarks](https://www.mailpro.org/post/direct-mail-response-rates-by-industry/),
+  [Focus Digital](https://focus-digital.co/direct-mail-response-rates-by-industry/)).
+  **Filed as support for T063/T060, not as a new technique.**
+- **GBP freshness and category precision — confirms known ground, adds nothing.**
+  Weekly photos and Posts now weighted comparably to raw review count; the
+  position-1→31 category failure; proximity ~55% / GBP signals ~32% / reviews
+  ~16% of the local equation
+  ([Wolfpack](https://wolfpackadvising.com/blog/how-to-rank-higher-on-google-maps/),
+  [SEOLocale](https://seolocale.com/google-map-pack-ranking-in-2026-how-the-local-3-pack-really-works/)).
+  Already covered by T016/T022; **no new filing.**
+- **Rejected, with reasons.** (1) *The April 2026 GBP review-policy update* —
+  I searched it and it is **already in this journal at 08-11**, including the
+  staff-name ban and the correction to T047's method. Re-reporting it would be
+  padding. (2) *The 1.2%-of-businesses-cited-by-AI statistic* — also already
+  recorded 08-11. (3) *The 2025-26 GSC logging bug* as an explanation for the
+  flood — rejected again on dates; fixed 2026-04-27, flood began 08-04
+  ([ppc.land](https://ppc.land/google-search-console-impressions-bug-ran-for-nearly-a-year-unnoticed/)).
+  (4) *Filing today's research as new techniques* — **I filed nothing.** The pile
+  is 53 with zero ever picked by a human; adding to it is the opposite of help.
+
+### Recommendations
+
+**Nothing in this commit is live.** The site runs from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout, and
+`publish_state.sh` copies droplet → repo only. My `snapshot.py` change below
+needs a deploy before it does anything. Every item here needs a human.
+
+1. **Divine: finish the deploy — ship `snapshot.py` and `gsc.py`.** *(Minutes.
+   Day 7; day 8 and day 11 for these two files specifically.)* `metrics.py` went
+   out on 08-14 and changed what `visitors` means; `snapshot.py` and `gsc.py`
+   stayed behind, so the journal now has a broken series **and** no way to check
+   whether the beacon is working. Shipping `snapshot.py` delivers both
+   `gsc.tracked` visibility and the `log_visitors`/`log_pageviews` discrepancy
+   check I added today. Ship `scout.py` + `growth_daily.py` **as a pair** or the
+   scout raises `TypeError`. *How you would know:* tomorrow's snapshot carries
+   `traffic.log_visitors`, `gsc.tracked`, `gsc.pages`, `keywords.ranked`,
+   `code_version` and `crawl_*`. *Checked:* all absent from today's
+   `snapshot.json`; `CRAWLER_SERIES` traced to `727deec` (08-07), `code_version`
+   to `870a3dc` (08-09), `tracked_totals` to `9479b5c` (08-04).
+2. **Eric: confirm the PA HIC registration number and put it on the site, the
+   Business Profile and the estimate form.** *(Free if already registered.
+   NEW — never raised here.)* PA law requires the registration number on all
+   advertising distributed in Pennsylvania, and a website is advertising. **It is
+   not anywhere on this site.** *Why it is this high:* it is the only item on this
+   list that is a legal exposure rather than a growth idea, non-compliance can
+   render contracts unenforceable, and it doubles as the trust signal the footer
+   is missing — there is currently no "licensed", "insured" or registration line
+   anywhere on the homepage. *If Eric is not registered and does ≥$5,000/year, that
+   is the finding, and it outranks everything else in this journal.* *How you would
+   know:* it is a compliance item, not a metric — but a visible PA# plus
+   "insured" in the footer is also a standard conversion lift, so watch
+   `call_taps`. *Checked:* grepped all `*.html` for `HIC|home improvement
+   contractor|registration|PA#|licensed|insured` — zero relevant hits;
+   `index.html:586-613` is the full footer and carries only address, phone and a
+   privacy link.
+3. **Eric: twenty minutes on the Business Profile — primary category, then count
+   the service areas.** *(Free. T016/T051, day 20.)* Unchanged from yesterday and
+   the four days before it. Primary category remains the highest-weighted single
+   local-pack factor, with a documented position-1→31 failure from one word.
+   Screenshot first, change at most one field, count the service areas — padding
+   is a documented negative. *Why it stays near the top:* twenty days, zero calls,
+   zero top-3 in any named town, leaf-fall in about five weeks. *How you would
+   know:* the `york` bucket moves off 5/0, or `local_visitors` lifts off ~0,
+   within a month. *Checked:* T016 and T051 are both `status: candidate,
+   activated: null` in today's snapshot; no site change, no deploy.
+4. **Divine: delete the two off-area passages from the live site.** *(Five
+   minutes, free. Day 6 and day 18.)* `services/seamless-gutter-installation.html`
+   lines 228 and 236, and `services/gutter-guards.html:163` → *"homes across York
+   County, Pennsylvania"*. The flood justification stays withdrawn; what remains
+   is that the March 2026 core update targeted templated location pages, this site
+   has 15 generated area pages, and prose claiming counties the business barely
+   serves is that exact profile. *Checked:* both read out of the working tree
+   today at the line numbers given; the guards that prevent recurrence
+   (`_off_area_prose` `techniques.py:1413`, `SERVICE_AREA_WORDS`
+   `techniques.py:1328`) exist in git but ship with the same undeployed
+   `techniques.py`.
+5. **Divine: put York in the homepage title.** *(One line, five minutes. Day
+   15.)* `index.html:16` is still `<title>Gutter Installer &amp; Contractor |
+   NEMO Seamless Gutter</title>`. Make it `Seamless Gutters in York, PA | NEMO
+   Seamless Gutter` (49 chars, inside the 65-char limit at `techniques.py:1281`).
+   Not because of the 471 impressions — those are almost certainly bot
+   impressions — but because a York County contractor's most important page
+   should say York. *Checked:* `index.html:16` read today; `improve_ctr` returned
+   `noop` for the seventh consecutive day.
+6. **Eric: answer every existing Google review, in one sitting.** *(Free, no
+   customer contact. T033, day 4.)* Owner response rate is weighted above raw
+   review count, and replying carries **zero** policy surface under the April 2026
+   enforcement wave — which is exactly why it comes before T007. *Checked:* T033
+   is `candidate`/`activated: null`.
+7. **Someone must decide what the goal metric counts. Day 8, and it got worse
+   today.** `top3` has been 1-2 since 08-01 while `tracked_queries` went 108 →
+   **176**, so `share_pct` fell 1.9% → **1.1%** without a single position moving.
+   The scout added 6 more today and will keep doing so daily. By leaf-fall the
+   denominator is ~400 and the headline reads ~0.5% even if top-3 positions
+   double. Either cap the tracked universe or promote `top3 / ranked_known` (2 of
+   23) to the headline. **I have not made this change myself:** it redefines the
+   number Eric is judged against.
+8. **Eric: pick three candidates and reject the rest.** *(Day 8. Pile now 53, up
+   3 today; `does_not_work` still `[]` after twenty days.)* If T063 (roof-permit
+   letters) is the one that appeals — and the research above says the channel is
+   legally clean and the response rates are real — note it depends on rec 2 being
+   settled first, because the letters are advertising too.
+
+### What I changed in this repo today
+
+**One code change, four lines plus a comment, in `growth/snapshot.py`.** I added
+`log_visitors` and `log_pageviews` to the `SERIES` tuple so the beacon-vs-log
+discrepancy that `metrics.collect()` already records (`metrics.py:599-602`)
+actually reaches the snapshot. The existing comment directly above `SERIES`
+argues this exact case for `call_taps`/`ai_calls`: *"the review agent sees only
+this file, so a number missing here does not exist as far as the judgment layer
+is concerned."* The same was true of the beacon safety net from the day it
+shipped. The two series are absent for every date before `PV_START`, which is
+correct — pre-cutover history was never counted that way.
+
+I could not run the test suite: `pytest` is not installed in this container.
+`python3 -m py_compile growth/snapshot.py` passes and the module imports with the
+new tuple. `_series()` reads through `ledger.series()`, which returns whatever
+rows exist, so a metric with no pre-cutover rows yields a short series rather
+than an error — but **someone should run `growth/test_snapshot.py` before
+deploying it.**
+
+Nothing else. No page copy, no keyword lists. I did not touch `techniques.json`,
+`keywords.json`, `results.jsonl` or `state.json`, and did not activate, retire or
+re-status any technique.
+
+### Reasoning and uncertainties
+
+Day twenty. Two top-3 queries county-wide, zero in any named town, zero AI
+visitors across twenty-one days, zero phone leads ever, one call tap, three
+bookings. None of that moved today.
+
+What moved is my confidence in the measurements, in both directions. The beacon
+cutover is a real improvement — counting browsers that ran JS is a better
+definition of "visitor" than counting log lines that survived a PTR filter — and
+it arrived with a self-check that I then could not see, which is a small, fixable
+version of the same problem this whole project has: the engine collects more than
+the judgment layer is shown.
+
+**Where I am least confident. Four things.**
+
+*First, whether 08-14's "2" is real even as a partial day.* If the beacon
+misfires on some browsers — an ad blocker, a CSP issue, Safari — the true number
+is higher and I have no way to check until `log_visitors` is published. I would
+not be surprised by either 2 or 8. **This is the single most important thing to
+resolve, because every conversion argument in this journal rests on the visitor
+denominator**, and rec 1 resolves it.
+
+*Second, I have now over-read a daily delta on two consecutive days* — Wednesday
+calling +147 an acceleration, Thursday calling +43 a recurring job. Today I am
+saying the burst ran 08-04→08-11 and stopped. On a series this thin that is
+another one-or-two-day inference, and it deserves the same suspicion. What is
+different is the window arithmetic, which is not an inference: **09-01 was never
+a valid test date and three entries used it anyway.** I would rather be caught
+having recomputed the window than keep predicting against it.
+
+*Third, the recommendation list.* This is the fifth consecutive entry whose top
+items were not acted on, and today one of them finally was — partially, and by a
+commit that had its own reasons. Twenty days: zero techniques activated by a
+human, zero rejected. I said yesterday that if the list is still untouched on
+08-21 this review should drop to weekly and shrink to three lines. **I stand by
+that**, with one amendment: rec 2 is a legal item and should not wait for a
+weekly cadence.
+
+*Fourth, unchanged:* I cannot judge the **quality** of the generated copy from
+here. 32 pages carry `FAQPage` schema, but counting schema blocks is not reading
+them. If someone reads five guide pages and finds them thin, the "on-site work is
+saturated" conclusion collapses and there is plenty of work left.
+
+**What would change my mind, dated.** (1) **2026-08-16:** the first full beacon
+day lands. If it reads 6-10, the log-era numbers were roughly 2× inflated; if it
+reads 0-2, this site has almost no human traffic and every SEO recommendation
+here is premature next to the map pack. (2) **Corrected, replacing the 09-01
+test:** impressions should fall sharply between **09-04 and 09-12** and sit near
+6,000-9,000 by **09-13**. Above 18,000 on 09-13 and the flood is an ongoing
+process, not an event. (3) If rec 1 ships and `log_visitors` for a beacon-era day
+is close to `visitors`, the old log filter was fine all along and the commit's
+premise was wrong. (4) If rec 1 ships and `gsc.tracked` shows county impressions
+in the thousands rather than the low hundreds, the flood is a smaller share of
+the dataset than I have claimed. (5) If rec 5 ships and `gutter installer`
+impressions do **not** fall, that confirms bots rather than the title. (6) Still
+pending deploy: whether `keywords_added` falls below 5, and whether
+`by_intent.price.covered` moves off 3.
