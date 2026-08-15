@@ -1,15 +1,15 @@
 {
-  "generated": "2026-08-14T06:03:59+00:00",
-  "date": "2026-08-14",
+  "generated": "2026-08-15T06:03:10+00:00",
+  "date": "2026-08-15",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
     "target_pct": 50,
-    "share_pct": 1.2,
+    "share_pct": 1.1,
     "measured": true,
     "why_unmeasured": null,
-    "coverage_pct": 34.1,
-    "tracked_queries": 170,
+    "coverage_pct": 33.5,
+    "tracked_queries": 176,
     "top3": 2,
     "top10": 7,
     "ranked_known": 23
@@ -95,6 +95,10 @@
       {
         "date": "2026-08-13",
         "value": 17
+      },
+      {
+        "date": "2026-08-14",
+        "value": 2
       }
     ],
     "pageviews": [
@@ -177,6 +181,10 @@
       {
         "date": "2026-08-13",
         "value": 28
+      },
+      {
+        "date": "2026-08-14",
+        "value": 2
       }
     ],
     "organic_visitors": [
@@ -258,6 +266,10 @@
       },
       {
         "date": "2026-08-13",
+        "value": 2
+      },
+      {
+        "date": "2026-08-14",
         "value": 2
       }
     ],
@@ -341,6 +353,10 @@
       {
         "date": "2026-08-13",
         "value": 0
+      },
+      {
+        "date": "2026-08-14",
+        "value": 0
       }
     ],
     "ai_visitors": [
@@ -422,6 +438,10 @@
       },
       {
         "date": "2026-08-13",
+        "value": 0
+      },
+      {
+        "date": "2026-08-14",
         "value": 0
       }
     ],
@@ -505,6 +525,10 @@
       {
         "date": "2026-08-13",
         "value": 13
+      },
+      {
+        "date": "2026-08-14",
+        "value": 0
       }
     ],
     "referral_visitors": [
@@ -586,6 +610,10 @@
       },
       {
         "date": "2026-08-13",
+        "value": 0
+      },
+      {
+        "date": "2026-08-14",
         "value": 0
       }
     ],
@@ -669,6 +697,10 @@
       {
         "date": "2026-08-13",
         "value": 0
+      },
+      {
+        "date": "2026-08-14",
+        "value": 0
       }
     ],
     "bot_hits": [
@@ -751,6 +783,10 @@
       {
         "date": "2026-08-13",
         "value": 2823
+      },
+      {
+        "date": "2026-08-14",
+        "value": 1693
       }
     ],
     "call_taps": [
@@ -821,6 +857,10 @@
       {
         "date": "2026-08-13",
         "value": 0
+      },
+      {
+        "date": "2026-08-14",
+        "value": 0
       }
     ],
     "ai_calls": [
@@ -886,6 +926,10 @@
       },
       {
         "date": "2026-08-13",
+        "value": 0
+      },
+      {
+        "date": "2026-08-14",
         "value": 0
       }
     ],
@@ -969,6 +1013,10 @@
       {
         "date": "2026-08-13",
         "value": 0
+      },
+      {
+        "date": "2026-08-14",
+        "value": 0
       }
     ],
     "phone_leads": [
@@ -1050,6 +1098,10 @@
       },
       {
         "date": "2026-08-13",
+        "value": 0
+      },
+      {
+        "date": "2026-08-14",
         "value": 0
       }
     ],
@@ -1133,6 +1185,10 @@
       {
         "date": "2026-08-13",
         "value": 0
+      },
+      {
+        "date": "2026-08-14",
+        "value": 0
       }
     ]
   },
@@ -1144,8 +1200,8 @@
   "keywords": {
     "by_town": {
       "county": {
-        "total": 92,
-        "covered": 34,
+        "total": 94,
+        "covered": 35,
         "top3": 2
       },
       "hanover": {
@@ -1154,12 +1210,12 @@
         "top3": 0
       },
       "dover": {
-        "total": 15,
+        "total": 16,
         "covered": 6,
         "top3": 0
       },
       "red-lion": {
-        "total": 9,
+        "total": 10,
         "covered": 3,
         "top3": 0
       },
@@ -1174,18 +1230,18 @@
         "top3": 0
       },
       "york": {
-        "total": 26,
+        "total": 28,
         "covered": 5,
         "top3": 0
       }
     },
     "by_intent": {
       "hire": {
-        "total": 105,
-        "covered": 50
+        "total": 109,
+        "covered": 51
       },
       "price": {
-        "total": 37,
+        "total": 38,
         "covered": 3
       },
       "diy": {
@@ -1193,7 +1249,7 @@
         "covered": 1
       },
       "check": {
-        "total": 20,
+        "total": 21,
         "covered": 4
       }
     },
@@ -1224,7 +1280,7 @@
       "gutter contractor red lion pa",
       "gutter contractors york pa",
       "gutter guard installation dallastown pa",
-      "gutter installation york",
+      "gutter guard installation dover pa",
       "gutter installers dover pa",
       "gutter installers red lion pa",
       "gutter installers york pa",
@@ -1232,6 +1288,7 @@
       "gutter repair dallastown pa",
       "gutter repair hanover pa",
       "gutter repair near me york pa",
+      "gutter replacement after new roof york pa",
       "gutter replacement dover pa",
       "gutters overflowing during rain who to call",
       "half round copper gutter installers york pa",
@@ -1248,20 +1305,24 @@
       "seamless gutter installer dallastown pa",
       "seamless gutter installers dallastown pa",
       "seamless gutter installers hanover pa",
+      "seamless gutter installers near me red lion pa",
       "soffit and fascia repair dover pa",
       "soffit and fascia repair spring grove pa",
       "soffit and fascia repair york pa",
       "who installs gutters in dover pa",
       "who installs gutters in red lion pa",
+      "who to call when gutter is falling off house",
       "5 inch vs 6 inch gutters",
       "5 inch vs 6 inch gutters which do i need",
       "5 inch vs 6 inch gutters which is better",
       "are gutter guards worth it",
       "best gutter company in york county pa",
+      "cost to replace gutters and downspouts york pa",
       "cost to replace gutters on a house",
       "cost to replace gutters on a ranch house",
       "cost to replace gutters on a ranch house pa",
       "do i need gutters on my house",
+      "do i need new gutters with a new roof",
       "gutter cleaning cost dover pa",
       "gutter cleaning cost per foot pennsylvania",
       "gutter cleaning cost red lion pa",
@@ -1555,13 +1616,13 @@
     ]
   },
   "gsc": {
-    "date": "2026-08-14",
+    "date": "2026-08-15",
     "ok": true,
     "connected": true,
-    "rows": 840,
+    "rows": 846,
     "matched": 23,
-    "clicks": 11,
-    "impressions": 24745,
+    "clicks": 12,
+    "impressions": 24866,
     "avg_position": 24.8
   },
   "techniques": [
@@ -1655,6 +1716,10 @@
         {
           "date": "2026-08-13",
           "value": 0
+        },
+        {
+          "date": "2026-08-14",
+          "value": 0
         }
       ]
     },
@@ -1747,6 +1812,10 @@
         },
         {
           "date": "2026-08-13",
+          "value": 0
+        },
+        {
+          "date": "2026-08-14",
           "value": 0
         }
       ]
@@ -2116,6 +2185,10 @@
         {
           "date": "2026-08-13",
           "value": 3
+        },
+        {
+          "date": "2026-08-14",
+          "value": 0
         }
       ]
     },
@@ -2910,6 +2983,60 @@
       "notes": "first step: Shoot one 20-second vertical phone video of the brake running aluminium at a real York job, with the fall cleaning flat price spoken out loud, then build a single Meta campaign with the Calls objective, 12-mile radius around York PA, age 35+, no interest targeting, $3/day, and the business line as the call destination \u2014 nothing else until it has run 14 days.\neffort: days\ncost: under $100/mo\nexpected: $90/mo ($3/day) from 1 Sept to 30 Nov. Target 25\u201360 calls or Messenger threads over the season at $4\u201310 per contact; 10\u201320 estimates. Kill switch: if cost per real conversation exceeds $25 after two weeks, shut it off and move the budget to the Google call-only campaign already in the ledger.",
       "verdict": null,
       "owned_visitors": null
+    },
+    {
+      "id": "T063",
+      "slug": "roof_permit_gutter_followup",
+      "name": "Roofing-permit follow-up letter, 14-day window",
+      "kind": "distribution",
+      "status": "candidate",
+      "hypothesis": "Every re-roof in York County ends with gutters off the fascia and a homeowner who has just been told their gutters are 20 years old, rusted at the seams, or hung on rotted wood. Roof permits are public record and are filed BEFORE or DURING the job, which means Eric can reach the exact homeowner who is spending money on the roofline this month \u2014 not a random street. This is the ledger's roofer-referral idea without needing the roofer's permission, and unlike EDDM the targeting is a trigger event, not a guess. Autumn is peak re-roof season in PA, which is the same six weeks as leaf-fall demand.",
+      "evidence": "Permit records are public in all 50 states and carry address, permit type, value and date, and are used as a trigger-event lead signal by trades: https://permitledger.com/blog and https://getshovld.com/blog/permit-pull-lead-generation-explained-for-contractors \u2014 the recommended workflow is a 7-day lookback so outreach stays fresh (https://getshovld.com/blog/permit-pull-lead-generation-explained-for-contractors). Adjacent-trade permit plays (e.g. fresh soffit/fascia after a re-roof) are documented at https://permitgrab.com/. Speed and specificity matter because 78% of homeowners hire the first contractor who responds: https://www.estatehub.io/articles/2026-benchmarks-lead-conversion-rates-home-services",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-15",
+      "added": "2026-08-15",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Monday morning, pull the last 14 days of residential roofing/re-roof permits for York City and the two townships Eric works most (call or email the code office and ask how they publish the weekly permit list \u2014 most PA municipalities will email it or post a PDF), and hand-address 10 letters.\neffort: days\ncost: under $100/mo\nexpected: 20-40 residential roofing permits a month across York City + the 6-8 townships Eric already drives; 25 first-class letters a week at ~$0.75 each (~$75/mo) with a photo of Eric's brake and a flat 'gutters re-hung or replaced, price in writing, same week' offer. Target 2-4% response = 3-6 calls a month, 1-2 booked jobs, at a cost per job well under any Angi lead.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T064",
+      "slug": "new_roof_gutter_decision_page",
+      "name": "\"Do I need new gutters with a new roof?\" York page",
+      "kind": "content",
+      "status": "candidate",
+      "hypothesis": "This is the single highest-intent question in the trade that NEMO has no page for: the homeowner asking it has a roofer standing in the driveway, a number on a proposal, and a decision to make this week. It is a question people ask an AI assistant word-for-word, and answer engines reward one self-contained, honest answer with a real price range. It also gives the permit letters and any roofer partnership a URL to point at, and it targets a query family (new roof + gutters + soffit/fascia) the ledger already knows the site ranks near the top for but cannot sell.",
+      "evidence": "AI Overviews since June 2026 place inline citations beside the exact supporting text, rewarding capsule-style self-contained answers, and FAQPage-marked pages are reported far more likely to be surfaced: https://seolocal.us/answers/how-to-get-cited-by-chatgpt/ . Contractors winning in 2026 are the ones with content that answers real questions plus a fast phone path: https://lightningleadspro.io/blog/home-service-contractor-marketing-guide/ . Roofing permits are explicitly mapped to gutter/soffit/fascia demand: https://permitgrab.com/",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-15",
+      "added": "2026-08-15",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Write the 40-word answer first \u2014 'If your gutters are under about 10 years old and the fascia is sound, keep them; replace them if X, Y, Z' \u2014 then build the page around it and add FAQPage schema.\neffort: hours\ncost: free\nexpected: One page, answer in the first 40 words, real York County price bands, an honest 'when you should NOT replace them' section, phone number above the fold. Target: indexed within 48h via the existing IndexNow push, top-3 for 3-5 of the new-roof query cluster inside 8 weeks, and it becomes the URL printed on the permit letter.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T065",
+      "slug": "ai_prompt_audit_log",
+      "name": "Monthly AI answer audit: who gets named, and from which sources",
+      "kind": "indexing",
+      "status": "candidate",
+      "hypothesis": "The ledger has six or seven AI-visibility candidates (Brave, Bing Places, Apple, Foursquare, BuildZoom, third-party lists, bot-fetch check) and no way to rank them. One hour a month of running the real prompts and recording which URLs the engines cite turns that guessing into a target list specific to York County \u2014 Eric works only on the pages that are actually feeding the answers here, and can tell within a month whether any of it moved.",
+      "evidence": "The recommended method is to run the prompts clean, record whether you were named, and log the third-party sources the AI cited, because those cited URLs are the citation surfaces in your market: https://www.ignitvio.com/blog/how-to-get-recommended-by-chatgpt/ and https://biziq.com/blog/why-chatgpt-recommends-one-contractor-over-another-and-how-to-be-the-one/ . There is only ~45% overlap between map-pack winners and businesses AI assistants recommend, so map-pack work alone does not cover this: https://leadlocalseo.com/blog/how-to-get-recommended-by-chatgpt/ . AI-referred calls also show the highest phone lead rate of any channel (45%), though volume is still small: https://www.invoca.com/reports/the-invoca-home-services-lead-conversion-benchmarks-report-2026",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-15",
+      "added": "2026-08-15",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Run the eight prompts today in a clean session and paste the cited URLs into a sheet \u2014 that is the baseline, and it costs one hour.\neffort: hours\ncost: free\nexpected: 8 fixed prompts ('best gutter company in York PA', 'who installs copper gutters near York Pennsylvania', 'gutter cleaning York PA cost', etc.) across ChatGPT, Gemini, Perplexity and Copilot, logged monthly in a sheet: named yes/no, details correct yes/no, sources cited. Success = a ranked list of 5-10 York County citation surfaces to pursue, and NEMO named in at least 1 of 8 prompts by December.",
+      "verdict": null,
+      "owned_visitors": null
     }
   ],
   "scoreboard": {
@@ -2978,11 +3105,14 @@
       "T059",
       "T060",
       "T061",
-      "T062"
+      "T062",
+      "T063",
+      "T064",
+      "T065"
     ]
   },
   "last_build": {
-    "date": "2026-08-14",
+    "date": "2026-08-15",
     "log": [
       {
         "ok": true,
@@ -3004,7 +3134,7 @@
       },
       {
         "ok": true,
-        "detail": "added \"What to Ask Gutter Installers in York County Before You Hire\" to /services/seamless-gutter-installation.html for 'gutter installers york'",
+        "detail": "added \"What Gutter Installation Costs in York, PA \u2014 and How to Get \" to /services/seamless-gutter-installation.html for 'gutter installation york'",
         "slug": "strengthen_pages"
       },
       {
@@ -3053,20 +3183,22 @@
     "changed": 1
   },
   "last_scout": {
-    "date": "2026-08-14",
+    "date": "2026-08-15",
     "ok": true,
     "techniques_added": [
-      "jobsite_yard_sign_neighbor_proof",
-      "same_street_route_day_pricing",
-      "meta_radius_call_ads_leaf_season"
+      "roof_permit_gutter_followup",
+      "new_roof_gutter_decision_page",
+      "ai_prompt_audit_log"
     ],
     "keywords_added": [
-      "seamless gutter installation cost per foot",
-      "half round gutters near me",
-      "when should i clean my gutters in pennsylvania",
-      "gutter companies dover pa reviews"
+      "do i need new gutters with a new roof",
+      "gutter replacement after new roof york pa",
+      "cost to replace gutters and downspouts york pa",
+      "gutter guard installation dover pa",
+      "seamless gutter installers near me red lion pa",
+      "who to call when gutter is falling off house"
     ],
-    "notes": ""
+    "notes": "PHONE FIRST: the permit play is the only one of these three that can ring the phone in August. Do it before the content. COMPLIANCE, read this twice: (1) contact permit homeowners by first-class mail or a knock ONLY \u2014 do not cold-call or text them. Unsolicited calls/texts to residential numbers risk TCPA and PA telemarketing exposure, and it is exactly the kind of shortcut that turns a good channel into a legal bill. (2) Pennsylvania's Home Improvement Consumer Protection Act requires the PA HIC registration number to appear in advertising \u2014 check it is on the letters, the yard signs, the door hangers, the site footer and the Business Profile before any of the outbound work in the ledger goes out. (3) Never buy or pull permit data from a scraper that violates a portal's terms; ask the code office for the published weekly list, which most York County municipalities will simply email you. CAVEAT ON PERMITS: York County has no single open-data permit portal \u2014 coverage will be uneven and this may be a per-municipality phone call rather than a download. Start with York City plus the two townships Eric works most; if three code offices won't publish a list, this idea gets 4 hours and then gets retired rather than nursed. CONSIDERED AND REJECTED: buying Angi/Thumbtack/Networx shared leads (legal, but $60-100 a lead sold to three competitors, and it trains the market to price-shop a one-truck operation); Google Business Profile messaging/chat (Google retired it in 2024, so it is not available no matter what a 2026 blog post claims); chasing the '150+ reviews before AI names you' benchmark one vendor cites \u2014 treat that as vendor marketing, and note that the only legal path to review count is asking every customer with neutral language, which the ledger already has. The FTC fake-review rule carries penalties north of $50k per violation and Google's April 2026 enforcement uses GPS and device fingerprinting, so incentivised or gated reviews are not a grey area, they are the fastest way to lose the profile. FINALLY: the AI audit is measurement, not revenue. Give it one hour a month and do not let it displace the permit letters or the review asks."
   },
   "pages": {
     "areas": [

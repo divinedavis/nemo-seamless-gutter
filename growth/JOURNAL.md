@@ -7961,3 +7961,26 @@ smaller share of the dataset than I claim here. (4) If recommendation 4 ships an
 the title — the opposite inference from the one I drew yesterday. (5) Still
 pending deploy: whether `keywords_added` falls below 5, and whether
 `by_intent.price.covered` moves off 3.
+
+## 2026-08-15 — engine run
+
+Goal: **1.1%** top-3 share of 176 tracked queries (target 50%).
+2026-08-14: 2 visitors (2 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — ok: added "What Gutter Installation Costs in York, PA — and How to Get " to /services/seamless-gutter-installation.html for 'gutter installation york'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: no query needs its own page — the remaining gaps all belong on pages that exist, which strengthen_pages handles
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 40 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 1 URL(s), HTTP 200
+
+**Scout proposed (as candidates, not running):**
+- T063 Roofing-permit follow-up letter, 14-day window — Every re-roof in York County ends with gutters off the fascia and a homeowner who has just been told their gutters are 20 years old, rusted at the seams, or hung on rotted wood. Roof permits are publi
+- T064 "Do I need new gutters with a new roof?" York page — This is the single highest-intent question in the trade that NEMO has no page for: the homeowner asking it has a roofer standing in the driveway, a number on a proposal, and a decision to make this we
+- T065 Monthly AI answer audit: who gets named, and from which sources — The ledger has six or seven AI-visibility candidates (Brave, Bing Places, Apple, Foursquare, BuildZoom, third-party lists, bot-fetch check) and no way to rank them. One hour a month of running the rea
