@@ -8368,3 +8368,26 @@ the dataset than I have claimed. (5) If rec 5 ships and `gutter installer`
 impressions do **not** fall, that confirms bots rather than the title. (6) Still
 pending deploy: whether `keywords_added` falls below 5, and whether
 `by_intent.price.covered` moves off 3.
+
+## 2026-08-16 — engine run
+
+Goal: **1.1%** top-3 share of 182 tracked queries (target 50%).
+2026-08-15: 2 visitors (1 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — ok: added "Scheduling a Half-Round Gutter Installation Anywhere in York" to /services/half-round-gutters.html for 'half round gutter installation york county'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: published 'who to call when gutter is falling off house' → /guides/who-to-call-when-gutter-is-falling-off-house.html
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 41 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 2 URL(s), HTTP 200
+
+**Scout proposed (as candidates, not running):**
+- T066 LeafFilter/Leaf Home second-opinion page + call CTA — The single hottest gutter buyer in York County right now is the homeowner who just sat through a national gutter-guard in-home pitch and has a $5,000-$8,000 quote on the kitchen table. That person is 
+- T067 Two fall community-event booths, estimates booked on the spot — Every inbound channel in the ledger is 8-12 weeks from working and leaf-fall starts in six. A folding table at a York County fall festival or Saturday farmers market puts Eric in front of 300-600 loca
+- T068 Facebook Marketplace services listing for flat-price fall cleaning — York County homeowners browse Marketplace for local trades the way they used to browse the classifieds, and a services listing is free, takes fifteen minutes, and produces a named local person with a 

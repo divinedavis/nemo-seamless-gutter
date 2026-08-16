@@ -1,6 +1,6 @@
 {
-  "generated": "2026-08-15T06:03:10+00:00",
-  "date": "2026-08-15",
+  "generated": "2026-08-16T06:04:18+00:00",
+  "date": "2026-08-16",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
@@ -9,7 +9,7 @@
     "measured": true,
     "why_unmeasured": null,
     "coverage_pct": 33.5,
-    "tracked_queries": 176,
+    "tracked_queries": 182,
     "top3": 2,
     "top10": 7,
     "ranked_known": 23
@@ -99,6 +99,10 @@
       {
         "date": "2026-08-14",
         "value": 2
+      },
+      {
+        "date": "2026-08-15",
+        "value": 2
       }
     ],
     "pageviews": [
@@ -184,6 +188,10 @@
       },
       {
         "date": "2026-08-14",
+        "value": 2
+      },
+      {
+        "date": "2026-08-15",
         "value": 2
       }
     ],
@@ -271,6 +279,10 @@
       {
         "date": "2026-08-14",
         "value": 2
+      },
+      {
+        "date": "2026-08-15",
+        "value": 1
       }
     ],
     "local_visitors": [
@@ -356,6 +368,10 @@
       },
       {
         "date": "2026-08-14",
+        "value": 0
+      },
+      {
+        "date": "2026-08-15",
         "value": 0
       }
     ],
@@ -443,6 +459,10 @@
       {
         "date": "2026-08-14",
         "value": 0
+      },
+      {
+        "date": "2026-08-15",
+        "value": 0
       }
     ],
     "direct_visitors": [
@@ -529,6 +549,10 @@
       {
         "date": "2026-08-14",
         "value": 0
+      },
+      {
+        "date": "2026-08-15",
+        "value": 1
       }
     ],
     "referral_visitors": [
@@ -614,6 +638,10 @@
       },
       {
         "date": "2026-08-14",
+        "value": 0
+      },
+      {
+        "date": "2026-08-15",
         "value": 0
       }
     ],
@@ -701,6 +729,10 @@
       {
         "date": "2026-08-14",
         "value": 0
+      },
+      {
+        "date": "2026-08-15",
+        "value": 0
       }
     ],
     "bot_hits": [
@@ -787,6 +819,10 @@
       {
         "date": "2026-08-14",
         "value": 1693
+      },
+      {
+        "date": "2026-08-15",
+        "value": 2294
       }
     ],
     "call_taps": [
@@ -861,6 +897,10 @@
       {
         "date": "2026-08-14",
         "value": 0
+      },
+      {
+        "date": "2026-08-15",
+        "value": 0
       }
     ],
     "ai_calls": [
@@ -930,6 +970,10 @@
       },
       {
         "date": "2026-08-14",
+        "value": 0
+      },
+      {
+        "date": "2026-08-15",
         "value": 0
       }
     ],
@@ -1017,6 +1061,10 @@
       {
         "date": "2026-08-14",
         "value": 0
+      },
+      {
+        "date": "2026-08-15",
+        "value": 0
       }
     ],
     "phone_leads": [
@@ -1102,6 +1150,10 @@
       },
       {
         "date": "2026-08-14",
+        "value": 0
+      },
+      {
+        "date": "2026-08-15",
         "value": 0
       }
     ],
@@ -1189,6 +1241,10 @@
       {
         "date": "2026-08-14",
         "value": 0
+      },
+      {
+        "date": "2026-08-15",
+        "value": 0
       }
     ]
   },
@@ -1200,12 +1256,12 @@
   "keywords": {
     "by_town": {
       "county": {
-        "total": 94,
-        "covered": 35,
+        "total": 97,
+        "covered": 37,
         "top3": 2
       },
       "hanover": {
-        "total": 8,
+        "total": 9,
         "covered": 4,
         "top3": 0
       },
@@ -1230,18 +1286,18 @@
         "top3": 0
       },
       "york": {
-        "total": 28,
+        "total": 30,
         "covered": 5,
         "top3": 0
       }
     },
     "by_intent": {
       "hire": {
-        "total": 109,
-        "covered": 51
+        "total": 110,
+        "covered": 53
       },
       "price": {
-        "total": 38,
+        "total": 42,
         "covered": 3
       },
       "diy": {
@@ -1249,7 +1305,7 @@
         "covered": 1
       },
       "check": {
-        "total": 21,
+        "total": 22,
         "covered": 4
       }
     },
@@ -1271,6 +1327,7 @@
       "fascia board rot gutter replacement york pa",
       "gutter cleaning dallastown pa",
       "gutter cleaning near me hanover pa",
+      "gutter cleaning near me york pa",
       "gutter cleaning red lion pa",
       "gutter cleaning spring grove pa",
       "gutter companies near dallastown pa",
@@ -1294,7 +1351,6 @@
       "half round copper gutter installers york pa",
       "half round copper gutters near me",
       "half round copper gutters york pa",
-      "half round gutter installation york county",
       "half round gutters historic home pa",
       "half round gutters near me",
       "ice dam damage gutter replacement york county pa",
@@ -1311,12 +1367,12 @@
       "soffit and fascia repair york pa",
       "who installs gutters in dover pa",
       "who installs gutters in red lion pa",
-      "who to call when gutter is falling off house",
       "5 inch vs 6 inch gutters",
       "5 inch vs 6 inch gutters which do i need",
       "5 inch vs 6 inch gutters which is better",
       "are gutter guards worth it",
       "best gutter company in york county pa",
+      "copper half round gutters cost pa",
       "cost to replace gutters and downspouts york pa",
       "cost to replace gutters on a house",
       "cost to replace gutters on a ranch house",
@@ -1324,12 +1380,14 @@
       "do i need gutters on my house",
       "do i need new gutters with a new roof",
       "gutter cleaning cost dover pa",
+      "gutter cleaning cost hanover pa",
       "gutter cleaning cost per foot pennsylvania",
       "gutter cleaning cost red lion pa",
       "gutter cleaning york pa cost",
       "gutter companies dover pa reviews",
       "gutter companies york pa reviews",
       "gutter guard cost pa",
+      "gutter guard cost per foot pa",
       "gutter guard installation cost",
       "gutter guard installation cost per foot",
       "gutter guard installation cost york pa",
@@ -1346,6 +1404,7 @@
       "gutter replacement cost york pa",
       "gutter replacement estimate spring grove pa",
       "gutters overflowing in heavy rain",
+      "gutters overflowing in heavy rain what to do",
       "half round gutter cost per foot",
       "half round gutters cost per foot",
       "half round gutters historic home pennsylvania",
@@ -1358,6 +1417,7 @@
       "how often should gutters be cleaned in pa",
       "ice dam damaged gutters replace or repair york pa",
       "ice dam gutter damage repair pa",
+      "leaffilter cost york pa",
       "leaffilter vs local gutter guard cost",
       "seamless gutter cost per foot installed pa",
       "seamless gutter cost per foot installed pennsylvania",
@@ -1616,13 +1676,13 @@
     ]
   },
   "gsc": {
-    "date": "2026-08-15",
+    "date": "2026-08-16",
     "ok": true,
     "connected": true,
-    "rows": 846,
+    "rows": 853,
     "matched": 23,
-    "clicks": 12,
-    "impressions": 24866,
+    "clicks": 14,
+    "impressions": 24971,
     "avg_position": 24.8
   },
   "techniques": [
@@ -1720,6 +1780,10 @@
         {
           "date": "2026-08-14",
           "value": 0
+        },
+        {
+          "date": "2026-08-15",
+          "value": 0
         }
       ]
     },
@@ -1816,6 +1880,10 @@
         },
         {
           "date": "2026-08-14",
+          "value": 0
+        },
+        {
+          "date": "2026-08-15",
           "value": 0
         }
       ]
@@ -2188,6 +2256,10 @@
         },
         {
           "date": "2026-08-14",
+          "value": 0
+        },
+        {
+          "date": "2026-08-15",
           "value": 0
         }
       ]
@@ -3037,6 +3109,60 @@
       "notes": "first step: Run the eight prompts today in a clean session and paste the cited URLs into a sheet \u2014 that is the baseline, and it costs one hour.\neffort: hours\ncost: free\nexpected: 8 fixed prompts ('best gutter company in York PA', 'who installs copper gutters near York Pennsylvania', 'gutter cleaning York PA cost', etc.) across ChatGPT, Gemini, Perplexity and Copilot, logged monthly in a sheet: named yes/no, details correct yes/no, sources cited. Success = a ranked list of 5-10 York County citation surfaces to pursue, and NEMO named in at least 1 of 8 prompts by December.",
       "verdict": null,
       "owned_visitors": null
+    },
+    {
+      "id": "T066",
+      "slug": "national_guard_quote_second_opinion",
+      "name": "LeafFilter/Leaf Home second-opinion page + call CTA",
+      "kind": "content",
+      "status": "candidate",
+      "hypothesis": "The single hottest gutter buyer in York County right now is the homeowner who just sat through a national gutter-guard in-home pitch and has a $5,000-$8,000 quote on the kitchen table. That person is not researching gutters, they are price-checking a number tonight, and they search brand + cost or brand + alternative. NEMO forms aluminium on site and can quote guards honestly against that number, but has no page that meets the query. This is a 30-day-decision audience, not a someday audience, and the ask is a phone call for a real second number rather than a booking slot.",
+      "evidence": "Gutter-specific 2026 guidance says comparison content aimed at national guard brands captures high-intent shoppers who are actively price-checking, and that local contractors win by offering a comparable guard at a noticeably lower local price with faster response: <cite index=\"29-1,29-2,29-3,29-4,29-5\">National guard brands spend heavily but charge premium prices and often underperform in local map-pack results. Win by ranking locally, offering a comparable guard at a noticeably lower local price, gathering genuine reviews, and responding faster. Comparison content captures high-intent shoppers actively price-checking the national brands.</cite> Same source on ticket size: <cite index=\"29-12\">a seamless-gutter install runs $1,000-$3,000; gutter guards push it to $1,000-$5,000+</cite>. https://www.elev8operations.com/guides/how-to-get-more-gutter-leads-2026 and https://www.talentsintoprofits.com/gutter-marketing",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-16",
+      "added": "2026-08-16",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Write down Eric's own honest installed price per foot for guards on a standard 5-inch K-style run, and the three questions he asks a homeowner to size a guard job, then draft one page: what a national brand quote usually includes, what NEMO's equivalent costs, what is genuinely different (lifetime transferable warranty vs local warranty, subcontracted vs owner-installed), and a phone number CTA reading: read me your quote number and I will tell you on the phone what I would charge.\neffort: days\ncost: free\nexpected: Page live and indexed within 7 days; top-3 for 3-5 brand-comparison queries within 60 days (this query family has almost no local competition); 8-15 organic sessions a week by mid-October and 2-4 phone calls a month from that page alone, at a ticket 2x a plain install because the guard is attached.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T067",
+      "slug": "fall_event_booth_estimate_booking",
+      "name": "Two fall community-event booths, estimates booked on the spot",
+      "kind": "distribution",
+      "status": "candidate",
+      "hypothesis": "Every inbound channel in the ledger is 8-12 weeks from working and leaf-fall starts in six. A folding table at a York County fall festival or Saturday farmers market puts Eric in front of 300-600 local homeowners in one day during the exact week they are looking at their gutters, and skips the trust problem that 13 reviews and 4.2 stars create for a stranger online. The output is not traffic, it is a name, an address and a date on the calendar written down while the homeowner is standing there. It also seeds the review and referral engine the rest of the ledger depends on.",
+      "evidence": "Gutter-lead guidance from ServiceTitan lists community presence as a direct lead source for gutter businesses: <cite index=\"24-5,24-6,24-7,24-8\">Community involvement is a marketing approach where businesses actively participate in local events, projects, and initiatives to build their reputation and become recognized as trusted members of the neighborhood. Homeowners are far more likely to hire a company they recognize and trust than one they have never heard of. This familiarity generates new leads, referrals, and repeat bookings.</cite> Seasonal timing matters: <cite index=\"28-13,28-14\">Plan your seasons ahead of the rush. Fall drives guards and cleaning, spring drives replacement and repair - marketing has to start weeks before each surge, not once homeowners are already calling around.</cite> https://www.servicetitan.com/blog/gutter-leads and https://minyona.com/blog/gutter-lead-generation-guide",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-16",
+      "added": "2026-08-16",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Call or email the market manager for two York County fall events with a September date (a borough fall festival and a Saturday farmers market in a leaf-heavy older neighbourhood) and ask the vendor fee and whether a home-services table is permitted; book the cheaper one today before slots fill.\neffort: days\ncost: under $100/mo\nexpected: Two Saturdays in September. 50-80 real conversations, 15-25 addresses written down, 6-10 estimates booked on the calendar that day, 3-5 jobs closed, plus 20+ people who now recognise the name when it appears in the map pack.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T068",
+      "slug": "marketplace_services_flat_price_cleaning",
+      "name": "Facebook Marketplace services listing for flat-price fall cleaning",
+      "kind": "distribution",
+      "status": "candidate",
+      "hypothesis": "York County homeowners browse Marketplace for local trades the way they used to browse the classifieds, and a services listing is free, takes fifteen minutes, and produces a named local person with a stated problem and a message thread - which is a conversation, not a click. Cleaning is the low-friction front door: a $150 job that puts Eric on a ladder over a roofline he can then quote for replacement or guards. This is Meta-compliant organic posting, not ads and not group spam, so it costs nothing while the Meta-ads and LSA candidates wait for budget.",
+      "evidence": "Facebook remains the primary platform where home-service customers are found, and community participation converts when it is helpful rather than spammy: <cite index=\"10-9,10-10,10-11,10-12\">Social media marketing for construction is not just random posts. It is about being where your ideal clients hang out. For most contractors, that means Facebook, Instagram, and increasingly, TikTok. Join local community groups and provide helpful advice (without spamming).</cite> The cleaning-as-front-door logic is gutter-specific: <cite index=\"29-8,29-9\">Gutter cleaning is low-ticket but it is the perfect entry point to upsell guards and to inspect for repair or replacement needs. Treat cleaning as lead generation for higher-ticket guard and install work, cluster cleanings by neighborhood for route efficiency.</cite> https://www.builderleadconverter.com/blog/how-to-get-more-construction-leads/ and https://www.elev8operations.com/guides/how-to-get-more-gutter-leads-2026",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-16",
+      "added": "2026-08-16",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Photograph one finished gutter run on Eric's phone in daylight, then post a Marketplace services listing titled with the real service and the real flat price (for example: gutter cleaning, single-storey home, $X, York County, owner-operated), with the phone number in the description and a note that photos of the problem get a price the same day.\neffort: hours\ncost: free\nexpected: Listing live this week, renewed weekly through November. 5-15 inbound messages a month in September-November, 3-6 booked cleanings a month, and 1-2 of those converting to a guard or replacement quote at 10x the ticket.",
+      "verdict": null,
+      "owned_visitors": null
     }
   ],
   "scoreboard": {
@@ -3108,11 +3234,14 @@
       "T062",
       "T063",
       "T064",
-      "T065"
+      "T065",
+      "T066",
+      "T067",
+      "T068"
     ]
   },
   "last_build": {
-    "date": "2026-08-15",
+    "date": "2026-08-16",
     "log": [
       {
         "ok": true,
@@ -3134,7 +3263,7 @@
       },
       {
         "ok": true,
-        "detail": "added \"What Gutter Installation Costs in York, PA \u2014 and How to Get \" to /services/seamless-gutter-installation.html for 'gutter installation york'",
+        "detail": "added \"Scheduling a Half-Round Gutter Installation Anywhere in York\" to /services/half-round-gutters.html for 'half round gutter installation york county'",
         "slug": "strengthen_pages"
       },
       {
@@ -3151,8 +3280,7 @@
       },
       {
         "ok": true,
-        "noop": true,
-        "detail": "no query needs its own page \u2014 the remaining gaps all belong on pages that exist, which strengthen_pages handles",
+        "detail": "published 'who to call when gutter is falling off house' \u2192 /guides/who-to-call-when-gutter-is-falling-off-house.html",
         "slug": "money_pages"
       },
       {
@@ -3170,35 +3298,35 @@
       {
         "ok": true,
         "noop": false,
-        "detail": "[gen_sitemap] wrote 40 URLs to sitemap.xml",
+        "detail": "[gen_sitemap] wrote 41 URLs to sitemap.xml",
         "slug": "rebuild_sitemap"
       },
       {
         "ok": true,
-        "detail": "submitted 1 URL(s), HTTP 200",
+        "detail": "submitted 2 URL(s), HTTP 200",
         "slug": "ping_indexnow"
       }
     ],
-    "new": 0,
+    "new": 1,
     "changed": 1
   },
   "last_scout": {
-    "date": "2026-08-15",
+    "date": "2026-08-16",
     "ok": true,
     "techniques_added": [
-      "roof_permit_gutter_followup",
-      "new_roof_gutter_decision_page",
-      "ai_prompt_audit_log"
+      "national_guard_quote_second_opinion",
+      "fall_event_booth_estimate_booking",
+      "marketplace_services_flat_price_cleaning"
     ],
     "keywords_added": [
-      "do i need new gutters with a new roof",
-      "gutter replacement after new roof york pa",
-      "cost to replace gutters and downspouts york pa",
-      "gutter guard installation dover pa",
-      "seamless gutter installers near me red lion pa",
-      "who to call when gutter is falling off house"
+      "leaffilter cost york pa",
+      "gutter guard cost per foot pa",
+      "gutter cleaning near me york pa",
+      "gutter cleaning cost hanover pa",
+      "copper half round gutters cost pa",
+      "gutters overflowing in heavy rain what to do"
     ],
-    "notes": "PHONE FIRST: the permit play is the only one of these three that can ring the phone in August. Do it before the content. COMPLIANCE, read this twice: (1) contact permit homeowners by first-class mail or a knock ONLY \u2014 do not cold-call or text them. Unsolicited calls/texts to residential numbers risk TCPA and PA telemarketing exposure, and it is exactly the kind of shortcut that turns a good channel into a legal bill. (2) Pennsylvania's Home Improvement Consumer Protection Act requires the PA HIC registration number to appear in advertising \u2014 check it is on the letters, the yard signs, the door hangers, the site footer and the Business Profile before any of the outbound work in the ledger goes out. (3) Never buy or pull permit data from a scraper that violates a portal's terms; ask the code office for the published weekly list, which most York County municipalities will simply email you. CAVEAT ON PERMITS: York County has no single open-data permit portal \u2014 coverage will be uneven and this may be a per-municipality phone call rather than a download. Start with York City plus the two townships Eric works most; if three code offices won't publish a list, this idea gets 4 hours and then gets retired rather than nursed. CONSIDERED AND REJECTED: buying Angi/Thumbtack/Networx shared leads (legal, but $60-100 a lead sold to three competitors, and it trains the market to price-shop a one-truck operation); Google Business Profile messaging/chat (Google retired it in 2024, so it is not available no matter what a 2026 blog post claims); chasing the '150+ reviews before AI names you' benchmark one vendor cites \u2014 treat that as vendor marketing, and note that the only legal path to review count is asking every customer with neutral language, which the ledger already has. The FTC fake-review rule carries penalties north of $50k per violation and Google's April 2026 enforcement uses GPS and device fingerprinting, so incentivised or gated reviews are not a grey area, they are the fastest way to lose the profile. FINALLY: the AI audit is measurement, not revenue. Give it one hour a month and do not let it displace the permit letters or the review asks."
+    "notes": "Only three proposals because the ledger is already far larger than one owner with a brake can execute; adding a fourth would just deepen the backlog. All three are deliberately chosen to be independent of the 8-12 week organic and map-pack work already queued. CONSIDERED AND REJECTED: (1) Buying Angi/Thumbtack/shared gutter leads - 2026 gutter lead pricing runs $20-90 shared and $50-200 exclusive, and shared leads put NEMO into a four-way price fight on its highest-margin work; cost per acquired job, not cost per lead, is the number that matters. (2) Google Business Profile chat/messaging - Google removed that feature from Business Profiles, so any advice recommending it is stale; do not chase it. (3) Bidding on the LeafFilter brand name in paid search - permitted by Google policy but expensive, and using a competitor trademark in ad copy is not; the organic comparison page gets the same buyer for nothing. (4) Bandit signs on utility poles and road verges - illegal in most PA townships and a fine risk; the yard-sign candidate already in the ledger stays on private property with permission. (5) Any incentive attached to a Marketplace or event conversation in exchange for a review - a review policy violation and a suspension risk, and the profile cannot afford one. HONESTY GUARDRAILS ON TECHNIQUE 1: use only publicly published or homeowner-reported price ranges for the national brands, state plainly where they are genuinely better (transferable lifetime warranty, national service network), never claim a certification or warranty NEMO does not carry, and quote Eric's real installed price. A comparison page that overstates the competitor's price is both dishonest and legally exposed. SEASONAL CLOCK: today is 16 August. The comparison page needs to be live by 1 September to be indexed before the leaf-fall search spike, the event booths need booking this week because September vendor slots close in August, and all three should be reviewed on 1 December when York County gutter demand drops until ice-dam season. RATING CAUTION: the 4.2/13 profile is below the review threshold that reportedly separates top-ranked Local Service Ads listings, so if the LSA candidate is activated it will underperform until the review work in the ledger lands - sequence reviews first, LSAs second."
   },
   "pages": {
     "areas": [
@@ -3233,6 +3361,7 @@
       "leaffilter-alternative-york-pa.html",
       "seamless-vs-sectional-gutters.html",
       "signs-your-gutters-need-replacing-york-county-pa.html",
+      "who-to-call-when-gutter-is-falling-off-house.html",
       "york-gutters.html"
     ],
     "services": [
