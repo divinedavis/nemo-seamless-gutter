@@ -20,6 +20,7 @@ Rules every technique here obeys:
     The content has to be worth reading or it will not hold a ranking.
 """
 import html
+import itertools
 import json
 import os
 import re
@@ -973,9 +974,31 @@ def strengthen_pages(ctx):
     # /services/seamless-gutter-installation.html — the site's main money page.
     # Filtering at intake only protects the queries that arrive after the
     # filter; the queue has to be filtered where it is read.
-    todo = sorted((k for k in kws if not k.get("covered")
-                   and not _names_other_market(k["query"])),
-                  key=lambda k: order.get(k.get("intent"), 9))
+    pool = [k for k in kws if not k.get("covered")
+            and not _names_other_market(k["query"])]
+
+    # Interleave the intents instead of sorting strictly by them.
+    #
+    # A strict sort meant the whole `hire` bucket had to be exhausted before a
+    # single `price` query was written, and this technique ships about one
+    # section a day. On 2026-08-16 that was 57 uncovered `hire` queries in front
+    # of 39 uncovered `price` ones, so the first price section would land around
+    # mid-October — after the leaf-fall season the pricing content exists to
+    # sell into. Worse, the queue is re-sorted every morning and the scout adds
+    # up to 12 queries a day, so a refilling `hire` bucket can push `price` back
+    # indefinitely: `by_intent.price.covered` sat at 3 for three weeks while its
+    # total grew 35 → 42.
+    #
+    # Round-robin in the same priority order keeps `hire` first in every
+    # rotation — it is still the intent that converts — but guarantees the other
+    # three are reached on the following days rather than never. Within an
+    # intent the original order is preserved.
+    buckets = {}
+    for k in pool:
+        buckets.setdefault(order.get(k.get("intent"), 9), []).append(k)
+    todo = [k for row in itertools.zip_longest(
+                *(buckets[i] for i in sorted(buckets)))
+            for k in row if k is not None]
 
     done = set(ledger.get_state("strengthened", []))
     # One unusable reply used to end the step for the day. The queue is 47

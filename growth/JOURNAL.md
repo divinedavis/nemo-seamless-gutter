@@ -8391,3 +8391,434 @@ Goal: **1.1%** top-3 share of 182 tracked queries (target 50%).
 - T066 LeafFilter/Leaf Home second-opinion page + call CTA — The single hottest gutter buyer in York County right now is the homeowner who just sat through a national gutter-guard in-home pitch and has a $5,000-$8,000 quote on the kitchen table. That person is 
 - T067 Two fall community-event booths, estimates booked on the spot — Every inbound channel in the ledger is 8-12 weeks from working and leaf-fall starts in six. A folding table at a York County fall festival or Saturday farmers market puts Eric in front of 300-600 loca
 - T068 Facebook Marketplace services listing for flat-price fall cleaning — York County homeowners browse Marketplace for local trades the way they used to browse the classifieds, and a services listing is free, takes fifteen minutes, and produces a named local person with a 
+
+## 2026-08-16 — review agent
+
+### Lead: the first full beacon day landed at 2, and the beacon is not the problem — the number is real
+
+Yesterday I set a dated test: *"2026-08-16: the first full beacon day lands. If it
+reads 6-10, the log-era numbers were roughly 2× inflated; if it reads 0-2, this
+site has almost no human traffic and every SEO recommendation here is premature
+next to the map pack."*
+
+**It reads 2.** Visitors 2, pageviews 2, organic 1, direct 1.
+
+Before treating that as the collapse it looks like, the comparison has to be
+same-weekday, because 08-15 is a Saturday and Saturdays were already the floor:
+
+| | Sat 08-01 (log) | Sat 08-08 (log) | **Sat 08-15 (beacon)** |
+|---|---|---|---|
+| visitors | 5 | 3 | **2** |
+| organic | 0 | 0 | **1** |
+| direct | 5 | 3 | **1** |
+
+And the partial Friday, against its own weekday: organic was 1 (07-31) and 0
+(08-07) in the log era; the beacon read **2** on 08-14 while covering only ~45%
+of the day.
+
+**So organic went up across the instrument change, on both beacon days, against
+the matching weekday.** That is the finding, and it settles a question I could
+not answer yesterday. A beacon that was silently dropping real people would drop
+them from every bucket. Instead the bucket that survived is organic and the
+bucket that vanished is direct — 5 and 3 on the comparable Saturdays, 1 now.
+That is precisely the failure mode `588ae32` was written to fix: the log-era
+`direct` bucket was mostly clients that never execute JavaScript.
+
+**Conclusion: the beacon is working, and this site's real human traffic is
+roughly 2-4 people a day, nearly all of it organic search.** The honest
+version of the drop is 3-5 → 2 on comparable days, not 9 → 2. That is a smaller
+correction than yesterday's table implied and a worse absolute number than any
+figure in this journal before 08-14.
+
+I still cannot *prove* it, because rec 1 has not shipped: today's snapshot has no
+`traffic.log_visitors`. The weekday argument above is the best I can do without
+it and it is inference, not verification.
+
+**One thing to watch, not yet a finding.** Pageviews equal visitors exactly on
+both beacon days — 2/2 and 2/2, a pages-per-visit of 1.00. `analytics.js`
+fires the pageview IIFE on every page load (`analytics.js:50-70`), so a
+two-page session should log two hits. Two days of n=2 proves nothing. If
+pages-per-visit is still 1.00 after a full week, either every visitor bounces or
+the beacon fires once per session, and those need different fixes.
+
+**Do not quote a beacon median yet.** There are two beacon days, one of them
+partial. The first honest 7-day beacon window closes **2026-08-21**.
+
+### Where the numbers stand
+
+**The goal metric: `top3` = 2 of 182 tracked queries, `share_pct` 1.1%. The
+count of 2 has not moved since 08-10 — seven days.** Target 50%.
+
+| bucket | total | covered | top3 |
+|---|---|---|---|
+| county | 97 | 37 | **2** |
+| york | 30 | 5 | 0 |
+| dover | 16 | 6 | 0 |
+| red-lion | 10 | 3 | 0 |
+| dallastown | 10 | 3 | 0 |
+| spring-grove | 10 | 3 | 0 |
+| hanover | 9 | 4 | 0 |
+
+**Zero top-3 positions in all seven named towns, day twenty-one.** `top10` 7 and
+`ranked_known` 23, both unmoved for over a week. `coverage_pct` held at 33.5
+(61/182 against yesterday's 59/176) — covered +2, tracked +6.
+
+**Search Console: 853 rows / 23 matched / 14 clicks / 24,971 impressions / avg
+position 24.8.** Row growth +7 (from +147, +43, +6). `matched` stuck at 23 for
+the **ninth** day. `avg_position` flat at 24.8 for the fourth. Clicks +2.
+
+**The flood is confirmed dead, on three days of evidence rather than one.** I
+diffed today's `discovered_untracked` against yesterday's published snapshot:
+**0 added, 0 removed, 0 changed** — the same 40 rows, the same 12,067
+impressions, the same 0 clicks, `gutter installer` still exactly 471 at position
+1. That is now three consecutive byte-identical days. The 28-day window rolled
+forward twice and neither the day that entered nor the day that left touched a
+single one of those rows, which is only possible if the burst is entirely
+interior to the window and finished. **Reading stands: an event that ran roughly
+08-04 → 08-11, not a recurring job.** Yesterday's revision was right and
+Thursday's was wrong.
+
+**Traffic.** Covered above. `ai_visitors` is **0 for all 22 days on record**.
+
+**Leads.** `bookings_all_time` **3**, `phone_leads_all_time` **0**, `call_taps`
+**1 all-time** (08-12, no second tap in four days), `ai_calls` 0 since 07-30.
+Nothing new.
+
+**Ledger: 68 techniques — 11 active, 1 retired, 56 candidates.** All 11 active
+auto-activated 2026-07-27; every one is an on-site engine task.
+**`scoreboard.does_not_work` is `[]` on day twenty-one: zero techniques activated
+by a human, zero rejected, ever.** The pile grew by 3 again today.
+
+**The engine is not blocked, and the prompt that briefs me is stale on this
+point.** My standing instructions still say to expect the scout to fail on a
+self-imposed API spend cap "until 2026-08-01" — that is sixteen days in the past
+and today's `last_scout` is `ok: true` with three techniques and six keywords
+added, on top of a clean build that shipped two pages. **Someone should delete
+that paragraph from the prompt**; it invites a lead paragraph about a blocker
+that does not exist. Per Step 3b, the data wins and I am recording it here rather
+than reasoning from it.
+
+### Did previous changes work?
+
+**Prediction 1 — 7-day median `organic_visitors` ≥ 2 by 2026-08-16. PASSED, and
+now closed.** The window 08-10→08-16 holds 2, 3, 2, 2, 2, 1 with 08-16 unseen;
+the 4th of seven sorted values is 2 whatever the last one is. Stated caveat
+stands and is worth repeating because it is the whole lesson of this prediction:
+**this was a prediction about whether a number that oscillates 0-3 lands on 2
+rather than 1. It is not evidence that anything worked.** I will not make another
+of that shape.
+
+**Prediction 2 — `call_taps` > 0 by 2026-09-01. Resolved yes on 08-13.** Still 1
+tap all-time. Four days, no second.
+
+**Prediction 3 — the impression flood.** Corrected test from yesterday stands
+unchanged and is not yet testable: impressions should fall sharply between
+**09-04 and 09-11**, and sit near 6,000-9,000 by **09-13**. Today's third
+identical day of the 40 rows is consistent with it. Above 18,000 on 09-13 and the
+event reading is wrong.
+
+**Predictions 4 and 5 — `keywords_added` < 5 after the scout deploys, and
+`by_intent.price.covered` moving off 3. Eighth day, still not deployed, so 4 is
+not evaluable.** Today `keywords_added` = 6.
+
+**Prediction 5 is evaluable, and it has failed for a reason I can now name.**
+`price` is **3 of 42** — 3 of 35, then 3 of 37, then 3 of 38, now 3 of 42. The
+numerator has not moved in three weeks. The mechanism is in `techniques.py:966`
+and it is not bad luck; see recommendation 4.
+
+**Yesterday's `snapshot.py` change (commit `9e18cbf`): committed, not deployed.**
+Today's `traffic` block has no `log_visitors`/`log_pageviews`, which is exactly
+the check it adds.
+
+**The deploy — recommended 08-10 through 08-15, now day 9 for `snapshot.py`.**
+Unchanged from yesterday and independently re-verified against today's file:
+
+| what | in `main` since | visible in today's snapshot? |
+|---|---|---|
+| `gsc.tracked` (`9479b5c`) | 08-04, **12 days** | no |
+| `crawl_*` series (`727deec`) | 08-07 | no |
+| `code_version` (`870a3dc`) | 08-09 | no |
+| `keywords.ranked` (`snapshot.py:200`) | before 08-09 | no |
+| `log_visitors` (`9e18cbf`) | 08-15 | no |
+
+**I checked before recommending anything new here, and it changed what I
+recommend.** I was going to propose publishing a per-town `top10` so I could see
+which town is closest to breaking through. `snapshot.py:200` already publishes
+`keywords.ranked` — every ranked query with its town and position — from which
+per-town top-10 is a two-line computation. **The thing I wanted already exists in
+`main` and is undeployed.** Same for the beacon discrepancy check. There is no
+snapshot work left to do; there is a deploy.
+
+**Not actioned, with day counts:** `snapshot.py`/`gsc.py` deploy **day 8**; PA
+HIC registration **day 2**; York in the homepage title **day 16**; the live
+Schuylkill passages **day 7**; the Akron paragraph **day 19**; T016 GBP category
+**day 21**; T007 reviews **day 21**; T033 review replies **day 5**; T011 LSA
+decision **day 18**; `?utm_source=gbp` **day 14**; the goal denominator **day
+9**. Re-verified in the working tree today: `index.html:16` is still
+`<title>Gutter Installer &amp; Contractor | NEMO Seamless Gutter</title>`;
+`services/seamless-gutter-installation.html:227-236` still names Pottsville,
+Frackville and Mahanoy City; `services/gutter-guards.html:163` still says
+"homes in Akron, PA"; and a grep of every `*.html` for
+`HIC #|home improvement contractor|PA #|licensed and insured|fully insured`
+returns **zero hits**.
+
+**A structural fact I should have stated five days ago: I cannot fix any of
+those from this repo, and neither could any future version of me.**
+`publish_state.sh` does `copy index.html` and
+`rsync -a "$DOCROOT/$dir/" "$CLONE/$dir/"` for `areas`, `guides` and `services`,
+then `git add -A` and commits. All four are **droplet → repo**. If I edited
+`index.html` or the Akron paragraph here, tomorrow's 06:00 publish would
+overwrite my edit with the docroot's version and commit the reversion. So
+"delete the Akron paragraph" is not a task I have been declining to do — it is
+physically outside this repo's reach, and it needs a hand on the droplet.
+`growth/*.py` is the exception: `publish_state.sh` copies only
+`growth/snapshot.json` and `growth/JOURNAL.md`, so engine code committed here
+survives and is what a deploy would ship.
+
+### What I researched today
+
+- **The Google Business Profile Q&A section is gone, and it takes half of a
+  ledger technique with it. NEW.** Google shut the My Business Q&A API on
+  2025-11-03, began deprecating the public Q&A section on 2025-12-03, and
+  replaced it from ~March 2026 with Gemini-powered **"Ask Maps"**, which
+  generates answers on the fly from the profile's **categories, attributes,
+  services, hours, photos and review text**
+  ([EmbedSocial](https://embedsocial.com/blog/google-my-business-features/),
+  [PinMeTo](https://www.pinmeto.com/blog/google-business-profile-updates-2026/),
+  [North County Digital](https://www.northcountydigital.com/marketing-blog/google-business-profile-qa-discontinued),
+  [Tall Boy Marketing](https://www.tallboymarketing.com/google-business-profile-removes-qa),
+  [Excite CS](https://www.excitecs.com/8494/goodbye-qa-hello-ask-maps-what-googles-latest-update-means-for-your-business/)).
+  Five independent sources; I could not fetch two of them directly (egress
+  proxy blocked `pinmeto.com`, `northcountydigital.com` and
+  `fogdigitalmarketing.com`), so this rests on search summaries plus corroboration
+  across domains rather than a primary Google announcement — treat the exact
+  dates as approximate and the removal itself as solid.
+  **Consequence for the ledger: T016 is named "GBP primary/secondary category +
+  Owner Q&A audit" and its Q&A half no longer exists as a place to type
+  anything.** The category half is untouched and still the highest-weighted
+  single signal. **The work did not disappear, it moved**: the fields Ask Maps
+  reads are exactly T022's itemised Services, T042's hours and T051's service
+  areas. Those three stopped being "profile hygiene" and became the source text
+  Gemini answers York County gutter questions from.
+- **GBP signals are now the largest single block of local-pack weight — 32%,
+  ahead of on-page 19%, reviews 16%, links 15% — and primary category is the
+  biggest signal inside it.** Proximity still matters but is less dominant for
+  service-area businesses spanning multiple towns
+  ([SEOLocale](https://seolocale.com/google-map-pack-ranking-in-2026-how-the-local-3-pack-really-works/),
+  [Birdeye](https://birdeye.com/blog/google-local-pack/),
+  [Predicta Digital](https://predictadigital.com.au/blog/how-to-rank-in-the-google-map-pack-in-2026-whats-actually-changed/)).
+  Consistent with what this journal already recorded on 08-15; **no new filing**,
+  but it is the third independent week of the same answer to "what would move
+  York from 0 top-3", and that answer is not on-site.
+- **Perplexity has no Business Profile equivalent — it assembles local answers
+  from Bing Places plus the open web, and ChatGPT takes 46.3% of its citations on
+  "best X near me" queries from directories**
+  ([Seenos](https://seenos.ai/perplexity-seo/perplexity-seo-local),
+  [Cheers](https://www.cheers.tech/geo-academy/ai-search-engine-source-differences),
+  [Scope](https://scope.online/learn/perplexity-local-business-guide)).
+  **This does not justify a new technique — it re-ranks existing ones.** The
+  ledger has seven AI-visibility candidates (T025 Brave, T029 Bing Places +
+  Apple, T046 bot-fetch check, T053 BuildZoom, T056 third-party lists, T065
+  audit) and no stated order. This names a mechanism: **T029's Bing Places half
+  is the one with a direct causal path to Perplexity**, and T046 gates all of
+  them. Filed as ordering evidence, not as a candidate.
+- **Conversion research, filed as support for recommendation 2, not as a
+  technique.** Trust badges placed near contact buttons lift conversion ~12.6%;
+  responding within 60 seconds lifts it up to 391%; roofing-adjacent trades run
+  4-8% site-to-lead
+  ([Bullseye](https://www.bullseyemarketingconsultants.com/marketing/high-converting-contractor-websites-the-2026-lead-generation-checklist/),
+  [EstateHub](https://www.estatehub.io/articles/2026-benchmarks-lead-conversion-rates-home-services),
+  [PipelineOn](https://pipelineon.com/blog/contractor-website-conversion-rate/)).
+  **I am deliberately not turning this into a recommendation.** At 2-4 visitors a
+  day, a 12.6% conversion lift is 0.3 extra leads per year. Every
+  conversion-optimisation idea in this ledger — T023, T024, T054 — is arguing
+  about the denominator 2. They are not wrong, they are just worth almost nothing
+  until something upstream changes, and the research above says the upstream
+  thing is the Business Profile.
+- **Rejected.** (1) *FAQPage structured data*, which the AEO sources push hard —
+  `techniques.py` already emits FAQPage JSON-LD on every page it generates, and
+  32 pages carry it. This is the exact recommendation my standing instructions
+  cite as the one that wasted a slot; it is still already shipped. (2) *GBP
+  messaging/chat* — Google removed the feature; already flagged in the scout's
+  own notes. (3) *Filing today's research as new techniques* — **I filed
+  nothing.** 56 candidates, zero ever picked by a human. (4) *A new
+  keyword-universe cap proposal* — that is recommendation 6, already open since
+  08-08, and re-proposing it as new would be padding.
+
+### Recommendations
+
+**Nothing in this commit is live.** The site runs from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout, and
+`publish_state.sh` copies droplet → repo only. My `techniques.py` change below
+needs a deploy before it does anything.
+
+1. **Divine: deploy `growth/`.** *(Minutes. Day 9.)* Unchanged and now blocking
+   five things at once: `gsc.tracked` (12 days), `crawl_*`, `code_version`,
+   `keywords.ranked`, and the `log_visitors` beacon check — plus today's
+   `techniques.py` change. Ship `scout.py` + `growth_daily.py` **as a pair** or
+   the scout raises `TypeError`. *How you would know:* tomorrow's snapshot
+   carries `traffic.log_visitors`, `gsc.tracked`, `keywords.ranked` and
+   `code_version`. *Checked:* all five absent from today's `snapshot.json`;
+   `keywords.ranked` traced to `snapshot.py:200`, `log_visitors` to
+   `snapshot.py:47`. **The lead section of this entry is inference that this
+   deploy would turn into verification.**
+2. **Eric: confirm the PA HIC registration number and put it on the site, the
+   Business Profile and the estimate form.** *(Free if already registered. Day
+   2.)* Unchanged from yesterday. PA law requires the registration number on all
+   advertising distributed in Pennsylvania and a website is advertising; it is
+   the only item on this list that is a legal exposure rather than a growth idea.
+   Today's research adds a second reason: trust badges beside contact buttons are
+   a documented ~12.6% conversion lift, and this site currently carries no
+   "licensed", "insured" or registration line anywhere. *If Eric is not
+   registered and does ≥$5,000/year, that is the finding and it outranks
+   everything else here.* *Checked:* grepped every `*.html` today for
+   `HIC #|home improvement contractor|PA #|licensed and insured|fully insured` —
+   zero hits; `index.html` footer carries address, phone and a privacy link only.
+3. **Eric: twenty minutes on the Business Profile — primary category, then the
+   service-area list, then the itemised Services.** *(Free. T016/T051/T022, day
+   21.)* This is the sixth consecutive day at or near the top and today's
+   research strengthens it twice: GBP signals are 32% of local-pack weight with
+   primary category the largest single one, **and** the Ask Maps change means
+   those same fields are now the text Gemini answers York County gutter questions
+   from. Screenshot first, change at most one field, count the service areas —
+   padding is a documented negative. **Ledger correction: skip the "Owner Q&A"
+   half of T016. That feature no longer exists.** *Why it stays here:* twenty-one
+   days, zero calls, zero top-3 in any named town, ~2-4 human visitors a day, and
+   leaf-fall in about four weeks. *How you would know:* the `york` bucket moves
+   off 5/0, or `local_visitors` lifts off ~0, within a month. *Checked:* T016,
+   T051 and T022 are all `status: candidate, activated: null` in today's
+   snapshot.
+4. **Divine: deploy the `strengthen_pages` queue change I made today (see
+   below) — it is why `price` coverage has been frozen at 3 for three weeks.**
+   *(Included in rec 1's deploy; no extra work.)* `techniques.py:966` sorted the
+   uncovered queue strictly by intent — `hire`, then `price`, then `check`, then
+   `diy` — and this technique ships about one section a day. Today that is **57
+   uncovered `hire` queries in front of 39 uncovered `price` ones**, so the first
+   price section would have landed around **mid-October, after the leaf-fall
+   season the pricing content exists to sell into**. Worse, the queue is re-sorted
+   every morning and the scout adds up to 12 queries a day
+   (`scout.py:40`), so a refilling `hire` bucket can defer `price` indefinitely —
+   which is exactly the observed behaviour: `price` covered 3 while its total went
+   35 → 37 → 38 → 42. *How you would know:* `by_intent.price.covered` moves off 3
+   within a week of deploy. *Checked:* the ordering is `techniques.py:966`, not a
+   ledger technique; `money_pages` shares the same `order` dict
+   (`techniques.py:455`) but **I am not touching it** — it returned "no query
+   needs its own page" on eleven of the last twelve days, so its ordering
+   almost never selects anything and changing it would be noise. That was my
+   first draft of this recommendation and the build log refuted it.
+5. **Divine: the three live-site edits — homepage title, Schuylkill passages,
+   Akron paragraph.** *(Ten minutes total, free. Days 16, 7 and 19.)*
+   `index.html:16` → `Seamless Gutters in York, PA | NEMO Seamless Gutter` (49
+   chars, inside the 65-char limit at `techniques.py:1281`);
+   `services/seamless-gutter-installation.html:227-236` and
+   `services/gutter-guards.html:163` → "York County, Pennsylvania". **Grouped and
+   marked Divine because, as established above, these cannot be done from this
+   repo — a commit here is reverted by the next publish run.** The guards that
+   prevent recurrence (`_off_area_prose` `techniques.py:1413`,
+   `SERVICE_AREA_WORDS` `techniques.py:1328`) exist in git and ship with the same
+   pending deploy.
+6. **Someone must decide what the goal metric counts. Day 9, worse again
+   today.** `top3` has been 1-2 since 08-01 while `tracked_queries` went 108 →
+   **182**. Today the engine covered 2 queries and the scout added 6 — a 3:1 loss
+   rate, and `coverage_pct` only held flat by rounding. The denominator grows
+   faster than the engine can cover it, so **both headline numbers now fall on a
+   good day**. Either cap the tracked universe or promote `top3 / ranked_known`
+   (2 of 23) to the headline. **I have not made this change myself:** it
+   redefines the number Eric is judged against.
+7. **Eric: answer every existing Google review, in one sitting.** *(Free, no
+   customer contact. T033, day 5.)* Owner response rate is weighted above raw
+   review count and replying carries zero policy surface under the April 2026
+   enforcement wave. Ask Maps adds a reason: it reads review text, so replies that
+   name the service and the town become answer material. *Checked:* T033 is
+   `candidate`/`activated: null`.
+8. **Eric: pick three candidates and reject the rest.** *(Day 9. Pile now 56, up
+   3 today; `does_not_work` still `[]` after twenty-one days.)*
+
+**On cadence.** Yesterday I said that if the recommendation list is still
+untouched on **2026-08-21** this review should drop to weekly and shrink to three
+lines, with rec 2 exempted as a legal item. **I stand by that.** Five days.
+
+### What I changed in this repo today
+
+**One code change, in `growth/techniques.py`:** `strengthen_pages` now
+round-robins the uncovered queue across intents instead of sorting strictly by
+intent, plus the `itertools` import it needs. `hire` still leads every rotation —
+it is still the intent that converts — but `price`, `check` and `diy` are reached
+on the following days rather than after the hire bucket empties. Rationale and
+arithmetic in recommendation 4.
+
+`pytest` is still not installed in this container, so I could not run
+`growth/test_techniques.py` — **someone should, before deploying.**
+`python3 -m py_compile growth/techniques.py` passes, and I replicated the new
+queue construction against today's real intent counts (57/39/18/7) and asserted:
+no query lost or duplicated (121 in, 121 out), within-intent order preserved,
+first `price` query moves from position ~58 to position **2**, 8 of the first 30
+slots go to `price`, and empty / single-item / unknown-intent pools do not raise.
+
+Nothing else. No page copy, no keyword lists — and as established above, page
+copy committed here would be reverted by tomorrow's publish anyway. I did not
+touch `techniques.json`, `keywords.json`, `results.jsonl` or `state.json`, and
+did not activate, retire or re-status any technique.
+
+### Reasoning and uncertainties
+
+Day twenty-one. Two top-3 queries county-wide, zero in any named town, zero AI
+visitors across twenty-two days, zero phone leads ever, one call tap, three
+bookings. None of that moved today. What moved is that I now believe the traffic
+number, and the traffic number is 2.
+
+That belief is the day's real output, and it reorders everything. For twenty days
+this journal has argued about on-site work against a visitor count that was
+mostly scanners. Against a true 2-4 humans a day, the on-site queue is not
+*wrong* — the pages have to exist before anyone can land on them — but no on-site
+change can produce a call this month, because there is nobody there to convert.
+The three cheapest items on the list (GBP category, service areas, itemised
+Services) are the only ones that touch the surface where a York County homeowner
+with a falling gutter actually starts, and they are twenty-one days old and free.
+
+**Where I am least confident. Four things.**
+
+*First, the beacon conclusion is inference.* The same-weekday organic comparison
+is the strongest argument available to me and it rests on n=2 beacon days against
+n=2 log-era Saturdays. If `log_visitors` ships and reads 12 against a beacon 2 on
+the same day, my reading survives; if it reads 3 against a beacon 2, then the old
+log filter was roughly right all along, the direct bucket was real people, and
+the commit's premise — and this entry's lead — were both wrong.
+
+*Second, the intent-ordering fix could be solving a smaller problem than I
+think.* I can see 57 uncovered hire queries in the snapshot, but
+`strengthen_pages` also skips any query with no host page and any already in the
+`strengthened` state list, and **I cannot see either from here** — the real hire
+backlog could be 12 rather than 57, in which case price was three weeks away
+rather than two months and the change is a minor improvement instead of an
+unblocking. The failed `money_pages` version of this same idea is the warning:
+its queue looked deep from the snapshot and was empty on eleven of twelve days.
+What makes me keep the change anyway is the observed outcome rather than the
+queue depth — `price` covered has been 3 for three weeks across four different
+denominators, and that is the number a working queue would have moved.
+
+*Third, my research today leaned on search-result summaries for the Ask Maps
+finding* because the proxy blocked three of the five sources. Five domains agree
+and the direction is unambiguous, but I have not read a Google announcement, and
+I would rather flag that than let a ledger correction rest on secondhand text
+without saying so.
+
+*Fourth, unchanged and now three weeks old: I cannot judge the quality of the
+generated copy from here.* If someone reads five guide pages and finds them thin,
+"on-site work is saturated" collapses and there is a great deal left to do.
+
+**What would change my mind, dated.** (1) **2026-08-21:** the first honest 7-day
+beacon window closes. If it medians 2-3, the traffic reading above is confirmed
+and the map pack is the only game; if it medians 6+, 08-14 and 08-15 were a
+weekend trough and I over-read two days again. (2) **Corrected flood test:**
+impressions fall sharply **09-04 → 09-11**, near 6,000-9,000 by **09-13**; above
+18,000 on 09-13 and the event reading is wrong. (3) **On deploy:** if
+`log_visitors` for a beacon-era day is close to `visitors`, the old filter was
+fine and the lead of this entry is wrong. (4) **On deploy:** if
+`by_intent.price.covered` has not moved off 3 within a week of the queue change
+shipping, my diagnosis of the ordering is wrong and the block is somewhere I have
+not looked. (5) **On deploy:** if `gsc.tracked` shows county impressions in the
+thousands rather than the low hundreds, the flood is a smaller share of the
+dataset than I have claimed all week. (6) If pages-per-visit is still exactly
+1.00 after seven beacon days, the beacon is firing once per session and the
+pageview series means less than I have assumed.
