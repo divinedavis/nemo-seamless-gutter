@@ -42,31 +42,42 @@ SUMMARY = {"total": 146, "covered": 54, "coverage_pct": 37.0, "ranked_known": 23
            "ranked": []}
 
 
-class PageCountsTest(unittest.TestCase):
+class PageNamesTest(unittest.TestCase):
     def setUp(self):
         self.root = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.root)
 
-    def test_counts_what_is_on_disk(self):
+    def test_names_what_is_on_disk(self):
         _make_site(self.root, areas=15, guides=15, services=7)
-        self.assertEqual(S._page_counts(self.root),
+        got = S._page_names(self.root)
+        self.assertEqual({k: len(v) for k, v in got.items()},
                          {"areas": 15, "guides": 15, "services": 7})
+        # Slugs, without the .html — the subject is what the scout must read.
+        self.assertIn("page-3", got["services"])
+        self.assertNotIn("page-3.html", got["services"])
 
-    def test_only_html_counts(self):
+    def test_only_html_is_a_page(self):
         _make_site(self.root, areas=2)
         # A backup or a stray asset in areas/ is not a page.
         for name in ("seamless-gutters-dover-pa.html.bak", "hero.jpg"):
             open(os.path.join(self.root, "areas", name), "w").close()
-        self.assertEqual(S._page_counts(self.root)["areas"], 2)
+        self.assertEqual(len(S._page_names(self.root)["areas"]), 2)
 
-    def test_missing_directory_reads_zero_not_crash(self):
+    def test_order_is_stable(self):
+        # An os.listdir reordering must not read as a change to the site.
+        _make_site(self.root, guides=6)
+        self.assertEqual(S._page_names(self.root)["guides"],
+                         sorted(S._page_names(self.root)["guides"]))
+
+    def test_missing_directory_reads_empty_not_crash(self):
         # A fresh docroot, or a wrong --docroot, must not take the scout down.
-        self.assertEqual(S._page_counts(self.root),
-                         {"areas": 0, "guides": 0, "services": 0})
-        self.assertEqual(S._page_counts("/no/such/path")["guides"], 0)
+        self.assertEqual(S._page_names(self.root),
+                         {"areas": [], "guides": [], "services": []})
+        self.assertEqual(S._page_names("/no/such/path")["guides"], [])
 
     def test_none_docroot_is_survivable(self):
-        self.assertEqual(S._page_counts(None), {"areas": 0, "guides": 0, "services": 0})
+        self.assertEqual(S._page_names(None),
+                         {"areas": [], "guides": [], "services": []})
 
 
 class PromptTest(unittest.TestCase):
@@ -86,14 +97,31 @@ class PromptTest(unittest.TestCase):
             patcher.start()
             self.addCleanup(patcher.stop)
 
-    def test_prompt_names_the_real_page_counts(self):
+    def test_prompt_names_the_real_pages(self):
         text = S.build_prompt(self.root)
-        self.assertIn("7 service pages", text)
-        self.assertIn("15 town service-area pages", text)
-        self.assertIn("15 guides", text)
+        # Counts are still stated...
+        self.assertIn("services (7)", text)
+        self.assertIn("areas (15)", text)
+        self.assertIn("guides (15)", text)
+        # ...but the slugs are what stops T071-shaped proposals: on 2026-08-17
+        # the scout proposed a copper/half-round page while two were live.
+        self.assertIn("page-6", text)
         # The figures that were frozen in since 2026-07-27 are gone.
         self.assertNotIn("four service pages", text)
         self.assertNotIn("five town", text)
+
+    def test_prompt_forbids_reproposing_an_existing_page(self):
+        text = S.build_prompt(self.root)
+        self.assertIn("Do NOT propose writing a page whose subject is already",
+                      text)
+
+    def test_empty_docroot_does_not_claim_pages_exist(self):
+        # A wrong --docroot must not tell the scout the site has pages it
+        # cannot name, nor crash.
+        empty = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, empty)
+        text = S.build_prompt(empty)
+        self.assertIn("services (0): none", text)
 
     def test_prompt_states_the_backlog_depth(self):
         text = S.build_prompt(self.root)

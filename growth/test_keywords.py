@@ -12,6 +12,9 @@ No network, no droplet state — `load()` is patched with a fixture.
 
 Run: python3 -m growth.test_keywords   (from the repo root)
 """
+import os
+import shutil
+import tempfile
 import unittest
 from unittest import mock
 
@@ -97,6 +100,106 @@ class RankedRowsTest(unittest.TestCase):
         fell = {r["query"] for r in before["ranked"] if r["position"] <= 3} - \
                {r["query"] for r in after["ranked"] if r["position"] <= 3}
         self.assertEqual(fell, {"seamless gutters hanover pa"})
+
+
+class UnassignedTargetCoverageTest(unittest.TestCase):
+    """Coverage for a query the scout added and nobody assigned a page to.
+
+    `add()` defaults `target` to "", the scout supplies nothing, and only
+    `strengthen_pages` ever fills it — one query a day, as a side effect of
+    writing a section. So on 2026-08-17 "copper gutters york pa cost" read
+    "no page targets this query" while the copper guide was live. See
+    keywords._find_host().
+    """
+
+    def setUp(self):
+        self.root = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.root)
+        os.makedirs(os.path.join(self.root, "guides"))
+        os.makedirs(os.path.join(self.root, "services"))
+        os.makedirs(os.path.join(self.root, "areas"))
+        # Titles copied from the live pages as of 2026-08-17.
+        self._page("guides/copper-gutters-historic-home-york-pa.html",
+                   "Copper Gutters for Historic Homes | York PA Cost Guide "
+                   "| NEMO Seamless Gutter",
+                   h1="Copper Gutters for Historic Homes in York County, PA",
+                   # In the body only, so the h1-only rule can be tested.
+                   body="half round gutters cost per foot varies by house")
+        self._page("services/gutter-soffit-fascia-replacement.html",
+                   "Gutter, Soffit &amp; Fascia Replacement in York, PA",
+                   body="We replace rotted fascia board and soffit.")
+        self._page("index.html", "Seamless Gutters in York, PA",
+                   body="Free estimates across York County.")
+
+    def _page(self, rel, title, h1=None, body=""):
+        path = os.path.join(self.root, rel)
+        with open(path, "w") as f:
+            f.write(f"<html><head><title>{title}</title></head>"
+                    f"<body><h1>{h1 or title}</h1><p>{body}</p>"
+                    f"</body></html>")
+
+    def _check(self, kws):
+        saved = []
+        with mock.patch.object(K, "load", return_value=kws), \
+             mock.patch.object(K, "save", side_effect=lambda k: saved.append(k)), \
+             mock.patch.object(K.ledger, "today", return_value="2026-08-17"):
+            return K.check_coverage(self.root)[0]
+
+    def test_unassigned_query_is_credited_to_the_page_that_targets_it(self):
+        k = _kw("copper gutters york pa cost", covered=False, target="",
+                intent="price")
+        got = self._check([k])[0]
+        self.assertTrue(got["covered"])
+        self.assertIn("copper-gutters-historic-home-york-pa.html",
+                      got["coverage_detail"])
+
+    def test_one_distinguishing_token_is_not_enough(self):
+        # 'replace' alone matched the soffit-and-fascia page on 2026-08-17,
+        # which is the wrong page for this query. Two tokens or nothing.
+        got = self._check([_kw("how much to replace gutters on a house",
+                               covered=False, target="")])[0]
+        self.assertFalse(got["covered"])
+        self.assertEqual(got["coverage_detail"], "no page targets this query")
+
+    def test_body_copy_alone_does_not_count(self):
+        # The words are in the copper page's body, not its title or h1.
+        got = self._check([_kw("half round gutters cost per foot",
+                               covered=False, target="")])[0]
+        self.assertFalse(got["covered"])
+
+    def test_genuinely_uncovered_query_stays_uncovered(self):
+        got = self._check([_kw("gutter guard installation red lion pa",
+                               covered=False, target="")])[0]
+        self.assertFalse(got["covered"])
+
+    def test_an_assigned_target_still_wins(self):
+        # A keyword whose target resolves must be judged on that page, not on
+        # whatever else the site happens to say — the fallback is for the
+        # unassigned case only.
+        got = self._check([_kw("copper gutters york pa cost", covered=False,
+                               target="/services/gutter-soffit-fascia-replacement.html")])[0]
+        self.assertFalse(got["covered"])
+        self.assertIn("missing", got["coverage_detail"])
+
+    def test_missing_docroot_does_not_credit_anything(self):
+        with mock.patch.object(K, "load",
+                               return_value=[_kw("copper gutters york pa cost",
+                                                 covered=False, target="")]), \
+             mock.patch.object(K, "save"), \
+             mock.patch.object(K.ledger, "today", return_value="2026-08-17"):
+            got = K.check_coverage("/no/such/docroot")[0][0]
+        self.assertFalse(got["covered"])
+
+    def test_index_is_built_once_not_per_keyword(self):
+        kws = [_kw(f"query number {i} gutters", covered=False, target="")
+               for i in range(25)]
+        with mock.patch.object(K, "_headline_index",
+                               wraps=K._headline_index) as spy, \
+             mock.patch.object(K, "load", return_value=kws), \
+             mock.patch.object(K, "save"), \
+             mock.patch.object(K.ledger, "today", return_value="2026-08-17"):
+            K.check_coverage(self.root)
+        self.assertEqual(spy.call_count, 1)
 
 
 if __name__ == "__main__":

@@ -87,25 +87,49 @@ Return ONLY valid JSON, no prose:
 DEFAULT_DOCROOT = os.environ.get("WEB_ROOT", "/var/www/nemo-seamless-gutter")
 
 
-def _page_counts(docroot):
-    """How many pages the site actually has, counted rather than remembered.
+def _page_names(docroot):
+    """Which pages the site actually has, named rather than counted.
 
     The BUSINESS block used to hardcode "four service pages, five town
     service-area pages, three guides". By 2026-08-08 the real figures were 7,
     15 and 15 — so for twelve days the scout proposed against a site a third
     of the real size, which is a good way to get told to write a page that
     already exists.
+
+    Counting fixed the size and not the problem. On 2026-08-17 the scout
+    proposed T071, "Copper & half-round gutter page for York's historic homes",
+    whose hypothesis states in as many words "there is no page for it" — while
+    /guides/copper-gutters-historic-home-york-pa.html and
+    /services/half-round-gutters.html were both live, the second carrying its
+    own "Copper Half-Round Gutters for Historic Homes in York, PA" section and
+    a historic-district FAQ. A count cannot prevent that: "16 guides" tells a
+    writer the site is substantial, not which sixteen subjects are taken. The
+    slugs can, so send the slugs.
+
+    Returned per directory so the prompt can keep its shape, and sorted so the
+    prompt is stable day to day — a reordering diff would look like a change to
+    the site when nothing had changed.
     """
     out = {}
     for sub in ("areas", "guides", "services"):
         # An empty docroot must NOT fall through to a relative path — that
-        # counts whatever happens to sit in the cwd, which on the developer's
+        # lists whatever happens to sit in the cwd, which on the developer's
         # machine is this repo's own copy of the site and looks entirely
-        # plausible in the prompt. Zero is the honest answer.
+        # plausible in the prompt. Empty is the honest answer.
         d = os.path.join(docroot, sub) if docroot else None
-        out[sub] = (len([f for f in os.listdir(d) if f.endswith(".html")])
-                    if d and os.path.isdir(d) else 0)
+        out[sub] = (sorted(f[:-5] for f in os.listdir(d) if f.endswith(".html"))
+                    if d and os.path.isdir(d) else [])
     return out
+
+
+def _page_block(pages):
+    """The pages, as prompt text. Names, with counts kept alongside them."""
+    lines = []
+    for sub in ("services", "areas", "guides"):
+        names = pages[sub]
+        lines.append(f"{sub} ({len(names)}): "
+                     + (", ".join(names) if names else "none"))
+    return "\n".join(lines)
 
 
 def build_prompt(docroot=None):
@@ -125,7 +149,7 @@ def build_prompt(docroot=None):
              f"UNMEASURED (no Search Console). Coverage proxy: {kw['coverage_pct']}% "
              f"of {kw['total']} tracked queries have a page targeting them")
 
-    pages = _page_counts(docroot or DEFAULT_DOCROOT)
+    pages = _page_names(docroot or DEFAULT_DOCROOT)
     backlog = kw["total"] - kw["covered"]
 
     return f"""Today is {ledger.today()}.
@@ -133,9 +157,14 @@ def build_prompt(docroot=None):
 BUSINESS
 NEMO Seamless Gutter, nemoseamlessgutter.com — seamless gutter contractor in York, PA.
 Google Business Profile is live: 4.2 stars, 13 reviews, roughly 300 profile views a month.
-The site has a homepage with an online booking widget, {pages['services']} service pages,
-{pages['areas']} town service-area pages, {pages['guides']} guides, and an AI phone agent
-that answers calls and captures leads when Eric is on a roof.
+The site has a homepage with an online booking widget, an AI phone agent that answers
+calls and captures leads when Eric is on a roof, and these pages already published:
+
+{_page_block(pages)}
+
+Do NOT propose writing a page whose subject is already in that list. If an existing
+page covers the subject but covers it badly, say so and propose strengthening that
+named page instead of creating a new one.
 
 CURRENT NUMBERS (yesterday unless noted)
 - visitors: {last('visitors')}

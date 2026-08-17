@@ -197,6 +197,80 @@ def _page_text(docroot, target):
         return None
 
 
+# How many distinguishing tokens a query must share with a page's title/h1
+# before an unassigned query may be credited to that page. See _find_host().
+FALLBACK_MIN_TOKENS = 2
+
+
+def _headline_index(docroot):
+    """{relative path: title + h1 text} for every page on the site.
+
+    Only the title and h1 — deliberately not h2. `strengthen_pages` appends an
+    h2 section per run, so the area pages have accumulated dozens of headings
+    between them, and matching on h2 credits queries to whichever town page
+    happened to receive a section mentioning the words. Measured on
+    2026-08-17's uncovered list: h2 matching flipped 43 of 128 queries and its
+    picks included "best gutter company york pa" -> the Dallastown page.
+    Title and h1 are what the page is *about*.
+    """
+    index = {}
+    if not docroot or not os.path.isdir(docroot):
+        return index
+    roots = [("", docroot)] + [(sub, os.path.join(docroot, sub))
+                               for sub in ("areas", "guides", "services")]
+    for sub, d in roots:
+        if not os.path.isdir(d):
+            continue
+        for name in sorted(os.listdir(d)):
+            if not name.endswith(".html"):
+                continue
+            rel = f"/{sub}/{name}" if sub else f"/{name}"
+            html = _page_text(docroot, rel)
+            if html is None:
+                continue
+            heads = re.findall(r"<title[^>]*>(.*?)</title>", html, re.S)
+            heads += re.findall(r"<h1[^>]*>(.*?)</h1>", html, re.S)
+            index[rel] = re.sub(r"<[^>]+>", " ", " ".join(heads))
+    return index
+
+
+def _find_host(key_toks, index):
+    """Which existing page already targets this query, if any.
+
+    Coverage is checked against the one page in a keyword's `target`. Nothing
+    fills `target` in: `add()` defaults it to "", the scout supplies nothing,
+    and only `strengthen_pages` ever sets it — as a side effect of writing a
+    new section, at one query a day. So every scout-added query was permanently
+    "no page targets this query" no matter what the site actually said. On
+    2026-08-17 that was 128 uncovered queries against 190 tracked, while
+    /guides/copper-gutters-historic-home-york-pa.html sat live and
+    "copper gutters york pa cost" sat in the build queue.
+
+    Three consequences, all observed: `coverage_pct` drifted down as the scout
+    added queries faster than one-a-day could cover them (33.5 -> 32.6 that
+    morning); `by_intent.price.covered` froze at 3 while price rose 35 -> 46,
+    because every new price query arrived uncoverable; and `strengthen_pages`
+    spent its single daily write appending sections to pages that already
+    answered the query.
+
+    Requiring FALLBACK_MIN_TOKENS distinguishing tokens is what keeps this
+    honest. One token is not aboutness: on 2026-08-17 the single-token matches
+    were "how much to replace gutters on a house" -> the soffit-and-fascia
+    page (wrong), and "gutter cleaning near me york pa" -> three pages at once.
+    At two tokens every match was defensible and the wrong ones were excluded.
+    Deliberately conservative: a missed match leaves a query in the build
+    queue, which costs a day of writing, while a false one marks the goal
+    metric covered when nothing covers it.
+    """
+    want = set(key_toks)
+    if len(want) < FALLBACK_MIN_TOKENS:
+        return None
+    for rel, head in sorted(index.items()):
+        if all(t in head for t in want):
+            return rel
+    return None
+
+
 def check_coverage(docroot):
     """For each query, does a page exist whose title/h1 actually targets it?
 
@@ -204,12 +278,25 @@ def check_coverage(docroot):
     wrote a page for — without pretending to predict rank. A page that merely
     mentions the words in body copy is marked covered-but-weak, which is a
     different (and lesser) thing than a page built for the query.
+
+    A query with no usable `target` falls back to searching the whole site for
+    a page whose title/h1 already targets it — see _find_host() for why that
+    is not the same as guessing, and what it was fixing.
     """
     kws = load()
     changed = 0
+    index = _headline_index(docroot)
     for k in kws:
         html = _page_text(docroot, k.get("target"))
         covered, detail = False, "no page targets this query"
+        if html is None:
+            # No page assigned, or the assignment points at a file that is not
+            # there. Ask the site rather than the (usually empty) target field.
+            toks = [t for t in _tokens(k["query"]) if t not in STOP]
+            host = _find_host([t for t in toks if t not in GENERIC], index)
+            if host:
+                covered = True
+                detail = f"targeted by title/h1 of {host} (unassigned target)"
         if html is not None:
             heads = re.findall(r"<title[^>]*>(.*?)</title>", html, re.S)
             heads += re.findall(r"<h1[^>]*>(.*?)</h1>", html, re.S)
