@@ -1,6 +1,6 @@
 {
-  "generated": "2026-08-16T06:04:18+00:00",
-  "date": "2026-08-16",
+  "generated": "2026-08-17T06:03:35+00:00",
+  "date": "2026-08-17",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
@@ -8,8 +8,8 @@
     "share_pct": 1.1,
     "measured": true,
     "why_unmeasured": null,
-    "coverage_pct": 33.5,
-    "tracked_queries": 182,
+    "coverage_pct": 32.6,
+    "tracked_queries": 190,
     "top3": 2,
     "top10": 7,
     "ranked_known": 23
@@ -103,6 +103,10 @@
       {
         "date": "2026-08-15",
         "value": 2
+      },
+      {
+        "date": "2026-08-16",
+        "value": 2
       }
     ],
     "pageviews": [
@@ -192,6 +196,10 @@
       },
       {
         "date": "2026-08-15",
+        "value": 2
+      },
+      {
+        "date": "2026-08-16",
         "value": 2
       }
     ],
@@ -283,6 +291,10 @@
       {
         "date": "2026-08-15",
         "value": 1
+      },
+      {
+        "date": "2026-08-16",
+        "value": 0
       }
     ],
     "local_visitors": [
@@ -372,6 +384,10 @@
       },
       {
         "date": "2026-08-15",
+        "value": 0
+      },
+      {
+        "date": "2026-08-16",
         "value": 0
       }
     ],
@@ -463,6 +479,10 @@
       {
         "date": "2026-08-15",
         "value": 0
+      },
+      {
+        "date": "2026-08-16",
+        "value": 0
       }
     ],
     "direct_visitors": [
@@ -553,6 +573,10 @@
       {
         "date": "2026-08-15",
         "value": 1
+      },
+      {
+        "date": "2026-08-16",
+        "value": 2
       }
     ],
     "referral_visitors": [
@@ -642,6 +666,10 @@
       },
       {
         "date": "2026-08-15",
+        "value": 0
+      },
+      {
+        "date": "2026-08-16",
         "value": 0
       }
     ],
@@ -733,6 +761,10 @@
       {
         "date": "2026-08-15",
         "value": 0
+      },
+      {
+        "date": "2026-08-16",
+        "value": 0
       }
     ],
     "bot_hits": [
@@ -823,6 +855,10 @@
       {
         "date": "2026-08-15",
         "value": 2294
+      },
+      {
+        "date": "2026-08-16",
+        "value": 2661
       }
     ],
     "call_taps": [
@@ -901,6 +937,10 @@
       {
         "date": "2026-08-15",
         "value": 0
+      },
+      {
+        "date": "2026-08-16",
+        "value": 0
       }
     ],
     "ai_calls": [
@@ -974,6 +1014,10 @@
       },
       {
         "date": "2026-08-15",
+        "value": 0
+      },
+      {
+        "date": "2026-08-16",
         "value": 0
       }
     ],
@@ -1065,6 +1109,10 @@
       {
         "date": "2026-08-15",
         "value": 0
+      },
+      {
+        "date": "2026-08-16",
+        "value": 0
       }
     ],
     "phone_leads": [
@@ -1154,6 +1202,10 @@
       },
       {
         "date": "2026-08-15",
+        "value": 0
+      },
+      {
+        "date": "2026-08-16",
         "value": 0
       }
     ],
@@ -1245,6 +1297,10 @@
       {
         "date": "2026-08-15",
         "value": 0
+      },
+      {
+        "date": "2026-08-16",
+        "value": 0
       }
     ]
   },
@@ -1256,7 +1312,7 @@
   "keywords": {
     "by_town": {
       "county": {
-        "total": 97,
+        "total": 101,
         "covered": 37,
         "top3": 2
       },
@@ -1271,33 +1327,33 @@
         "top3": 0
       },
       "red-lion": {
-        "total": 10,
+        "total": 11,
         "covered": 3,
         "top3": 0
       },
       "dallastown": {
-        "total": 10,
-        "covered": 3,
+        "total": 11,
+        "covered": 4,
         "top3": 0
       },
       "spring-grove": {
-        "total": 10,
+        "total": 11,
         "covered": 3,
         "top3": 0
       },
       "york": {
-        "total": 30,
+        "total": 31,
         "covered": 5,
         "top3": 0
       }
     },
     "by_intent": {
       "hire": {
-        "total": 110,
-        "covered": 53
+        "total": 114,
+        "covered": 54
       },
       "price": {
-        "total": 42,
+        "total": 46,
         "covered": 3
       },
       "diy": {
@@ -1321,11 +1377,11 @@
       "downspout installations york",
       "emergency gutter repair near me dallastown pa",
       "emergency gutter repair near me york pa",
+      "emergency gutter repair york county pa",
       "fascia and soffit repair dover pa",
       "fascia and soffit repair spring grove pa",
       "fascia and soffit repair york pa",
       "fascia board rot gutter replacement york pa",
-      "gutter cleaning dallastown pa",
       "gutter cleaning near me hanover pa",
       "gutter cleaning near me york pa",
       "gutter cleaning red lion pa",
@@ -1338,8 +1394,10 @@
       "gutter contractors york pa",
       "gutter guard installation dallastown pa",
       "gutter guard installation dover pa",
+      "gutter guard installation red lion pa",
       "gutter installers dover pa",
       "gutter installers red lion pa",
+      "gutter installers spring grove pa",
       "gutter installers york pa",
       "gutter overflowing in heavy rain who to call",
       "gutter repair dallastown pa",
@@ -1367,13 +1425,16 @@
       "soffit and fascia repair york pa",
       "who installs gutters in dover pa",
       "who installs gutters in red lion pa",
+      "who installs half round gutters near me",
       "5 inch vs 6 inch gutters",
       "5 inch vs 6 inch gutters which do i need",
       "5 inch vs 6 inch gutters which is better",
       "are gutter guards worth it",
       "best gutter company in york county pa",
+      "copper gutters york pa cost",
       "copper half round gutters cost pa",
       "cost to replace gutters and downspouts york pa",
+      "cost to replace gutters on a 1500 sq ft house",
       "cost to replace gutters on a house",
       "cost to replace gutters on a ranch house",
       "cost to replace gutters on a ranch house pa",
@@ -1383,6 +1444,7 @@
       "gutter cleaning cost hanover pa",
       "gutter cleaning cost per foot pennsylvania",
       "gutter cleaning cost red lion pa",
+      "gutter cleaning prices dallastown pa",
       "gutter cleaning york pa cost",
       "gutter companies dover pa reviews",
       "gutter companies york pa reviews",
@@ -1417,6 +1479,7 @@
       "how often should gutters be cleaned in pa",
       "ice dam damaged gutters replace or repair york pa",
       "ice dam gutter damage repair pa",
+      "leaffilter cost vs local gutter company",
       "leaffilter cost york pa",
       "leaffilter vs local gutter guard cost",
       "seamless gutter cost per foot installed pa",
@@ -1676,14 +1739,14 @@
     ]
   },
   "gsc": {
-    "date": "2026-08-16",
+    "date": "2026-08-17",
     "ok": true,
     "connected": true,
-    "rows": 853,
+    "rows": 926,
     "matched": 23,
-    "clicks": 14,
-    "impressions": 24971,
-    "avg_position": 24.8
+    "clicks": 16,
+    "impressions": 26011,
+    "avg_position": 25.0
   },
   "techniques": [
     {
@@ -1783,6 +1846,10 @@
         },
         {
           "date": "2026-08-15",
+          "value": 0
+        },
+        {
+          "date": "2026-08-16",
           "value": 0
         }
       ]
@@ -1884,6 +1951,10 @@
         },
         {
           "date": "2026-08-15",
+          "value": 0
+        },
+        {
+          "date": "2026-08-16",
           "value": 0
         }
       ]
@@ -2260,6 +2331,10 @@
         },
         {
           "date": "2026-08-15",
+          "value": 0
+        },
+        {
+          "date": "2026-08-16",
           "value": 0
         }
       ]
@@ -3163,6 +3238,60 @@
       "notes": "first step: Photograph one finished gutter run on Eric's phone in daylight, then post a Marketplace services listing titled with the real service and the real flat price (for example: gutter cleaning, single-storey home, $X, York County, owner-operated), with the phone number in the description and a note that photos of the problem get a price the same day.\neffort: hours\ncost: free\nexpected: Listing live this week, renewed weekly through November. 5-15 inbound messages a month in September-November, 3-6 booked cleanings a month, and 1-2 of those converting to a guard or replacement quote at 10x the ticket.",
       "verdict": null,
       "owned_visitors": null
+    },
+    {
+      "id": "T069",
+      "slug": "microsoft_ads_call_campaign_york",
+      "name": "Microsoft (Bing/Copilot) call ads, Sept 1 \u2013 Nov 30",
+      "kind": "distribution",
+      "status": "candidate",
+      "hypothesis": "The ledger's paid plan is Google-only, and Google's gutter auction in York is where LeafFilter-class advertisers spend. Bing's auction is thinner and its audience skews older and desktop \u2014 which is exactly the York County homeowner who owns a 1970s two-storey with 20-year-old gutters and pays cash. At Bing-level CPCs, $3/day buys real hire-intent clicks in a 15-mile radius during leaf-fall, and a call asset means the ad itself can ring Eric's phone without the homeowner ever reaching the site. Second payoff: the same account is the only paid surface inside Copilot answers, which is where NEMO currently gets zero AI visitors.",
+      "evidence": "2026 pricing guides put Microsoft's average CPC around $1.54 versus $2.69 on Google (https://www.stackmatix.com/blog/microsoft-advertising-cost-pricing-guide), a cost guide answers 'worth it for local service providers' affirmatively with clicks arriving within hours of approval (https://www.uproas.io/blog/bing-ads-cost), and Microsoft is now serving ads inside Copilot's generative answers (https://www.balistro.com/blog/microsoft-bing-ads-copilot).",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-17",
+      "added": "2026-08-17",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Open a Microsoft Advertising account, set location targeting to a 15-mile radius around York PA (residents-in-area, not interest), and launch one campaign of ~12 exact/phrase hire-intent keywords ('gutter installation york pa', 'gutter repair near me', 'gutter cleaning york pa') with a call asset on Eric's existing local number and a $3/day cap.\neffort: hours\ncost: under $100/mo\nexpected: $90/mo cap; 30\u201360 clicks and 4\u20138 tracked inbound calls a month across Sept\u2013Nov, of which 2\u20133 become booked estimates. Kill it if cost per answered call exceeds $35 after four weeks (not two \u2014 the channel needs a month of data).",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T070",
+      "slug": "hoa_community_newsletter_ads",
+      "name": "Paid ads in HOA / 55+ community newsletters, Sept\u2013Nov issues",
+      "kind": "distribution",
+      "status": "candidate",
+      "hypothesis": "NEMO's problem is that a stranger with 13 reviews has to be believed before he gets dialled. An HOA or 55+ community newsletter borrows the association's trust for $25\u201350 an issue and lands inside the door of 250\u2013400 houses that were all built in the same decade, under the same trees, with the same 20-year-old aluminium \u2014 the single most homogeneous gutter-replacement audience in York County. Retirees in those developments are also the people who will not climb a ladder in October, which makes the flat-price fall cleaning ad the ring-now offer. Unlike EDDM, Eric can pick the exact development and the ad repeats monthly for less than one postcard drop.",
+      "evidence": "Neighborhood-newsletter display ads typically run $25\u201350 with high readership in a few hundred households, and are explicitly called out as working for the trades (https://outofyourrut.com/mining-for-gold-in-neighborhood-newsletters/); the association endorsement is the mechanism \u2014 residents treat the newsletter as vetted, so ads inside it carry credibility other formats don't (https://pr.pioneerpublishers.com/article/HOA-Newsletter-Ads-Drive-Results-for-Local-Businesses?storyId=69e792e8f5321a0002ac52d1). Contractor-side guidance adds the second move: ask to advertise, and ask to speak at a board meeting (https://www.southernphc.com/marketing-matters/build-your-business-through-homeowners-associations/).",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-17",
+      "added": "2026-08-17",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Build a one-page list of the 5 largest HOA / 55+ developments within 20 minutes of the shop (Manchester and Springettsbury townships, East York, Jacobus, Dallastown\u2013Red Lion corridor), find each one's manager or newsletter editor on its public site, and email one asking for the September issue's ad rate and copy deadline.\neffort: days\ncost: under $100/mo\nexpected: 3 communities \u00d7 3 monthly issues for under $300 total; 2\u20135 calls per issue, 6\u201312 booked cleanings across the fall, at least one of which converts to a replacement quote. One cleaning job pays for the whole season's ads.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T071",
+      "slug": "copper_half_round_historic_page",
+      "name": "Copper & half-round gutter page for York's historic homes",
+      "kind": "content",
+      "status": "candidate",
+      "hypothesis": "This is the one service NEMO sells that the national gutter-guard advertisers and the low-price crews cannot deliver, and there is no page for it. York City's historic district, Wrightsville, Hanover, New Freedom and the farmhouse stock along the Susquehanna have slate roofs, HARB rules and homeowners who need half-round or copper specifically \u2014 and they search for the material, not the trade. Volume is small but the ticket is 3\u20136\u00d7 a standard aluminium job and competition for 'copper gutters york pa' is close to nil, so it is the fastest realistic route to an actual top-3 position and to being the only name an AI engine can give when asked who installs copper gutters near York. It also creates the one asset the authority-link candidate needs: a page a preservation society will actually link to.",
+      "evidence": "Gutter-specific SEO guidance in July 2026 says each gutter search is its own buyer and materials (aluminum/copper) need their own page treatment rather than one blended install page (https://grwlocal.com/resources/local-seo-for-gutter-companies); keyword research for the trade describes copper searches as a distinct premium segment researching longevity and appearance (https://www.slaterockautomation.com/post/free-seo-keyword-research-data-for-gutter-companies); competitors who do rank this way pair copper with named historic neighbourhoods (https://newenglandseamelessgutters.com/specialty-gutters/).",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-17",
+      "added": "2026-08-17",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Photograph one completed half-round or copper job (or the brake forming a half-round profile), then write the page with real per-foot price ranges, the difference between half-round aluminium and copper, and a plain paragraph on what York City's historic architectural review process expects \u2014 no claims about approvals Eric hasn't actually obtained.\neffort: days\ncost: free\nexpected: Top-3 for 4\u20138 copper/half-round/historic queries within 8\u201312 weeks (they are low-competition, so this also lifts the 182-query coverage number), 1\u20133 inquiries a month at premium ticket, and one inbound link from a York County preservation or historic-district group within 90 days.",
+      "verdict": null,
+      "owned_visitors": null
     }
   ],
   "scoreboard": {
@@ -3237,11 +3366,14 @@
       "T065",
       "T066",
       "T067",
-      "T068"
+      "T068",
+      "T069",
+      "T070",
+      "T071"
     ]
   },
   "last_build": {
-    "date": "2026-08-16",
+    "date": "2026-08-17",
     "log": [
       {
         "ok": true,
@@ -3251,8 +3383,7 @@
       },
       {
         "ok": true,
-        "noop": true,
-        "detail": "no page is due a snippet rewrite",
+        "detail": "rewrote title/description on /index.html (1160 impressions, 9 clicks, pos 5.5) \u2014 Put the two highest-volume searches (gutter contractor, gutter cleaning) plus York PA at the front of the titl",
         "slug": "improve_ctr"
       },
       {
@@ -3263,7 +3394,7 @@
       },
       {
         "ok": true,
-        "detail": "added \"Scheduling a Half-Round Gutter Installation Anywhere in York\" to /services/half-round-gutters.html for 'half round gutter installation york county'",
+        "detail": "added \"Gutter Cleaning in Dallastown, PA\" to /areas/seamless-gutters-dallastown-pa.html for 'gutter cleaning dallastown pa'",
         "slug": "strengthen_pages"
       },
       {
@@ -3280,7 +3411,8 @@
       },
       {
         "ok": true,
-        "detail": "published 'who to call when gutter is falling off house' \u2192 /guides/who-to-call-when-gutter-is-falling-off-house.html",
+        "noop": true,
+        "detail": "no query needs its own page \u2014 the remaining gaps all belong on pages that exist, which strengthen_pages handles",
         "slug": "money_pages"
       },
       {
@@ -3307,26 +3439,28 @@
         "slug": "ping_indexnow"
       }
     ],
-    "new": 1,
-    "changed": 1
+    "new": 0,
+    "changed": 2
   },
   "last_scout": {
-    "date": "2026-08-16",
+    "date": "2026-08-17",
     "ok": true,
     "techniques_added": [
-      "national_guard_quote_second_opinion",
-      "fall_event_booth_estimate_booking",
-      "marketplace_services_flat_price_cleaning"
+      "microsoft_ads_call_campaign_york",
+      "hoa_community_newsletter_ads",
+      "copper_half_round_historic_page"
     ],
     "keywords_added": [
-      "leaffilter cost york pa",
-      "gutter guard cost per foot pa",
-      "gutter cleaning near me york pa",
-      "gutter cleaning cost hanover pa",
-      "copper half round gutters cost pa",
-      "gutters overflowing in heavy rain what to do"
+      "copper gutters york pa cost",
+      "who installs half round gutters near me",
+      "emergency gutter repair york county pa",
+      "cost to replace gutters on a 1500 sq ft house",
+      "gutter cleaning prices dallastown pa",
+      "gutter guard installation red lion pa",
+      "leaffilter cost vs local gutter company",
+      "gutter installers spring grove pa"
     ],
-    "notes": "Only three proposals because the ledger is already far larger than one owner with a brake can execute; adding a fourth would just deepen the backlog. All three are deliberately chosen to be independent of the 8-12 week organic and map-pack work already queued. CONSIDERED AND REJECTED: (1) Buying Angi/Thumbtack/shared gutter leads - 2026 gutter lead pricing runs $20-90 shared and $50-200 exclusive, and shared leads put NEMO into a four-way price fight on its highest-margin work; cost per acquired job, not cost per lead, is the number that matters. (2) Google Business Profile chat/messaging - Google removed that feature from Business Profiles, so any advice recommending it is stale; do not chase it. (3) Bidding on the LeafFilter brand name in paid search - permitted by Google policy but expensive, and using a competitor trademark in ad copy is not; the organic comparison page gets the same buyer for nothing. (4) Bandit signs on utility poles and road verges - illegal in most PA townships and a fine risk; the yard-sign candidate already in the ledger stays on private property with permission. (5) Any incentive attached to a Marketplace or event conversation in exchange for a review - a review policy violation and a suspension risk, and the profile cannot afford one. HONESTY GUARDRAILS ON TECHNIQUE 1: use only publicly published or homeowner-reported price ranges for the national brands, state plainly where they are genuinely better (transferable lifetime warranty, national service network), never claim a certification or warranty NEMO does not carry, and quote Eric's real installed price. A comparison page that overstates the competitor's price is both dishonest and legally exposed. SEASONAL CLOCK: today is 16 August. The comparison page needs to be live by 1 September to be indexed before the leaf-fall search spike, the event booths need booking this week because September vendor slots close in August, and all three should be reviewed on 1 December when York County gutter demand drops until ice-dam season. RATING CAUTION: the 4.2/13 profile is below the review threshold that reportedly separates top-ranked Local Service Ads listings, so if the LSA candidate is activated it will underperform until the review work in the ledger lands - sequence reviews first, LSAs second."
+    "notes": "Sequencing: Microsoft Ads first (live in an afternoon, and leaf-fall is six weeks out), newsletter ads second because September copy deadlines fall in late August, copper page third since it pays off in 8\u201312 weeks. Pause the ad campaign roughly mid-December to mid-February when PA demand collapses, then restart late February for ice-dam aftermath. MEASUREMENT WARNING: use Microsoft's own call-reporting number inside the ad only \u2014 do NOT put a tracking number on the site or the Business Profile, because inconsistent NAP suppresses map-pack confidence and that risk outweighs the attribution benefit. OVERLAPS TO AVOID DOUBLE-SPENDING: the HOA ad and the ledger's 'same-street pricing' and EDDM candidates all target the same neighbourhoods \u2014 run the newsletter ad first and use the same-street price as the offer inside it rather than paying for both an EDDM drop and an ad in one development. CONSIDERED AND REJECTED: (1) Angi/Thumbtack pay-per-lead \u2014 legal, but the same lead is sold to three or four contractors, cost per lead in gutters is high, and a one-truck operator who is on a roof cannot win a race he doesn't know started; Local Services Ads already in the ledger is the better paid-lead bet. (2) Google Business Profile chat/messaging as a low-friction contact \u2014 Google retired that feature, so it no longer exists to switch on. (3) Geotagged-photo manipulation, keyword-stuffed footers and CTR-boosting services, all of which are still marketed to contractors and all of which 2026 local-SEO reporting lists as noise or outright risk (https://www.localmighty.com/blog/google-business-profile-ranking-factors/) \u2014 a profile suspension costs more than any of them could earn. (4) Any incentive attached to a review: the FTC rule in force since October 2024 carries civil penalties reported up to $51,744 per violation for incentivised or gated reviews, and Google's April 2026 enforcement reportedly uses device and location signals to detect it (https://lanternrow.com/blog/google-business-profile-optimization-for-local-service-businesses/). Ask everyone, neutral wording, good or bad. (5) Unlinked-mention reclamation \u2014 a genuinely high-return tactic, but NEMO has almost no press mentions yet to reclaim; revisit once the authority-link and event candidates have generated coverage. FINALLY, the number that should worry Eric most: 300 profile views a month and zero calls with a 4.2-star average. Ads and newsletters push more people at that profile; if the review replies and the answered-call experience are still broken when they arrive, the money buys nothing. Fix the answer-the-phone side in the same week the ads go live."
   },
   "pages": {
     "areas": [
