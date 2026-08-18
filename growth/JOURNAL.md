@@ -8846,7 +8846,6 @@ Goal: **1.1%** top-3 share of 190 tracked queries (target 50%).
 - T070 Paid ads in HOA / 55+ community newsletters, Sept–Nov issues — NEMO's problem is that a stranger with 13 reviews has to be believed before he gets dialled. An HOA or 55+ community newsletter borrows the association's trust for $25–50 an issue and lands inside the
 - T071 Copper & half-round gutter page for York's historic homes — This is the one service NEMO sells that the national gutter-guard advertisers and the low-price crews cannot deliver, and there is no page for it. York City's historic district, Wrightsville, Hanover,
 
-
 ## 2026-08-17 — review agent
 
 ### Lead: the build queue has been partly fabricated, and I can name the line of code
@@ -9354,3 +9353,26 @@ five guides and finds them thin then "on-site work is saturated" collapses.
    lever either, and the honest next question is whether a one-truck operator can
    win this county on search at all — or whether the answer is the trade-referral
    and neighbourhood candidates that have sat in the pile since day one.
+
+## 2026-08-18 — engine run
+
+Goal: **1.0%** top-3 share of 195 tracked queries (target 50%).
+2026-08-17: 3 visitors (1 organic, 1 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: answer-first opening on /areas/seamless-gutters-hanover-pa.html for 'gutter installation hanover' (50 words, + FAQ schema, 7 impressions)
+- `strengthen_pages` — ok: added "Hiring Gutter Installers in Dover, PA: What the Job Looks Li" to /areas/seamless-gutters-dover-pa.html for 'gutter installers dover pa'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: no query needs its own page — the remaining gaps all belong on pages that exist, which strengthen_pages handles
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 41 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 2 URL(s), HTTP 200
+
+**Scout proposed (as candidates, not running):**
+- T072 Same-week repair lane (repair/downspout, call-only) — NEMO's whole funnel is built around a $2,400 install decision that nobody makes on a first phone call — which is why 300 GBP views produce zero rings. Repair is the opposite: a torn-loose gutter, a le
+- T073 Quarterly dated refresh of the cost guides and top pages — The ledger's GEO work is all one-shot — rewrite the guides once, submit to Brave once, check the bots once. But the answer engines that decide who gets named for 'how much do gutters cost in York PA' 
+- T074 Spanish-language service page, GBP fields and phone path (York City) — York City is one of the most heavily Spanish-speaking places in the county, full of older rowhomes and small landlords with 40-year-old gutters — and essentially no local gutter contractor publishes a

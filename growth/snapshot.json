@@ -1,15 +1,15 @@
 {
-  "generated": "2026-08-17T06:03:35+00:00",
-  "date": "2026-08-17",
+  "generated": "2026-08-18T06:04:05+00:00",
+  "date": "2026-08-18",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
     "target_pct": 50,
-    "share_pct": 1.1,
+    "share_pct": 1.0,
     "measured": true,
     "why_unmeasured": null,
-    "coverage_pct": 32.6,
-    "tracked_queries": 190,
+    "coverage_pct": 32.3,
+    "tracked_queries": 195,
     "top3": 2,
     "top10": 7,
     "ranked_known": 23
@@ -107,6 +107,10 @@
       {
         "date": "2026-08-16",
         "value": 2
+      },
+      {
+        "date": "2026-08-17",
+        "value": 3
       }
     ],
     "pageviews": [
@@ -201,6 +205,10 @@
       {
         "date": "2026-08-16",
         "value": 2
+      },
+      {
+        "date": "2026-08-17",
+        "value": 3
       }
     ],
     "organic_visitors": [
@@ -295,6 +303,10 @@
       {
         "date": "2026-08-16",
         "value": 0
+      },
+      {
+        "date": "2026-08-17",
+        "value": 1
       }
     ],
     "local_visitors": [
@@ -389,6 +401,10 @@
       {
         "date": "2026-08-16",
         "value": 0
+      },
+      {
+        "date": "2026-08-17",
+        "value": 1
       }
     ],
     "ai_visitors": [
@@ -482,6 +498,10 @@
       },
       {
         "date": "2026-08-16",
+        "value": 0
+      },
+      {
+        "date": "2026-08-17",
         "value": 0
       }
     ],
@@ -577,6 +597,10 @@
       {
         "date": "2026-08-16",
         "value": 2
+      },
+      {
+        "date": "2026-08-17",
+        "value": 1
       }
     ],
     "referral_visitors": [
@@ -670,6 +694,10 @@
       },
       {
         "date": "2026-08-16",
+        "value": 0
+      },
+      {
+        "date": "2026-08-17",
         "value": 0
       }
     ],
@@ -765,6 +793,10 @@
       {
         "date": "2026-08-16",
         "value": 0
+      },
+      {
+        "date": "2026-08-17",
+        "value": 0
       }
     ],
     "bot_hits": [
@@ -859,6 +891,10 @@
       {
         "date": "2026-08-16",
         "value": 2661
+      },
+      {
+        "date": "2026-08-17",
+        "value": 1722
       }
     ],
     "call_taps": [
@@ -941,6 +977,10 @@
       {
         "date": "2026-08-16",
         "value": 0
+      },
+      {
+        "date": "2026-08-17",
+        "value": 0
       }
     ],
     "ai_calls": [
@@ -1018,6 +1058,10 @@
       },
       {
         "date": "2026-08-16",
+        "value": 0
+      },
+      {
+        "date": "2026-08-17",
         "value": 0
       }
     ],
@@ -1113,6 +1157,10 @@
       {
         "date": "2026-08-16",
         "value": 0
+      },
+      {
+        "date": "2026-08-17",
+        "value": 0
       }
     ],
     "phone_leads": [
@@ -1206,6 +1254,10 @@
       },
       {
         "date": "2026-08-16",
+        "value": 0
+      },
+      {
+        "date": "2026-08-17",
         "value": 0
       }
     ],
@@ -1301,6 +1353,10 @@
       {
         "date": "2026-08-16",
         "value": 0
+      },
+      {
+        "date": "2026-08-17",
+        "value": 0
       }
     ]
   },
@@ -1312,18 +1368,18 @@
   "keywords": {
     "by_town": {
       "county": {
-        "total": 101,
+        "total": 103,
         "covered": 37,
         "top3": 2
       },
       "hanover": {
-        "total": 9,
+        "total": 10,
         "covered": 4,
         "top3": 0
       },
       "dover": {
         "total": 16,
-        "covered": 6,
+        "covered": 7,
         "top3": 0
       },
       "red-lion": {
@@ -1342,18 +1398,18 @@
         "top3": 0
       },
       "york": {
-        "total": 31,
+        "total": 33,
         "covered": 5,
         "top3": 0
       }
     },
     "by_intent": {
       "hire": {
-        "total": 114,
-        "covered": 54
+        "total": 118,
+        "covered": 55
       },
       "price": {
-        "total": 46,
+        "total": 47,
         "covered": 3
       },
       "diy": {
@@ -1375,8 +1431,10 @@
       "downspout extension installation red lion pa",
       "downspout extension installation york pa",
       "downspout installations york",
+      "downspout repair near me york pa",
       "emergency gutter repair near me dallastown pa",
       "emergency gutter repair near me york pa",
+      "emergency gutter repair york county",
       "emergency gutter repair york county pa",
       "fascia and soffit repair dover pa",
       "fascia and soffit repair spring grove pa",
@@ -1395,7 +1453,6 @@
       "gutter guard installation dallastown pa",
       "gutter guard installation dover pa",
       "gutter guard installation red lion pa",
-      "gutter installers dover pa",
       "gutter installers red lion pa",
       "gutter installers spring grove pa",
       "gutter installers york pa",
@@ -1409,10 +1466,12 @@
       "half round copper gutter installers york pa",
       "half round copper gutters near me",
       "half round copper gutters york pa",
+      "half round gutters hanover pa",
       "half round gutters historic home pa",
       "half round gutters near me",
       "ice dam damage gutter replacement york county pa",
       "ice dam damaged gutters repair pa",
+      "instalacion de canaletas york pa",
       "seamless gutter company spring grove pa",
       "seamless gutter installation hanover pa",
       "seamless gutter installation york pa",
@@ -1431,6 +1490,7 @@
       "5 inch vs 6 inch gutters which is better",
       "are gutter guards worth it",
       "best gutter company in york county pa",
+      "copper gutter installation cost york pa",
       "copper gutters york pa cost",
       "copper half round gutters cost pa",
       "cost to replace gutters and downspouts york pa",
@@ -1739,13 +1799,13 @@
     ]
   },
   "gsc": {
-    "date": "2026-08-17",
+    "date": "2026-08-18",
     "ok": true,
     "connected": true,
-    "rows": 926,
+    "rows": 929,
     "matched": 23,
-    "clicks": 16,
-    "impressions": 26011,
+    "clicks": 17,
+    "impressions": 26074,
     "avg_position": 25.0
   },
   "techniques": [
@@ -1851,6 +1911,10 @@
         {
           "date": "2026-08-16",
           "value": 0
+        },
+        {
+          "date": "2026-08-17",
+          "value": 0
         }
       ]
     },
@@ -1955,6 +2019,10 @@
         },
         {
           "date": "2026-08-16",
+          "value": 0
+        },
+        {
+          "date": "2026-08-17",
           "value": 0
         }
       ]
@@ -2335,6 +2403,10 @@
         },
         {
           "date": "2026-08-16",
+          "value": 0
+        },
+        {
+          "date": "2026-08-17",
           "value": 0
         }
       ]
@@ -3292,6 +3364,60 @@
       "notes": "first step: Photograph one completed half-round or copper job (or the brake forming a half-round profile), then write the page with real per-foot price ranges, the difference between half-round aluminium and copper, and a plain paragraph on what York City's historic architectural review process expects \u2014 no claims about approvals Eric hasn't actually obtained.\neffort: days\ncost: free\nexpected: Top-3 for 4\u20138 copper/half-round/historic queries within 8\u201312 weeks (they are low-competition, so this also lifts the 182-query coverage number), 1\u20133 inquiries a month at premium ticket, and one inbound link from a York County preservation or historic-district group within 90 days.",
       "verdict": null,
       "owned_visitors": null
+    },
+    {
+      "id": "T072",
+      "slug": "same_week_repair_call_lane",
+      "name": "Same-week repair lane (repair/downspout, call-only)",
+      "kind": "conversion",
+      "status": "candidate",
+      "hypothesis": "NEMO's whole funnel is built around a $2,400 install decision that nobody makes on a first phone call \u2014 which is why 300 GBP views produce zero rings. Repair is the opposite: a torn-loose gutter, a leaking seam, a downspout off the wall is a $150\u2013$450 same-week job a York homeowner will dial a stranger about. The national guard advertisers do not chase repair, so the auction and the SERP are thin. Every repair visit puts Eric on a ladder next to gutters he can quote for replacement or guards, so the small job is the cheapest install lead in the county \u2014 and unlike the reactive heavy-rain play already in the ledger, this lane runs every day of leaf season, not only for 48 hours after a storm.",
+      "evidence": "2026 gutter lead-gen analysis: repair and replacement are different sales with different timelines, and 'a leaking joint or a gutter torn loose in a storm is a same-week call that goes to whoever picks up the phone first' \u2014 https://minyona.com/blog/gutter-lead-generation-guide ; contractor guidance the same year stresses homeowners treat gutter problems as urgent and book the first contractor who responds, so the site needs click-to-call above the fold rather than a form \u2014 https://resultsdigitalus.com/how-gutter-company-lead-generation-works-in-2026/",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-18",
+      "added": "2026-08-18",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Rewrite the repair service page around one promise Eric can actually keep and will publish in writing (e.g. 'repairs looked at within 3 business days, York County'), with a tel: link as the only above-the-fold action and the booking widget demoted below it.\neffort: days\ncost: free\nexpected: Repair page ranking top-3 for 'gutter repair york pa' and 3 sibling repair queries inside 60 days; 6\u201310 inbound repair calls a month by October, of which 2\u20133 convert to a quoted install or guard job \u2014 first channel in the business to produce a repeatable weekly call.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T073",
+      "slug": "quarterly_dated_refresh_money_pages",
+      "name": "Quarterly dated refresh of the cost guides and top pages",
+      "kind": "content",
+      "status": "candidate",
+      "hypothesis": "The ledger's GEO work is all one-shot \u2014 rewrite the guides once, submit to Brave once, check the bots once. But the answer engines that decide who gets named for 'how much do gutters cost in York PA' are biased hard toward recent pages, and a cost guide written once in 2026 will quietly stop being cited by 2027 while Eric's competitors' pages get refreshed. A dated, genuinely updated price range \u2014 real 2026 York County per-foot numbers from Eric's own recent jobs \u2014 is also the single most call-worthy thing on the site, because the homeowner who reads a real price is the one who dials to confirm it.",
+      "evidence": "Analysis of 17M citations found ChatGPT cites URLs on average 458 days newer than Google's organic results \u2014 the strongest freshness preference of any platform tested \u2014 with the recommended fix being a quarterly refresh cycle on top citing pages \u2014 https://launchcodex.com/blog/seo-geo-ai/how-chatgpt-picks-sources/",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-18",
+      "added": "2026-08-18",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Before Sept 1, update the gutter cost guide with Eric's actual 2026 York County per-foot ranges, a visible 'updated August 2026' line, a correct dateModified in schema, and push the URL through IndexNow the same morning.\neffort: hours\ncost: free\nexpected: First AI-answer-engine visitors (target: 5+/month by November, from zero), plus cost-guide impressions up and at least one guide holding top-3 for a 'cost' query through the leaf-season peak.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T074",
+      "slug": "spanish_lane_york_city",
+      "name": "Spanish-language service page, GBP fields and phone path (York City)",
+      "kind": "distribution",
+      "status": "candidate",
+      "hypothesis": "York City is one of the most heavily Spanish-speaking places in the county, full of older rowhomes and small landlords with 40-year-old gutters \u2014 and essentially no local gutter contractor publishes a word of Spanish. A Spanish searcher who finds one page in their own language does not comparison-shop five contractors; they call the one that speaks to them. This is close to zero competition inside NEMO's own drive radius, and it is a calling audience, not a booking-widget audience. It only ships if it is honest: the AI phone agent must genuinely handle Spanish, or Eric must have a real bilingual person to hand the call to.",
+      "evidence": "2026 local-language checklist for service businesses: one service page in the customers' primary non-English language, hreflang on both versions, a bilingual line in the GBP description, Q&A entries in that language, and replies to reviews in the same language \u2014 framed as an advantage most local businesses simply are not using \u2014 https://www.flento.io/blog/local-language-seo-multilingual-businesses",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-18",
+      "added": "2026-08-18",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Test the AI phone agent in Spanish; if it cannot hold a Spanish conversation and capture a name, address and problem, fix that first and publish nothing until it can.\neffort: days\ncost: free\nexpected: Top-3 for 4\u20136 Spanish gutter queries in York within 90 days (near-zero competing pages), and 2\u20134 Spanish-language calls a month by November \u2014 a lane no competitor is bidding on.",
+      "verdict": null,
+      "owned_visitors": null
     }
   ],
   "scoreboard": {
@@ -3369,11 +3495,14 @@
       "T068",
       "T069",
       "T070",
-      "T071"
+      "T071",
+      "T072",
+      "T073",
+      "T074"
     ]
   },
   "last_build": {
-    "date": "2026-08-17",
+    "date": "2026-08-18",
     "log": [
       {
         "ok": true,
@@ -3383,18 +3512,18 @@
       },
       {
         "ok": true,
-        "detail": "rewrote title/description on /index.html (1160 impressions, 9 clicks, pos 5.5) \u2014 Put the two highest-volume searches (gutter contractor, gutter cleaning) plus York PA at the front of the titl",
+        "noop": true,
+        "detail": "no page is due a snippet rewrite",
         "slug": "improve_ctr"
       },
       {
         "ok": true,
-        "noop": true,
-        "detail": "every ranking page already opens with a direct answer",
+        "detail": "answer-first opening on /areas/seamless-gutters-hanover-pa.html for 'gutter installation hanover' (50 words, + FAQ schema, 7 impressions)",
         "slug": "geo_answer_first_content_pass"
       },
       {
         "ok": true,
-        "detail": "added \"Gutter Cleaning in Dallastown, PA\" to /areas/seamless-gutters-dallastown-pa.html for 'gutter cleaning dallastown pa'",
+        "detail": "added \"Hiring Gutter Installers in Dover, PA: What the Job Looks Li\" to /areas/seamless-gutters-dover-pa.html for 'gutter installers dover pa'",
         "slug": "strengthen_pages"
       },
       {
@@ -3443,24 +3572,21 @@
     "changed": 2
   },
   "last_scout": {
-    "date": "2026-08-17",
+    "date": "2026-08-18",
     "ok": true,
     "techniques_added": [
-      "microsoft_ads_call_campaign_york",
-      "hoa_community_newsletter_ads",
-      "copper_half_round_historic_page"
+      "same_week_repair_call_lane",
+      "quarterly_dated_refresh_money_pages",
+      "spanish_lane_york_city"
     ],
     "keywords_added": [
-      "copper gutters york pa cost",
-      "who installs half round gutters near me",
-      "emergency gutter repair york county pa",
-      "cost to replace gutters on a 1500 sq ft house",
-      "gutter cleaning prices dallastown pa",
-      "gutter guard installation red lion pa",
-      "leaffilter cost vs local gutter company",
-      "gutter installers spring grove pa"
+      "emergency gutter repair york county",
+      "downspout repair near me york pa",
+      "copper gutter installation cost york pa",
+      "half round gutters hanover pa",
+      "instalacion de canaletas york pa"
     ],
-    "notes": "Sequencing: Microsoft Ads first (live in an afternoon, and leaf-fall is six weeks out), newsletter ads second because September copy deadlines fall in late August, copper page third since it pays off in 8\u201312 weeks. Pause the ad campaign roughly mid-December to mid-February when PA demand collapses, then restart late February for ice-dam aftermath. MEASUREMENT WARNING: use Microsoft's own call-reporting number inside the ad only \u2014 do NOT put a tracking number on the site or the Business Profile, because inconsistent NAP suppresses map-pack confidence and that risk outweighs the attribution benefit. OVERLAPS TO AVOID DOUBLE-SPENDING: the HOA ad and the ledger's 'same-street pricing' and EDDM candidates all target the same neighbourhoods \u2014 run the newsletter ad first and use the same-street price as the offer inside it rather than paying for both an EDDM drop and an ad in one development. CONSIDERED AND REJECTED: (1) Angi/Thumbtack pay-per-lead \u2014 legal, but the same lead is sold to three or four contractors, cost per lead in gutters is high, and a one-truck operator who is on a roof cannot win a race he doesn't know started; Local Services Ads already in the ledger is the better paid-lead bet. (2) Google Business Profile chat/messaging as a low-friction contact \u2014 Google retired that feature, so it no longer exists to switch on. (3) Geotagged-photo manipulation, keyword-stuffed footers and CTR-boosting services, all of which are still marketed to contractors and all of which 2026 local-SEO reporting lists as noise or outright risk (https://www.localmighty.com/blog/google-business-profile-ranking-factors/) \u2014 a profile suspension costs more than any of them could earn. (4) Any incentive attached to a review: the FTC rule in force since October 2024 carries civil penalties reported up to $51,744 per violation for incentivised or gated reviews, and Google's April 2026 enforcement reportedly uses device and location signals to detect it (https://lanternrow.com/blog/google-business-profile-optimization-for-local-service-businesses/). Ask everyone, neutral wording, good or bad. (5) Unlinked-mention reclamation \u2014 a genuinely high-return tactic, but NEMO has almost no press mentions yet to reclaim; revisit once the authority-link and event candidates have generated coverage. FINALLY, the number that should worry Eric most: 300 profile views a month and zero calls with a 4.2-star average. Ads and newsletters push more people at that profile; if the review replies and the answered-call experience are still broken when they arrive, the money buys nothing. Fix the answer-the-phone side in the same week the ads go live."
+    "notes": "Sequencing: the repair lane is the only one of these three that can ring a phone before leaf-fall, so ship it first \u2014 before Sept 1 \u2014 and hold the Spanish lane until the phone path is genuinely bilingual. Honesty guardrails, non-negotiable: (1) the repair promise must be a window Eric will actually hit, not '24/7 emergency service' he cannot staff; (2) the quarterly refresh means genuinely re-checking prices against real recent invoices, not flipping a date on unchanged text \u2014 date-flipping is the kind of thing that erodes trust with both readers and engines; (3) never publish 'se habla espa\u00f1ol' unless a Spanish speaker (human or a verified agent mode) will actually answer that call. Considered and rejected: shared lead marketplaces (Angi/HomeAdvisor/Thumbtack) \u2014 2026 numbers put shared leads at roughly $240 per acquired customer at about a 12% close versus ~$95 at ~30% for exclusive/owned channels (resultsdigitalus.com), which is the wrong economics for a one-truck shop and hands NEMO's best prospects to three competitors at once. Also rejected: a dedicated call-tracking number displayed on the Business Profile \u2014 it is the standard agency recommendation, but swapping the GBP number introduces NAP inconsistency risk on a profile that is already weak, and the ledger's existing GBP-call-clicks measurement gets 80% of the answer for zero risk. Also rejected: township- and subdivision-level pages (Springettsbury, Manchester Township, named developments) \u2014 real upside, but it is the same technique as the active town pages and should be an expansion of that item, not a new one. Finally, worth knowing: 2026 ranking-factor surveys put Google Business Profile signals at roughly 32% of map-pack weight with reviews next at about 20% (hookagency.com, pipelineon.com), and only ~45% of businesses winning the map pack also appear in AI answers \u2014 so the GBP and review candidates already sitting in the ledger are still the highest-weight unstarted work in this business, ahead of anything proposed here."
   },
   "pages": {
     "areas": [
