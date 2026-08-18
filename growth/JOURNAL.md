@@ -9376,3 +9376,455 @@ Goal: **1.0%** top-3 share of 195 tracked queries (target 50%).
 - T072 Same-week repair lane (repair/downspout, call-only) — NEMO's whole funnel is built around a $2,400 install decision that nobody makes on a first phone call — which is why 300 GBP views produce zero rings. Repair is the opposite: a torn-loose gutter, a le
 - T073 Quarterly dated refresh of the cost guides and top pages — The ledger's GEO work is all one-shot — rewrite the guides once, submit to Brave once, check the bots once. But the answer engines that decide who gets named for 'how much do gutters cost in York PA' 
 - T074 Spanish-language service page, GBP fields and phone path (York City) — York City is one of the most heavily Spanish-speaking places in the county, full of older rowhomes and small landlords with 40-year-old gutters — and essentially no local gutter contractor publishes a
+
+## 2026-08-18 — review agent
+
+### Lead: both headline metrics are denominated by a number the scout inflates faster than the engine can ever cover, so both are guaranteed to fall no matter how well the site performs
+
+Twelve consecutive publish commits, read out of git:
+
+| date | tracked | covered (implied) | coverage_pct | top3 | new pages | build steps noop |
+|---|---|---|---|---|---|---|
+| 08-07 | 140 | 53 | 37.9 | 1 | 0 | 8/11 |
+| 08-08 | 146 | 54 | 37.0 | 1 | 0 | 8/11 |
+| 08-09 | 152 | 55 | 36.2 | 1 | 0 | 8/11 |
+| 08-10 | 161 | 56 | 34.8 | 2 | 0 | 8/11 |
+| 08-11 | 161 | 57 | 35.4 | 2 | 0 | 8/11 |
+| 08-12 | 161 | 57 | 35.4 | 2 | 0 | 10/11 |
+| 08-13 | 161 | 57 | 35.4 | 2 | 0 | 10/11 |
+| 08-14 | 170 | 58 | 34.1 | 2 | 0 | 8/11 |
+| 08-15 | 176 | 59 | 33.5 | 2 | 0 | 8/11 |
+| 08-16 | 182 | 61 | 33.5 | 2 | **1** | 7/11 |
+| 08-17 | 190 | 62 | 32.6 | 2 | 0 | 7/11 |
+| 08-18 | 195 | 63 | 32.3 | 2 | 0 | 7/11 |
+
+**`coverage_pct` has fallen 5.6 points in twelve days while the numerator went
+*up* ten.** The site did not get worse at covering queries. It covered ten more
+of them. The percentage fell because the scout added **55 queries over those
+eleven day-steps** — 5.0/day — against an engine that covered ten, **0.9/day**.
+
+That ratio is the whole story and it does not close. To hold coverage flat the
+engine needs to cover 5.0 queries a day; it manages 0.9, and seven to ten of its
+eleven build steps report **noop** every morning because the pages already exist.
+**One new page in twelve days.**
+
+**This is bigger than yesterday's bug, and it partly eats yesterday's fix.**
+Yesterday I found `check_coverage()` measuring against a `target` field nothing
+fills, and shipped a fallback worth +7.2 points on deploy. At 5.0 added/day
+against 0.9 covered/day the denominator inflation gives that entire gain back:
+fifteen days after deploy the site reads **~33.5%** (270 tracked, ~90 covered),
+and by day twenty it is back at today's 32.3%. I fixed the ruler and the ruler
+is still going to read down.
+
+**The same mechanism owns the goal metric.** `top3` has been **2** since 08-10 —
+nine days — while `share_pct` went 1.2 → 1.1 → **1.0**. Nothing about NEMO's
+rankings changed today. The denominator grew by five. **Every future review will
+report the goal metric falling while the business stands still**, and that is a
+reporting artifact, not a result.
+
+I am not fixing this one myself, for the same reason as yesterday: it redefines
+the number Eric is judged against. See recommendation 7. But I can now put a
+number on the cost of not deciding.
+
+### Where the numbers stand
+
+**Goal metric: `top3` = 2 of 195, `share_pct` 1.0% against a 50% target.
+The count is flat at 2 for the ninth consecutive day.** `top10` 7 and
+`ranked_known` 23, both unchanged. **Zero top-3 positions in all seven named
+towns, day twenty-three** — hanover 0/10, dover 0/16, red-lion 0/11,
+dallastown 0/11, spring-grove 0/11, york 0/33; the two top-3s are both in the
+county bucket (2 of 103).
+
+**Search Console: 929 rows / 23 matched / 17 clicks / 26,074 impressions /
+avg position 25.0.** Against yesterday: rows +3, clicks +1, impressions +63,
+matched and avg_position frozen. `matched` has been 23 for days — the site
+appears for 929 queries and 23 of them are ones we track.
+
+**The flood rows are byte-identical for a fifth consecutive day.** I diffed all
+40 `discovered_untracked` rows against yesterday's published snapshot: zero
+changed, zero added, zero dropped — same query, same position to one decimal,
+same impressions, same clicks. A live SERP jitters. Forty rows frozen to the
+decimal for five days is a static historical block, and the rank-tracker reading
+from 08-14 now looks right rather than merely plausible.
+
+**Yesterday's +1,040-impression alarm stands down.** I flagged that rows +73 and
+impressions +1,040 with the flood frozen meant "something else is moving". Today
+it is +3 and +63. That was a one-day event, not the start of a second burst.
+Prediction 3's tripwire (rows +50 on three of five days) has not fired.
+
+**Traffic, fourth beacon day: 3 visitors, 3 pageviews** (1 organic, 1 maps,
+1 direct). The four beacon days are 2, 2, 2, 3. Pre-beacon 08-07..08-13 read
+5, 3, 12, 9, 15, 9, 17 — median 9. The gap is the measurement change of 08-14,
+not a traffic collapse, and I will not compare across it.
+
+**Pages per visit is exactly 1.00 on all four beacon days.** Nine sessions,
+nine pageviews, **not one person has viewed a second page.** I checked whether
+that is instrumentation: `analytics.js:50` fires the pageview beacon in an IIFE
+on every load, `metrics.py:556` increments `pv_pages` per hit (a raw count, not
+unique paths), and the script is present on 40 of 41 HTML files — the only
+omission is `setup.html`, an admin page. So this is real behaviour. Nine
+sessions is far too few to conclude from, but it is the fourth day in a row and
+it points at a bounce problem, not a beacon problem.
+
+**Leads. `bookings_all_time` 3, `phone_leads_all_time` 0.** `call_taps` still
+**1 all-time** — 08-12, six days ago, no second tap. `ai_calls` 0 since 07-30.
+Zero bookings and zero phone leads since 08-11.
+
+**Ledger: 74 techniques — 11 active, 1 retired, 62 candidates.** The pile grew
+by three today (T072–T074). **`does_not_work` is still `[]` on day twenty-three.**
+
+**The engine itself is healthy.** `last_build` all-ok, `last_scout` ok. No
+billing cap, no API error, nothing in the failure column. The 08-01 usage-limit
+block described in my instructions is long cleared and should stop being
+described as a live blocker. **The engine is not broken; it has run out of work
+it is allowed to do.**
+
+### Did previous changes work?
+
+**Prediction 1 — deploy of yesterday's `keywords.py` fix lands `coverage_pct`
+at 37–40% and `by_intent.price.covered` at 6–8. Untestable: the deploy has not
+happened. Day eleven.** Today's snapshot has no `code_version`, no
+`traffic.log_visitors`, no `gsc.tracked`, no `keywords.ranked`; `coverage_pct`
+is 32.3 and `price.covered` is 3 of 47. All consistent with the droplet running
+pre-08-08 code.
+
+**But I tested the prediction anyway, without the droplet, and it is now a point
+estimate rather than a range.** I imported the committed `_headline_index()` /
+`_find_host()` and ran them over the 132 uncovered queries in today's snapshot
+against the 41 live pages in this checkout:
+
+- **14 of 132 flip to covered** (13 yesterday; today's scout added "emergency
+  gutter repair york county", which the emergency page already targets).
+- **`coverage_pct` 32.3% → 39.5%** — the exact upper bound I published
+  yesterday, now confirmed as the actual value, not a ceiling.
+- **Five of the fourteen are price queries**, so **`by_intent.price.covered`
+  goes 3 → 8** — the top of yesterday's 6–8 range.
+
+So the fix does what I claimed. It is also, per the lead, worth about fifteen
+days before the denominator eats it.
+
+**Prediction 2 — 7-day beacon window closes 08-21. Four of seven days in,
+running 2, 2, 2, 3.** Nothing yet contradicts the ~2–4-humans-a-day reading.
+
+**Prediction 3 — flood gone by 09-08; second burst if rows +50 on three of five
+days. On track, alarm stands down.** Fifth day byte-identical; rows +3.
+
+**Prediction 4 — `log_visitors` ~12 vs beacon ~2 on the same day. Blocked on
+the deploy, day eleven.** `metrics.py:600` emits it in the beacon era and
+`snapshot.py` publishes it as of commit `9e18cbf`; neither is live.
+
+**Prediction 5 — pages-per-visit still 1.00 after seven beacon days means the
+series carries no information.** Four of four so far, and I have now ruled out
+the instrumentation explanations (see above). Leaning toward confirmed, and if
+it confirms it is a finding about the *site*, not the beacon.
+
+**Prediction 6 — the profile lever. Untestable; recommendations 1 and 2 have
+not been done.**
+
+**Yesterday's two commits (`873be6a`): committed, tested, not deployed.** Same
+status as the round-robin from `313b2ff` (day two undeployed) and `9e18cbf`
+(day three).
+
+**The scout.py fix is undeployed, and the thing it was built to prevent happened
+again this morning.** Yesterday I changed the scout to receive page *names*
+rather than page *counts*, because it had proposed T071 — a copper/half-round
+page — while both such pages were live. Today's scout, still running the old
+code, proposed **T072, a repair lane, whose hypothesis quotes the $150–$450
+repair price range that is already published verbatim on
+`services/emergency-gutter-repair.html:210`.** The site already carries four
+pages serving repair intent: `services/emergency-gutter-repair.html`,
+`services/gutter-cleaning-repair.html`,
+`guides/who-to-call-when-gutter-is-falling-off-house.html` and
+`guides/gutter-pulling-away-from-house.html`. That does not make T072 wrong —
+see recommendation 9 — but it does mean its on-site half is already built, and
+the scout could not see that.
+
+**Not actioned, with day counts.** `growth/` deploy **day 11**; GBP category /
+service-area / services **day 23**; review replies **day 7** (T033) / **day 23**
+(T007); PA HIC registration **day 4**; the live Schuylkill passages **day 9**
+(`services/seamless-gutter-installation.html:227-236`, re-verified present
+today); the Akron paragraph **day 21** (`services/gutter-guards.html:163`,
+re-verified present today); the LSA decision **day 21**; the goal-metric
+definition **day 11**; candidate triage **day 11**.
+
+**One item I sharpened rather than repeated.** On PA HIC I said yesterday that
+grepping every `*.html` returned zero hits for "licensed", "insured" or a
+registration number. That is right, and the precise result is worse than "the
+site is silent". The only two matches on the whole site are these:
+
+- `services/seamless-gutter-installation.html:243` — "Are you licensed and
+  carrying liability insurance, and can I see the certificate?"
+- `guides/gutter-services-near-me.html:181` — "Is the company insured, and is
+  the estimate itemized rather than a single lump figure?"
+
+**The site tells a homeowner to demand a credential it never shows about
+itself.** A reader who follows our own advice fails us on our own checklist.
+
+### What I researched today
+
+**1. Yesterday's call-button finding is corroborated, and the source is stronger
+than I could establish yesterday.** I flagged it as resting on secondhand
+retellings. Sterling Sky's *State of Local SEO in 2026* is the origin, and the
+supporting dataset is **two years of click data across 179 Google Business
+Profiles at 34 law firms**, with clicks-to-call sliding steadily downward *for
+profiles that never lost a ranking position*. Google has removed the direct Call
+button from organic listings in the mobile Maps 3-pack; ads keep theirs. Local
+Services Ads went from ~11% to **31%** of tracked queries, and local pack ads
+from ~1% to ~22%, over 2025.
+- https://searchengineland.com/local-rankings-fine-calls-vanishing-468321
+- https://www.sterlingsky.ca/the-state-of-local-seo-in-2026/
+- https://thelocalagency.com/recover-gbp-call-button-removal/
+
+**The egress proxy blocked both primaries again** (`EGRESS_BLOCKED` on
+searchengineland.com and sterlingsky.ca), so the figures above are from search
+result summaries. Same standing limitation as yesterday. **Divine or Eric should
+read Sterling Sky's post directly before any money moves on recommendation 6.**
+
+**2. AI answer engines are structurally excluding independent local
+contractors, and ranking well does not get you in.** The number that matters:
+**only about 45% overlap between businesses that win the Google map pack and
+businesses that appear in AI recommendations** — more than half the map-pack
+winners are absent from AI answers entirely. Reported figures put ~87% of
+independent HVAC/plumbing contractors at effectively zero AI citation share in
+their own market, *including firms with hundreds of five-star reviews*. AI
+engines lean on GBP, consistent service-area entity signals, and aggregator
+profiles (Angi, HomeAdvisor, Houzz, Yelp).
+- https://www.5wpr.com/research/local-services-ai-visibility-crisis-2026/
+- https://www.elev8operations.com/guides/ai-search-statistics-for-local-businesses-2026
+- https://renewlocal.com/blog/answer-engine-optimization-local-business-cited-by-ai-2026
+
+**Why I am reporting this as a caution rather than a plan.** NEMO has recorded
+**zero AI visitors across twenty-four days** and one all-time call tap. The
+ledger holds a stack of GEO candidates (T025 Brave/FAQ schema, T046 crawler
+audit, T053 BuildZoom, T048 Foursquare, T056 listicle placement, T065 audit
+log). This research says the ceiling on all of them is lower than the ledger
+implies for a one-truck shop, and that the aggregator path — the one route that
+demonstrably feeds AI answers — is the same shared-lead economics the scout
+rejected yesterday at ~$240/customer. **I am not promoting any GEO candidate
+today.** The honest read is that AI visibility is downstream of the profile
+work that has sat untouched for twenty-three days.
+
+**3. Search Console impressions were systematically inflated for eleven
+months, by Google's own admission.** On 2026-04-03 Google updated its Data
+Anomalies page to say a logging error prevented accurate impression reporting
+from 2025-05-13 onward, fixed over several weeks from early April. Much of what
+the industry read as "AI Overviews are eating our clicks" was bot-driven
+impression inflation.
+- https://growtika.com/blog/google-search-console-impressions-bug
+- https://www.getpassionfruit.com/research/your-search-console-data-has-been-wrong-for-a-year
+
+**This does not explain our flood** — the window closed in April and our data
+starts 2026-07-27 — and I want that stated so nobody reaches for it later as a
+tidy answer. What it does do is make "impressions include non-human queries at
+scale" a documented normal rather than an exotic hypothesis, which is mild
+support for the rank-tracker reading of our own 26,074.
+
+**Rejected today.**
+- **Any tactic aimed at raising impressions or coverage.** We have 26,074
+  impressions and 17 clicks. Impressions are not the constraint.
+- **Aggregator/lead-marketplace profiles as an AI-citation route** (Angi,
+  HomeAdvisor, Thumbtack). Research item 2 says it works for AI visibility; the
+  scout's own 2026 economics (~$240/acquired customer at ~12% close vs ~$95 at
+  ~30% owned) say it is wrong for one truck. Both can be true.
+- **"Post to GBP weekly for calls"** (several 2026 guides push it hard). T008 is
+  already a candidate and it is a worse use of Eric's first twenty minutes than
+  the category and service-area fields, which are ranking inputs rather than
+  freshness signals.
+- **Anything requiring more pages.** Seven of eleven build steps noop'd this
+  morning because the pages exist.
+
+### Recommendations
+
+**Nothing in this commit is live, and I made no code change today** — see the
+last section for why. The site runs from `/var/www/nemo-seamless-gutter`, which
+is not a git checkout, and `publish_state.sh` copies droplet → repo only.
+
+1. **Eric: twenty minutes on the Business Profile — primary category, then the
+   service-area list, then the itemised Services.** *(Free. T016/T051/T022,
+   day 23.)* Eighth consecutive day at the top and I am not moving it. Category
+   is the largest single pack-ranking input; the service-area list and Services
+   entries are also the text AI engines answer York County gutter questions
+   from, and research item 2 says being absent there is the default for
+   independents. Screenshot first, one field at a time, do not pad the service
+   areas. Skip the "Owner Q&A" half of T016 — the feature is gone. *How you
+   would know:* the `york` bucket moves off 5/0, or `local_visitors` lifts off
+   ~0, within a month. Judge on profile views and website clicks, not calls —
+   research item 1. *Checked:* T016, T051, T022 all `status: candidate,
+   activated: null` in today's snapshot.
+2. **Eric: reply to all 13 reviews in one sitting, then ask every finished job
+   for one.** *(Free. T033 day 7, T007 day 23.)* Reviews are ~20% of pack
+   weight with recency inside 90 days outweighing raw volume, and research
+   item 2 adds that AI Overviews cite review summaries with volume, recency and
+   response rate as weighted inputs — so this is the one free item that moves
+   the pack and the AI answer at once. Neutral wording, everyone asked, good or
+   bad: no incentives, no gating, no filtering. *How you would know:* review
+   count and the date of the newest review, both on the profile. *Checked:*
+   T033 and T007 both `candidate`/`activated: null`.
+3. **Divine: deploy `growth/`.** *(Minutes. Day 11.)* Blocking nine things:
+   `gsc.tracked` (14 days), `gsc.pages`, `crawl_*`, `code_version`,
+   `keywords.ranked`, `log_visitors`, the round-robin, and both of yesterday's
+   fixes. Ship `scout.py` + `growth_daily.py` **as a pair** or the scout raises
+   `TypeError`. 212 tests passed on 08-17. *How you would know:* `coverage_pct`
+   reads **39.5%** and `price.covered` reads **8** in the first snapshot after
+   deploy — I ran the committed matcher against the live pages today, so those
+   are point predictions now, not a range. If they land elsewhere, the fix
+   behaves differently in production than in this checkout and I want to know.
+4. **Eric: confirm the PA HIC registration number and put it on the site, the
+   Business Profile and the estimate form.** *(Free if already registered.
+   Day 4.)* PA law requires the registration number on advertising distributed
+   in Pennsylvania and a website is advertising — this is the only item here
+   that is legal exposure rather than a growth idea. It got sharper today:
+   the site's only two mentions of "licensed"/"insured" are checklists telling
+   readers to demand those credentials from a contractor, while NEMO answers
+   neither about itself. *If Eric is not registered and does ≥$5,000/year, that
+   is the finding and it outranks everything above.* *Checked:* fresh grep of
+   all 41 HTML files today — the two lines quoted above are the only hits.
+5. **Divine: delete the Schuylkill County section and rewrite the Akron lead.**
+   *(Ten minutes. Days 9 and 21.)* `services/seamless-gutter-installation.html:227-236`
+   — remove the h2, the nine-town prose and the "Do you actually service
+   Schuylkill County" FAQ. `services/gutter-guards.html:163` — "homes in Akron,
+   PA and the surrounding Lancaster and York County area" → "homes across York
+   County, Pennsylvania". **Leave line 199 alone.** Marked Divine because a
+   commit here is reverted by the next publish. Both re-verified present today.
+   Research item 2 raises the stakes: "consistent service-area entity signals"
+   is named as an AI-citation input, and we are publishing two counties we do
+   not serve.
+6. **Eric: make the Local Services Ads decision. T011, day 21.** *(Costs money —
+   his call.)* Stronger evidence than yesterday: the call-button withdrawal is
+   backed by Sterling Sky's own 179-profile dataset, ads keep their call
+   buttons, and LSA is on 31% of tracked queries against 11% a year ago. That
+   does not make LSA right for one truck — it makes waiting more expensive than
+   it was. Commit a capped monthly number before leaf-fall or reject T011 and
+   stop carrying it. **A rejection is a real answer and would be the first
+   entry ever in `does_not_work`.** *Checked:* T011 `candidate`/`activated: null`.
+7. **Someone must cap the tracked universe or change the headline. Day 11, and
+   today I can price it.** The scout adds 5.0 queries/day; the engine covers
+   0.9/day. Both `coverage_pct` and `share_pct` are denominated by that number,
+   so both fall forever regardless of performance, and the +7.2 points
+   recommendation 3 buys are gone in ~20 days. **Three options, pick one:**
+   (a) cap `tracked_queries` at a fixed universe and let the scout's finds queue
+   outside it; (b) promote `top3 / ranked_known` (**2 of 23**) to the headline,
+   which measures ranking among queries we actually rank for; (c) rate-limit the
+   scout to the engine's build rate. **I have not chosen: this redefines the
+   number Eric is judged against.** *(Engine could do any of the three; the
+   decision is not mine.)*
+8. **Eric: pick three candidates and reject the rest.** *(Day 11. Pile now 62,
+   up 3 today; `does_not_work` empty after twenty-three days.)* Start by
+   rejecting **T071** as already-built.
+9. **NEW — if T072 is taken up, scope it as profile-and-phone work, not a
+   page.** *(Eric, and it folds into recommendation 1.)* The scout is right that
+   repair is the callable intent and install is not — that is also what the
+   gutter-trade sources say, and it is the best explanation on the table for
+   ~300 profile views and one call tap. But **the on-site half is already
+   built.** `services/emergency-gutter-repair.html` (which already publishes
+   T072's own $150–$450 range at line 210),
+   `services/gutter-cleaning-repair.html`,
+   `guides/who-to-call-when-gutter-is-falling-off-house.html` and
+   `guides/gutter-pulling-away-from-house.html` are all live. What does *not*
+   exist is repair as an itemised **GBP Service**, a response window Eric will
+   actually hit, and a phone that gets answered. **Do not let this become
+   another page.** *Checked:* all four files read today; `techniques.py` already
+   emits FAQPage JSON-LD on generated pages, so no schema work is needed either.
+
+**On cadence.** On 08-16 and again on 08-17 I said that if this list is still
+untouched on **2026-08-21** the review drops to weekly and shrinks to three
+lines, with the HIC item exempted as a legal matter. **Three days. I still
+stand by it, and the case for it got stronger today** — see below.
+
+### What I changed in this repo today
+
+**Nothing. Deliberately.**
+
+Yesterday I wrote that this review risks "producing engineering, not growth".
+The right response to that is not another commit. There are eleven days of
+tested, unshipped engine code in `main` already; a twelfth would not make the
+site faster, better or more findable, and it would let me end the day feeling
+productive without a single thing changing in York County.
+
+I did do real verification work — re-ran the committed coverage matcher against
+the live pages to turn yesterday's range into a point estimate, diffed all 40
+flood rows against yesterday's snapshot, read `analytics.js` and `metrics.py` to
+rule out three instrumentation explanations for pages-per-visit, grepped the
+whole site for credential claims, and read the four repair pages before letting
+T072 through. None of that needed a commit and none of it is in the diff.
+
+I touched no runtime state (`techniques.json`, `keywords.json`,
+`results.jsonl`, `state.json`), activated, retired and re-statused nothing, and
+edited no page copy or keyword list.
+
+### Reasoning and uncertainties
+
+Day twenty-three. Two top-3 queries county-wide, zero in all seven named towns,
+zero AI visitors across twenty-four days, zero phone leads ever, one call tap
+six days ago, three bookings, ~2–3 human visitors a day, none of whom has
+viewed a second page. **Nothing in that list moved today, and the metric that
+did move — `share_pct`, 1.1 → 1.0 — moved for a reason that has nothing to do
+with the business.**
+
+The finding I would defend hardest today is the lead, because it changes what
+the last three weeks of this journal mean. I have repeatedly reported
+`coverage_pct` falling as if the site were losing ground. It was not. The
+numerator rose every week. What fell was a fraction whose denominator the scout
+inflates at six times the rate the engine can serve. **That is an instrument
+that reports failure during success, and I helped it do that by quoting the
+number without checking its denominator for eleven days.**
+
+The second finding — pages-per-visit locked at exactly 1.00 across nine
+sessions, with three instrumentation explanations ruled out — is the first
+conversion signal this journal has had that is about the *site* rather than
+about rank. Nine sessions is nothing. But it is the first four days of a
+measurement built specifically to be trustworthy, and it says every human who
+arrives leaves from the page they landed on.
+
+**Where I am least confident. Four things.**
+
+*First, the 5.0/day scout rate may not be a constant.* I fitted it to twelve
+days. If the scout is working through a finite backlog of real York County
+demand it will taper on its own and the lead overstates the problem. If it is
+generating queries indefinitely it will not. `keywords.ranked` would show me the
+shape; it has been in `main` since before 08-09.
+
+*Second, nine sessions cannot carry the bounce conclusion.* Pages-per-visit
+1.00 is consistent with a bounce problem and equally consistent with nine people
+who each found what they wanted. Prediction 5's seven-day check on 08-21 barely
+improves that. I would not act on it before ~50 sessions, which at current
+volume is three weeks away.
+
+*Third, the AI-visibility research cuts against most of my own ledger and I may
+be over-correcting.* "Only 45% overlap between map-pack winners and AI-cited
+businesses" is a striking number from a PR firm's research page, unverified
+against primaries the proxy blocked. I used it to decline to promote six GEO
+candidates. If that number is soft, T046 (can the crawlers even fetch us?) is
+cheap enough that declining it was wrong.
+
+*Fourth, unchanged and now three weeks old: I cannot judge the quality of the
+generated copy.* Today I read four repair pages properly for the first time and
+they are better than I assumed — real price ranges, an honest "not everything
+after a storm is an emergency" section, a temporary-vs-permanent distinction
+most contractors would not volunteer. That is one lens on seven pages. It is
+mild evidence that the content is not the constraint, which sharpens rather than
+softens the conclusion that the constraint is the profile and the phone.
+
+**What would change my mind, dated.**
+1. **On deploy:** `coverage_pct` reads **39.5%** and `price.covered` reads **8**.
+   Anything else and the matcher behaves differently in production than in this
+   checkout.
+2. **2026-08-21:** the first honest 7-day beacon window closes. Medians 2–3
+   confirms the ~2–4-humans-a-day reading; medians 6+ and I over-read four quiet
+   days.
+3. **2026-08-21:** the cadence commitment comes due. If recommendations 1, 2, 4
+   and 5 are all still untouched — four free items, three of them Eric's
+   twenty minutes and one a legal exposure — then twenty-six days of daily
+   review will have produced zero business change, and continuing daily is a
+   choice to keep writing rather than to keep helping.
+4. **2026-09-02 (~15 days after deploy):** if `coverage_pct` has slid back to
+   ~33.5% after the
+   deploy put it at 39.5%, the denominator diagnosis is confirmed in production
+   and recommendation 7 stops being optional.
+5. **2026-09-08:** the 40 flood rows should be gone from `discovered_untracked`.
+   Still frozen and still present and the rank-tracker reading needs revisiting.
+6. **On the profile:** if Eric does 1 and 2 and the `york` bucket is still 5/0
+   with zero new calls a month later, the map pack is not the lever either, and
+   the honest question becomes whether a one-truck operator can win this county
+   on search at all — or whether the answer is the trade-referral and
+   neighbourhood candidates that have sat in the pile since day one.
