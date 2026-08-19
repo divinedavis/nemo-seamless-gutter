@@ -1,6 +1,6 @@
 {
-  "generated": "2026-08-18T06:04:05+00:00",
-  "date": "2026-08-18",
+  "generated": "2026-08-19T06:00:10+00:00",
+  "date": "2026-08-19",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
@@ -12,7 +12,7 @@
     "tracked_queries": 195,
     "top3": 2,
     "top10": 7,
-    "ranked_known": 23
+    "ranked_known": 25
   },
   "traffic": {
     "visitors": [
@@ -111,6 +111,10 @@
       {
         "date": "2026-08-17",
         "value": 3
+      },
+      {
+        "date": "2026-08-18",
+        "value": 2
       }
     ],
     "pageviews": [
@@ -209,6 +213,10 @@
       {
         "date": "2026-08-17",
         "value": 3
+      },
+      {
+        "date": "2026-08-18",
+        "value": 2
       }
     ],
     "organic_visitors": [
@@ -307,6 +315,10 @@
       {
         "date": "2026-08-17",
         "value": 1
+      },
+      {
+        "date": "2026-08-18",
+        "value": 0
       }
     ],
     "local_visitors": [
@@ -405,6 +417,10 @@
       {
         "date": "2026-08-17",
         "value": 1
+      },
+      {
+        "date": "2026-08-18",
+        "value": 0
       }
     ],
     "ai_visitors": [
@@ -502,6 +518,10 @@
       },
       {
         "date": "2026-08-17",
+        "value": 0
+      },
+      {
+        "date": "2026-08-18",
         "value": 0
       }
     ],
@@ -601,6 +621,10 @@
       {
         "date": "2026-08-17",
         "value": 1
+      },
+      {
+        "date": "2026-08-18",
+        "value": 2
       }
     ],
     "referral_visitors": [
@@ -698,6 +722,10 @@
       },
       {
         "date": "2026-08-17",
+        "value": 0
+      },
+      {
+        "date": "2026-08-18",
         "value": 0
       }
     ],
@@ -797,6 +825,10 @@
       {
         "date": "2026-08-17",
         "value": 0
+      },
+      {
+        "date": "2026-08-18",
+        "value": 0
       }
     ],
     "bot_hits": [
@@ -895,6 +927,10 @@
       {
         "date": "2026-08-17",
         "value": 1722
+      },
+      {
+        "date": "2026-08-18",
+        "value": 2607
       }
     ],
     "call_taps": [
@@ -981,6 +1017,10 @@
       {
         "date": "2026-08-17",
         "value": 0
+      },
+      {
+        "date": "2026-08-18",
+        "value": 0
       }
     ],
     "ai_calls": [
@@ -1062,6 +1102,10 @@
       },
       {
         "date": "2026-08-17",
+        "value": 0
+      },
+      {
+        "date": "2026-08-18",
         "value": 0
       }
     ],
@@ -1161,6 +1205,10 @@
       {
         "date": "2026-08-17",
         "value": 0
+      },
+      {
+        "date": "2026-08-18",
+        "value": 0
       }
     ],
     "phone_leads": [
@@ -1259,6 +1307,10 @@
       {
         "date": "2026-08-17",
         "value": 0
+      },
+      {
+        "date": "2026-08-18",
+        "value": 0
       }
     ],
     "total_leads": [
@@ -1356,6 +1408,10 @@
       },
       {
         "date": "2026-08-17",
+        "value": 0
+      },
+      {
+        "date": "2026-08-18",
         "value": 0
       }
     ]
@@ -1577,7 +1633,7 @@
       {
         "query": "gutter installer",
         "position": 1,
-        "impressions": 471,
+        "impressions": 472,
         "clicks": 0
       },
       {
@@ -1799,13 +1855,13 @@
     ]
   },
   "gsc": {
-    "date": "2026-08-18",
+    "date": "2026-08-19",
     "ok": true,
     "connected": true,
-    "rows": 929,
-    "matched": 23,
-    "clicks": 17,
-    "impressions": 26074,
+    "rows": 935,
+    "matched": 25,
+    "clicks": 18,
+    "impressions": 26144,
     "avg_position": 25.0
   },
   "techniques": [
@@ -1915,6 +1971,10 @@
         {
           "date": "2026-08-17",
           "value": 0
+        },
+        {
+          "date": "2026-08-18",
+          "value": 0
         }
       ]
     },
@@ -2023,6 +2083,10 @@
         },
         {
           "date": "2026-08-17",
+          "value": 0
+        },
+        {
+          "date": "2026-08-18",
           "value": 0
         }
       ]
@@ -2407,6 +2471,10 @@
         },
         {
           "date": "2026-08-17",
+          "value": 0
+        },
+        {
+          "date": "2026-08-18",
           "value": 0
         }
       ]
@@ -3502,7 +3570,7 @@
     ]
   },
   "last_build": {
-    "date": "2026-08-18",
+    "date": "2026-08-19",
     "log": [
       {
         "ok": true,
@@ -3518,12 +3586,13 @@
       },
       {
         "ok": true,
-        "detail": "answer-first opening on /areas/seamless-gutters-hanover-pa.html for 'gutter installation hanover' (50 words, + FAQ schema, 7 impressions)",
+        "noop": true,
+        "detail": "every ranking page already opens with a direct answer",
         "slug": "geo_answer_first_content_pass"
       },
       {
-        "ok": true,
-        "detail": "added \"Hiring Gutter Installers in Dover, PA: What the Job Looks Li\" to /areas/seamless-gutters-dover-pa.html for 'gutter installers dover pa'",
+        "ok": false,
+        "detail": "3 candidate(s) failed, last: generation failed for 'half round copper gutters york pa': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CeBbZiabi26ezb6ZqQoDU\"}",
         "slug": "strengthen_pages"
       },
       {
@@ -3539,9 +3608,8 @@
         "slug": "area_pages"
       },
       {
-        "ok": true,
-        "noop": true,
-        "detail": "no query needs its own page \u2014 the remaining gaps all belong on pages that exist, which strengthen_pages handles",
+        "ok": false,
+        "detail": "content generation failed for 'instalacion de canaletas york pa': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CeBbZjdbTqhwpWU6YjmKx\"}",
         "slug": "money_pages"
       },
       {
@@ -3558,35 +3626,24 @@
       },
       {
         "ok": true,
-        "noop": false,
-        "detail": "[gen_sitemap] wrote 41 URLs to sitemap.xml",
+        "noop": true,
+        "detail": "sitemap.xml unchanged",
         "slug": "rebuild_sitemap"
       },
       {
         "ok": true,
-        "detail": "submitted 2 URL(s), HTTP 200",
+        "noop": true,
+        "detail": "nothing new to submit",
         "slug": "ping_indexnow"
       }
     ],
     "new": 0,
-    "changed": 2
+    "changed": 0
   },
   "last_scout": {
-    "date": "2026-08-18",
-    "ok": true,
-    "techniques_added": [
-      "same_week_repair_call_lane",
-      "quarterly_dated_refresh_money_pages",
-      "spanish_lane_york_city"
-    ],
-    "keywords_added": [
-      "emergency gutter repair york county",
-      "downspout repair near me york pa",
-      "copper gutter installation cost york pa",
-      "half round gutters hanover pa",
-      "instalacion de canaletas york pa"
-    ],
-    "notes": "Sequencing: the repair lane is the only one of these three that can ring a phone before leaf-fall, so ship it first \u2014 before Sept 1 \u2014 and hold the Spanish lane until the phone path is genuinely bilingual. Honesty guardrails, non-negotiable: (1) the repair promise must be a window Eric will actually hit, not '24/7 emergency service' he cannot staff; (2) the quarterly refresh means genuinely re-checking prices against real recent invoices, not flipping a date on unchanged text \u2014 date-flipping is the kind of thing that erodes trust with both readers and engines; (3) never publish 'se habla espa\u00f1ol' unless a Spanish speaker (human or a verified agent mode) will actually answer that call. Considered and rejected: shared lead marketplaces (Angi/HomeAdvisor/Thumbtack) \u2014 2026 numbers put shared leads at roughly $240 per acquired customer at about a 12% close versus ~$95 at ~30% for exclusive/owned channels (resultsdigitalus.com), which is the wrong economics for a one-truck shop and hands NEMO's best prospects to three competitors at once. Also rejected: a dedicated call-tracking number displayed on the Business Profile \u2014 it is the standard agency recommendation, but swapping the GBP number introduces NAP inconsistency risk on a profile that is already weak, and the ledger's existing GBP-call-clicks measurement gets 80% of the answer for zero risk. Also rejected: township- and subdivision-level pages (Springettsbury, Manchester Township, named developments) \u2014 real upside, but it is the same technique as the active town pages and should be an expansion of that item, not a new one. Finally, worth knowing: 2026 ranking-factor surveys put Google Business Profile signals at roughly 32% of map-pack weight with reviews next at about 20% (hookagency.com, pipelineon.com), and only ~45% of businesses winning the map pack also appear in AI answers \u2014 so the GBP and review candidates already sitting in the ledger are still the highest-weight unstarted work in this business, ahead of anything proposed here."
+    "date": "2026-08-19",
+    "ok": false,
+    "detail": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CeBbZmoa3D13VfTrjbMgW\"}"
   },
   "pages": {
     "areas": [
