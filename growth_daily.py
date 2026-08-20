@@ -28,7 +28,7 @@ import traceback
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from growth import (email_report, gsc, keywords, ledger,  # noqa: E402
+from growth import (email_report, gsc, indexstatus, keywords, ledger,  # noqa: E402
                     metrics, report, review, scout, seed, snapshot,
                     techniques)
 
@@ -94,6 +94,17 @@ def cmd_measure(args):
             "(coverage below is only a proxy)")
     elif not g.get("ok"):
         log(f"  gsc: FAILED — {g.get('detail', '')[:160]}")
+
+    # Rank says where a page sits when it is shown. This says whether Google
+    # kept it at all — which is the question rank cannot answer for a page
+    # earning nothing, because "never indexed" and "indexed, nobody searched"
+    # look identical from here and need opposite responses.
+    ix = indexstatus.summary(indexstatus.run(dry_run=args.dry_run))
+    if not ix.get("measured"):
+        log(f"  indexing: not measured ({(ix.get('detail') or '')[:120]})")
+    else:
+        log(f"  indexing: {ix['indexed']}/{ix['inspected']} indexed "
+            f"({ix['accept_pct']}%), {ix['unknown_to_google']} never seen by Google")
 
     s = keywords.summary()
     # Record the size of the tracked universe as a series. share_pct is a
