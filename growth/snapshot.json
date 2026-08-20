@@ -1,6 +1,6 @@
 {
-  "generated": "2026-08-19T06:00:10+00:00",
-  "date": "2026-08-19",
+  "generated": "2026-08-20T06:00:10+00:00",
+  "date": "2026-08-20",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
@@ -115,6 +115,10 @@
       {
         "date": "2026-08-18",
         "value": 2
+      },
+      {
+        "date": "2026-08-19",
+        "value": 3
       }
     ],
     "pageviews": [
@@ -217,6 +221,10 @@
       {
         "date": "2026-08-18",
         "value": 2
+      },
+      {
+        "date": "2026-08-19",
+        "value": 6
       }
     ],
     "organic_visitors": [
@@ -319,6 +327,10 @@
       {
         "date": "2026-08-18",
         "value": 0
+      },
+      {
+        "date": "2026-08-19",
+        "value": 2
       }
     ],
     "local_visitors": [
@@ -420,6 +432,10 @@
       },
       {
         "date": "2026-08-18",
+        "value": 0
+      },
+      {
+        "date": "2026-08-19",
         "value": 0
       }
     ],
@@ -523,6 +539,10 @@
       {
         "date": "2026-08-18",
         "value": 0
+      },
+      {
+        "date": "2026-08-19",
+        "value": 0
       }
     ],
     "direct_visitors": [
@@ -625,6 +645,10 @@
       {
         "date": "2026-08-18",
         "value": 2
+      },
+      {
+        "date": "2026-08-19",
+        "value": 1
       }
     ],
     "referral_visitors": [
@@ -726,6 +750,10 @@
       },
       {
         "date": "2026-08-18",
+        "value": 0
+      },
+      {
+        "date": "2026-08-19",
         "value": 0
       }
     ],
@@ -829,6 +857,10 @@
       {
         "date": "2026-08-18",
         "value": 0
+      },
+      {
+        "date": "2026-08-19",
+        "value": 0
       }
     ],
     "bot_hits": [
@@ -931,6 +963,10 @@
       {
         "date": "2026-08-18",
         "value": 2607
+      },
+      {
+        "date": "2026-08-19",
+        "value": 2844
       }
     ],
     "call_taps": [
@@ -1021,6 +1057,10 @@
       {
         "date": "2026-08-18",
         "value": 0
+      },
+      {
+        "date": "2026-08-19",
+        "value": 0
       }
     ],
     "ai_calls": [
@@ -1106,6 +1146,10 @@
       },
       {
         "date": "2026-08-18",
+        "value": 0
+      },
+      {
+        "date": "2026-08-19",
         "value": 0
       }
     ],
@@ -1209,6 +1253,10 @@
       {
         "date": "2026-08-18",
         "value": 0
+      },
+      {
+        "date": "2026-08-19",
+        "value": 0
       }
     ],
     "phone_leads": [
@@ -1311,6 +1359,10 @@
       {
         "date": "2026-08-18",
         "value": 0
+      },
+      {
+        "date": "2026-08-19",
+        "value": 0
       }
     ],
     "total_leads": [
@@ -1412,6 +1464,10 @@
       },
       {
         "date": "2026-08-18",
+        "value": 0
+      },
+      {
+        "date": "2026-08-19",
         "value": 0
       }
     ]
@@ -1633,7 +1689,7 @@
       {
         "query": "gutter installer",
         "position": 1,
-        "impressions": 472,
+        "impressions": 470,
         "clicks": 0
       },
       {
@@ -1855,14 +1911,14 @@
     ]
   },
   "gsc": {
-    "date": "2026-08-19",
+    "date": "2026-08-20",
     "ok": true,
     "connected": true,
-    "rows": 935,
+    "rows": 964,
     "matched": 25,
     "clicks": 18,
-    "impressions": 26144,
-    "avg_position": 25.0
+    "impressions": 26613,
+    "avg_position": 25.1
   },
   "techniques": [
     {
@@ -1974,6 +2030,10 @@
         },
         {
           "date": "2026-08-18",
+          "value": 0
+        },
+        {
+          "date": "2026-08-19",
           "value": 0
         }
       ]
@@ -2087,6 +2147,10 @@
         },
         {
           "date": "2026-08-18",
+          "value": 0
+        },
+        {
+          "date": "2026-08-19",
           "value": 0
         }
       ]
@@ -2475,6 +2539,10 @@
         },
         {
           "date": "2026-08-18",
+          "value": 0
+        },
+        {
+          "date": "2026-08-19",
           "value": 0
         }
       ]
@@ -3570,7 +3638,7 @@
     ]
   },
   "last_build": {
-    "date": "2026-08-19",
+    "date": "2026-08-20",
     "log": [
       {
         "ok": true,
@@ -3585,14 +3653,13 @@
         "slug": "improve_ctr"
       },
       {
-        "ok": true,
-        "noop": true,
-        "detail": "every ranking page already opens with a direct answer",
+        "ok": false,
+        "detail": "1 page(s) failed, last: generation failed for /areas/seamless-gutters-spring-grove-pa.html: anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CeDVNbYvVhiuNbmFvsYMu\"}",
         "slug": "geo_answer_first_content_pass"
       },
       {
         "ok": false,
-        "detail": "3 candidate(s) failed, last: generation failed for 'half round copper gutters york pa': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CeBbZiabi26ezb6ZqQoDU\"}",
+        "detail": "3 candidate(s) failed, last: generation failed for 'half round copper gutters york pa': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CeDVNe11w6fbDAcgoXBuG\"}",
         "slug": "strengthen_pages"
       },
       {
@@ -3609,7 +3676,7 @@
       },
       {
         "ok": false,
-        "detail": "content generation failed for 'instalacion de canaletas york pa': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CeBbZjdbTqhwpWU6YjmKx\"}",
+        "detail": "content generation failed for 'instalacion de canaletas york pa': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CeDVNeqNM2U8AVFMJeaXV\"}",
         "slug": "money_pages"
       },
       {
@@ -3641,9 +3708,9 @@
     "changed": 0
   },
   "last_scout": {
-    "date": "2026-08-19",
+    "date": "2026-08-20",
     "ok": false,
-    "detail": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CeBbZmoa3D13VfTrjbMgW\"}"
+    "detail": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CeDVNgScFBMuWu3EsnVfE\"}"
   },
   "pages": {
     "areas": [
