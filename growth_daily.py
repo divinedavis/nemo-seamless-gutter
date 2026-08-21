@@ -22,6 +22,7 @@ Every command takes --dry-run, which makes the whole thing read-only, so it is
 safe to run by hand on the server while Eric's site is serving traffic.
 """
 import argparse
+import json
 import os
 import sys
 import traceback
@@ -234,6 +235,45 @@ def cmd_daily(args):
 
 # ------------------------------------------------------------------ status
 
+def _snapshot_problems(build_date, stale_days):
+    """Alert when the run completed but the state snapshot did not get written.
+
+    `snapshot.write()` is wrapped in a try/except in `cmd_daily` so a failure
+    there cannot take down the rest of the morning. That is right for the site
+    and wrong for visibility: on 2026-08-21 the write raised, the run carried
+    on and published a sitemap, and the only trace was a single
+    "snapshot: FAILED" line in /var/log/nemo-growth.log. The review agent spent
+    that morning reviewing the previous day's numbers without being told.
+
+    Nothing else here can see it. Every other check reads state the engine
+    wrote, so a missing write is invisible to all of them — the engine looks
+    healthy precisely because it is healthy everywhere except the one file the
+    cloud agent depends on.
+
+    The comparison is against the build rather than against the calendar: a
+    build that completed today next to a snapshot that still reads an older
+    date is unambiguous and needs no staleness grace. When the engine has not
+    run at all, `stale_days` is not 0 and the build check above owns the alarm,
+    so this stays quiet rather than reporting the same outage twice.
+    """
+    try:
+        with open(snapshot.SNAPSHOT_PATH) as f:
+            snap_date = json.load(f).get("date")
+    except FileNotFoundError:
+        snap_date = None
+    except Exception as e:
+        return [f"growth/snapshot.json cannot be read ({e}). The daily review "
+                f"agent reads this file and nothing else from this machine."]
+
+    if stale_days != 0 or snap_date == build_date:
+        return []
+    return [f"Today's run completed but growth/snapshot.json still reads "
+            f"{snap_date or 'no date'} against a build dated {build_date}. "
+            f"snapshot.write() is failing, so the daily review agent is "
+            f"reviewing stale state. The reason is on the 'snapshot: FAILED' "
+            f"line in /var/log/nemo-growth.log."]
+
+
 def cmd_watchdog(args):
     """Alert if the engine has stopped running.
 
@@ -265,6 +305,8 @@ def cmd_watchdog(args):
         problems.append("Today's run completed but these steps failed: "
                         + "; ".join(f"{r['slug']} — {r.get('detail', '')[:120]}"
                                     for r in failed))
+    problems.extend(_snapshot_problems(when, stale_days))
+
     g = ledger.get_state("gsc_last") or {}
     if g and not g.get("ok"):
         problems.append(f"Search Console sync is failing: "

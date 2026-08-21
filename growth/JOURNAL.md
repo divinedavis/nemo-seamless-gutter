@@ -10799,3 +10799,434 @@ Recommendation 2 has appeared ten times.
    33/5/0 with no calls a month later, the map pack is not the lever either, and
    the real question becomes whether a one-truck operator can win this county on
    search at all.
+
+## 2026-08-21 — review agent
+
+### Lead: the engine ran this morning, published no state, and told nobody. I am reviewing yesterday's numbers.
+
+There is no `2026-08-21 — engine run` entry above this one, and there is no new
+`growth/snapshot.json`. Today's publish commit — `ccc0fb6`, "Publish growth
+state for 2026-08-21" — **changed one file, `sitemap.xml`, by one line.** Every
+other daily publish in this repo's history carried `growth/snapshot.json` and
+`growth/JOURNAL.md`. I checked all ten of the most recent ones; they all do.
+
+So the state file I am reviewing is dated **2026-08-20** and its traffic series
+ends **2026-08-19**. Every number in this entry was already reported yesterday.
+I have no new data at all.
+
+**What actually happened, as far as the repo can tell me.** The one line that
+did change is the `lastmod` on `/reports/waiting-on-you.html`, 08-19 → 08-20.
+That file is written by the `report` step and its date is picked up by
+`rebuild_sitemap` on the *following* run. So this morning's run got at least as
+far as `rebuild_sitemap` — **the engine is alive and the cron fired.** What
+failed is narrower: `snapshot.write()` raised.
+
+`growth_daily.py:220-228` wraps that call in a try/except that logs
+`snapshot: FAILED — {e}` and continues. That is the right design — a snapshot
+bug should not stop the site build — but it means the only record of the reason
+is one line in `/var/log/nemo-growth.log`, which I cannot read. The exception
+came before `append_journal`, which is why the engine's own entry is missing too.
+
+**Why nobody was told, which is the part worth fixing.** `cmd_watchdog`
+(`growth_daily.py:237`) checks three things: whether `last_build` has gone
+stale, whether today's build had failing steps, and whether the GSC sync is
+erroring. All three read state the engine *wrote*. **None of them can see a
+write that did not happen.** The engine is healthy everywhere except the single
+file the cloud agent depends on, so the 11:00 watchdog will look at it, find a
+completed build, and stay quiet about this. Eric will get mail today — the
+credit failures still trip the failed-steps check — but nothing in it will say
+the snapshot is missing.
+
+**I fixed that.** See "What I changed in this repo today". It needs a deploy.
+
+**What this costs today.** Three dated commitments from yesterday came due this
+morning and the feed went dark on the same morning. Two of the three cannot be
+evaluated at all — details below. I am not going to guess at them.
+
+### Where the numbers stand
+
+**All of this is 2026-08-20 data, republished, not re-measured.** I am
+restating it only so this entry stands on its own; nothing here moved, because
+nothing here was re-read.
+
+**Goal metric: `top3` = 2 of 195 tracked queries, `share_pct` 1.0% against a
+50% target.** Flat at 2 for the twelfth consecutive day. `top10` 7,
+`ranked_known` 25 — against `ranked_known` the honest reading is **2 of 25**.
+**Zero top-3 positions in all seven named towns:** york 33 tracked / 5 covered /
+**0** top-3, dover 16/7/0, red-lion 11/3/0, dallastown 11/4/0, spring-grove
+11/3/0, hanover 10/4/0. Both top-3s sit in the county bucket, **2 of 103**.
+
+**Direction: unchanged.** I cannot say "it moved" or "it held" for 08-21,
+because 08-21 was never measured.
+
+Coverage 32.3%, `tracked_queries` 195. By intent: hire 55/118, check 4/22,
+diy 1/8, **price 3 of 47**. Search Console at last reading: 964 rows, 25
+matched, 18 clicks, 26,613 impressions, avg position 25.1.
+
+**Traffic, beacon days 08-14 → 08-19: 2, 2, 2, 3, 2, 3 visitors.** Median 2.
+**Leads: `bookings_all_time` 3, `phone_leads_all_time` 0**, one call tap ever
+(08-12), `ai_calls` 0 since 07-30, `ai_visitors` 0 across the whole series.
+
+**Ledger: 74 techniques — 11 active, 62 candidates, 1 retired.
+`does_not_work` is still empty on day twenty-six.**
+
+### Did previous changes work?
+
+**1 — "If the credit failure runs a third consecutive day it needs Divine."
+Cannot be evaluated, and it is not a close call.** The file that would record
+today's build was never written. As of 08-20 it was day two, matching the
+08-12/13 episode exactly. Today is the day that would have broken the pattern
+and I have no way to see it. **I have escalated to Divine anyway** — not on the
+credit tripwire, which remains unresolved, but on the snapshot failure, which
+is a new and independent problem. The credit question rides along in the same
+message because it costs nothing to ask both at once.
+
+**2 — "The seven-day beacon window closes 08-21." Six of seven days in, and
+the seventh is missing.** 08-14 → 08-19: **2, 2, 2, 3, 2, 3**. Median 2, mean
+2.33, range 2–3. **Verdict: I am closing this at six days rather than leaving
+it open indefinitely.** Six consecutive days inside a two-visitor band is
+already a tighter result than the seven-day test was designed to produce; a
+seventh point cannot move a median of 2 to anything near the 6+ that would have
+falsified it. **The site gets about two to three human visitors a day.** That
+is the honest number and I am going to stop re-testing it.
+
+**3 — "If recommendations 2, 3, 4 and 6 are still untouched, this review drops
+to weekly and three lines." Cannot be evaluated, and I am not executing it
+today.** Those four are Business Profile and HIC actions. Their signals —
+`local_visitors`, the `york` bucket, profile views — live in the snapshot that
+was not written, and GBP actions were never visible to me directly in any case.
+Firing a self-imposed demotion on absent evidence would be the same error I
+criticised myself for on 08-20, in the other direction.
+
+**But I do not want to leave it as "deferred" and quietly let it lapse, because
+that is how commitments die.** So I am revising it on its merits instead, and
+saying why. The premise was that twenty-six days of daily review produced no
+change in York County. That premise is still true. What today shows is that the
+premise was incomplete: **this review caught an engine failure that no other
+part of the system was watching for, on the one morning it happened.** The
+watchdog could not see it, the engine could not report it, and by tomorrow the
+evidence — a one-file publish commit — would have been buried under a normal
+one. That is real value, and it is a different kind of value from the strategy
+essay.
+
+So the honest revision is a split, not a demotion:
+- **Daily, short:** an engine-health check. Did the run complete, did it publish,
+  what failed, what does the goal metric read. Ten lines. This is the part that
+  earns its keep.
+- **Weekly, long:** the research-and-recommendations essay. Recommendation 2 has
+  now appeared eleven times. Writing it a twelfth time tomorrow will not make
+  Eric do it, and the repetition is actively devaluing the entries around it.
+
+**New commitment, dated: the first review after a fresh snapshot arrives runs in
+the short form, and the long form runs on Mondays.** HIC stays exempt from any
+cadence change, as before.
+
+**4 — "The flood does not age out; the 40 rows persist." Holding, untested
+today.** Still 40 rows at last reading. The 2026-09-08 test stands. But I found
+something today that weakens my own explanation of it — see research item 1.
+
+**5 — "Deploy lands `coverage_pct` at 39.5% and `price.covered` at 8." Still
+untestable, day 14.** What I *can* now report, which no prior entry checked:
+**I ran the test suite in this repo and it passes — 212 tests, and 218 after
+mine.** The fourteen-day deploy queue is not a pile of unverified work; it is
+green. That removes one of the stated reasons for hesitating over it.
+
+**6 — The profile lever. Untestable, day 26.** Recommendations 2, 3 and 4 have
+not been actioned as far as any measurement available to me can tell.
+
+**7 — "There may be nine more price defects of this shape, or this may be the
+only one." Tested today. It is not the only one — there are four.** Yesterday's
+entry found `guides/gutter-cleaning-cost-york-pa.html` promising "general
+ballpark figures … With that caveat:" and then delivering none. I grepped every
+one of the 41 pages for dollar figures and cross-referenced against price
+headings. **Exactly one page on this site answers a cost question with a
+number** — `guides/how-much-do-seamless-gutters-cost.html` ($7–$14/ft,
+$1,500–$4,000). Four pages pose a cost question and answer it with factors only:
+
+| page | the question it poses | dollar figures |
+| --- | --- | --- |
+| `guides/gutter-cleaning-cost-york-pa.html` | "Typical price ranges" *(promises figures explicitly)* | **0** |
+| `guides/seamless-vs-sectional-gutters.html` | "How much do seamless gutters cost?" | **0** |
+| `areas/seamless-gutters-dover-pa.html` | "How much does gutter installation cost in Dover?" | **0** |
+| `areas/seamless-gutters-hanover-pa.html` | "How much does gutter installation in Hanover cost?" | **0** |
+
+The two area pages are the clearest proof that this is structural rather than
+sloppy: `AREA_SYSTEM` (`growth/techniques.py:256-257`) tells the writer **"never
+quote a number"**, and the FAQ generator is instructed to write "a real
+follow-up question a York County homeowner would ask next". **The engine
+reliably generates the cost question and is then forbidden from answering it.**
+Meanwhile `MONEY_SYSTEM` (`growth/techniques.py:379-390`) tells a different
+writer that refusing to discuss price is *why* lead-gen sites outrank
+contractors. Yesterday called this a contradiction; today it has a count.
+
+**8 — A hypothesis of my own that I tested and killed.** I wondered whether the
+Philadelphia impression flood was self-inflicted — whether some page mentions
+those towns and Google is matching on it. `strengthen_pages` did write off-area
+places onto the site once, which is why the geo guard exists (commits `851aa5d`,
+`463ab8a`). **I grepped all 41 pages plus `index.html` for 22 of the flood
+towns — Glenside, Audubon, Wayne, Plymouth Meeting, Royersford, Eagleville,
+Horsham, Phoenixville, Norristown, Abington, Malvern, Exton, Devon, Upper
+Merion, Willow Grove, Blue Bell, Hatboro, Spring City, Radnor, Lower Gwynedd,
+East Norriton — plus "Montgomery" and "Philadelphia". Zero hits.** The geo guard
+is holding and the flood is not coming from our content. Negative result,
+recorded so nobody re-tests it.
+
+### What I researched today
+
+**1. The rank-tracker explanation for the flood is weaker than this journal has
+been assuming, and I want that on the record against my own prior entries.**
+Google **deprecated the `&num=100` URL parameter in September 2025**,
+specifically to stop rank-tracking tools generating impressions at deep
+positions — the exact mechanism this journal has been invoking since 08-14 to
+explain 12,000 out-of-county impressions at positions 10–35. If that loophole
+has been closed for eleven months, "rank tracker" needs a new mechanism to be
+true. I am not replacing the theory, because **the single strongest piece of
+evidence survives it intact: `gutter installer`, position 1.0, 470 impressions,
+0 clicks, over a 28-day window.** Position one with a zero click-through across
+470 impressions is not something a human sample does. Whatever is generating
+these, it is not homeowners. But I no longer think this journal has correctly
+identified *what*.
+- https://www.incremys.com/en/resources/blog/rank-tracking
+- https://yositeup.com/blog/google-search-console-data-guide-2026
+
+**2. The Business Profile is the substrate for AI answers, not just the map
+pack — which re-prices the recommendation I have made eleven times.** 2026
+sources: **78% of local-services brands are invisible to AI answer engines**;
+only ~1.2% of local businesses get recommended. What matters here is the
+mechanism — ChatGPT pulls Business Profile information directly into local
+answers, Gemini reads GBP as authoritative, and Google's AI Overviews use GBP as
+the spine of the output. Also useful: **ChatGPT and Gemini cite the same domain
+only 8% of the time and recommend the same business 4.2% of the time**, and they
+source differently — Gemini leans on business websites, ChatGPT on Reddit and
+directories.
+
+This matters because `ai_visitors` has been 0 for twenty-six days and this
+journal has treated GBP and AI-visibility as two separate projects. They are one
+project. **The profile work already at the top of this list is also the AI work**
+— which is a better argument for it than any I have made in eleven attempts.
+- https://www.marketingcode.com/ai-search-78-percent-invisible-may-core-update-geo-playbook-may-2026/
+- https://martech.org/business-websites-dominate-geminis-local-ai-citations/
+- https://www.cheers.tech/geo-academy/ai-search-engine-source-differences
+
+**3. A number from our own code that reframes the whole site-versus-profile
+question, and that I should have found weeks ago.** `growth/scout.py:159`
+carries the business context the scout is given: *"Google Business Profile is
+live: 4.2 stars, 13 reviews, roughly 300 profile views a month."*
+
+**Three hundred profile views a month.** The site gets two to three visitors a
+day — call it 75 a month. **The Business Profile is already reaching roughly
+four times as many people as the entire website**, including all 41 pages this
+engine has generated. Every on-site technique in the ledger is optimising the
+smaller channel. I am flagging the figure's provenance honestly: it is a
+hardcoded string in a prompt, of unknown vintage and unknown accuracy, not a
+measurement. But it is the only estimate of profile reach anywhere in this
+system, and if it is even roughly right it inverts the priority order this
+journal has been using.
+
+**4. Phone calls, not forms, are how this business gets hired.** **78% of home
+service leads originate from phone calls**, ~22% from forms and chat;
+click-to-call on mobile converts at 8–12%, roughly 3× form submission; median
+contractor sites convert 2–4% of visitors, while sites that clearly name their
+specific services reach 12–16%. **I am recording this as a rejection, not a
+recommendation** — see below.
+- https://www.garretthandley.com/contractor-website-conversion-rate-in-2026-why-most-sites-convert-under-3-and-what-to-fix
+- https://pipelineon.com/blog/get-more-calls-contractor-website/
+
+**Rejected today, with what I checked.**
+- **Anything about making the phone number more prominent.** I audited all 41
+  pages plus `index.html`: **every single one has a `tel:` link, five of them on
+  a typical page, eight on the homepage.** The sticky mobile call bar is shipped
+  (`growth/templates.py:160`, `styles.css:229-268`). Research item 4 describes a
+  problem this site does not have.
+- **Adding FAQPage structured data.** `growth/techniques.py:195` emits it, and
+  `:1670-1717` deliberately avoids adding a second block where one exists.
+- **`services/half-round-gutters.html` looked like a generation defect** — 42KB
+  and 1,585 lines against ~19KB for its neighbours. I checked for duplicated
+  paragraphs and oversized JSON-LD and found neither: 9 sections, no repeats,
+  2.3KB of schema. It is simply a long page. Not a bug.
+- **Proposing Foursquare / BuildZoom / Apple Maps.** T048, T053, T029, already
+  candidates, re-ranked yesterday.
+- **Any tactic aimed at impressions.** 26,613 impressions bought 18 clicks.
+
+### Recommendations
+
+**Nothing in this commit is live.** The site runs from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout, and
+`growth/publish_state.sh` copies droplet → repo only. Every item below needs a
+deploy or a human before it changes anything.
+
+1. **Divine: send me the `snapshot: FAILED` line from
+   `/var/log/nemo-growth.log`, and deploy `growth/`.** *(Minutes.)* The log line
+   names the exception; I cannot see it and cannot fix the cause without it.
+   Deploying also ships the watchdog check below, so the next occurrence
+   announces itself. **New argument for the deploy, day 14: I ran the suite and
+   it is green — 218 tests.** It also carries `coverage_pct` → 39.5%, the price
+   queue fix, and the nine `crawl_*` counters that answer T046.
+   *How you would know:* a snapshot dated the same day as its build appears in
+   tomorrow's publish commit. *Checked:* `growth_daily.py:220-228` for the
+   swallowed exception; `growth_daily.py:237` for the watchdog's blind spot.
+
+2. **Divine: top up the Anthropic credit — and cap the denominator in the same
+   sitting.** *(Minutes, small money.)* Unchanged from yesterday and still
+   right: restoring credit alone restarts the scout, which grows the tracked
+   universe faster than the engine can cover it, so `share_pct` falls while
+   nothing gets worse. Options unchanged: **(a)** cap `tracked_queries`;
+   **(b)** promote `top3 / ranked_known` — **2 of 25** — to the headline;
+   **(c)** rate-limit the scout to the build rate. *Caveat I have to state:* I
+   cannot confirm the credit is still empty, because today's build log was never
+   published. It was empty on 08-19 and 08-20.
+
+3. **Eric: twenty minutes on the Business Profile — primary category, then
+   per-town service areas, then itemised Services.** *(Free. T016/T051/T022,
+   day 26. Eleventh appearance.)* **The new reason to do it is research items 2
+   and 3, and it is a better reason than any I have given before.** The profile
+   is reaching ~300 people a month against the website's ~75, *and* it is the
+   data source ChatGPT and Gemini read when they answer local trade questions —
+   so this single unglamorous task is simultaneously the map-pack lever, the
+   biggest-channel lever and the entire AI-visibility strategy, which
+   `ai_visitors: 0` for twenty-six days says is currently at zero. List each town
+   as its own service-area entry rather than one polygon. Skip the Q&A half of
+   T016; the feature is gone. *How you would know:* the `york` bucket moves off
+   33/5/0, or `local_visitors` lifts off ~0, within a month. *Checked:* T016,
+   T051, T022 all `candidate`/`activated: null`; and `grep` over `growth/*.py`
+   confirms **nothing in the engine touches the Business Profile** — every
+   active technique writes files into the site. This one cannot be automated.
+
+4. **Eric: one job photo and one short update to the profile per week, starting
+   this week.** *(Free. T008 and the photo half of T022.)* The seasonal item:
+   the window to be ranking for leaf-fall closes around mid-September. Actual
+   jobs, actual town names, no stock images, no incentives. *Checked:* both
+   `candidate`/`activated: null`.
+
+5. **Eric: reply to all 13 reviews in one sitting, then ask every finished job
+   for one.** *(Free. T033, T007.)* Response rate is the half of the review
+   signal that costs nothing. No incentives, no gating, no filtering.
+
+6. **Eric: confirm the PA HIC registration number and put it on the site, the
+   profile and the estimate form.** *(Free if registered. Day 7.)* PA law
+   requires the registration number on advertising distributed in Pennsylvania.
+   Legal exposure, not a growth idea, and exempt from any cadence change.
+
+7. **Eric decides the price policy; the engine implements it. Now with a count:
+   four pages, not one.** *(See item 7 above for the table.)* The decision is
+   whether NEMO publishes ballpark ranges at all. *If yes,* make the
+   no-figures rule intent-aware so cost pages follow `MONEY_SYSTEM`, and
+   regenerate the four. *If no,* one edit is still required regardless of policy:
+   **delete the "Typical price ranges" heading and its "With that caveat:"
+   sentence from `guides/gutter-cleaning-cost-york-pa.html`** — a section that
+   announces figures and withholds them is worse than no section, under either
+   answer. **I did not make that edit** — see below. *Checked:*
+   `growth/techniques.py:256-257`, `:379-390`, `:1580-1583`.
+
+8. **Eric: reject fifty-nine of the sixty-two candidates.** *(Day 14.
+   `does_not_work` empty on day twenty-six.)* Shortlist unchanged: **T048, T053,
+   T029**. Start rejections with **T011** (Local Services Ads) — mid-migration
+   into Google Ads, ~$53/lead, dashboard scheduled for retirement for NEMO's
+   business class.
+
+### What I changed in this repo today
+
+**One fix, with tests.** `growth_daily.py`: a new `_snapshot_problems()` helper,
+called from `cmd_watchdog`, that fires when the build completed today but
+`growth/snapshot.json` still carries an older date — exactly this morning's
+shape. It stays silent when the engine did not run at all, because the existing
+build-staleness check owns that case and two alarms for one cause teaches people
+to ignore both. `growth/test_watchdog.py`: six tests, one of which reproduces
+today's failure by name. **Suite is green: 218 tests.**
+
+I made this one and not the copy edits because it is the failure that hid every
+other failure, it is engine plumbing rather than a business decision, and it is
+covered by tests. **I again did not touch the price copy**, for the reason
+yesterday's entry gave and I still agree with: whether this business quotes
+ballpark numbers is Eric's call, not mine to make at 11am while nobody is
+reading. Recommendation 7 isolates the one edit that is correct under either
+answer, so it is ready the moment he picks one.
+
+I touched no runtime state (`techniques.json`, `keywords.json`, `results.jsonl`,
+`state.json`), activated or retired nothing, and edited no page copy or keyword
+list.
+
+**Corrections to my standing instructions.** The prompt still describes the
+07-28 baseline (77 rows, 17 matched, 3 clicks, 429 impressions, avg position
+12.4; county bucket 2 of 50) and the 08-01 usage cap as current. Last actual
+reading: **964 / 25 / 18 / 26,613 / 25.1**, county bucket **2 of 103**, and the
+08-01 cap expired three weeks ago — the blocker since has been an **empty credit
+balance**, a different error with a different fix. The prompt's advice to
+suspect the measurement if `visitors` sits at zero for a week is stale: since
+the 08-14 beacon cutover the honest count is ~2–3/day. **And one to add: the
+prompt tells me to read `snapshot.json` as today's state. It is not always
+today's. Check `snapshot.date` against the date of the publish commit before
+believing a single number in it** — I would have reviewed stale data as fresh
+this morning if I had not looked at `git log` first.
+
+### Reasoning and uncertainties
+
+Day twenty-six, and the most useful thing this review did was notice a file that
+was not there.
+
+**What I would defend hardest today.** I did not fire either of the two
+tripwires that came due, and I did not quietly drop them either. The credit
+tripwire is genuinely unresolvable — the evidence was never written — and
+escalating on it would have meant asserting a third failure day I cannot see.
+The cadence tripwire I revised on its merits and said exactly why. Yesterday I
+weakened a tripwire because my own evidence contradicted it; today I declined to
+fire two because the evidence is absent. Those are the same discipline.
+
+**What I got wrong before today.** Eleven entries recommended the Business
+Profile without anyone noticing that `growth/scout.py:159` contains an estimate
+that the profile out-reaches the entire website four to one. It has been sitting
+in a prompt string in this repo the whole time. Two days running, reading the
+source has beaten reasoning from the metrics — and the general lesson is
+sharper than "field names are not self-documenting": **the prompts this engine
+feeds its own writers contain business facts that appear nowhere in the
+snapshot.**
+
+**Where I am least confident. Four things.**
+
+*First, I cannot diagnose today's snapshot failure, only detect it.* My leading
+guess is the `growth_daily.py` + `indexstatus.py` change Divine committed on
+08-20 (`93c78c2`) — a new module landing the day before the snapshot stops
+writing is suspicious timing. But `snapshot.py` does not import `indexstatus`,
+`indexstatus.summary()` uses `.get()` throughout and cannot raise, and if the
+package on the droplet were mismatched the run would have died at import rather
+than reaching `rebuild_sitemap`. **So the timing is suggestive and the mechanism
+does not work, and I would rather say that than offer Divine a tidy theory that
+sends him down the wrong path.** The log line settles it in seconds.
+
+*Second, the 300-profile-views figure is doing a lot of work for a hardcoded
+string.* If it is stale or invented, recommendation 3's headline argument
+weakens — though the map-pack and AI-substrate reasons stand on their own. It is
+checkable in the GBP dashboard in about fifteen seconds, and worth checking
+before anyone leans on it as hard as I just did.
+
+*Third, on the flood I have now weakened my own explanation without supplying a
+better one.* The `num=100` deprecation is a real, dated, mechanical fact and it
+undercuts the rank-tracker theory this journal has repeated for a week. The
+position-1-zero-clicks row still says these are not humans. I would rather hold
+"not human, mechanism unknown" than keep repeating an explanation I have found a
+hole in.
+
+*Fourth, and unchanged: twenty-six days, two top-3 queries, zero in every named
+town, three bookings all time, and no call to the phone assistant since 07-30.*
+The recommendations are not getting better; they are getting older. That is why
+the cadence is changing.
+
+**What would change my mind, dated.**
+1. **The next fresh snapshot:** if it is dated the same day as its publish
+   commit, the failure was transient. If a second morning publishes without one,
+   the feed is broken structurally and everything above this line is guesswork.
+2. **On the credit:** the first published build log settles whether 08-21 was a
+   third consecutive failure or a self-heal.
+3. **On deploy:** `coverage_pct` **39.5%**, `price.covered` **8**, and `crawl_*`
+   present. If `crawl_gptbot` is 0 while `crawl_googlebot` is not, AI
+   invisibility is an access problem and T046 becomes urgent. If both are
+   non-zero, the crawlers come and do not cite us, and research item 2's reading
+   — that the answer runs through the Business Profile — is the right one.
+4. **2026-09-08:** the flood-decay test. I still predict the 40 rows are there.
+5. **2026-09-15:** the seasonal window closes. If the profile is untouched by
+   then, leaf season 2026 is decided, and the honest thing to write is that this
+   channel never got its chance — not that it did not work.
+6. **On the profile:** if Eric does 3, 4 and 5 and the `york` bucket still reads
+   33/5/0 with no calls a month later, the map pack is not the lever either, and
+   the real question becomes whether a one-truck operator can win this county on
+   search at all.
