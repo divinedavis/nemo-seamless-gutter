@@ -11230,3 +11230,323 @@ the cadence is changing.
    33/5/0 with no calls a month later, the map pack is not the lever either, and
    the real question becomes whether a one-truck operator can win this county on
    search at all.
+
+## 2026-08-22 — review agent
+
+### Lead: day two of no data, and today is worse — there is no publish commit at all.
+
+Yesterday's entry closed with a dated test: *"if a second morning publishes
+without one, the feed is broken structurally and everything above this line is
+guesswork."* **That test has fired.**
+
+Yesterday the 06:00 run at least pushed something — a one-line `sitemap.xml`
+change, commit `ccc0fb6`. **Today there is no commit from the droplet at all.**
+`git log origin/main` ends at `932e18f`, which is my own entry from yesterday
+morning. The last publish window (06:00–06:05 UTC, where the previous two
+landed at 06:00:16 and 06:04:45) passed five hours ago.
+
+So `growth/snapshot.json` still reads **2026-08-20** and its traffic series
+still ends **2026-08-19**. **This is the third consecutive review written
+against the same numbers.** I am keeping this entry short, per the cadence
+split I committed to yesterday — long form on Mondays, and today is Saturday.
+There is no new measurement to reason about, and writing the strategy essay a
+twelfth time against three-day-old data would be padding.
+
+**Why "no commit" is not the same as "the engine is dead."** `publish_state.sh:76`
+checks whether anything in the staging clone actually changed and, if not,
+prints `publish: nothing changed` and exits 0 **without committing**. So an
+empty morning is what you get whenever every published path is byte-identical.
+Two hypotheses fit today equally well and I cannot separate them from here:
+
+- **A — the run did not happen** (cron, droplet, or python). Then `last_build`
+  is still `2026-08-20`.
+- **B — the run happened and produced nothing publishable.** `snapshot.write()`
+  raises again, so `snapshot.json` and `JOURNAL.md` are untouched; credit is
+  still empty, so no pages are written; and `sitemap.xml` does not move either,
+  because the `lastmod` it carried yesterday comes from `reports/waiting-on-you.html`,
+  which only changes when `cmd_report` rewrites it. If the 08-21 run died at or
+  after the snapshot step, that file still has an 08-20 mtime and today's
+  `rebuild_sitemap` correctly changes nothing.
+
+**A free discriminator, and it costs Divine nothing to read.** The 11:00 ET
+watchdog has not run yet — I run before it. Which mail arrives settles it:
+
+| mail | means |
+| --- | --- |
+| "The last completed build was 2026-08-20 — 2 days ago" | **A.** The cron is not producing runs. |
+| the usual failed-steps/credit mail, nothing about staleness | **B.** The engine is alive; only the snapshot write is broken. |
+| nothing at all | the watchdog cron is down too, which is its own finding |
+
+Note what **cannot** happen: a mail naming the missing snapshot. That check is
+`_snapshot_problems()`, committed yesterday in `932e18f` and **not deployed.**
+
+### Where the numbers stand
+
+**2026-08-20 data, republished for the third time. Nothing below was
+re-measured and nothing below moved, because nothing was read.**
+
+**Goal metric: `top3` = 2 of 195 tracked queries, `share_pct` 1.0% against 50%.**
+Flat at 2 for the fourteenth day if it is still 2, which I cannot confirm.
+`top10` 7, `ranked_known` 25 — honestly read, **2 of 25**. **Zero top-3
+positions in all seven named towns:** york 33/5/**0**, dover 16/7/**0**,
+red-lion 11/3/**0**, dallastown 11/4/**0**, spring-grove 11/3/**0**,
+hanover 10/4/**0**. Both top-3s are in the county bucket, **2 of 103**.
+
+**Direction: unknown for 08-21 and unknown for 08-22.** Not flat — unknown.
+
+Coverage 32.3%. By intent: hire 55/118, check 4/22, diy 1/8, **price 3 of 47**.
+GSC at last reading: 964 rows, 25 matched, 18 clicks, 26,613 impressions,
+avg position 25.1. Traffic 08-14→08-19: **2, 2, 2, 3, 2, 3**. Leads:
+**3 bookings all time, 0 phone leads**, one call tap ever (08-12), `ai_visitors`
+0 across the whole series. Ledger: 74 techniques, 11 active, 62 candidates,
+1 retired, `does_not_work` **still empty on day twenty-seven**.
+
+### Did previous changes work?
+
+**1 — "A second morning without a snapshot means the feed is structurally
+broken." FIRED, and I am escalating.** See the lead. Two mornings, and the
+second one is emptier than the first.
+
+**2 — Yesterday's recommendation 1 (deploy `growth/`, send the log line). Not
+actioned.** I can prove the second half from the repo: no commit today means no
+new snapshot, and had the package been deployed, `snapshot.json` would carry a
+`code_version` block. This is the fifteenth consecutive day the deploy has been
+recommended.
+
+**3 — New, and the most useful thing I found today: the deploy gap is at least
+seventeen days, and I can measure it rather than assert it.** Previous entries
+called it "fourteen days" from the age of the recommendation. The published
+snapshot's own *shape* dates the droplet's `growth/snapshot.py` directly —
+**five features that `build()` emits in this repo are absent from the file the
+droplet wrote**, each traceable to a dated commit:
+
+| missing from the published snapshot | added by | dated |
+| --- | --- | --- |
+| `keywords.ranked` | `bea7a47` | 2026-08-05 |
+| `gsc.pages` | `aeed46d` | 2026-08-06 |
+| `traffic.crawl_*` (`metrics.CRAWLER_SERIES`) | `727deec` | 2026-08-07 |
+| `code_version` | `870a3dc` | 2026-08-09 |
+| `traffic.log_visitors` / `log_pageviews` | `9e18cbf` | 2026-08-15 |
+
+The earliest absence puts the droplet's `snapshot.py` **before 2026-08-05 — at
+least seventeen days stale.** There is a bleak joke in the fourth row:
+`_code_fingerprint()` exists precisely so nobody has to do this forensics again,
+and it is itself undeployed, so I had to do the forensics to discover that.
+
+**4 — A better mechanism for the snapshot crash than yesterday's, though still
+not a diagnosis.** Yesterday I floated Divine's 08-20 commit `93c78c2` and then
+talked myself out of it because `snapshot.py` does not import `indexstatus`.
+That reasoning was too narrow. `93c78c2` landed **2026-08-20 13:55 UTC — after
+the last good snapshot and before the first failure**, and it is the only known
+change to that machine in the window. The point is not that `indexstatus` raises;
+it is that deploying a **current `growth_daily.py` against a seventeen-day-old
+`growth/` package** is the partial-deploy shape this journal already recorded
+once, on 08-09. I still cannot name the exception, and the log line settles it
+in seconds. **But the remedy does not depend on the diagnosis** — deploying the
+whole package fixes it under either story, which is why recommendation 1 is
+unchanged and why I am not asking anyone to wait for a root cause.
+
+**5 — The beacon window.** Closed yesterday at six days (median 2/day). Not
+reopened. **6 — The flood.** 2026-09-08 test stands, untested today.
+**7 — The price contradiction (four pages).** Unchanged; Eric's call.
+**8 — The profile lever (recs 3–6 of 08-21).** Untestable, day 27, unactioned.
+
+### What I researched today
+
+Deliberately narrow, for the reason in the lead.
+
+**1. Map-pack weighting has moved from "prominence" to "popularity", and
+freshness is now a direct ranking input.** 2026 sources put **GBP signals at 32%
+of local pack weight** — the largest single category, ahead of on-page (19%),
+reviews (16%) and links (15%) — and describe a shift away from static prominence
+(age, backlinks, total review count) toward active engagement, with **weekly
+photos, posts and review replies directly influencing rankings.**
+
+This does not add a recommendation; it **re-orders two existing ones.** Yesterday
+ranked the one-off profile setup (rec 3) above the weekly photo/post habit
+(rec 4) and review replies (rec 5). If freshness is a live signal rather than a
+tidiness virtue, 4 and 5 are closer in value to 3 than I have been treating them
+— and they are the two that are *habits*, so they are also the two that benefit
+from starting before mid-September rather than after.
+- https://www.sparkzmarketing.com/post/google-business-profile-ranking-factors-2026-win-local
+- https://whitespark.ca/local-search-ranking-factors/
+- https://hookagency.com/blog/local-seo-for-home-service-businesses/
+
+**2. I went looking for a doorway-page risk in this engine's own output, and
+found the opposite. Recording it as a negative result, with the numbers.**
+2026 sources say Google's local algorithm has got materially better at detecting
+doorway pages, that a penalty damages sitewide quality signals and not just the
+offending URLs, and that per-town pages survive **only** where the page carries
+real local substance rather than a template with the city swapped in. This site
+generates fifteen such pages, so the question is live and nobody here has asked
+it.
+
+**First measurement said it was bad, and it was wrong.** A `difflib.quick_ratio`
+pass over the fifteen area pages with the town name masked returned **0.97** for
+the closest pair. I nearly wrote that up. `quick_ratio` compares character
+multisets and ignores word order, which inflates similarity badly on pages that
+share a nav, a footer and a trade vocabulary.
+
+**The proper measure says the pages are fine.** Six-word shingle overlap, town
+name masked, containment scored against the shorter page:
+
+- **median containment 0.20** across all 105 pairs
+- **maximum 0.34**
+- **zero pairs above 0.50**
+
+Every pair above 0.30 involves `wrightsville`, the shortest page at 560 words,
+where shared chrome is simply a larger fraction of a small page — an artifact of
+length, not duplicated body copy. Spot-reading confirms it: the Glen Rock page
+is about a borough in a narrow valley whose streets climb enough to change
+downspout placement, and about matching half-round to historic turret rooflines.
+That is not a template.
+
+**And it is deliberate.** `growth/techniques.py:245-250` — `AREA_SYSTEM` — tells
+the writer in as many words: *"A page that just repeats 'we serve <town>, call
+us today' three times will not rank and will make the site look like every other
+contractor's doorway page. Write about the actual place."* **The guard was built
+in from the start.** Proposing it would have been the FAQPage mistake again.
+- https://searchfoundry.co.uk/blog/programmatic-seo-on-a-budget-scaling-local-landing-pages-without-spam-penalties/
+- https://www.bigredseo.com/doorway-pages-vs-landing-pages/
+- https://www.cheers.tech/geo-academy/what-should-location-pages-include-for-ai-search
+
+**3. One genuine interaction between the two, which sharpens an existing
+recommendation without adding one.** The sources agree on *what* keeps a
+location page on the right side of the line: real pricing signals, real
+testimonials, area-specific detail. `AREA_SYSTEM` forbids the writer to invent
+prices, reviews, testimonials, job counts or certifications — **correctly**, it
+does not know them. The result is pages rich in housing-and-roof specificity and
+empty of commercial specificity. That is the safe trade and I would not reverse
+it. But it means the differentiators Google most rewards are exactly the ones
+**only Eric can supply**, and an LLM never will. That is a new argument for
+yesterday's recommendation 7, not a new recommendation.
+
+**Rejected today.** Doorway-page remediation (measured above; guard already
+shipped). Anything about phone-number prominence (audited 08-21: every page has
+`tel:` links, sticky mobile bar shipped). FAQPage schema (`techniques.py:195`).
+Any tactic aimed at impressions — 26,613 bought 18 clicks. **T011 Local Services
+Ads**, and today's research strengthens the rejection: the 2026 migration into
+Google Ads reaches storefront advertisers in August and **service-area businesses
+without storefronts later in 2026**, so NEMO would be onboarding into a product
+mid-move.
+
+### Recommendations
+
+**Nothing in this commit is live.** The site runs from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout, and
+`publish_state.sh` copies droplet → repo only. Everything below needs a deploy
+or a human.
+
+1. **Divine: deploy the whole `growth/` package, and send me the
+   `snapshot: FAILED` line from `/var/log/nemo-growth.log`.** *(Minutes. Day 15.)*
+   **The new argument is item 3 above: the gap is measured at seventeen-plus
+   days across five dated commits, not estimated.** A current `growth_daily.py`
+   over a package that old is the likeliest shape of the crash, and a whole-package
+   deploy fixes it whether or not that is the cause. It also ships
+   `_snapshot_problems()`, so the next occurrence announces itself instead of
+   costing three review days. **I ran the suite in this checkout today:
+   `python3 -m unittest discover -s growth` → 218 tests, OK.**
+   *How you would know:* tomorrow's publish commit carries a `snapshot.json`
+   dated the same day, containing `code_version`. *Checked:* `growth_daily.py:222-229`
+   (swallowed exception), `:308` (undeployed check), `publish_state.sh:76`
+   (why an all-quiet morning produces no commit at all).
+
+2. **Divine: top up the Anthropic credit.** *(Minutes, small money.)* Unchanged.
+   As of the last readable build log every content technique and the scout were
+   failing on `credit balance is too low` — a real empty balance, not the 08-01
+   usage cap, which expired three weeks ago. **Caveat: I cannot confirm today's
+   state, because no build log was published.** Cap the denominator in the same
+   sitting, per 08-21 rec 2 — restoring the scout alone grows `tracked_queries`
+   faster than the engine covers it, so `share_pct` falls while nothing worsens.
+
+3. **Eric: unchanged from 2026-08-21, and I am not restating them a twelfth
+   time.** Recommendations 3–8 of that entry stand as written: the Business
+   Profile setup, the weekly photo and post, replying to all 13 reviews, the PA
+   HIC registration number, the price policy decision, and rejecting the
+   candidate backlog. **One re-ordering from today's research item 1:** the
+   weekly-habit items (08-21 recs 4 and 5) are worth more than I ranked them, and
+   they are seasonal — the leaf-fall window closes around mid-September.
+   **HIC remains exempt from any cadence change**; it is legal exposure, not
+   growth.
+
+### What I changed in this repo today
+
+**Nothing but this entry, and that is a deliberate call rather than a quiet
+one.** Yesterday I added the watchdog check that would have caught today's
+failure. It is still sitting undeployed, at the back of a queue that today's
+measurement dates to seventeen days. **The bottleneck on this system is not the
+supply of correct code; it is the absence of a deploy step.** Writing a second
+fix into the same queue would look like progress and would change nothing on the
+machine that matters. I would rather the record say plainly that the right move
+today was to stop adding to the pile.
+
+I touched no runtime state (`techniques.json`, `keywords.json`, `results.jsonl`,
+`state.json`), activated or retired nothing, and edited no page copy or keyword
+list.
+
+**Corrections to my standing instructions.** Two carried over from 08-21 and
+still true: the prompt's 07-28 GSC baseline (77 rows / 17 matched / 3 clicks /
+429 impressions / position 12.4, county 2 of 50) is nearly a month stale — last
+actual reading **964 / 25 / 18 / 26,613 / 25.1**, county **2 of 103**; and the
+08-01 usage cap it describes as current expired three weeks ago, replaced by an
+**empty credit balance**, a different error with a different fix. Two more from
+today: **the prompt says the engine "pushes its state an hour before you run" —
+the real gap is about five hours** (publishes ~06:00 UTC, I run ~11:05 UTC), which
+matters because it means a missing publish is genuinely missing by the time I
+look, not merely late. And **the prompt's instruction to read `snapshot.json` as
+today's state is now wrong three days running.** Check `snapshot.date` against
+`git log` before believing any number in it.
+
+### Reasoning and uncertainties
+
+Day twenty-seven. For the third morning the honest headline is that the
+instrument is broken, not that the business did or did not move.
+
+**What I would defend hardest today.** I found what looked like a serious,
+publishable problem — near-duplicate town pages, at 0.97 similarity, with real
+2026 sources saying Google now punishes exactly that and punishes the whole site
+for it. It would have made a strong-looking recommendation. It was a measurement
+artifact, and the second measurement said the opposite, and the code said the
+guard had been deliberately built in from the beginning. **I would rather publish
+the negative result and the wrong first number than the finding.** The standing
+instruction here is to check the code before recommending; the sharper version
+after today is to check your own instrument before believing it, because a bad
+measure is more dangerous than no measure — it arrives with a number attached.
+
+**Where I am least confident.**
+
+*First, I cannot tell hypothesis A from hypothesis B*, and they need different
+responses — a dead cron is an outage, a failing snapshot write is a bug. The
+watchdog mail settles it this morning at no cost, which is why I built the table
+rather than guessing.
+
+*Second, the seventeen-day figure is a lower bound, not a point estimate.* It
+says the droplet's `snapshot.py` predates 08-05. It says nothing about the other
+twenty modules, which could each be a different age — that is precisely the
+partial-deploy failure of 08-09, and precisely what `code_version` was built to
+end.
+
+*Third, I am relying on secondary sources for the 32%-and-freshness claim.* The
+weighting figures in local-SEO reports are survey-derived and the sources are
+marketing agencies with an interest in the answer. I used them to **re-order**
+existing recommendations, not to justify new work, which is about as much weight
+as that evidence will carry.
+
+*Fourth, and unchanged: twenty-seven days, two top-3 queries, zero in every named
+town, three bookings all time, no call since 07-30 — and now three days where
+even that could not be re-read.* The gap between what this system measures and
+what would make Eric's phone ring has not narrowed.
+
+**What would change my mind, dated.**
+1. **Tomorrow's publish commit.** A `snapshot.json` dated 08-23 with a
+   `code_version` block means both problems were the same problem and the deploy
+   fixed it. A third empty morning means the daily review has no input at all and
+   should say so in three lines until it does.
+2. **Today's watchdog mail**, per the table above.
+3. **On deploy:** `coverage_pct` → 39.5%, `price.covered` → 8, `crawl_*` present.
+   If `crawl_gptbot` is 0 while `crawl_googlebot` is not, AI invisibility is an
+   access problem and T046 becomes urgent.
+4. **2026-09-08:** the flood-decay test. Still predicting the 40 rows persist.
+5. **2026-09-15:** the seasonal window closes. If the profile is untouched by
+   then, leaf season 2026 was decided by inaction, and the honest thing to write
+   is that this channel never got its chance.
