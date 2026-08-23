@@ -11550,3 +11550,293 @@ what would make Eric's phone ring has not narrowed.
 5. **2026-09-15:** the seasonal window closes. If the profile is untouched by
    then, leaf season 2026 was decided by inaction, and the honest thing to write
    is that this channel never got its chance.
+
+## 2026-08-23 — review agent
+
+### Lead: third day with no data. Keeping the promise I made yesterday to stop writing the essay — but two things are genuinely new, and one of them kills the leading hypothesis.
+
+Yesterday I wrote that a third empty morning "means the daily review has no input
+at all and should say so in three lines until it does." That morning is today.
+`git log origin/main` still ends at `94c9554`, my own entry from yesterday. The
+last commit from the droplet was **`ccc0fb6`, 2026-08-21 06:04:45 UTC** — a
+one-line `sitemap.xml` change, now two mornings ago. `growth/snapshot.json` still
+reads **2026-08-20** and its traffic series still ends **2026-08-19**. This is the
+**fourth consecutive review against the same numbers.**
+
+So: no strategy section today, and no restating the Eric list a thirteenth time.
+But I found something the previous three entries missed, and it is not a
+restatement.
+
+### Finding 1 — the engine has a heartbeat visible in git, and it stopped on 2026-08-20.
+
+Nobody here has used `sitemap.xml` as an instrument. It is one.
+
+- `seo/gen_sitemap.py:21-29` walks the whole docroot and writes each URL's
+  `<lastmod>` from **`os.path.getmtime()`**. It is not a curated list.
+- `growth/report.py:33-72` — `write_waiting_page()` — rewrites
+  `reports/waiting-on-you.html` via `os.replace` on **every** non-dry-run report.
+  So that file's mtime *is* the date `cmd_report` last completed.
+- In `cmd_daily` (`growth_daily.py:211-233`) the order is measure → review →
+  **build (which rebuilds the sitemap)** → coverage → scout → snapshot → **report**.
+  The sitemap is written *before* the report, so the `lastmod` published on
+  morning D reports the report step of morning **D-1**.
+
+Read the git history through that lens:
+
+| publish commit | `waiting-on-you.html` lastmod | means |
+| --- | --- | --- |
+| `cfe94a9` (08-20) | 2026-08-19 | the **08-19** run finished `cmd_report` |
+| `ccc0fb6` (08-21) | 2026-08-20 | the **08-20** run finished `cmd_report`; the 08-21 run reached `cmd_build` |
+| — (08-22) | no change | the report step has **not** run since 08-20 |
+| — (08-23) | no change | still hasn't |
+
+**The 08-21 run reached `cmd_build` and never reached `write_waiting_page`.**
+
+**This rules out the hypothesis I have been leading with for three days.**
+`snapshot.write()` is wrapped in `try/except` at `growth_daily.py:223-229` — the
+exception is *swallowed* and the run continues to `cmd_report`. So "only the
+snapshot write is broken" is **not consistent with the evidence**: under that
+story the 08-21 run would have gone on to rewrite `waiting-on-you.html`, and the
+08-22 sitemap would have carried lastmod `2026-08-21` and produced a publish
+commit. It did not. Whatever is killing the run is **upstream of the report and
+outside the try/except.**
+
+That narrows the crash window to four places, and it is a short list to grep a log for:
+
+1. `ledger.set_state("last_build", ...)` — `growth_daily.py:169`, the last
+   statement in `cmd_build`, *after* `rebuild_sitemap` has already written the file
+2. `keywords.check_coverage(args.docroot)` — `:218`
+3. `scout.run(...)` — `:219` (`cmd_scout` does **not** wrap it)
+4. the head of `report.build_text()`, before `write_waiting_page`
+
+The individual techniques are **not** candidates: `cmd_build:160-163` wraps each
+one in `try/except`. Nor is a wedged publisher — see finding 1b.
+
+**My guess, offered as a guess and nothing more: the disk is full.** It fits the
+shape better than anything else on that list — (1) is a write, `snapshot.write()`
+is a 224 KB write that is failing, `JOURNAL.md` is now 742 KB and grows daily, and
+a full disk breaks writes while leaving reads and the sitemap rebuild working.
+I have no evidence for it beyond fit. `df -h` costs one second and either kills it
+or ends this.
+
+### Finding 1b — "no commit" does not mean the publisher failed, and cannot mean a merge conflict.
+
+Worth recording because it removes a whole class of suspects. `publish_state.sh`
+runs from cron **as its own entry, after** `growth_daily.py`, so it runs even when
+the engine crashed. And at line 45 it does `git fetch` + **`git reset --hard
+origin/main`** before copying anything — so the staging clone at `/root/nemo-repo`
+*cannot* wedge on a conflict with my review commits, which is the failure mode I
+would otherwise have suspected first given that both sides write `JOURNAL.md`.
+An empty morning means the **docroot** produced nothing new, not that the push
+broke. If the push itself were failing on auth, `set -euo pipefail` would make it
+a hard error in the log rather than silence.
+
+### Finding 2 — the impression flood has a better, dated explanation than "rank trackers", and it predicts the opposite of what I predicted.
+
+The standing story since 08-14 is that the 26,613 impressions are rank-tracker
+traffic, with a dated test on **2026-09-08** predicting the 40 Philadelphia-suburb
+rows persist. Two things from today's research undercut it:
+
+- **The mechanism I assumed was closed eleven months before this flood started.**
+  Google deprecated the `&num=100` parameter on **2025-09-11**, which is precisely
+  what let rank-tracker scraping inflate GSC impressions. That channel was shut
+  before August 2026.
+- **There is a confirmed Google-side logging bug.** Google acknowledged on
+  **2026-04-03** that Search Console had over-reported impressions from
+  **2025-05-13** onward, and has been rolling out a fix. Contributing factors
+  named include renewed SERP scraping and AI commerce crawlers.
+
+This flips my dated test. Rank-tracker traffic *persists*; a logging bug being
+fixed *decays*. **I now expect the 08-14 prediction to fail** — I predict the
+impression count falls materially, and I would rather write that down before the
+data returns than after.
+
+The corroborating detail is already sitting in the snapshot and I had not weighed
+it properly: `keywords.discovered_untracked` has **`gutter installer` at position
+1.0 with 470 impressions and 0 clicks.** A genuine position-1 result with 470
+impressions returns something like 30-100 clicks even on an AI-Overview-suppressed
+query. Zero is not a low CTR; it is an absence of humans.
+
+**The operational consequence, which is the part that matters:** `impressions` and
+`avg_position` on this property are **not trustworthy metrics right now**, and
+`avg_position` 25.1 is an average over mostly-phantom impressions. Report `top3`,
+`ranked_known` and **clicks** — 18 of them — and stop quoting position as if it
+measured anything. Nothing in the code needs to change for that; it is a reading
+discipline for whoever writes these entries next, me included.
+
+### Where the numbers stand
+
+**All 2026-08-20 data, republished a fourth time. Nothing was re-measured.**
+
+Goal metric **`top3` = 2 of 195 tracked queries, `share_pct` 1.0%** against a
+target of 50%. Against what Search Console can actually rank, **2 of 25**.
+`top10` 7. **Zero top-3 positions in every named town** — york 33/5/**0**,
+dover 16/7/**0**, red-lion 11/3/**0**, dallastown 11/4/**0**,
+spring-grove 11/3/**0**, hanover 10/4/**0**; both top-3s are in the county
+bucket, **2 of 103**. Direction for 08-20 through 08-22: **unknown, not flat.**
+
+Coverage 32.3%. By intent: hire 55/118, check 4/22, diy 1/8, **price 3 of 47**.
+GSC at last reading 964 rows / 25 matched / **18 clicks** / 26,613 impressions —
+see finding 2 before believing the last two. Traffic 08-14→08-19: **2, 2, 2, 3, 2,
+3**. Leads: **3 bookings all time, 0 phone leads**, one call tap ever (08-12).
+`ai_visitors` **0 across the entire 26-day series**. `last_build` 08-20: **0 new,
+0 changed**. Scout still failing on `credit balance is too low`. Ledger: 74
+techniques, 11 active, 1 retired, `does_not_work` **still empty on day twenty-eight**.
+
+### Did previous changes work?
+
+**1 — "A third empty morning" test. Fired.** Honoured: this entry has no strategy
+section.
+
+**2 — "Only `snapshot.write()` is broken" (08-21, 08-22). Refuted today.** See
+finding 1. I led with this hypothesis for two days and it was wrong; the swallowed
+exception at `growth_daily.py:228` is the reason it cannot be the whole story, and
+I had read that line without drawing the consequence.
+
+**3 — Deploy the `growth/` package. Not actioned, day sixteen.** No new snapshot,
+so still no `code_version` block. The measured deploy gap is now **at least
+eighteen days** (droplet's `snapshot.py` predates `bea7a47`, 2026-08-05).
+
+**4 — Top up Anthropic credit. Not actioned** as of the last readable build log.
+
+**5 — The 08-14 flood prediction. I am now predicting against it.** See finding 2.
+
+**6 — Eric's list (08-21 recs 3–8).** Unactioned, day 28. Not restating it.
+**HIC registration remains exempt** from any cadence throttling — that is legal
+exposure, not growth.
+
+### What I researched today
+
+Narrow, per the lead.
+
+- **GSC impression inflation.** The `&num=100` deprecation and the Google-acknowledged
+  logging bug — the substance is in finding 2.
+  https://www.getpassionfruit.com/blog/how-google-was-reporting-wrong-data-for-gsc-for-months-google-search-console-impression-bug ·
+  https://brodieclark.com/impression-spike-google-search-console/ ·
+  https://www.practicalecommerce.com/did-google-just-prevent-rank-tracking
+- **Service areas do not affect ranking.** Sterling Sky and others are consistent
+  in 2026: the service-area polygon in a Business Profile tells users where you
+  travel and does **not** help you rank there; proximity to the *verified address*
+  still drives it. **Rejected as a recommendation** — but it is a useful caution
+  on 08-21 rec 3. Nobody should expect setting a wide service area to move York.
+  https://www.sterlingsky.ca/does-the-service-area-in-google-my-business-impact-ranking/
+- **AI citation base rates.** SOCi's 2026 index: only **1.2%** of local business
+  locations are ever recommended by AI search, and lead-gen aggregators dominate
+  the answers. This **reframes an existing number rather than adding work**:
+  `ai_visitors` = 0 for 26 straight days is the *expected* value at that base rate,
+  not evidence of a bug. It lowers my urgency on T046, which I had been treating
+  as a possible access problem.
+  https://jweis.com/blog/ai-search-geo-contractors/ ·
+  https://renewlocal.com/blog/answer-engine-optimization-local-business-cited-by-ai-2026
+
+**Rejected today:** everything on-site. With the feed dark and the deploy queue at
+eighteen days, an on-site recommendation is a recommendation to lengthen a queue.
+
+### Recommendations
+
+**Nothing in this commit is live.** The site runs from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout, and
+`publish_state.sh` copies droplet → repo only.
+
+1. **Divine: run `df -h`, then `tail -50 /var/log/nemo-growth.log`.** *(Seconds.)*
+   This is a smaller ask than the one I have made for fifteen days and it comes
+   with a shortlist. Finding 1 says the run dies between `rebuild_sitemap` and
+   `write_waiting_page`; the four candidates are `growth_daily.py:169`, `:218`,
+   `:219`, and the head of `report.build_text`. A full disk fits all of them at
+   once. *How you would know:* the traceback names one of the four.
+   *Checked:* `growth_daily.py:211-233` (order), `:223-229` (swallowed exception —
+   why the snapshot cannot be the sole cause), `:160-163` (techniques wrapped),
+   `growth/report.py:33-72`, `seo/gen_sitemap.py:21-29`, `growth/publish_state.sh:45`.
+
+2. **Divine: deploy the whole `growth/` package.** *(Minutes. Day 16.)* Unchanged
+   and still correct under every story, and it ships `_snapshot_problems()` so the
+   next occurrence announces itself. I ran the suite in this checkout today:
+   `python3 -m unittest discover -s growth -t .` → **218 tests, OK**. (The `-t .`
+   matters — without it the relative imports fail and you get 11 spurious errors.)
+
+3. **Divine: top up the Anthropic credit** *(minutes, small money)*, and cap the
+   query denominator in the same sitting per 08-21 rec 2 — restoring the scout
+   grows `tracked_queries` faster than the engine covers it, so `share_pct` falls
+   while nothing on the site gets worse.
+
+4. **Nobody: do *not* remove `reports/waiting-on-you.html` from the sitemap.**
+   Recording this as an explicit non-recommendation because it is the tidy-looking
+   move and it would be a mistake. The comment at `growth/report.py:36` says
+   "`seo/gen_sitemap.py` never sees it" — that comment is **wrong**; the generator
+   walks the whole docroot and the URL is in `sitemap.xml` line 36 today. The page
+   is `noindex`, so the cost is a wasted row in a 41-URL sitemap. The benefit is
+   that it is currently the **only** remaining signal that reaches me about whether
+   the engine finished its run. Leave it until the feed is healthy, then revisit.
+
+5. **Eric: unchanged from 2026-08-21 recs 3–8.** Not restating. One caution added
+   from today's research: setting a wide service area on the Business Profile will
+   not by itself move York rankings.
+
+### What I changed in this repo today
+
+**Only this entry.** Same reasoning as yesterday, and today it is better founded:
+the bottleneck is not the supply of correct code, it is the absence of a deploy
+step, and the queue is now measured at eighteen days. I deliberately did **not**
+fix the wrong comment at `report.py:36` — a comment-only commit into an undeployed
+queue is motion, not progress, and the recommendation above preserves the
+information without touching the machine. I touched no runtime state
+(`techniques.json`, `keywords.json`, `results.jsonl`, `state.json`), activated or
+retired nothing, and edited no page copy or keyword list.
+
+**Corrections to my standing instructions.** Carried forward and still true: the
+prompt's 07-28 GSC baseline (77 rows / 3 clicks / 429 impressions / position 12.4,
+county 2 of 50) is a month stale — last actual reading 964 / 18 / 26,613 / 25.1,
+county **2 of 103**; the 08-01 usage cap it describes expired three weeks ago and
+has been replaced by an **empty credit balance**, a different error with a
+different fix; the engine publishes ~5 hours before this review, not one; and
+`snapshot.json` has not been today's state for four days running — check
+`snapshot.date` against `git log` before believing any number in it. **New today:**
+the prompt tells me to treat `avg_position` as thin-but-real. Finding 2 says it is
+worse than thin — it is an average over impressions that are substantially
+phantom. Prefer `top3`, `ranked_known` and clicks.
+
+### Reasoning and uncertainties
+
+Day twenty-eight, and for the third morning the honest headline is that the
+instrument is broken rather than that the business moved.
+
+**What I would defend hardest today.** I spent two days leading with a hypothesis
+that a single line of code I had already read ruled out. The fix was not more
+research; it was noticing that a file nobody thinks of as data —
+`sitemap.xml` — records a timestamp every morning, and that its history was
+sitting in the repo the whole time. When the designed instrument fails, the
+question is which *undesigned* ones are still recording. That is the transferable
+lesson, and I would rather log it than the finding.
+
+**Where I am least confident.**
+
+*The disk-full guess is a guess.* It fits, and fit is not evidence. I flagged it
+as a guess precisely so nobody treats it as a diagnosis; the log settles it.
+
+*Finding 1 assumes runs are still happening.* If cron died after 08-21, the
+silence on 08-22 and 08-23 is explained trivially and only the conclusion about
+the **08-21** run survives. That conclusion — reached build, never reached report,
+so the swallowed snapshot exception is not the sole cause — holds either way, and
+that is the part that changes where to look.
+
+*Finding 2 rests on secondary reporting of a Google bug*, not on Google's own
+notice, and I cannot separate "logging bug" from "AI crawler impressions" from
+here. But the zero-clicks-at-position-1 row is first-party data from this
+property's own snapshot, and it does not depend on any of those sources.
+
+*And unchanged: twenty-eight days, two top-3 queries, zero in every named town,
+three bookings all time, no phone lead ever, no call tap since 08-12* — and now
+three days where none of it could be re-read.
+
+**What would change my mind, dated.**
+1. **Tomorrow's publish commit.** A `snapshot.json` dated 08-24 with a
+   `code_version` block means the deploy fixed it. A fourth empty morning and I
+   will cut this to a status line.
+2. **`df -h` and the log**, per rec 1.
+3. **2026-09-08 — the flood test, and I have now reversed my side of it.** I
+   predict the impression count **falls materially**. If the 40 rows persist at
+   volume, the logging-bug story is wrong and rank-tracker traffic survives the
+   `&num=100` deprecation by some route I have not identified.
+4. **2026-09-15 — the seasonal window closes.** If the Business Profile is
+   untouched by then, leaf season 2026 was decided by inaction, and the honest
+   thing to write is that this channel never got its chance.
