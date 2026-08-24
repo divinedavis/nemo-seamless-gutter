@@ -11840,3 +11840,428 @@ three days where none of it could be re-read.
 4. **2026-09-15 — the seasonal window closes.** If the Business Profile is
    untouched by then, leaf season 2026 was decided by inaction, and the honest
    thing to write is that this channel never got its chance.
+
+## 2026-08-24 — review agent
+
+### Lead: the credit got topped up and the engine is writing again — and the watchdog cannot see that half the run is still dead.
+
+Two genuinely new things this morning, one good and one bad, and they are related.
+
+**Good: a human acted.** Commit `60560db`, 2026-08-24 06:06 UTC, is the first
+droplet commit carrying **content** since 2026-08-20. It published a new
+Spanish-language guide (`guides/instalacion-de-canaletas-york-pa.html`, 243 lines)
+and a strengthened Spring Grove area page. Neither is template output — the Spring
+Grove additions name Jefferson and Seven Valleys and argue about 5-inch versus
+6-inch on that town's roofs, and no template in `templates.py` contains Spanish.
+Those are model calls that succeeded. **The Anthropic credit balance was
+restored.** That closes a recommendation open since 2026-07-28 and it is the first
+human action on this list in twenty-nine days. `sitemap.xml` gives both pages
+`lastmod` 2026-08-24 and that field is `os.path.getmtime()`, so they were written
+this morning, not backfilled.
+
+**Bad: `growth/snapshot.json` still reads 2026-08-20.** This is the **fifth
+consecutive review against identical numbers.** And today I can date the failure
+precisely instead of guessing at it.
+
+### Finding 1 — the run still dies between build and report, and today that is no longer conditional.
+
+Yesterday's entry established `reports/waiting-on-you.html`'s sitemap `lastmod` as
+an undesigned instrument: `report.write_waiting_page()` rewrites that file via
+`os.replace` on every non-dry-run report (`growth/report.py:33-72`), and
+`seo/gen_sitemap.py:21-29` stamps each URL's `lastmod` from the file's mtime.
+
+In today's freshly-rebuilt sitemap that row reads **`2026-08-20`**.
+
+So the sitemap written this morning, by this morning's run, says the report step
+last completed on **2026-08-20**. The 08-21, 08-22, 08-23 and 08-24 runs all
+reached `cmd_build` — this morning's proves it, it wrote two pages and the sitemap
+— and **none of them reached `cmd_report`.**
+
+Yesterday I flagged this conclusion as resting on an assumption: *"Finding 1
+assumes runs are still happening. If cron died after 08-21, the silence is
+explained trivially."* **Today's commit removes the assumption.** Cron is alive,
+python starts, the droplet is up, and the run gets as far as writing files. The
+crash or hang is real and it is where I said it was.
+
+From `cmd_daily` (`growth_daily.py:211-233`), everything between the end of
+`cmd_build` and `write_waiting_page` that is **not** wrapped in `try/except`:
+
+1. `ledger.set_state("last_build", ...)` — `growth_daily.py:169`
+2. `keywords.check_coverage(args.docroot)` — `:218`
+3. `scout.run(...)` — `:219` (`cmd_scout` does not wrap it)
+4. the head of `report.build_text()` — `growth/report.py:116-121`
+
+**I can narrow that list by two.**
+
+**(1) is nearly ruled out.** It is the statement immediately after the technique
+loop, and every technique is individually wrapped (`:160-163`). For the run to die
+there, `ledger.set_state` — a small JSON write — would have to fail on a morning
+when the same process had just written a 243-line HTML file, modified another, and
+rewritten `sitemap.xml`. See finding 2.
+
+**(2) is weakened hard.** `keywords.check_coverage(args.docroot)` is called with
+identical arguments **three** times per run: `cmd_measure` (`:88`), inside
+`cmd_build` (`:145`), and again at `:218`. `cmd_measure` completes — otherwise
+`cmd_build` never runs. For it to raise only on the third call, it would have to
+choke on something the build had just written. That is *possible* today, when the
+build wrote two pages. It cannot explain 08-22 and 08-23, when the build wrote
+nothing at all and the run still died.
+
+**That leaves `scout.run()` and the head of `report.build_text()`** — and one of
+them just got much more interesting.
+
+### Finding 2 — the disk-full guess is dead, and the scout's success path has never run.
+
+**Disk-full is refuted, not merely unsupported.** I offered it yesterday as a guess
+that "fits the shape" — writes failing while reads keep working. This morning's run
+created a new 243-line file, rewrote an existing area page, and rewrote
+`sitemap.xml`. Writes work. I would rather retire my own guess in one line than
+carry it another day.
+
+**What replaces it is a real structural hazard.** `growth/scout.py:211-270`:
+
+- The **failure** path is wrapped and battle-tested. `llm.load_key()` is in
+  `try/except`; `llm.call_json()` is in `try/except`; both return a dict. That path
+  has executed every morning for weeks against `credit balance is too low`, and on
+  every one of those mornings the run went on to finish its report.
+- The **success** path — everything after that `except` block — is **completely
+  unwrapped**: `ledger.add(...)` in the technique loop, `keywords.add(...)` in the
+  keyword loop, `ledger.set_state("scout_last", ...)`.
+
+That code has been unreachable for weeks, because the LLM call always failed before
+it. **Topping up the credit is exactly what makes it reachable.** An engine whose
+error path is well-worn and whose happy path is cold is a specific and unlovely
+kind of fragile.
+
+I want to be careful about how much this explains. It fits **today** well. It does
+**not** explain 08-21 through 08-23, when `last_scout` was still failing on credit
+and the wrapped path should have returned cleanly — unless the credit was restored
+earlier than the content suggests. So I am not claiming scout as the diagnosis. I
+am claiming it is now the first thing to read in the log, and that its shape is
+worth fixing regardless of whether it is today's culprit.
+
+### Finding 3 — the watchdog reports "ok" while half the run is dead, and it is built to.
+
+**This is the finding I would keep if I could keep only one**, because it explains
+why five days of a dark data feed produced no alert to anybody.
+
+`cmd_watchdog` (`growth_daily.py:277-331`) runs at 11:00 ET from its own cron entry
+(`deploy/cron-nemo-growth:36`). Everything it checks:
+
+| check | reads | fires today? |
+| --- | --- | --- |
+| never recorded a build | `last_build` | no |
+| `stale_days >= 2` | `last_build.date` | **no — the build runs every morning** |
+| failed steps today | `last_build.log` | only if a *technique* failed |
+| Search Console sync failing | `gsc_last` | no, GSC was `ok` |
+| `_snapshot_problems(...)` | `snapshot.json` vs build date | **not deployed** |
+
+Every one of those reads state written **by or before `cmd_build`** — and
+`cmd_build` is the one part of the run that still works. Everything downstream of
+it can be dead indefinitely and the watchdog will print `watchdog: ok — last build
+2026-08-24` and mail nothing.
+
+**The monitor is blind to this outage by construction.** It asks "did the engine
+run?", the engine half-ran, and half-running answers yes.
+
+There is a bitter detail. `_snapshot_problems` — the one check that *would* catch
+this, comparing `snapshot.json`'s date against the build date — was written by a
+review agent on 2026-08-21 (`932e18f`) precisely for this failure. It is in this
+repo. It has 218 passing tests behind it. **It has never been deployed**, so the
+alarm built for this outage sat in git while the outage ran.
+
+There is a diagnostic gift in it too, which costs nothing to collect:
+
+> **If Divine has received watchdog emails since 08-22, the crash is inside
+> `cmd_build` before `ledger.set_state`. If the inbox is empty, it is after it.**
+
+An empty inbox is data here, not an absence of data. That single fact splits the
+candidate list in half before anyone opens a terminal.
+
+### Finding 4 — 15 of 17 guides have never had a single inbound internal link.
+
+This one is about growth rather than plumbing, and it is measured, not guessed. I
+counted inbound links to every guide from every other HTML page in the docroot:
+
+```
+gutter-cleaning-cost-york-pa.html            5
+seamless-vs-sectional-gutters.html           8
+the other 15 guides                          0
+```
+
+Both linked guides are linked by **hand-built** markup on area pages. **Every guide
+the engine has ever written is an orphan**, reachable only through `sitemap.xml`.
+
+The cause is in the code and it is almost funny. `internal_links`
+(`techniques.py:539-546`) opens with: *"New town pages are orphans until something
+links to them, and Google finds orphaned pages slowly and ranks them badly."* The
+technique is correct, active, and protected from retirement (`review.py:35`). It
+calls `_all_area_pages(ctx)` and meshes **area pages only**. The reasoning was
+written down, agreed with, implemented — and applied to one of the two directories
+that needed it. Sixteen guides have been published into a directory the mesh does
+not visit.
+
+This is a candidate explanation for a pattern this journal has been reporting as a
+mystery: guides that draw impressions and rank in the 20s-30s. Orphan pages with no
+internal PageRank and no topical context ranking poorly is the ordinary,
+well-understood outcome, not an anomaly.
+
+**Checked against the ledger before writing this:** no technique proposes guide
+interlinking. `internal_links` is area-only by its own docstring;
+`york_local_authority_links` is about *external* links from chambers and suppliers.
+Not a duplicate, not a candidate, not retired.
+
+### Finding 5 — today's Spanish page ships declared as English, and orphaned.
+
+The new page is titled *"Instalación de Canaletas en York PA: Precios 2026"* and is
+Spanish throughout. Line 2 is:
+
+```html
+<html lang="en">
+```
+
+`growth/templates.py:16` hardcodes that for every page the engine generates, which
+is right for the other forty and wrong for this one. `grep hreflang` across the
+entire docroot and across `techniques.py` and `templates.py` returns **nothing** —
+no page has an hreflang annotation and no code emits one. And per finding 4 it has
+zero inbound links.
+
+So the engine wrote a genuinely good bet — York City has one of the county's
+largest Spanish-speaking populations, the ledger's `spanish_lane_york_city`
+candidate makes that argument well, and essentially no local gutter contractor
+publishes in Spanish — and then shipped it declared as the wrong language, with no
+language annotation, linked from nowhere. The bet is sound. The wiring is not.
+
+### Where the numbers stand
+
+**Everything below is 2026-08-20 data, republished a fifth time. Nothing has been
+re-measured since.** I am not going to dress that up.
+
+**Goal metric: `top3` = 2 of 195 tracked queries, `share_pct` 1.0%**, against a
+target of 50%. Against the 25 queries Search Console can actually rank, 2 of 25.
+`top10` 7. **Zero top-3 positions in every named town** — york 33/5/**0**,
+dover 16/7/**0**, red-lion 11/3/**0**, dallastown 11/4/**0**,
+spring-grove 11/3/**0**, hanover 10/4/**0**. Both top-3s sit in the county bucket,
+**2 of 103**. Direction 08-20 → 08-24: **unknown.** Not flat — unknown. Five days
+of a business's rank data that nobody will ever see, because a snapshot that was
+never written cannot be written retroactively.
+
+Coverage 32.3% of 195. By intent: hire 55/118, check 4/22, diy 1/8,
+**price 3 of 47**. Traffic 08-14→08-19: **2, 2, 2, 3, 2, 3**; organic 2, 1, 0, 1,
+0, 2. Leads: **3 bookings all time, 0 phone leads ever**, one call tap in the
+entire series (08-12). `ai_visitors` **0 across all 26 days**. GSC at last reading:
+964 rows, 25 matched, **18 clicks**, 26,613 impressions, avg position 25.1 — see
+the 08-23 entry before believing the last two; `gutter installer` sits at position
+1.0 with 470 impressions and **zero clicks**, which is not a low CTR, it is an
+absence of humans. Ledger: 74 techniques, 11 active, **`does_not_work` still empty
+on day twenty-nine.**
+
+### Did previous changes work?
+
+**1 — "A `snapshot.json` dated 08-24 means the deploy fixed it" (08-23, dated
+test). Resolved: the deploy did not happen.** A publish commit arrived; it carried
+no `snapshot.json` and no `code_version` block. I had framed this as a binary and
+the morning came back with a third answer — commit, content, no snapshot — which is
+more informative than either branch I wrote. I take the lesson over the prediction.
+
+**2 — "The disk is full" (08-23, offered as a guess). Refuted.** Finding 2. One
+day, correctly labelled a guess, killed by the next morning's evidence.
+
+**3 — "Only `snapshot.write()` is broken" (08-21, 08-22). Stays refuted**, and
+today's content commit removes the last conditional from the refutation.
+
+**4 — Top up the Anthropic credit (open since 07-28). ACTIONED.** The first human
+action recorded in this journal in twenty-nine days. Consequences: content
+techniques ran, `money_pages`/guide writing resumed, and — per finding 2 — the
+scout's cold success path became reachable. Worth saying plainly: **this was the
+right thing to do and it visibly worked.**
+
+**5 — Deploy the `growth/` package. Not actioned, day twenty.** The measured gap is
+now at least twenty days. Today it has a price attached: `_snapshot_problems`,
+written on 08-21 for exactly this outage, would have alerted Divine on 08-22 and
+every morning since.
+
+**6 — The 08-14 impression-flood test (due 2026-09-08). Untestable this week.** No
+new GSC reading since 08-20. My 08-23 reversal — predicting impressions *fall*
+because the driver is a Google logging bug rather than rank-tracker scraping —
+stands unmodified and unexamined.
+
+**7 — Eric's list (08-21 recs 3-8). Unactioned, day twenty-nine.** Not restating
+it; it is in the 08-21 entry. **HIC registration remains exempt** from any
+throttling. That is legal exposure in Pennsylvania, not a growth tactic, and it
+does not belong on the same list as gutter keywords.
+
+### What I researched today
+
+- **Review velocity overtook review count.** The 2026 local ranking factor surveys
+  move velocity from rank 93 (2022) to rank 11 — roughly 10% of local weight, the
+  largest single year-over-year rise in the local algorithm. A profile with 30
+  reviews gaining 5 a month routinely outranks one with 60 that gained none. NEMO
+  sits at **4.2 stars, 13 reviews**, and the journal records no new review in the
+  time it has been running. This does not change the standing recommendation that
+  Eric ask every completed customer for a review — it raises its rank, because it
+  says a *trickle* beats a *burst*, which is the pace one owner can actually keep.
+  Compatible with Google's terms: asking all customers without gating or incentive.
+  https://searchengineland.com/google-business-profile-audit-local-rankings-472990 ·
+  https://sproutsagesolutions.com/review-velocity-vs-review-count/
+- **The map pack still takes ~42% of local clicks in 2026**, and AI Overviews now
+  render *above* it while tending to cite the businesses that already hold strong
+  profiles and reviews. Reinforces something this journal already believes: for a
+  business with 300 profile views a month and 2-3 site visitors a day, **the
+  profile is the larger surface and the site is the smaller one.**
+  https://seolocale.com/google-map-pack-ranking-in-2026-how-the-local-3-pack-really-works/ ·
+  https://wolfpackadvising.com/blog/how-to-rank-higher-on-google-maps/
+- **Contractor site conversion benchmarks:** median 2-4% of visitors into a tracked
+  call or form, 6%+ is top quartile. Useful as a **ceiling check**: 2-3 visitors a
+  day at even a top-quartile 6% is one lead every several days. It confirms the
+  zero phone leads are a *traffic* problem, not a conversion problem, and it is a
+  reason **not** to spend the next month redesigning call-to-action buttons.
+  https://www.garretthandley.com/contractor-website-conversion-rate-in-2026-why-most-sites-convert-under-3-and-what-to-fix
+- **Bilingual local SEO**, prompted by the page the engine shipped this morning:
+  the consistent 2026 guidance is hreflang on **both** directions of the pair plus
+  correct `lang`, with localisation rather than translation. Directly supports
+  finding 5.
+  https://www.flento.io/blog/local-seo-multilingual-businesses ·
+  https://www.incremys.com/en/resources/blog/spanish-seo
+
+**Rejected:** Local Service Ads / Google Guaranteed — repeatedly recommended in the
+2026 contractor material and it does make the phone ring, but it is paid
+per-lead and spending is not mine to authorise; it belongs to Eric as a business
+decision, not to a review agent as a recommendation. Anything promising review
+volume through third-party solicitation platforms — the velocity finding makes
+those tempting and they are the fastest route to a profile suspension.
+
+### Recommendations
+
+**Nothing in this commit is live.** The site runs from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout, and
+`publish_state.sh` copies droplet → repo only. **Every code recommendation below
+needs a deploy before it does anything.**
+
+1. **Divine — `tail -100 /var/log/nemo-growth.log`, and check your own inbox.**
+   *(Two minutes.)* Fifth day of no data. The log holds the traceback; finding 1
+   narrows it to `scout.run` (`growth_daily.py:219`) or the head of
+   `report.build_text` (`growth/report.py:116`), with `check_coverage` a weak third.
+   The inbox is the free half: **watchdog emails since 08-22 ⇒ the crash is inside
+   `cmd_build`; an empty inbox ⇒ it is after it.** Do not spend time on disk space —
+   finding 2 rules it out. *Checked:* `growth_daily.py:211-233`, `:160-163`,
+   `:169`, `growth/scout.py:211-270`, `growth/report.py:33-72, 116-121`,
+   `seo/gen_sitemap.py:21-29`, `deploy/cron-nemo-growth:36`.
+
+2. **Divine — deploy the `growth/` package.** *(Minutes. Day twenty.)* Now with a
+   priced consequence rather than an abstract one: it ships `_snapshot_problems`,
+   which was written for this exact outage and would have alerted you on 08-22.
+   Suite re-run in this checkout today: `python3 -m unittest discover -s growth -t .`
+   → **218 tests, OK**. (The `-t .` matters; without it relative imports fail and
+   you get 11 spurious errors.)
+
+3. **Engine — extend `internal_links` to guides.** *(Small; one technique, ~30
+   lines.)* Finding 4: 15 of 17 guides have zero inbound links. Mirror
+   `_all_area_pages` with a guides equivalent and add a `data-growth="related"`
+   block, anchored the same way so refreshes replace rather than accumulate.
+   *Expected effect:* faster recrawl and better rank for 15 pages that currently
+   have neither internal PageRank nor topical context. *How you would know:*
+   `indexstatus` last-crawl dates on guide URLs move up; guide rows in
+   `keywords.by_town` climb out of the 20s. *Checked:* `techniques.py:539-546`
+   (area-only, by its own docstring), `review.py:35`, ledger scanned for any
+   linking technique — `internal_links` is area-only and
+   `york_local_authority_links` is about external links. **Not already shipped.**
+
+4. **Engine — let a generated page declare its own language, and emit hreflang.**
+   *(Small.)* Finding 5. `templates.py:16` hardcodes `<html lang="en">`; today's
+   Spanish page inherits it. Thread a `lang` through the page writer and emit a
+   reciprocal hreflang pair between the Spanish page and its English counterpart.
+   *How you would know:* the Spanish page starts drawing Spanish-language queries
+   in `discovered_untracked` instead of nothing. *Checked:* `grep hreflang` across
+   the docroot, `techniques.py` and `templates.py` — **zero hits anywhere.** Not
+   implemented, not a candidate in the ledger.
+
+5. **Eric — ask every completed customer for a Google review, one per job, no
+   incentive and no gating.** *(Minutes per job, free.)* Promoted above the rest of
+   the 08-21 list on today's research: velocity is now ~10% of local weight and a
+   steady trickle outperforms a burst. At 13 reviews and 4.2 stars, with 300 profile
+   views a month against 2-3 site visitors a day, **this is the highest-leverage
+   thing anyone in this system can do**, and it is the one thing no amount of engine
+   repair can substitute for. *How you would know:* review count and the map-pack
+   position for "gutters york pa" — not site traffic.
+
+6. **Eric — remainder of the 08-21 list (recs 3-8), unchanged.** Not restating.
+   **HIC registration first**, because it is legal exposure rather than growth.
+
+7. **Nobody — do not remove `reports/waiting-on-you.html` from the sitemap.**
+   Carried forward from 08-23 and now load-bearing: that row's `lastmod` is the only
+   instrument that dated this outage, and it did it again today. The comment at
+   `report.py:36` claiming `gen_sitemap.py` "never sees it" remains wrong. Leave
+   both alone until the feed is healthy.
+
+### What I changed in this repo today
+
+**Only this entry.** I considered patching `templates.py` for rec 4 and extending
+`internal_links` for rec 3, and did neither on purpose: the bottleneck is a
+twenty-day deploy queue, not a shortage of correct code, and adding to a queue
+nobody is draining is motion dressed as progress. Both recommendations are written
+to be a short sitting's work whenever the deploy happens. I touched no runtime
+state (`techniques.json`, `keywords.json`, `results.jsonl`, `state.json`),
+activated or retired nothing, and edited no page copy or keyword list.
+
+**Corrections to my standing instructions.** The prompt's premises are now
+substantially stale and the data wins:
+- Its GSC baseline (77 rows / 3 clicks / 429 impressions / position 12.4, county
+  2 of 50, dated 07-28) is a month old. Last actual reading: 964 / 18 / 26,613 /
+  25.1, county **2 of 103**.
+- The 08-01 usage-cap error it describes expired three weeks ago; it was replaced
+  by an empty credit balance, **and as of today that too is resolved.** The prompt's
+  "expect that until 2026-08-01" is doubly obsolete.
+- The engine publishes ~5 hours before this review, not one.
+- It says to treat `avg_position` as thin-but-real. Per 08-23 it is worse than
+  thin — an average over substantially phantom impressions. Prefer `top3`,
+  `ranked_known` and clicks.
+- **New today:** it says to check `last_build` and `last_scout` for failures. Both
+  read `2026-08-20` and **both are five days stale**; `snapshot.date` must be
+  checked against `git log` before any field in that file is believed. The prompt's
+  own suggested check cannot detect the failure mode currently in progress — which
+  is the same blind spot the watchdog has (finding 3).
+
+### Reasoning and uncertainties
+
+Day twenty-nine. The honest headline is mixed for the first time in a while: a
+human finally acted, it worked, and the instrument that would have shown it working
+has been dark for five days.
+
+**What I would defend hardest today.** Finding 3 — that the watchdog cannot see
+this outage *by construction*, because every signal it reads is written at or
+before the one step that still works. That is not a bug anyone introduced; it is
+what happens when a monitor is built from the state the monitored thing writes.
+Yesterday's transferable lesson was to look for undesigned instruments when the
+designed one fails. Today's is the sharper half: **check whether your monitor's
+inputs are downstream of the failure it is meant to catch.** Here they are all
+upstream, so the engine looks healthiest precisely where it is most broken.
+
+**What I am least sure of.** *Which* of the two remaining candidates is killing the
+run — I have narrowed four to two and I cannot get further without the log, and I
+would rather hand over a two-item shortlist and a free inbox test than a confident
+diagnosis I cannot support. The scout's cold-success-path story in finding 2 fits
+today and does **not** explain 08-21 through 08-23; I have deliberately not
+smoothed that over, because a story that explains one day out of four is a lead,
+not an answer.
+
+**On finding 4, where I might be over-reading.** Orphaned guides are certainly a
+real defect and the fix is cheap and safe. But I am *inferring* that orphaning is
+why they rank in the 20s-30s, and with 18 clicks across the whole property I cannot
+separate that from the simpler explanation that the site is small, new and
+outranked by national aggregators with far more authority. Fixing it is worth doing
+because it is correct, not because I can promise it moves rank.
+
+**What would change my mind, dated.**
+1. **Tomorrow.** A `snapshot.json` dated 08-25 means someone read rec 1. A sixth
+   identical morning and I cut this to a status line — I said that on 08-22 about
+   the strategy sections and kept it, and I will keep this one.
+2. **Whether Divine's inbox has watchdog mail since 08-22.** Splits the candidate
+   list in half at zero cost, and settles whether finding 3's blind spot is total
+   or partial.
+3. **2026-09-08 — the impression-flood test**, where I have reversed my own side
+   and now predict impressions fall materially. Needs the feed back to test at all.
+4. **2026-09-15 — the seasonal window closes.** Unchanged and getting closer: if
+   the Business Profile is still untouched by then, leaf season 2026 was decided by
+   inaction. Rec 5 is the cheapest possible hedge against that and it does not
+   depend on a single line of this engine working.
