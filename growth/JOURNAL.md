@@ -12265,3 +12265,288 @@ because it is correct, not because I can promise it moves rank.
    the Business Profile is still untouched by then, leaf season 2026 was decided by
    inaction. Rec 5 is the cheapest possible hedge against that and it does not
    depend on a single line of this engine working.
+
+## 2026-08-25 — review agent
+
+### Status line, as promised
+
+**Sixth consecutive review against 2026-08-20 data.** `growth/snapshot.json` still
+reads `2026-08-20T06:00:10`. In the sitemap this morning's run rebuilt an hour ago,
+`reports/waiting-on-you.html` still carries `lastmod` **2026-08-20** — so the report
+step has now failed to complete on six consecutive mornings. Yesterday I said a sixth
+identical morning gets cut to a status line. This is that, and I am not restating the
+Eric list or writing a strategy section.
+
+Three things below are new and none of them are restatements. Two of them **correct
+my own previous entries**, which is the reason this is longer than one line.
+
+### Finding 1 — I used a frozen snapshot as evidence about the days it was frozen
+
+The 08-24 entry declined to name `scout.run()` as the diagnosis on this reasoning:
+
+> "It does **not** explain 08-21 through 08-23, when `last_scout` was still failing
+> on credit and the wrapped path should have returned cleanly."
+
+**That is circular and it is wrong.** `last_scout` reads `2026-08-20` because the
+snapshot is frozen at 08-20 — not because the scout failed on 08-21. The same applies
+to `last_build`. **There is no evidence whatsoever about what the scout did on 08-21,
+08-22 or 08-23.** I reached into a file that stopped being updated and read its
+contents as a report on the period during which it stopped being updated.
+
+This matters because that objection was the *sole stated reason* for not naming the
+scout. Removing it does not prove the scout is the culprit — it restores it to being
+an unexcluded candidate, which is where the evidence actually leaves it.
+
+The general lesson, and the one I would keep: **when an instrument freezes, every
+field in it becomes a statement about the freeze date and about nothing after it.**
+The 08-24 entry correctly warned that `snapshot.date` must be checked against
+`git log` before believing any field — and then believed two fields.
+
+### Finding 2 — run duration is recoverable from the publish commits, and it changed on exactly the morning the report died
+
+Another undesigned instrument, in the same spirit as the sitemap trick. The cron entry
+(`deploy/cron-nemo-growth:30`) is a single line joining two commands with `;`:
+
+```
+... growth_daily.py daily ... ; ... growth/publish_state.sh ...
+```
+
+Sequential, and `;` rather than `&&`, so `publish_state.sh` runs whatever the engine
+did. **The publish commit's timestamp is therefore the moment `growth_daily.py`
+exited.** Run start is fixed by cron. So every publish commit dates a run duration:
+
+| morning | publish commit | duration | content written |
+| --- | --- | --- | --- |
+| 08-18 | `e523062` 06:04:11 | ~4m | yes |
+| **08-19** | `3f7fd40` 06:00:17 | **17s** | no — all LLM calls 400'd |
+| **08-20** | `cfe94a9` 06:00:16 | **16s** | no — all LLM calls 400'd |
+| **08-21** | `ccc0fb6` 06:04:45 | **4m45s** | **no** |
+| 08-22 | — | — | nothing to commit |
+| 08-23 | — | — | nothing to commit |
+| 08-24 | `60560db` 06:06:10 | ~6m | yes |
+| 08-25 | `aa5a5d3` 06:05:25 | ~5m | yes |
+
+Two things fall out.
+
+**(a) The run terminates. It does not hang.** `publish_state.sh` lands its commit five
+minutes in, and it cannot run until `growth_daily.py` has exited. So whatever kills the
+run **raises and exits** — there is a traceback in `/var/log/nemo-growth.log`, not a
+wedged process. That rules out the hung-web-search story I was ready to propose from
+`llm.py:124` (`urlopen(timeout=240)` inside a 5-attempt retry loop), and it means the
+log has a stack trace naming a line number.
+
+**(b) 08-21 is the anomaly, and it is the exact morning the report step died.** A run
+where every LLM call fails on a 400 takes ~16 seconds — 400 is not in `RETRY_STATUS`
+(`llm.py:72,131`), so credit errors fail fast with no backoff. 08-19 and 08-20 are both
+16-17s. **08-21 took 4m45s and produced no content.** Something in the LLM path started
+taking real time on precisely the morning the run stopped reaching `cmd_report`.
+
+**I am deliberately not overclaiming this.** 4m45s does *not* prove the credit was
+restored on 08-21. `RETRIES=5` with `BACKOFF=(2,6,15,40,75)` is ~138s of sleep per
+call, so a morning of 429s or 529s produces a long run with no content too. What the
+number *does* establish is that **the 08-21 run was not a fast-fail-on-400 run**, which
+is what the 08-24 entry assumed it was. The LLM path behaved differently that morning.
+That is a correlation with a date on it, not a diagnosis.
+
+### Finding 3 — the GSC logging-bug explanation is dead on dates, and my 08-23 prediction loses its mechanism
+
+On 08-23 I reversed my side of the 2026-09-08 impression-flood test, predicting
+impressions **fall materially**, on the grounds that the driver was a Google logging
+bug being fixed rather than rank-tracker scraping.
+
+**Checked the dates today and the mechanism does not survive them.** Google confirmed
+the bug on 2026-04-03 and **the fix rolled out on 2026-04-27**, forward-only. The
+impression flood on this property began around **2026-08-14** — three and a half months
+*after* the fix landed. Post-fix data cannot be explained by a pre-fix logging error.
+
+I read the right source on 08-23 and took "rolling out a fix" as ongoing when the same
+reporting gives a completion date in April.
+
+**So I withdraw the mechanism and keep the observation.** The first-party fact is
+untouched and does not depend on any of this: `gutter installer` sits at position 1.0
+with **470 impressions and zero clicks**, and a genuine position-1 result with 470
+impressions does not return zero. That remains an absence of humans. But I no longer
+have a story for *why*, and I would rather hold an unexplained anomaly than a tidy
+explanation that is three months out of date. The 09-08 test still stands; I now have
+no confident side to take on it.
+
+**The operational reading discipline is unchanged and is the part that matters:**
+report `top3`, `ranked_known` and **clicks**. Do not quote `avg_position`.
+
+### Where the numbers stand
+
+**All 2026-08-20 data, republished a sixth time. Nothing has been re-measured.**
+
+Goal metric **`top3` = 2 of 195 tracked queries, `share_pct` 1.0%** against a target of
+50%; 2 of the 25 queries Search Console can actually rank. `top10` 7. **Zero top-3
+positions in every named town** — york 33/5/0, dover 16/7/0, red-lion 11/3/0,
+dallastown 11/4/0, spring-grove 11/3/0, hanover 10/4/0. Both top-3s are in the county
+bucket, 2 of 103. **Direction 08-20 → 08-25: unknown.** Not flat — unknown.
+
+Coverage 32.3%. Traffic 08-14→08-19: 2, 2, 2, 3, 2, 3. Leads: **3 bookings all time,
+0 phone leads ever**, one call tap in the whole series (08-12). `ai_visitors` 0 across
+all 26 days. Ledger: 74 techniques, 11 active, `does_not_work` **still empty on day
+thirty**.
+
+**What did happen this morning:** the build wrote real content for the second day
+running — a `geo:answer-first` lead paragraph on the Dillsburg area page and a new
+"Soffit and Fascia Repair in York, PA" section with a repairable/borderline/replace
+triage list on the soffit-fascia service page. Both are model output, both are decent,
+both are live on the site. **The engine's content half is working. Its measurement half
+has been dead for six days.**
+
+### Did previous changes work?
+
+**1 — "A sixth identical morning gets a status line" (08-24). Fired, honoured.**
+
+**2 — "`last_scout` still failing on credit 08-21–08-23" (08-24). Withdrawn as
+unfounded.** Finding 1. It was read off a frozen file.
+
+**3 — "Impressions will fall materially because the driver is a logging bug" (08-23).
+Mechanism refuted.** Finding 3. Prediction withdrawn rather than defended.
+
+**4 — Top up the Anthropic credit. Actioned 08-24, still holding.** Second consecutive
+morning of successful generation. This remains the one human action in thirty days and
+it is still visibly working.
+
+**5 — Deploy the `growth/` package. Not actioned, day twenty-one.** Suite re-run in
+this checkout today: `python3 -m unittest discover -s growth -t .` → **218 tests, OK.**
+
+**6 — Extend `internal_links` to guides (08-24 rec 3). Not actioned.** Re-counted
+inbound links this morning: `seamless-vs-sectional-gutters` 8,
+`gutter-cleaning-cost-york-pa` 5, **the other 15 guides 0.** Unchanged. Both linked
+guides are linked by hand-built markup; every guide the engine has written is still an
+orphan, including yesterday's Spanish page.
+
+**7 — Eric's list (08-21 recs 3-8). Unactioned, day thirty.** Not restating.
+**HIC registration remains exempt** from throttling — legal exposure, not growth.
+
+### What I researched today
+
+Deliberately narrow, per the status-line commitment.
+
+- **The GSC impression bug's actual fix date** — the substance is finding 3.
+  https://searchengineland.com/google-search-console-bug-inflated-impression-counts-473530 ·
+  https://seosherpa.com/google-search-console-fixed-its-50-week-impression-bug/ ·
+  https://www.getpassionfruit.com/blog/how-google-was-reporting-wrong-data-for-gsc-for-months-google-search-console-impression-bug
+- **2026 local ranking factors.** Reviews remain a top-three factor, now decomposed
+  into three dimensions: volume, recency, **and owner response rate**. AI Overviews
+  render above the map pack and cite the businesses that already hold strong profiles.
+  **This adds nothing new to this journal** — response rate has been in the
+  recommendations since at least the 08-13 entry, and I am recording that I checked
+  rather than re-ranking it as a discovery.
+  https://wolfpackadvising.com/blog/how-to-rank-higher-on-google-maps/ ·
+  https://hookagency.com/blog/local-seo-for-home-service-businesses/
+- **Call tracking / dynamic number insertion (CallRail and similar).** **Rejected.**
+  It is the standard 2026 recommendation for contractors and it is wrong for this
+  business today: at 2-3 visitors a day, a tracking number would attribute a lead
+  volume of approximately zero, at a monthly cost, while adding a NAP inconsistency
+  risk against the Business Profile. Revisit if traffic reaches a level where
+  attribution is a real question.
+  https://avidtrak.com/use-case/local-seo-call-tracking
+
+**Rejected wholesale:** every on-site idea. Sixth day of a dark feed, twenty-one-day
+deploy queue. Adding to that queue is motion, not progress.
+
+### Recommendations
+
+**Nothing in this commit is live.** The site runs from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout, and `publish_state.sh`
+copies droplet → repo only. Every code recommendation below needs a deploy first.
+
+1. **Divine — `grep -n "Traceback" -A20 /var/log/nemo-growth.log | tail -60`.**
+   *(One minute.)* Finding 2(a) upgrades this from "read the log" to "there is a stack
+   trace in it and it names a line number." The run raises and exits ~5 minutes in;
+   it does not hang. *Checked:* `deploy/cron-nemo-growth:30` (`;` not `&&`, sequential),
+   publish commit timestamps, `growth_daily.py:211-233`, `growth/llm.py:72,124,131`.
+
+2. **Divine — check your inbox first; it is free and it halves the search.** The
+   watchdog reads `ledger.get_state("last_build")` from droplet state
+   (`growth_daily.py:286`) and fires at `stale_days >= 2` (`:299`). So:
+   - **Watchdog mail since 08-22** ⇒ `ledger.set_state("last_build")`
+     (`growth_daily.py:169`) is failing; the crash is at or before it.
+   - **Empty inbox** ⇒ `last_build` is being written fine, and the crash is at
+     `keywords.check_coverage` (`:218`) or `scout.run` (`:219`) — the only two
+     unwrapped statements between the build and the `try/except` at `:221-229`.
+
+   An empty inbox is data here, not the absence of it. *Checked:*
+   `growth_daily.py:277-331`, `:169`, `:218-229`.
+
+3. **Divine — deploy the `growth/` package.** *(Minutes. Day twenty-one.)* Unchanged
+   and still correct under every story; it ships `_snapshot_problems`, written on 08-21
+   for this exact outage, which would have alerted you on 08-22 and every morning since.
+   218 tests pass. (The `-t .` matters — without it relative imports fail and you get
+   11 spurious errors.)
+
+4. **Engine — extend `internal_links` to guides.** *(Small, ~30 lines.)* Carried from
+   08-24 rec 3, re-verified this morning, unchanged: 15 of 17 guides have zero inbound
+   links. *Checked today:* `techniques.py:539-546` is area-only by its own docstring;
+   `york_local_authority_links` is external links; link count re-run across the docroot.
+   **Not already shipped.**
+
+5. **Engine — let a generated page declare its own language, and emit hreflang.**
+   *(Small.)* Carried from 08-24 rec 4. `templates.py:16` hardcodes `<html lang="en">`
+   and yesterday's Spanish guide inherits it. *Checked:* `grep hreflang` across the
+   docroot, `techniques.py` and `templates.py` — **zero hits anywhere.**
+
+6. **Eric — ask every completed customer for a Google review, one per job, no incentive
+   and no gating; reply to every review.** *(Minutes per job, free.)* Highest-leverage
+   item in the system and the only one that does not depend on a single line of this
+   engine working. Not re-argued.
+
+7. **Nobody — do not remove `reports/waiting-on-you.html` from the sitemap.** Carried
+   forward and load-bearing for a third day: that row's `lastmod` dated this outage
+   again this morning. The comment at `report.py:36` claiming `gen_sitemap.py` "never
+   sees it" is still wrong. Leave both alone until the feed is healthy.
+
+### What I changed in this repo today
+
+**Only this entry.** Same reasoning as the last two days and it has not weakened: the
+bottleneck is a twenty-one-day deploy queue, not a shortage of correct code. I touched
+no runtime state (`techniques.json`, `keywords.json`, `results.jsonl`, `state.json`),
+activated or retired nothing, and edited no page copy or keyword list.
+
+**Corrections to my standing instructions.** Carried forward: the prompt's 07-28 GSC
+baseline is a month stale (last actual reading 964 rows / 18 clicks / 26,613
+impressions / position 25.1, county 2 of 103); its 08-01 usage-cap story is doubly
+obsolete — that cap expired, was replaced by an empty credit balance, and **that was
+resolved on 08-24**; the engine publishes ~5 hours before this review, not one; prefer
+`top3`/`ranked_known`/clicks over `avg_position`. **Sharpened today:** the prompt says
+to check `last_build` and `last_scout` for failures. Per finding 1, those fields cannot
+be read at all while the snapshot is frozen — they describe 08-20 and nothing since.
+`snapshot.date` must be checked against `git log` **before any field in the file is
+quoted**, including by me.
+
+### Reasoning and uncertainties
+
+Day thirty. Two of the three findings above are me correcting my own work from the last
+two days, and I would rather that be the shape of the entry than pad it with a third
+day of strategy nobody can act on.
+
+**What I would defend hardest.** Finding 1. The 08-24 entry wrote down the correct rule
+— check `snapshot.date` against `git log` before believing any field — and then broke
+it two sections later by reading `last_scout` as a report on days after the freeze. A
+stale instrument is more dangerous than a dead one, because it keeps answering. The
+generalisation: **a frozen file's fields are statements about the freeze date only**,
+and that has to be applied to the fields you want to use, not just announced.
+
+**Where I am least confident.** Finding 2(b) is a correlation with a date, not a cause.
+4m45s on 08-21 is consistent with restored credit *and* with a morning of 429s, and I
+cannot separate them from here. I have written it as a narrowing, not an answer,
+because a story that fits one morning is a lead.
+
+**What I gave up today.** A working explanation for the impression flood. Finding 3
+kills the mechanism I adopted two days ago and I have not replaced it. Zero clicks at
+position 1.0 on 470 impressions is still real and still unexplained.
+
+**What would change my mind, dated.**
+1. **The log, per rec 1.** One traceback ends six days of inference. Everything above
+   is an attempt to make the best use of a repo when the answer is one command away on
+   a machine I cannot reach.
+2. **Divine's inbox**, per rec 2 — splits the candidate list at zero cost.
+3. **2026-09-08 — the impression-flood test.** I now have **no side**: the
+   rank-tracker mechanism was refuted on 08-23, the logging-bug mechanism is refuted
+   today, and I would rather record an open question than invent a third story.
+4. **2026-09-15 — the seasonal window closes.** Twenty-one days out. If the Business
+   Profile is still untouched, leaf season 2026 was decided by inaction, and rec 6 is
+   the cheapest possible hedge against that.
