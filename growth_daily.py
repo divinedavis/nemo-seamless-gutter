@@ -215,8 +215,34 @@ def cmd_daily(args):
     run_log = cmd_build(args)
     # Coverage is re-checked after the build so the report reflects the page
     # written this morning rather than yesterday's picture.
-    keywords.check_coverage(args.docroot)
-    scout_out = cmd_scout(args)
+    #
+    # Both of these are wrapped because of where they sit: between the build
+    # and the only two things anything outside this machine ever reads — the
+    # state snapshot and the report. Neither step is load-bearing for either.
+    # Coverage has already been scored twice by now (cmd_measure, cmd_build),
+    # and the scout only ever proposes candidates; it never activates one.
+    #
+    # Leaving them unwrapped cost seven days. On 2026-08-21 a deploy moved
+    # growth_daily.py without growth/scout.py, so `scout.run()` was called
+    # with a `docroot` keyword the deployed version did not accept and raised
+    # TypeError here. The run kept writing pages every morning and never wrote
+    # snapshot.json or sent the report, which is the one failure shape the
+    # watchdog is worst at seeing: last_build is fresh, no technique reports a
+    # failure, and the inbox is quiet. A crash here must cost the scout, not
+    # the morning's only two outputs.
+    try:
+        keywords.check_coverage(args.docroot)
+    except Exception as e:
+        traceback.print_exc()
+        log(f"  post-build coverage check failed: {e}")
+    try:
+        scout_out = cmd_scout(args)
+    except Exception as e:
+        traceback.print_exc()
+        # Same shape scout.run() returns on a handled failure, so the report's
+        # BLOCKED section surfaces it instead of the run dying silently.
+        scout_out = {"ok": False, "detail": f"crashed: {e}"}
+        log(f"  scout crashed: {e}")
 
     # Publish state for the cloud review agent, which cannot reach this machine.
     if not args.dry_run:
@@ -267,11 +293,16 @@ def _snapshot_problems(build_date, stale_days):
 
     if stale_days != 0 or snap_date == build_date:
         return []
-    return [f"Today's run completed but growth/snapshot.json still reads "
-            f"{snap_date or 'no date'} against a build dated {build_date}. "
-            f"snapshot.write() is failing, so the daily review agent is "
-            f"reviewing stale state. The reason is on the 'snapshot: FAILED' "
-            f"line in /var/log/nemo-growth.log."]
+    return [f"Today's run completed the build but growth/snapshot.json still "
+            f"reads {snap_date or 'no date'} against a build dated "
+            f"{build_date}, so the daily review agent is reviewing stale "
+            f"state. Two different causes look identical from here: "
+            f"snapshot.write() raised (look for 'snapshot: FAILED' in "
+            f"/var/log/nemo-growth.log), or the run died between the build "
+            f"and the snapshot and never reached it at all (no such line — "
+            f"look for the last Traceback instead). Check which: if "
+            f"reports/waiting-on-you.html is also stale the report never ran, "
+            f"which means the second."]
 
 
 def cmd_watchdog(args):

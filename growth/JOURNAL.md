@@ -12550,3 +12550,298 @@ position 1.0 on 470 impressions is still real and still unexplained.
 4. **2026-09-15 — the seasonal window closes.** Twenty-one days out. If the Business
    Profile is still untouched, leaf season 2026 was decided by inaction, and rec 6 is
    the cheapest possible hedge against that.
+
+## 2026-08-26 — review agent
+
+### The seven-day blackout has a cause, and it is one line
+
+`growth_daily.py:177` calls:
+
+```python
+return scout.run(dry_run=args.dry_run, docroot=args.docroot)
+```
+
+The `growth/scout.py` deployed on the droplet is old enough that its signature
+is still `def run(dry_run=False):`. That call raises
+
+```
+TypeError: run() got an unexpected keyword argument 'docroot'
+```
+
+at `growth_daily.py:219`, which is **unwrapped**, so the run dies there — after
+the build has written its pages, before `snapshot.write()`, before the report.
+Every morning since 2026-08-21. That is the whole outage.
+
+**The evidence chain, in the order it closes.** None of it needs the droplet.
+
+1. **The run stops between the build and the snapshot.** `snapshot.write()` sits
+   in a `try/except` at `growth_daily.py:222-229`, so it *cannot* end the run —
+   if it raised, execution would continue into `cmd_report`. `snapshot.json` is
+   frozen at `2026-08-20T06:00:10`, so the snapshot was never written; and
+   `reports/waiting-on-you.html` (written inside `report.build_text` →
+   `write_waiting_page`, `report.py:33-73`) still carries `lastmod` **2026-08-20**
+   in a sitemap regenerated this morning, so the report never ran either. A crash
+   inside `cmd_report` is therefore excluded: the snapshot would have been written
+   first. **The run dies before line 224.**
+2. **Only two statements live in that window** — `keywords.check_coverage`
+   (`:218`) and `cmd_scout` (`:219`).
+3. **`check_coverage` is excluded.** The identical call with the identical
+   argument already succeeded twice earlier in the same run, at `:88`
+   (`cmd_measure`) and `:147` (`cmd_build`) — the build demonstrably completed,
+   because it wrote pages. On 08-21 no pages were written at all, so nothing
+   changed on disk between `:147` and `:218`.
+4. **So the failure is `scout.run(...)` at `:219`.** For that call to succeed,
+   the deployed `growth/scout.py` must accept `docroot`. It gained that parameter
+   in **`a2d94d6`, 2026-08-08** — the commit that changed `growth_daily.py` and
+   `growth/scout.py` *together*, because they are a coupled pair.
+5. **The deployed package predates that.** Already established on 08-22: the
+   snapshot carries no `code_version` block, and `code_version` was added to
+   `snapshot.py` in `870a3dc` on **2026-08-09**. Combined with step 4, the
+   deployed package is at or before 2026-08-07.
+6. **And the CLI does not.** `93c78c2` — **authored by Divine, 2026-08-20 09:55
+   EDT**, message reporting a live "First reading: 6 of 6 inspected" — deployed a
+   *new* `growth_daily.py` plus a new `growth/indexstatus.py` onto that stale
+   package. It landed **after** that morning's 06:00 run. The first run to
+   execute it was **08-21 06:00**, the exact morning the report died.
+
+Reproduced here rather than asserted — the 2026-08-07 tree, parsed, then the call
+made against that signature:
+
+```
+08-07 scout.run parameters: ['dry_run']
+CALL growth_daily.py:177 -> TypeError: run() got an unexpected keyword argument 'docroot'
+```
+
+**The engine's own source predicted this, naming the commit.** From the
+`_code_fingerprint()` docstring in `snapshot.py:147-150`:
+
+> "The CLI entry point lives beside the package, not inside it, and it is a file
+> the deploy can miss on its own — 2026-08-08's scout change needed both
+> growth_daily.py and growth/scout.py to move together."
+
+That is `a2d94d6`. It happened again on 08-20, in the opposite direction: the CLI
+moved and the package did not.
+
+**Why nothing shouted.** This is the failure shape the watchdog is worst at
+seeing. `cmd_build` sets `last_build` at `:167` *before* it returns, so
+`stale_days` is 0 and the "engine has stopped" branch never fires. Since 08-24
+the credit has been good and no technique reports a failure, so the
+"these steps failed" branch is silent too. `gsc_last` is fine. **The deployed
+watchdog has had nothing to say since 08-24, while the review loop was blind.**
+That is exactly the blind spot the 08-24 entry named, now with the mechanism
+attached.
+
+**Confirming command, one line:**
+`grep -n "^def run" /var/www/nemo-seamless-gutter/growth/scout.py`
+`def run(dry_run=False):` confirms it. `def run(dry_run=False, docroot=None):`
+refutes it and I am wrong.
+
+### Where the numbers stand
+
+**Seventh consecutive review against 2026-08-20 data. Nothing has been
+re-measured since.** Every number below describes 08-20 and says nothing about
+the six days after it.
+
+Goal metric **`top3` = 2 of 195 tracked queries, `share_pct` 1.0%** against a
+target of 50% — 2 of the 25 queries Search Console can rank at all. `top10` 7.
+**Zero top-3 positions in every named town:** york 33/5/0, dover 16/7/0,
+red-lion 11/3/0, dallastown 11/4/0, spring-grove 11/3/0, hanover 10/4/0. Both
+top-3s sit in the county bucket, 2 of 103. **Direction 08-20 → 08-26: unknown.
+Not flat — unknown.**
+
+Coverage 32.3%. Traffic 08-14→08-19: 2, 2, 2, 3, 2, 3. Leads: **3 bookings all
+time, 0 phone leads ever.** `ai_visitors` 0 across all 26 days. Ledger: 74
+techniques, 11 active, 62 candidates, `does_not_work` **still empty on day
+thirty-one**. 40 discovered-untracked queries still unproposed.
+
+**What did happen this morning:** the build wrote real content for the third day
+running — Dallastown and Hanover area pages, 80 lines. Run finished 06:05:45,
+~5m45s. **The content half works. The measurement half has been dead seven days.**
+
+### Did previous changes work?
+
+**1 — "The crash is at `keywords.check_coverage` (:218) or `scout.run` (:219)"
+(08-25). Half right, and now resolved to `:219`.** Step 3 above excludes
+`check_coverage` on evidence that was available yesterday and that I did not use.
+
+**2 — "On 2026-08-21 the write raised, the run carried on and published a
+sitemap" — my own `_snapshot_problems` docstring, written 08-21. Wrong, and it
+has been wrong in the repo for five days.** `snapshot.write()` never ran at all.
+If it had raised and the run had carried on, `cmd_report` would have rewritten
+`reports/waiting-on-you.html` and its `lastmod` would read 08-21. It reads 08-20.
+I asserted a mechanism on day one and then reasoned from it for five days without
+ever testing it against the sitemap I was already using for other purposes.
+
+**3 — "The 08-21 run was not a fast-fail-on-400 run; something in the LLM path
+started taking real time" (08-25, finding 2b). Superseded, and the LLM had
+nothing to do with it.** The 4m45s is Divine's `indexstatus.run()` executing for
+the first time that morning: 42 sitemap URLs × `PACE_SECONDS = 0.4` plus a URL
+Inspection round-trip each (`indexstatus.py:41-42,152-162`). I was looking for a
+slow LLM because I did not know a new instrument had been installed the previous
+afternoon. **The lesson: I read `git log` for what the review agent committed and
+not for what Divine deployed, and his commit was the only thing that changed.**
+
+**4 — Top up the Anthropic credit. Actioned 08-24, holding.** Third consecutive
+morning of successful generation. Still the one human action in thirty-one days.
+
+**5 — Deploy the `growth/` package. Not actioned, day twenty-two — and it is no
+longer hygiene, it is the fix.** Every previous entry recommended this as good
+practice. It is now the direct repair for the outage. 218 tests pass in this
+checkout (`python3 -m unittest discover -s growth -t .` — the `-t .` matters).
+
+**6 — Extend `internal_links` to guides (08-24 rec 3). Not actioned.** Unchanged:
+15 of 17 guides still have zero inbound links.
+
+**7 — Eric's list (08-21 recs 3-8). Unactioned, day thirty-one.** Not restating.
+**HIC registration stays exempt** from throttling — legal exposure, not growth.
+
+### What I researched today
+
+Deliberately short. The diagnosis above is the day's work and I am not padding
+around it.
+
+- **2026 local ranking factors, re-checked for anything new.** Nothing new for
+  this journal. Reviews still decompose into volume, recency and owner response
+  rate; primary category still the heaviest single relevance lever. Both have
+  been in the recommendations since 08-13 and I am recording that I checked
+  rather than re-ranking them as discoveries.
+  https://wolfpackadvising.com/blog/how-to-rank-higher-on-google-maps/ ·
+  https://gomarketing.com/blog/the-complete-local-seo-guide-for-home-service-contractors-in-2026/
+- **AI Overviews for local trade queries — one genuinely useful deflationary
+  number.** AI Overviews render on roughly **7% of local searches**, and the
+  businesses cited in them are essentially the businesses already ranking in the
+  map pack. **This kills the "optimise for AI answer engines" line of work as a
+  separate activity** — there is no distinct lever, it is the map pack again. It
+  also fits this site's own data: `ai_visitors` has been 0 for 26 straight days.
+  https://www.searchquest.ai/guides/ai-local-seo/ ·
+  https://thevalleymarketinggroup.com/blog/google-ai-mode-local-seo-service-businesses-2026/
+- **Rejected:** every new on-site idea, seventh day of a dark feed and a
+  twenty-two-day deploy queue. Adding to that queue is motion, not progress.
+  **Call tracking / DNI** stays rejected on 08-25's reasoning (2-3 visitors/day
+  attributes nothing, at a monthly cost, against a NAP-consistency risk).
+
+### Recommendations
+
+**Nothing in this commit is live.** The site and the engine both run from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout, and
+`publish_state.sh` copies droplet → repo only. Everything below needs a deploy.
+
+1. **Divine — deploy the `growth/` package.** *(Minutes. Day twenty-two, and now
+   the actual repair.)* This is no longer "keep the droplet current" — the outage
+   is a CLI eleven days newer than the package it imports. Deploying `growth/`
+   fixes it in one step and simultaneously ships `_snapshot_problems`, the
+   fingerprint block, and 08-17's coverage fix. **Confirm the diagnosis first if
+   you want it in one line:** `grep -n "^def run" .../growth/scout.py`.
+   *Checked:* `growth_daily.py:177`, 08-07 tree parsed and the call reproduced,
+   `a2d94d6`, absence of `code_version` in `snapshot.json`.
+   **If you deploy nothing else this week, deploy this.**
+
+2. **Divine — after deploying, check that `snapshot.json` and
+   `reports/waiting-on-you.html` both date to that morning.** *(Seconds.)* Those
+   two files are the only proof the run reached its end. A green log is not
+   evidence; both dates advancing is.
+
+3. **Engine — wrap the two post-build steps so this cannot recur.** *(Done in
+   this commit, ~15 lines, needs the same deploy.)* A scout crash should cost the
+   scout, not the snapshot and the report. Details below. *Checked:*
+   `growth_daily.py:211-233` — they were unwrapped; **not already shipped.**
+
+4. **Eric — ask every completed customer for a Google review, one per job, no
+   incentive and no gating; reply to every review.** *(Minutes per job, free.)*
+   Unchanged, and the only item in this system that does not depend on a single
+   line of this engine working. Today's research adds one argument for it: since
+   AI Overviews cite whoever already wins the map pack, reviews are the same lever
+   twice. Not re-argued further.
+
+5. **Engine — extend `internal_links` to guides.** *(Small, ~30 lines.)* Carried
+   from 08-24. *Checked today:* `techniques.py:539-546` is area-only by its own
+   docstring; 15 of 17 guides have zero inbound links. **Not already shipped.**
+
+6. **Nobody — still do not remove `reports/waiting-on-you.html` from the
+   sitemap.** Carried forward, and it earned its keep decisively today: that
+   row's frozen `lastmod` is what proved the report never ran, which is what
+   excluded `cmd_report` and closed the chain. The comment at `report.py:36`
+   claiming `gen_sitemap.py` "never sees it" remains wrong. Leave both alone.
+
+### What I changed in this repo today
+
+Two small edits to `growth_daily.py`, both downstream of the finding. 218 tests
+pass. I touched no runtime state (`techniques.json`, `keywords.json`,
+`results.jsonl`, `state.json`), activated or retired nothing, and edited no page
+copy or keyword list.
+
+1. **Wrapped `keywords.check_coverage` and `cmd_scout` in `cmd_daily`.** Neither
+   is load-bearing for the snapshot or the report — coverage is already scored
+   twice per run, and the scout only proposes. A crash there now logs a traceback
+   and hands `cmd_report` a `{"ok": False, "detail": "crashed: ..."}`, which is
+   the shape `report.build_text` already reads into its BLOCKED section
+   (`report.py:135-137`). **The failure becomes an item in the daily email
+   instead of the reason there is no daily email.** This does not fix the
+   TypeError — the deploy does — it stops the next skew costing seven days.
+
+2. **Fixed the alert text in `_snapshot_problems`.** It told Divine the reason
+   would be on a `snapshot: FAILED` line in the log. In this outage there is no
+   such line, because the run never reached the write. It now names both causes,
+   and gives the one-file test that separates them (is
+   `reports/waiting-on-you.html` stale too?). Left over from my own wrong
+   mechanism of 08-21; the check itself still fires correctly, because it
+   compares the snapshot against the build and both causes produce that gap.
+
+**Corrections to my standing instructions.** Carried forward: the prompt's 07-28
+GSC baseline is a month stale (last real reading 964 rows / 18 clicks / 26,613
+impressions / position 25.1, county 2 of 103); its 08-01 usage-cap story is
+obsolete twice over — that cap expired, was replaced by an empty credit balance,
+and **that was resolved on 08-24**; the engine publishes ~5 hours before this
+review, not one; prefer `top3`/`ranked_known`/clicks over `avg_position`, which
+averages over too few impressions to read. **Carried from 08-25 and load-bearing
+today:** `snapshot.date` must be checked against `git log` before any field in
+the file is quoted. **Added today:** read `git log` for *Divine's* commits, not
+only the review agent's. The engine's behaviour changes when he deploys, and his
+08-20 commit was both the cause of this outage and the only thing in six days of
+entries I never looked at.
+
+### Reasoning and uncertainties
+
+Day thirty-one, and the answer was in the repository the entire week.
+
+**What I would defend hardest.** The exclusion argument in step 3 — that
+`check_coverage` cannot be the crash because the same call with the same argument
+already succeeded twice in the same run. That evidence was fully available on
+08-24 and on 08-25, and both entries wrote "`:218` or `:219`" without spending the
+two minutes to eliminate one. The general failure: I treated a two-candidate list
+as a resting place instead of a thing to bisect. Six entries of careful forensics
+around a question that a `git show` of the one commit I had not read would have
+answered on day two.
+
+**Where I am least confident.** Step 5 pins the deployed package at ≤ 2026-08-07
+from the absence of `code_version` (added 08-09) plus the scout signature (08-08).
+A package deployed in the ~24-hour window *between* those two commits would accept
+`docroot` and still lack `code_version`, which would break the chain. I regard
+that as unlikely rather than impossible — it requires a deploy landing inside a
+one-day gap and then stopping for eighteen days — and step 1's proof that the run
+dies before `snapshot.write()` independently forces the failure into `:218`/`:219`
+regardless. But it is the seam, and it is why rec 1 leads with a one-line
+confirmation instead of asking Divine to trust six paragraphs.
+
+**What I am not claiming.** That `indexstatus` is broken. It is careful code, it
+`run()`s without raising by contract, and it is exonerated here: it executes at
+`:103` in `cmd_measure`, and the build after it demonstrably completed. It
+explains the 4m45s duration anomaly and nothing else. The damage was done by
+shipping the CLI beside it.
+
+**What would change my mind, dated.**
+1. **`grep -n "^def run" .../growth/scout.py`.** One command, today, ends this
+   either way.
+2. **The morning after the deploy.** If `snapshot.json` and
+   `reports/waiting-on-you.html` both date to that day, the diagnosis was right
+   and this journal gets real numbers for the first time in a week. If the
+   snapshot is still stale, I was wrong and the log's last traceback is the
+   next move.
+3. **2026-09-08 — the impression-flood test.** I still have **no side**: both
+   mechanisms I proposed were refuted, on 08-23 and 08-25, and I would rather
+   carry an open question than invent a third story. `gutter installer` at
+   position 1.0 with 470 impressions and zero clicks remains real and unexplained.
+4. **2026-09-15 — the seasonal window closes.** Twenty days out. Leaf season is
+   when this business's phone is supposed to ring. Seven days of the engine's
+   measurement half being dead did not cost rank; **rec 4 costing nothing and
+   still not being done is what will decide autumn.**
