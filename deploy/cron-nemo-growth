@@ -50,10 +50,20 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # Watchdog — runs from its own entry so it survives the engine failing. If the
 # 06:00 run stops happening, the failure mode is an empty inbox, which looks
-# exactly like a quiet week. This makes silence loud.
+# exactly like a quiet week.
 #
-# Stays DAILY through the weekly-report change: cmd_watchdog sends nothing when
-# it finds nothing wrong, so this is not a daily email — it is the alarm. Moving
-# it to Fridays would mean a Saturday breakage went unreported for six days,
-# which is the exact failure the entry exists to catch.
-0 11 * * * root cd /var/www/nemo-seamless-gutter && WEB_ROOT=/var/www/nemo-seamless-gutter /usr/bin/python3 growth_daily.py watchdog --email divinejdavis@gmail.com >> /var/log/nemo-growth.log 2>&1
+# The --email was removed on 2026-08-27, at the owner's request. The check still
+# runs daily and still writes its verdict to the log; it just no longer mails.
+#
+# Know what that costs, because it is not nothing. This entry existed to make
+# silence loud, and the report going weekly on the same day made silence quieter:
+# a Monday failure now surfaces on Friday at the earliest, and a failure of cron
+# itself surfaces never, because the Friday mail is also a cron job. Nothing else
+# here alarms. The recovery path is `growth_daily.py watchdog` by hand, or
+# `grep watchdog /var/log/nemo-growth.log`, both of which need someone to already
+# suspect something is wrong — which is the state this entry used to prevent.
+#
+# Restoring it is one flag: append `--email divinejdavis@gmail.com`. It sends
+# nothing when the engine is healthy — cmd_watchdog returns early on no problems
+# — so putting it back does not reintroduce a daily email.
+0 11 * * * root cd /var/www/nemo-seamless-gutter && WEB_ROOT=/var/www/nemo-seamless-gutter /usr/bin/python3 growth_daily.py watchdog >> /var/log/nemo-growth.log 2>&1
