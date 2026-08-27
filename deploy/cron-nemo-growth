@@ -5,7 +5,7 @@
 # clobbers the other sites' jobs.
 #
 # 06:00 America/New_York: measure yesterday, judge what's running, build today's
-# page, tell search engines, scout for new techniques, and email the report.
+# page, tell search engines, scout for new techniques, and report.
 #
 # CRON_TZ matters: the droplet runs UTC, and without it the job would drift an
 # hour every daylight-saving change and stop being "6am" to the business.
@@ -28,9 +28,32 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # --owner-email is Eric's: leads, rank, what is new on his site and what needs
 # him, with none of the machinery — a report full of internals is a report
 # that stops getting read.
-0 6 * * * root cd /var/www/nemo-seamless-gutter && WEB_ROOT=/var/www/nemo-seamless-gutter /usr/bin/python3 growth_daily.py daily --email divinejdavis@gmail.com --owner-email eric@nemoseamlessgutter.com >> /var/log/nemo-growth.log 2>&1; cd /var/www/nemo-seamless-gutter && WEB_ROOT=/var/www/nemo-seamless-gutter /bin/bash growth/publish_state.sh >> /var/log/nemo-growth.log 2>&1
+#
+# The developer's copy went from daily to WEEKLY on 2026-08-27, at the owner's
+# request. Eric's copy is untouched and still goes every morning.
+#
+# It is done by splitting the SAME 6am entry on the day-of-week field rather
+# than by adding a second job that re-runs `report`, because the report is built
+# from the run that just happened. A separate Friday entry would either collide
+# with the 06:00 run or read a ledger it was still writing, and would show up in
+# the inbox as a report about a run that had not finished. Two lines that differ
+# only by `--email` is the duplication that buys that.
+#
+# 0-4,6 is Sun-Thu and Sat; 5 is Friday. Both lines must be kept in step — if
+# you change one, change the other.
+
+# Sun-Thu, Sat — Eric's report only.
+0 6 * * 0-4,6 root cd /var/www/nemo-seamless-gutter && WEB_ROOT=/var/www/nemo-seamless-gutter /usr/bin/python3 growth_daily.py daily --owner-email eric@nemoseamlessgutter.com >> /var/log/nemo-growth.log 2>&1; cd /var/www/nemo-seamless-gutter && WEB_ROOT=/var/www/nemo-seamless-gutter /bin/bash growth/publish_state.sh >> /var/log/nemo-growth.log 2>&1
+
+# Friday — the same run, plus the developer's weekly copy.
+0 6 * * 5 root cd /var/www/nemo-seamless-gutter && WEB_ROOT=/var/www/nemo-seamless-gutter /usr/bin/python3 growth_daily.py daily --email divinejdavis@gmail.com --owner-email eric@nemoseamlessgutter.com >> /var/log/nemo-growth.log 2>&1; cd /var/www/nemo-seamless-gutter && WEB_ROOT=/var/www/nemo-seamless-gutter /bin/bash growth/publish_state.sh >> /var/log/nemo-growth.log 2>&1
 
 # Watchdog — runs from its own entry so it survives the engine failing. If the
 # 06:00 run stops happening, the failure mode is an empty inbox, which looks
 # exactly like a quiet week. This makes silence loud.
+#
+# Stays DAILY through the weekly-report change: cmd_watchdog sends nothing when
+# it finds nothing wrong, so this is not a daily email — it is the alarm. Moving
+# it to Fridays would mean a Saturday breakage went unreported for six days,
+# which is the exact failure the entry exists to catch.
 0 11 * * * root cd /var/www/nemo-seamless-gutter && WEB_ROOT=/var/www/nemo-seamless-gutter /usr/bin/python3 growth_daily.py watchdog --email divinejdavis@gmail.com >> /var/log/nemo-growth.log 2>&1
