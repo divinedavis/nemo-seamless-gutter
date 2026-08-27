@@ -323,6 +323,33 @@ class WholePageGeoGuardTest(unittest.TestCase):
                 "faqs": ["nope", {"q": "Q", "a": None}]}
         self.assertEqual(T._generated_prose(data), "Ok Q")
 
+    # --- 2026-08-16: a bare string where a list belongs -----------------------
+    #
+    # strengthen_pages published 1,254 single-letter <p> tags onto
+    # services/half-round-gutters.html, because the model returned
+    # "paragraphs" as one string and every `for p in paragraphs` walked it
+    # character by character. These three pin the two consequences and the fix.
+
+    def test_a_string_of_paragraphs_renders_as_one_paragraph(self):
+        html = T._render_sections([{"h2": "Cost", "paragraphs":
+                                    "Copper is priced by weight."}])
+        self.assertEqual(html.count("<p>"), 1)
+        self.assertIn("<p>Copper is priced by weight.</p>", html)
+
+    def test_a_string_of_bullets_renders_as_one_item(self):
+        html = T._render_sections([{"h2": "Cost", "paragraphs": ["x"],
+                                    "bullets": "Total footage"}])
+        self.assertEqual(html.count("<li>"), 1)
+        self.assertIn("<li>Total footage</li>", html)
+
+    def test_the_geo_guard_still_sees_a_town_in_a_string_of_paragraphs(self):
+        # The letters-with-spaces flattening is why this mattered twice: a
+        # malformed reply is exactly when you least want the guard to go blind.
+        data = {"sections": [{"h2": "Areas",
+                              "paragraphs": "We work across Schuylkill County, PA."}]}
+        self.assertEqual(T._off_area_prose(T._generated_prose(data)),
+                         "Schuylkill County")
+
     def test_a_clean_york_county_page_passes_the_flattener(self):
         data = {"title": "Gutter Replacement Cost in York County, PA",
                 "h1": "What New Gutters Cost in York County",

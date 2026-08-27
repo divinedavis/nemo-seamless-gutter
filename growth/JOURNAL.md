@@ -12845,3 +12845,347 @@ shipping the CLI beside it.
    when this business's phone is supposed to ring. Seven days of the engine's
    measurement half being dead did not cost rank; **rec 4 costing nothing and
    still not being done is what will decide autumn.**
+
+## 2026-08-27 — review agent
+
+### A live page has been serving 1,254 single-letter paragraphs for eleven days
+
+Lead finding, and it is not about the outage.
+
+`services/half-round-gutters.html` contains a real, well-written 1,259-character
+paragraph of body copy **published one character per `<p>` element**:
+
+```html
+      <h2>Scheduling a Half-Round Gutter Installation Anywhere in York County</h2>
+      <p>H</p>
+      <p>a</p>
+      <p>l</p>
+      <p>f</p>
+```
+
+…for 1,263 consecutive lines. The page is 1,600 lines long; 1,254 of them are a
+single letter. Rendered, that is a mile-deep vertical column of individual
+letters between two perfectly good sections. It is in `sitemap.xml` with
+`lastmod` 2026-08-27, it carries `RoofingContractor`, `Service`, `Offer` and
+`FAQPage` JSON-LD, and it is the page targeted by the `half round copper gutters
+york pa` candidate the engine keeps queuing.
+
+**Dated: `3b43777`, 2026-08-16.** The parent commit has zero single-letter
+paragraphs; that commit adds 1,254 in one diff of +1,276 lines. **Eleven days
+live.**
+
+**It is live, not merely in the repo.** `publish_state.sh:62-69` rsyncs
+`areas/`, `guides/` and `services/` **docroot → repo**, one way, every morning.
+This morning's publish commit (`078bc25`, 06:05:27) touched that exact file. The
+repo copy therefore *is* the docroot copy as of 06:05 today. I could not confirm
+by fetching the page — this sandbox's egress proxy blocks `nemoseamlessgutter.com`
+— and the copy direction is the reason I do not think I need to.
+
+**The mechanism, reproduced here, not asserted.** `techniques.py:173`:
+
+```python
+for p in s.get("paragraphs") or []:
+    out.append(f"      <p>{_esc(p)}</p>")
+```
+
+The schema asks for `{"paragraphs": ["...", "..."]}`. On 08-16 the model
+returned `"paragraphs"` as a **bare string**. `for p in "Half-round…"` iterates
+characters.
+
+```
+>>> _render_sections([{'h2': 'T', 'paragraphs': 'abc'}])
+      <h2>T</h2>
+      <p>a</p>
+      <p>b</p>
+      <p>c</p>
+```
+
+Every guard upstream waves it through. `strengthen_pages` checks
+`if not data.get("h2") or not data.get("paragraphs")` (`:1032`) — a non-empty
+string is truthy. Nothing checks the type.
+
+**Why no alarm fired.** The build log records `{"ok": true, "slug":
+"strengthen_pages"}` and a `detail` string. **The engine has no instrument that
+looks at the HTML it wrote.** `ok` means the technique returned without raising,
+and it did. There is no length check, no paragraph-count check, no rendered-output
+sample in the snapshot. From the ledger's point of view 08-16 was a good day.
+
+**Why I did not catch it, which is the part I should own.** This was visible on
+2026-08-16, 08-17, 08-18, 08-19 and 08-20 — five mornings when the snapshot was
+*fresh* and I had every field I needed. My standing instructions say to grep the
+generated pages under `areas/` and `guides/` before recommending anything. I have
+been reading `techniques.py` diligently for eleven days to check whether features
+are already implemented, and never once read **what the code actually produced**.
+I verified the factory and never opened a box. `wc -l services/*.html` would have
+found it in one second on any of those five days.
+
+### Also true, and now day eight: the measurement half is still dead
+
+Yesterday's diagnosis stands unrefuted and **was not acted on.**
+
+- `growth/snapshot.json` still reads `2026-08-20T06:00:10`. Unchanged in git
+  since `cfe94a9`.
+- `reports/waiting-on-you.html` still carries `lastmod` **2026-08-20** in a
+  sitemap regenerated at 06:05 this morning. The report step has now failed on
+  **seven consecutive mornings**.
+- Today's run: publish commit 06:05:27, so ~5m27s — the same shape as 08-24
+  (~6m), 08-25 (~5m25s) and 08-26 (~5m45s). **Builds pages, dies before the
+  snapshot.** Exactly what a `TypeError` at `growth_daily.py:219` predicts.
+- One new confirmation available today and not used before: `publish_state.sh:47`
+  copies `growth/snapshot.json` **unconditionally**, every morning. It has been
+  copied seven times and produced no diff. The docroot's snapshot is frozen too —
+  this is not a publish-step artifact.
+
+**This is the eighth consecutive review written against 2026-08-20 data.**
+
+**The deploy queue, counted.** 17 engine-code commits touching `growth/*.py` or
+`growth_daily.py` since 2026-08-08. Exactly one of them reached the droplet —
+`93c78c2`, and only its CLI half, which is what caused the outage. **Sixteen
+commits of work in this repository have never run.** Including yesterday's
+crash-wrapping fix. Including, as of this commit, the fix for the finding above.
+Nothing the review agent writes reaches the droplet; the pipe runs one way.
+
+### Where the numbers stand
+
+**All 2026-08-20 data, republished an eighth time. Nothing has been re-measured
+since 08-20 and I can say nothing about the eight days after it.**
+
+Goal metric **`top3` = 2 of 195 tracked queries, `share_pct` 1.0%** against a
+target of 50% — 2 of the 25 queries Search Console can rank at all. `top10` 7.
+**Zero top-3 positions in every named town:** york 33/5/0, dover 16/7/0,
+red-lion 11/3/0, dallastown 11/4/0, spring-grove 11/3/0, hanover 10/4/0. Both
+top-3s sit in the county bucket, 2 of 103. **Direction 08-20 → 08-27: unknown.
+Not flat — unknown.**
+
+Coverage 32.3%. Traffic 08-14→08-19: 2, 2, 2, 3, 2, 3. Leads: **3 bookings all
+time, 0 phone leads ever.** `ai_visitors` 0 across all 26 days. Ledger: 74
+techniques, 11 active, `does_not_work` **still empty on day thirty-two**.
+
+**One number re-examined today.** The 40 `discovered_untracked` queries carry
+**12,066 impressions — 45.3% of the site's 26,613 — and zero clicks**, and every
+single one names a suburban Philadelphia town: Glenside, Audubon, Wayne, Plymouth
+Meeting, Royersford, Eagleville, Horsham, Phoenixville, Norristown, Abington,
+Malvern, Exton, Devon, Radnor, Upper Merion, Blue Bell, Willow Grove, Hatboro,
+Lower Gwynedd, Spring City, East Norriton. **Nearly half this property's
+impressions are for a metro 90 miles away that NEMO does not serve.** I tested
+the obvious on-site cause and it is refuted: grepping every `.html`, `.py`, `.js`
+and `.json` in the repo for those town names returns **only two test files**
+(`test_techniques.py`, `test_gsc.py`). The site never names them. The 2026-09-08
+impression-flood test still stands and I still have no side. What this *does*
+settle is the reading discipline: `avg_position` 25.1 is a mean over a query set
+that is 45% out-of-market, and quoting it as "our rank" would be wrong by
+construction. Report `top3`, `ranked_known` and clicks.
+
+### Did previous changes work?
+
+**1 — "Deploy `growth/` and both `snapshot.json` and `reports/waiting-on-you.html`
+will date to that morning" (08-26, rec 1+2). Not actioned. Prediction untested,
+and it stays on the board unchanged.** Day twenty-three of this recommendation,
+day two as the named repair. Nothing in today's evidence contradicts the
+diagnosis; the run duration and the frozen-copy argument above are both new and
+both consistent with it.
+
+**2 — Wrapping the two post-build steps (08-26, my own change). No effect and
+could not have had one.** It is in this repository, which the droplet never
+reads. Recording that so it is not later mistaken for a tried-and-failed fix.
+
+**3 — Top up the Anthropic credit. Actioned 08-24, holding — with a caveat I owe
+it.** Four consecutive mornings of successful generation. I checked the output
+this time instead of the log: today's Red Lion answer-first lede and the
+half-round copper cost section are **genuinely good copy** — specific, honest
+about price ("we quote off current material cost rather than a flat per-foot
+number"), and the cost section resolves the price contradiction the 08-20 entry
+complained about. FAQ `<h3>`s and `FAQPage` JSON-LD match, one block per page, no
+duplicate headings. **The content half is working well.** That credit was the
+best money spent on this project. The caveat: the same four days of generation
+are what produced the 08-16 defect's sibling risk, and nobody was checking.
+
+**4 — Eric's list (08-21 recs 3-8). Unactioned, day thirty-two.** Not restating.
+**HIC registration stays exempt** from throttling — legal exposure, not growth.
+
+**5 — Extend `internal_links` to guides (08-24 rec 3). Not actioned.** 15 of 17
+guides still have zero inbound links.
+
+### What I researched today
+
+Two searches, both chosen because of the finding rather than in spite of it.
+
+- **Google's scaled content abuse policy, current enforcement.** The definition
+  turns on *purpose*, not on whether software wrote the page — legitimate
+  programmatic local landing pages are explicitly fine at scale when they carry
+  real, differentiated, accurate content. That is a genuine reassurance for what
+  this engine is *supposed* to do. The uncomfortable half: the **March 2026 core
+  update named scaled content abuse as a primary target**, manual actions are
+  applied by human reviewers, and they arrive with a Search Console notice and a
+  reconsideration process. A 1,600-line page that is 78% single-letter paragraphs
+  is not a borderline judgement call for a human reviewer. I am **not** claiming
+  this page has caused a penalty — I have no data saying so, and one bad page on
+  a 38-page site is not "scaled" anything. I am claiming it is the single worst
+  artifact on this property and that leaving it up is an uninsured risk against
+  a business whose Business Profile is its livelihood.
+  https://patrickstox.com/programmatic-seo/risks/scaled-content-abuse/ ·
+  https://www.digitalapplied.com/blog/scaled-content-abuse-google-march-update-ai-pages-decimated
+- **Google Business Profile, checked for anything new since 08-17.** Nothing new
+  for this journal, and I am recording the check rather than re-selling it. The
+  Ask Maps replacement of Q&A is confirmed and correctly dated (API discontinued
+  2025-11-03, public section phased from 2025-12-03) — **already in this journal
+  since 08-17**, along with the consequence that the GBP services/attributes
+  fields and detailed review text are now the input Gemini answers from. It is
+  not a discovery today. https://www.seroundtable.com/google-maps-qa-feature-ask-40594.html
+- **Rejected:** the widely-repeated 2026 claim that Google shifted local ranking
+  from "prominence" to "popularity" (clicks/calls/interactions). It appears only
+  in marketing blogs, with no primary source and no documentation behind it, and
+  acting on it would mean chasing engagement metrics instead of the two levers
+  already established. Not recommending on that basis.
+  https://www.fogdigitalmarketing.com/blog/google-business-profile-ranking/
+- **Also rejected:** every new on-site *feature* idea. There are sixteen
+  undeployed commits and a broken live page. Adding to that queue is motion.
+  **Call tracking / DNI** stays rejected on 08-25's reasoning.
+
+### Recommendations
+
+**Nothing in this commit is live.** The site and the engine both run from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout, and
+`publish_state.sh` copies droplet → repo only. Everything below needs a deploy.
+
+1. **Divine — repair the live `services/half-round-gutters.html`.** *(Two
+   minutes. New today, and the first item in thirty-two days that is visible
+   damage to a customer-facing page rather than an internal metric.)* The
+   repaired file is in this commit: copy it into the docroot.
+   ```
+   cp /root/nemo-repo/services/half-round-gutters.html \
+      /var/www/nemo-seamless-gutter/services/half-round-gutters.html
+   ```
+   I rebuilt the 1,259 characters back into the 3 paragraphs the model actually
+   wrote, kept the wording, and left the rest of the file untouched: 1,600 lines
+   → 340, all three JSON-LD blocks still parse, all headings intact.
+   *Checked:* `git show 3b43777`, the reproduction above, `_render_sections`
+   at `techniques.py:173`. **Not previously reported in this journal.**
+
+2. **Divine — deploy the `growth/` package.** *(Minutes. Day twenty-three.)*
+   Unchanged from yesterday and still the highest-leverage single action
+   available. It repairs the seven-day measurement blackout in one step, and it
+   now also ships the type fix below, so the defect cannot recur on the next
+   morning `strengthen_pages` gets an odd reply. Confirm in one line if you want
+   to: `grep -n "^def run" /var/www/nemo-seamless-gutter/growth/scout.py` —
+   `def run(dry_run=False):` confirms the diagnosis.
+   *Checked:* `growth_daily.py:177/219`, `a2d94d6`, absent `code_version`.
+
+3. **Divine — after deploying, check `snapshot.json` and
+   `reports/waiting-on-you.html` both date to that morning.** *(Seconds.)*
+   Carried from 08-26. A green log is not evidence; both dates advancing is.
+
+4. **Eric — ask every completed customer for a Google review, one per job, no
+   incentive and no gating; reply to every review.** *(Minutes per job, free.)*
+   Unchanged, day thirty-two, and still the only item here that does not depend
+   on a single line of this engine working. Nineteen days to leaf season.
+
+5. **Engine — an output sanity check on every page the engine writes.**
+   *(Not done in this commit. ~20 lines, and I want it argued before it is
+   built.)* The type fix stops *this* bug. It does not stop the next
+   never-anticipated malformation, because the engine still has **no instrument
+   that reads its own HTML**. The cheap version: after writing a page, count
+   `<p>` elements and median paragraph length; if the median is under ~20
+   characters or the file grew by more than ~3× in one pass, mark the technique
+   `ok: false` and put it in the report. That is a general shape and it would
+   have caught 08-16 on 08-16. *Checked:* `techniques.py` write paths at
+   `:375, :539, :1083, :1190`, and the `last_build` schema in `snapshot.json` —
+   there is no length, no count, and no output sample anywhere. **Not already
+   implemented.**
+
+6. **Engine — extend `internal_links` to guides.** *(Small, ~30 lines.)* Carried
+   from 08-24. *Checked today:* `techniques.py:539-546` is area-only by its own
+   docstring; 15 of 17 guides have zero inbound links. **Not already shipped.**
+
+7. **Nobody — still do not remove `reports/waiting-on-you.html` from the
+   sitemap.** Carried. Its frozen `lastmod` is the load-bearing evidence in the
+   outage diagnosis, for the seventh day running.
+
+### What I changed in this repo today
+
+221 tests pass (`python3 -m unittest discover -s growth -t .` — the `-t .`
+matters; up from 218, the three new ones pin this bug). I touched no runtime
+state (`techniques.json`, `keywords.json`, `results.jsonl`, `state.json`),
+activated or retired nothing, and edited no keyword list.
+
+1. **`_strlist()` in `techniques.py`, applied at four places.** A bare string
+   becomes a one-element list; non-strings are dropped rather than `str()`'d.
+   Wired into `_render_sections` (both `paragraphs` and `bullets`), into
+   `strengthen_pages`' usability check and geo guard, and into `_generated_prose`.
+   **The `_generated_prose` half is the one worth flagging, because it is a
+   second bug that has never fired.** `parts.extend(s.get("paragraphs") or [])`
+   splits a string into characters too, and the final `" ".join` then renders
+   "Pottsville" as `P o t t s v i l l e`, which matches no town name. The geo
+   guard would have gone blind on precisely the input that is already
+   malformed. **To be exact about the history: this did not happen on 08-16.**
+   The guard was added in `851aa5d` on 2026-08-10, and the deployed package
+   predates 08-08, so on 08-16 `strengthen_pages` had no geo guard at all. The
+   blindness is latent, and it would have become real on the first run after
+   the deploy. Fixed before it could.
+2. **Rebuilt `services/half-round-gutters.html`** as described in rec 1.
+   **This edit is also an instrument, deliberately.** `publish_state.sh` rsyncs
+   `services/` docroot → repo every morning and will overwrite it. **If the
+   1,254 single-letter paragraphs reappear in tomorrow's publish commit, the
+   live page was not repaired.** If the file stays 340 lines, it was. Either way
+   tomorrow's `git log` answers rec 1 without anyone reporting back — the same
+   trick as the sitemap `lastmod`.
+
+**Corrections to my standing instructions.** Carried forward: the prompt's 07-28
+GSC baseline is a month stale (last real reading 964 rows / 18 clicks / 26,613
+impressions / position 25.1, county 2 of 103); its 08-01 usage-cap story is
+obsolete twice over, and the credit issue was resolved 08-24; the engine
+publishes ~5 hours before this review, not one; prefer `top3` / `ranked_known` /
+clicks over `avg_position`, which is a mean over a query set that is 45%
+out-of-market. Carried: check `snapshot.date` against `git log` before quoting
+any field; read `git log` for Divine's commits, not only the review agent's.
+**Added today, and it is the one I would keep above all the others: read the
+engine's output, not only its source and its ledger.** The prompt already told me
+to grep the generated pages. I read `techniques.py` every day for eleven days to
+check whether things were implemented, and never checked what it implemented
+them *into*.
+
+### Reasoning and uncertainties
+
+Day thirty-two. The finding was one `wc -l` away for eleven days.
+
+**What I would defend hardest.** That the page is broken on the live site and not
+only here. It rests entirely on the copy direction in `publish_state.sh:62-69`
+(rsync docroot → repo, `set -euo pipefail`, no reverse path anywhere in the file)
+plus the fact that this morning's publish commit touched that file. If that
+script's direction were reversed I would be wrong about everything in the lead
+section, so I read it in full rather than trusting the comment at the top of it.
+
+**Where I am least confident.** The severity. I have deliberately not claimed a
+ranking penalty, because I have no rank data since 08-20 and could not get any if
+I wanted it. It is equally possible Google has quietly ignored the page, that it
+never had impressions worth losing, or that a human reviewer has never seen it.
+What I will say without hedging is that it is bad for the *humans* who land on
+it — a homeowner comparing copper gutter quotes hits a wall of single letters and
+leaves — and that this is a business with 2-3 visitors a day and zero phone leads
+ever, which cannot spare one.
+
+**What I am not claiming.** That the outage caused this. It did not: the page was
+written on 08-16, five days before the run started dying, during a stretch when
+the snapshot was fresh and I was reviewing it daily. The outage hid nothing here.
+I did.
+
+**What I got wrong in my own framing this week.** Six entries of increasingly
+careful forensics on a broken instrument, while the thing the instrument exists
+to measure — the pages — sat unread. The diagnosis was good work and I would do
+it again, but the ratio was wrong: eleven days of reading the meter and none of
+looking out of the window.
+
+**What would change my mind, dated.**
+1. **Tomorrow's publish commit.** Answers rec 1 by itself, per the instrument
+   above.
+2. **The morning after the deploy.** `snapshot.json` and
+   `reports/waiting-on-you.html` both dating to that day confirms yesterday's
+   diagnosis; a still-frozen snapshot refutes it and the log's last traceback is
+   the next move.
+3. **2026-09-08 — the impression-flood test.** Still no side. Both mechanisms I
+   proposed were refuted (08-23, 08-25). Today adds one fact and no story: the
+   flood is 45.3% of all impressions, entirely suburban Philadelphia, and
+   **nothing on this site names those towns.**
+4. **2026-09-15 — the seasonal window closes.** Nineteen days. Rec 4 costs
+   nothing, needs no deploy, and is still not done. That, not the engine, is what
+   decides autumn.

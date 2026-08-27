@@ -163,6 +163,33 @@ def _ld(obj):
     return json.dumps(obj, indent=2).replace("<", "\\u003c")
 
 
+def _strlist(v):
+    """Model list-of-strings fields, normalised so a bare string is one item.
+
+    The schemas ask for {"paragraphs": ["...", "..."]}, and the model usually
+    obliges. When it returns a bare string instead, every `for x in v` in this
+    module iterates it CHARACTER BY CHARACTER, and each character is then
+    rendered as its own element. That is not hypothetical: on 2026-08-16
+    `strengthen_pages` wrote 1,254 single-letter <p> tags onto
+    services/half-round-gutters.html — a real, well-written paragraph of copy,
+    published one letter per line, and still live eleven days later.
+
+    Two call sites need this, not one. The renderer is the visible damage, but
+    `_off_area_prose` is fed the same field, and a string splits there too:
+    " ".join(list("Pottsville")) is "P o t t s v i l l e", which matches no
+    town name, so the geo guard silently stops guarding on exactly the input
+    that is already malformed. Normalise once, at both.
+
+    A dict or a number is dropped rather than str()'d — writing "None" or
+    "{'h2': ...}" into the page reads worse than writing nothing.
+    """
+    if v is None:
+        return []
+    if isinstance(v, str):
+        return [v] if v.strip() else []
+    return [x for x in v if isinstance(x, str) and x.strip()]
+
+
 def _render_sections(sections):
     """Body copy as it appears inside div.container.prose on the real pages:
     headings and paragraphs directly, no extra wrapper divs."""
@@ -170,11 +197,12 @@ def _render_sections(sections):
     for s in sections or []:
         if s.get("h2"):
             out.append(f'      <h2>{_esc(s["h2"])}</h2>')
-        for p in s.get("paragraphs") or []:
+        for p in _strlist(s.get("paragraphs")):
             out.append(f"      <p>{_esc(p)}</p>")
-        if s.get("bullets"):
+        bullets = _strlist(s.get("bullets"))
+        if bullets:
             out.append("      <ul>")
-            for b in s["bullets"]:
+            for b in bullets:
                 out.append(f"        <li>{_esc(b)}</li>")
             out.append("      </ul>")
     return "\n".join(out)
@@ -1029,7 +1057,9 @@ def strengthen_pages(ctx):
             if len(errors) >= MAX_ITEM_FAILURES:
                 break
             continue
-        if not data.get("h2") or not data.get("paragraphs"):
+        paragraphs = _strlist(data.get("paragraphs"))
+        bullets = _strlist(data.get("bullets"))
+        if not data.get("h2") or not paragraphs:
             errors.append(f"model returned nothing usable for '{kw['query']}'")
             if len(errors) >= MAX_ITEM_FAILURES:
                 break
@@ -1042,9 +1072,7 @@ def strengthen_pages(ctx):
         # County searcher the business is somewhere else. Rejecting costs one
         # candidate's worth of a day; shipping it costs a page until a human
         # notices.
-        off = _off_area_prose(" ".join(
-            [data["h2"]] + list(data["paragraphs"])
-            + list(data.get("bullets") or [])))
+        off = _off_area_prose(" ".join([data["h2"]] + paragraphs + bullets))
         if off:
             errors.append(f"rejected section for '{kw['query']}': names "
                           f"{off!r}, which is not York County")
@@ -1053,8 +1081,8 @@ def strengthen_pages(ctx):
             continue
 
         block = _render_sections([{
-            "h2": data["h2"], "paragraphs": data["paragraphs"],
-            "bullets": data.get("bullets")}])
+            "h2": data["h2"], "paragraphs": paragraphs,
+            "bullets": bullets}])
         faq = data.get("faq") or {}
         if faq.get("q") and _off_area_prose(f'{faq["q"]} {faq.get("a", "")}'):
             faq = {}
@@ -1486,8 +1514,12 @@ def _generated_prose(data):
         if not isinstance(s, dict):
             continue
         parts.append(s.get("h2"))
-        parts.extend(s.get("paragraphs") or [])
-        parts.extend(s.get("bullets") or [])
+        # _strlist, not `or []`: a bare string extends character by character,
+        # and the final " ".join then spells every town name out with spaces
+        # between the letters, which matches nothing. The guard would pass the
+        # one input shape that is already broken.
+        parts.extend(_strlist(s.get("paragraphs")))
+        parts.extend(_strlist(s.get("bullets")))
     for f in data.get("faqs") or []:
         if not isinstance(f, dict):
             continue
