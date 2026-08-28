@@ -13189,3 +13189,396 @@ looking out of the window.
 4. **2026-09-15 — the seasonal window closes.** Nineteen days. Rec 4 costs
    nothing, needs no deploy, and is still not done. That, not the engine, is what
    decides autumn.
+
+## 2026-08-28 — review agent
+
+### The alarm was switched off yesterday afternoon, while the engine was already half dead
+
+Divine was on the droplet yesterday. Two commits, 13:36 and 13:52 EDT:
+
+- `c5027c2` — the developer's growth report moved from **daily to weekly, Fridays 06:00**.
+- `8dae970` — `--email` **removed from the 11:00 watchdog**. It still runs and still
+  logs; it no longer mails anyone.
+
+Both say "at the owner's request", and `8dae970`'s own message is careful and
+honest about the cost: "a Monday failure now surfaces on Friday at the earliest,
+and a failure of cron itself surfaces never." That reasoning is right. What
+neither commit could know is that **the failure it describes had already
+happened eight days earlier and was live at the moment the flag came off.**
+
+He was on the machine, with a shell, and the `growth/` deploy — recommended
+every day since 2026-08-04 and the named repair since 08-26 — was not done.
+
+**And his own commit message contains the proof, which is new evidence I did not
+have yesterday.** `8dae970` reports, verbatim:
+
+> Verified on the droplet: `growth_daily.py watchdog` logs "ok -- last build
+> 2026-08-27" and exits 0 without sending.
+
+Run that against the code in *this repository* and it cannot happen.
+`cmd_watchdog` calls `_snapshot_problems(when, stale_days)` at
+`growth_daily.py:339`. With `last_build` = 2026-08-27 (`stale_days == 0`) and
+`snapshot.json` reading `2026-08-20`, `_snapshot_problems` hits its final branch
+(`growth_daily.py:294-305`), returns a problem, and `cmd_watchdog` **logs it and
+returns 1**. The droplet logged `ok` and returned 0. Therefore the deployed
+`growth_daily.py` **does not contain `_snapshot_problems`**, which was added in
+`932e18f` on **2026-08-21**.
+
+That independently pins the deployed CLI to `93c78c2` (2026-08-20, Divine's
+index-status deploy) and confirms the whole 08-26 chain from a source outside my
+own reasoning: the droplet's CLI is 08-20, the `growth/` package under it is
+2026-08-07 or older, and nothing since has moved. **Seven engine-code commits
+have landed on `growth/` or `growth_daily.py` since that partial deploy and not
+one has ever executed** (`git log 93c78c2..HEAD -- growth/ growth_daily.py`).
+
+### There is a way to confirm all of this today without touching the droplet
+
+The run dies at the scout, *before* `cmd_report`. So the reports die with it.
+
+- **Eric's owner report — daily, `--owner-email` — has not been sent since
+  2026-08-20.** Eight mornings. That is the report with the leads in it.
+- **Today is Friday 2026-08-28: the first Friday under the new schedule.** The
+  developer's weekly report was due at 06:00 this morning from
+  `0 6 * * 5` (`deploy/cron-nemo-growth:49`). It cannot have been sent, for the
+  same reason.
+
+Two empty inboxes, checkable in thirty seconds, from anywhere, by anyone. If
+Eric has a report from any morning after 08-20, I am wrong about the whole
+diagnosis. If he does not, no further debate is needed — deploy.
+
+I am flagging this specifically because a missing *first* weekly email is the
+easiest thing in the world to read as "the new cron didn't take yet."
+
+### Yesterday's page repair was reverted, exactly as the instrument predicted
+
+Yesterday I rebuilt `services/half-round-gutters.html` and left it as a test:
+if the single-letter paragraphs came back in today's publish commit, the live
+page was never repaired.
+
+**They came back.** `6f3b7c8` (today, 06:05:22) is `+1266` lines on that file.
+The current repo copy is **1,600 lines with 1,254 single-letter `<p>`
+elements** — byte-identical to the state it was in on 08-16. **Day twelve
+live.** Recommendation 1 was not actioned.
+
+**And the repair was structurally doomed regardless, which is my error and worth
+writing down.** `growth/publish_state.sh:68-74` rsyncs `areas/`, `guides/` and
+`services/` **docroot → repo** every morning, and `:45-47` copies `index.html`
+and `sitemap.xml` the same way. Those paths in this repository are a **read-only
+mirror**. Any edit I make to a generated page is guaranteed to be erased at
+06:05 the next morning. I repaired a file in the one directory tree where a
+repair cannot survive, and said so in the entry as though it were a fix waiting
+to be copied.
+
+Repairs to live pages can land in exactly two places: the docroot (a human), or
+the generator (`growth/techniques.py`, which is deploy-gated). Nowhere else.
+
+### I finally read the whole corpus, and the damage is confined to one page
+
+Yesterday's lesson was "read the engine's output, not only its source." Run
+across all 40 generated pages today rather than the one I already knew about:
+
+| | pages | median `<p>` length | `<p>` under 20 chars |
+| --- | --- | --- | --- |
+| `areas/` (15) | healthy | 145–384 | 0 |
+| `guides/` (17) | healthy | 147–361 | 1 total |
+| `services/` (7) | 6 healthy | 215–300 | 0 |
+| `services/half-round-gutters.html` | **broken** | **1** | **1,054** |
+
+**One page in forty.** That is genuinely reassuring and it is the first time
+anyone has checked. The `strengthen_pages` / `area_pages` output since the
+08-24 credit top-up is good copy by inspection, and it is not systematically
+malformed. The 08-16 defect was a single bad model reply, not a pattern.
+
+### Where the numbers stand
+
+**Ninth consecutive review written against 2026-08-20 data.** `snapshot.json`
+still reads `2026-08-20T06:00:10`; `git log -- growth/snapshot.json` still ends
+at `cfe94a9`. Everything below describes 08-20 and says nothing about the eight
+days since.
+
+Goal metric: **`top3` = 2 of 195 tracked queries — `share_pct` 1.0%** against a
+target of 50%; **2 of the 25 queries Search Console can rank at all**. `top10`
+7. **Zero top-3 positions in every named town:** york 33/5/0, dover 16/7/0,
+red-lion 11/3/0, dallastown 11/4/0, spring-grove 11/3/0, hanover 10/4/0. Both
+top-3s sit in the county bucket, 2 of 103. Coverage 32.3% (a proxy, not rank).
+**Direction 08-20 → 08-28: unknown. Not flat — unknown.**
+
+Leads: **3 bookings all time, 0 phone leads ever.** `ai_visitors` 0 across all
+26 measured days. Ledger: 74 techniques, 11 active, `does_not_work` **empty on
+day thirty-three**.
+
+**On the prompt's "traffic flat at zero" tripwire — it does not apply, and I am
+recording why so nobody re-raises it.** Traffic is 2–3 visitors/day
+(08-14→08-19: 2, 2, 2, 3, 2, 3), not zero. The step down from a pre-08-14 median
+of 9 is the **analytics beacon change of 08-14**, diagnosed on 08-18 and not a
+filter bug: `analytics.js:50` fires on every load and the script is present on
+40 of 41 HTML files. `metrics.py` is not the problem. The measurement *is*
+broken right now, but the reason is the frozen snapshot, not an over-broad
+exclusion.
+
+### Did previous changes work?
+
+**1 — "If the 1,254 single-letter paragraphs reappear in tomorrow's publish
+commit, the live page was not repaired" (08-27, my own instrument).
+The instrument fired. Not actioned; the page is still broken.** This is the
+cleanest prediction/result pair in the journal and it took one `git show`.
+
+**2 — Deploy the `growth/` package (day 24, rec 1 for the last three days).
+Not actioned — and yesterday it was declined by omission rather than missed.**
+Divine was on the droplet and deployed a cron change instead. I do not read that
+as neglect; I read it as the recommendation living in a file he may not read,
+while the cron change arrived as a direct request. **That is a routing problem,
+not a priority problem, and it is mine to fix.** Hence rec 1 below being an
+inbox check rather than a shell command.
+
+**3 — Repair the live `half-round-gutters.html` (08-27 rec 1). Not actioned,
+and my delivery mechanism was wrong.** See above. Replaced today with something
+that survives.
+
+**4 — Wrapping the post-build steps (08-26) and `_strlist` (08-27), my own
+changes. Still no effect and still could not have had one.** Both sit in
+undeployed commits. Recording again so neither is later mistaken for
+tried-and-failed.
+
+**5 — Top up the Anthropic credit (actioned 08-24). Holding, five days.**
+Content generation succeeded again this morning: a downspout-extension section
+on the Dover page, and it is good — specific about heavy Dover soil, honest
+about above-ground versus buried, and the FAQ `<h3>` matches its `FAQPage`
+entry. Today's corpus audit upgrades this from "the log says ok" to "I read all
+forty pages and only one is bad."
+
+**6 — Eric's list (08-21 recs 3-8). Unactioned, day thirty-three.** Not
+restating. **HIC registration stays exempt** from any throttling — legal
+exposure, not growth.
+
+**7 — Extend `internal_links` to guides (08-24 rec 3). Not actioned.**
+Re-measured today rather than carried: **15 of 17 guides have zero inbound
+links.** Only `gutter-cleaning-cost-york-pa.html` (5) and
+`seamless-vs-sectional-gutters.html` (8) are linked at all.
+
+### What I researched today
+
+- **GBP weighting, re-checked.** Business Profile signals ~32% of local-pack
+  weight, ahead of on-page (19%), reviews (16%) and links (15%); primary
+  category the single heaviest relevance lever. Consistent with what this
+  journal has said since 08-13. Recording the check, not re-selling it.
+  https://gomarketing.com/blog/the-complete-local-seo-guide-for-home-service-contractors-in-2026/ ·
+  https://wolfpackadvising.com/blog/how-to-rank-higher-on-google-maps/
+- **New, and it changes a standing recommendation: secondary categories dilute
+  the primary one.** The 2026 guidance is a *specific* primary plus **only 2–4
+  tightly relevant secondaries**; loading the ten available slots with
+  loosely-related categories spreads relevance instead of concentrating it. My
+  GBP recommendation has said "primary category, then service areas, then
+  itemised Services" for eleven appearances and has never said **remove the
+  wrong secondaries**. It does now.
+  https://www.greenthumblocal.com/guide-to-google-business-profile-category-optimization ·
+  https://acuteseo.com/local-seo-google-maps/what-categories-should-i-choose-in-google-business-profile/
+- **New, and it bounds the service-area recommendation: the cap is 20 regions.**
+  Service-area businesses hide the address and list **up to 20** areas. NEMO's
+  named towns (~15) fit, so "one entry per town" is still the right advice — but
+  it is not unlimited, and the towns should be ones Eric will actually drive to.
+  Two related 2026 changes raise the stakes: automated enforcement is faster,
+  and misclassification (storefront vs service-area) is a top suspension cause.
+  https://www.jxtgroup.com/google-business-profile-verification-in-2026-new-warnings-video-requirements-how-to-stay-compliant/ ·
+  https://almcorp.com/blog/google-business-profile-verification-flow/
+- **A number I am refusing to act on, and flagging as contested.** Today's
+  sources put AI Overviews on **38% of local service queries**; the sources I
+  cited on 08-26 put it at **7% of local searches**. Both are vendor blogs with
+  no primary source. The only first-party datum I have is `ai_visitors = 0` for
+  26 straight days. **I am not reopening AI-answer-engine work on a marketing
+  statistic that moves 5× depending on who is selling.** The 08-26 conclusion
+  stands on its non-numeric half: AI Overviews cite whoever already wins the map
+  pack, so there is no separate lever.
+  https://searchengineland.com/local-seo-sprints-a-90-day-plan-for-service-businesses-in-2026-469059
+- **Rejected:** Local Services Ads (costs money, already shortlisted for
+  rejection as T011); call tracking / DNI (08-25 reasoning — 2–3 visitors/day
+  attributes nothing, at a monthly cost, against a NAP-consistency risk); and
+  **every new on-site feature**, on the same grounds as the last three days —
+  seven undeployed engine commits and a broken live page. Adding to that queue
+  is motion.
+
+### Recommendations
+
+**Nothing in this commit is live.** The site and the engine both run from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout, and
+`publish_state.sh` copies droplet → repo only. Everything below needs a deploy
+or a human.
+
+1. **Divine — check two inboxes. Thirty seconds, no shell, no droplet.** *(New
+   today, and deliberately first: every previous version of this recommendation
+   asked for a command on a machine, and after twenty-four days of that not
+   happening the format is the thing I should change.)*
+   - Has **Eric** had his owner report on any morning after **2026-08-20**?
+   - Did **your** weekly developer report arrive at **06:00 today**, Friday
+     2026-08-28, the first one under `c5027c2`?
+
+   Expected under my diagnosis: **no** to both, because the run dies before
+   `cmd_report`. If either arrived, the diagnosis is wrong and I want to know.
+   *Checked:* `growth_daily.py:199-206` (`cmd_report` sends both) and `:258`
+   (it is the last statement in `cmd_daily`, after the crash point).
+
+2. **Divine — deploy the `growth/` package. Day twenty-four.** *(Minutes.)*
+   Unchanged and still the highest-leverage single action available. It ends the
+   measurement blackout, and it ships `_strlist` (so the letter-shredding cannot
+   recur), the post-build crash wrapping, and `_snapshot_problems` (so the
+   watchdog can see this failure shape at all). 221 tests pass in this checkout:
+   `python3 -m unittest discover -s growth -t .` — the `-t .` matters.
+   One-line confirmation if you want it first:
+   `grep -n "^def run" /var/www/nemo-seamless-gutter/growth/scout.py` —
+   `def run(dry_run=False):` confirms it.
+   *Checked:* `growth_daily.py:339` + `:294-305` against the `ok`/exit-0 output
+   quoted in your own `8dae970`; `git log 93c78c2..HEAD -- growth/ growth_daily.py`.
+
+3. **Divine — repair the live half-round page with the script added in this
+   commit.** *(Two minutes. Day twelve of visible damage on a customer-facing
+   page.)* No longer a file to copy — a script, in `deploy/`, which
+   `publish_state.sh` does **not** overwrite:
+   ```
+   git -C /root/nemo-repo fetch origin main && git -C /root/nemo-repo reset --hard origin/main
+   python3 /root/nemo-repo/deploy/repair_letter_paragraphs.py --root /var/www/nemo-seamless-gutter
+   python3 /root/nemo-repo/deploy/repair_letter_paragraphs.py --root /var/www/nemo-seamless-gutter --apply
+   ```
+   It reports before it writes, backs each file up to `*.repair-bak`, is safe to
+   re-run, scans the whole site rather than the one file I know about, and
+   imports nothing from `growth/` — so it works on today's droplet, before the
+   deploy. Verified here: its output on the broken file is **byte-identical** to
+   the hand rebuild I made yesterday (`diff` against `78679fc` — no differences),
+   1,600 → 340 lines, all three JSON-LD blocks parse, 10 `<h2>` / 14 `<h3>`
+   intact, shortest remaining paragraph 41 characters.
+   *How you would know:* tomorrow's publish commit shows that file **shrinking**
+   by ~1,260 lines. Same instrument, pointed the other way.
+
+4. **Divine — decide about the watchdog `--email` with the outage in view.**
+   *(One flag.)* Not a reversal request: your commit is right that a healthy
+   watchdog sends nothing, and the owner asked for less mail. But the state it
+   was switched off in matters — the deployed watchdog **cannot see this
+   failure** (rec 2 ships the check that can), the developer report is now
+   weekly, and today's weekly one did not arrive. Right now **nothing on that
+   machine can tell anyone it is broken.** After rec 2 the flag is worth putting
+   back, because then it only fires on a real problem.
+   *Checked:* `deploy/cron-nemo-growth:69`, `growth_daily.py:346-361`.
+
+5. **Eric — ask every completed customer for a Google review, one per job, no
+   incentive and no gating; reply to every review.** *(Minutes per job, free.
+   Day thirty-three.)* Still the only item in this system that does not depend
+   on a single line of this engine working, and reviews are still a top-three
+   local ranking factor on volume, recency and response rate. **Eighteen days to
+   the mid-September leaf-season window.**
+
+6. **Eric — twenty minutes on the Business Profile, now with one thing removed
+   as well as added.** *(Free. T016/T051/T022, day 33.)* Order: (a) primary
+   category exact; (b) **delete loosely-related secondary categories, keep 2–4**
+   — new today, and it is subtraction, which nobody ever recommends; (c) each
+   town as its own service-area entry, **up to the 20-area cap**, and only towns
+   Eric will actually drive to; (d) itemised Services. Skip the Q&A half of
+   T016 — the feature is gone (Ask Maps, API discontinued 2025-11-03).
+   *Checked:* T016, T051, T022 are all `candidate` / `activated: null`, and
+   `grep` over `growth/*.py` confirms **nothing in the engine touches the
+   Business Profile** — every active technique writes files into the site. This
+   one cannot be automated.
+
+7. **Engine — an output sanity check on every page the engine writes.**
+   *(~20 lines, still not built, carried from 08-27 rec 5.)* Today's corpus
+   audit is exactly the check, run by hand: `<p>` count, median paragraph
+   length, file-size delta. Median under ~20 chars or a >3× single-pass growth
+   marks the technique `ok: false` and puts it in the report. It would have
+   caught 08-16 on 08-16. *Checked today:* `grep -nE "median|paragraph_count|
+   sanity|_validate" growth/techniques.py` returns **nothing**; the `last_build`
+   schema in `snapshot.json` carries no length, count or output sample.
+   **Not already implemented.**
+
+8. **Engine — extend `internal_links` to guides.** *(Small, ~30 lines. Carried
+   from 08-24.)* *Checked today:* `techniques.py:567-578` is area-only by its own
+   docstring (`_all_area_pages`; the 08-27 entry's `:539-546` was correct before
+   yesterday's `_strlist` addition shifted the file by 28 lines), and I
+   re-counted the inbound links rather than carrying the claim — 15 of 17
+   guides at zero. **Not already shipped.**
+
+9. **Nobody — still do not remove `reports/waiting-on-you.html` from the
+   sitemap.** Carried, eighth day. Its `lastmod` moved 08-20 → **08-27** in
+   today's sitemap, which is consistent with Divine regenerating the report by
+   hand while testing yesterday's cron change, and it remains the only visibility
+   anyone outside the droplet has into whether the report step ran.
+
+### What I changed in this repo today
+
+221 tests pass (`python3 -m unittest discover -s growth -t .`). I touched no
+runtime state (`techniques.json`, `keywords.json`, `results.jsonl`,
+`state.json`), activated or retired nothing, and edited no keyword list.
+
+1. **Added `deploy/repair_letter_paragraphs.py`** (rec 3). Standalone, stdlib
+   only, dry-run by default, backs up before writing, idempotent, scans
+   `areas/`, `guides/`, `services/` and `index.html`. It matches `<p>` blocks
+   spanning lines, because the damage encodes a literal newline as `<p>\n</p>`
+   and a line-oriented match would run three paragraphs together; it requires a
+   run of at least 8 so a legitimate one-character paragraph is never touched;
+   and it splits the recovered text on blank lines to restore the paragraph
+   breaks the model originally wrote. Validated against the real broken file:
+   output byte-identical to yesterday's hand rebuild.
+
+2. **I deliberately did NOT re-repair `services/half-round-gutters.html` in this
+   repository.** It would be erased at 06:05 tomorrow by
+   `publish_state.sh:68-74`, and a repaired-looking file in the repo would
+   falsely suggest the live page is fine. The repo copy stays broken because the
+   live page is broken. That is the honest state and it keeps the instrument
+   working.
+
+**Corrections to my standing instructions.** Carried: the prompt's 07-28 GSC
+baseline is a month stale (last real reading 964 rows / 18 clicks / 26,613
+impressions / position 25.1, county 2 of 103); its 08-01 usage-cap story is
+obsolete twice over and the credit issue was resolved 08-24; the engine
+publishes ~5 hours before this review, not one; prefer `top3` / `ranked_known` /
+clicks over `avg_position`, which is a mean over a query set that is 45%
+out-of-market; check `snapshot.date` against `git log` before quoting any field;
+read `git log` for **Divine's** commits, not only the review agent's — that is
+what produced today's lead finding. Carried from 08-27: read the engine's
+output, not only its source. **Added today, two:** (a) `areas/`, `guides/`,
+`services/`, `index.html` and `sitemap.xml` in this repo are a **read-only
+mirror** — never "fix" a page here; (b) **read Divine's commit messages for
+droplet observations**, not just his diffs. Yesterday's proof of the deploy gap
+was a quoted line of terminal output in a commit about cron.
+
+### Reasoning and uncertainties
+
+Day thirty-three.
+
+**What I would defend hardest.** The watchdog inference. `_snapshot_problems`
+returns a problem for exactly the state the droplet was in yesterday, and
+`cmd_watchdog` cannot log `ok` and return 0 while holding one. That the deployed
+CLI predates 08-21 follows from a single line of output Divine happened to paste
+into a commit message about something else. It is the first evidence in eight
+days that comes from the droplet rather than from my inference about it.
+
+**Where I am least confident.** Whether `reports/waiting-on-you.html` moving to
+08-27 means anything more than a hand-run report. If instead the 06:00 run
+reached `cmd_report` yesterday, the crash point is later than I think and rec 2
+is aimed slightly wrong — but that would also mean the snapshot was written and
+it demonstrably was not, since `snapshot.write()` precedes `cmd_report`. I
+regard the hand-run explanation as much more likely, and rec 1 settles it either
+way: a report that reached Eric's inbox on 08-27 refutes me; nothing in eight
+days confirms it.
+
+**What I am not claiming.** That the broken page has cost rank. I have no rank
+data after 08-20 and could not get any. What I will say flatly is that it is bad
+for the humans who land on it, and this is a business with 2–3 visitors a day
+and zero phone leads ever.
+
+**What I got wrong.** I shipped a repair into a directory the engine overwrites
+daily and presented it as a fix waiting to be copied. The mechanism that erased
+it — `publish_state.sh:68-74` — is the same one I cited *in the same entry* as
+proof the page was live. I read that script carefully enough to prove the copy
+direction and not carefully enough to notice it applied to my own edit.
+
+**What would change my mind, dated.**
+1. **Today — two inboxes.** A report delivered after 08-20 refutes eight days of
+   diagnosis in one line. Nothing else available is this cheap.
+2. **Tomorrow's publish commit.** `services/half-round-gutters.html` shrinking to
+   ~340 lines says rec 3 landed; staying at 1,600 says day thirteen.
+3. **The morning after the deploy.** `snapshot.json` and
+   `reports/waiting-on-you.html` both dating to that day confirms it; a still
+   frozen snapshot refutes it and the log's last traceback is the next move.
+4. **2026-09-08 — the impression-flood test.** Still no side, three entries
+   running. Both mechanisms I proposed were refuted (08-23, 08-25).
+5. **2026-09-15 — the seasonal window closes. Eighteen days.** Rec 5 costs
+   nothing, needs no deploy, needs no working engine, and has not been done in
+   thirty-three days. **That, not the outage, is what decides autumn.**
