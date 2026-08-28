@@ -1,6 +1,6 @@
 {
-  "generated": "2026-08-20T06:00:10+00:00",
-  "date": "2026-08-20",
+  "generated": "2026-08-28T13:11:56+00:00",
+  "date": "2026-08-28",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
@@ -8,10 +8,10 @@
     "share_pct": 1.0,
     "measured": true,
     "why_unmeasured": null,
-    "coverage_pct": 32.3,
+    "coverage_pct": 42.6,
     "tracked_queries": 195,
     "top3": 2,
-    "top10": 7,
+    "top10": 8,
     "ranked_known": 25
   },
   "traffic": {
@@ -119,6 +119,38 @@
       {
         "date": "2026-08-19",
         "value": 3
+      },
+      {
+        "date": "2026-08-20",
+        "value": 1
+      },
+      {
+        "date": "2026-08-21",
+        "value": 2
+      },
+      {
+        "date": "2026-08-22",
+        "value": 0
+      },
+      {
+        "date": "2026-08-23",
+        "value": 0
+      },
+      {
+        "date": "2026-08-24",
+        "value": 1
+      },
+      {
+        "date": "2026-08-25",
+        "value": 2
+      },
+      {
+        "date": "2026-08-26",
+        "value": 2
+      },
+      {
+        "date": "2026-08-27",
+        "value": 2
       }
     ],
     "pageviews": [
@@ -225,6 +257,38 @@
       {
         "date": "2026-08-19",
         "value": 6
+      },
+      {
+        "date": "2026-08-20",
+        "value": 2
+      },
+      {
+        "date": "2026-08-21",
+        "value": 2
+      },
+      {
+        "date": "2026-08-22",
+        "value": 0
+      },
+      {
+        "date": "2026-08-23",
+        "value": 0
+      },
+      {
+        "date": "2026-08-24",
+        "value": 1
+      },
+      {
+        "date": "2026-08-25",
+        "value": 2
+      },
+      {
+        "date": "2026-08-26",
+        "value": 3
+      },
+      {
+        "date": "2026-08-27",
+        "value": 2
       }
     ],
     "organic_visitors": [
@@ -331,6 +395,38 @@
       {
         "date": "2026-08-19",
         "value": 2
+      },
+      {
+        "date": "2026-08-20",
+        "value": 0
+      },
+      {
+        "date": "2026-08-21",
+        "value": 1
+      },
+      {
+        "date": "2026-08-22",
+        "value": 0
+      },
+      {
+        "date": "2026-08-23",
+        "value": 0
+      },
+      {
+        "date": "2026-08-24",
+        "value": 0
+      },
+      {
+        "date": "2026-08-25",
+        "value": 0
+      },
+      {
+        "date": "2026-08-26",
+        "value": 2
+      },
+      {
+        "date": "2026-08-27",
+        "value": 1
       }
     ],
     "local_visitors": [
@@ -436,6 +532,38 @@
       },
       {
         "date": "2026-08-19",
+        "value": 0
+      },
+      {
+        "date": "2026-08-20",
+        "value": 0
+      },
+      {
+        "date": "2026-08-21",
+        "value": 0
+      },
+      {
+        "date": "2026-08-22",
+        "value": 0
+      },
+      {
+        "date": "2026-08-23",
+        "value": 0
+      },
+      {
+        "date": "2026-08-24",
+        "value": 0
+      },
+      {
+        "date": "2026-08-25",
+        "value": 0
+      },
+      {
+        "date": "2026-08-26",
+        "value": 0
+      },
+      {
+        "date": "2026-08-27",
         "value": 0
       }
     ],
@@ -543,6 +671,38 @@
       {
         "date": "2026-08-19",
         "value": 0
+      },
+      {
+        "date": "2026-08-20",
+        "value": 0
+      },
+      {
+        "date": "2026-08-21",
+        "value": 0
+      },
+      {
+        "date": "2026-08-22",
+        "value": 0
+      },
+      {
+        "date": "2026-08-23",
+        "value": 0
+      },
+      {
+        "date": "2026-08-24",
+        "value": 0
+      },
+      {
+        "date": "2026-08-25",
+        "value": 0
+      },
+      {
+        "date": "2026-08-26",
+        "value": 0
+      },
+      {
+        "date": "2026-08-27",
+        "value": 0
       }
     ],
     "direct_visitors": [
@@ -648,6 +808,38 @@
       },
       {
         "date": "2026-08-19",
+        "value": 1
+      },
+      {
+        "date": "2026-08-20",
+        "value": 0
+      },
+      {
+        "date": "2026-08-21",
+        "value": 1
+      },
+      {
+        "date": "2026-08-22",
+        "value": 0
+      },
+      {
+        "date": "2026-08-23",
+        "value": 0
+      },
+      {
+        "date": "2026-08-24",
+        "value": 1
+      },
+      {
+        "date": "2026-08-25",
+        "value": 2
+      },
+      {
+        "date": "2026-08-26",
+        "value": 0
+      },
+      {
+        "date": "2026-08-27",
         "value": 1
       }
     ],
@@ -755,6 +947,38 @@
       {
         "date": "2026-08-19",
         "value": 0
+      },
+      {
+        "date": "2026-08-20",
+        "value": 0
+      },
+      {
+        "date": "2026-08-21",
+        "value": 0
+      },
+      {
+        "date": "2026-08-22",
+        "value": 0
+      },
+      {
+        "date": "2026-08-23",
+        "value": 0
+      },
+      {
+        "date": "2026-08-24",
+        "value": 0
+      },
+      {
+        "date": "2026-08-25",
+        "value": 0
+      },
+      {
+        "date": "2026-08-26",
+        "value": 0
+      },
+      {
+        "date": "2026-08-27",
+        "value": 0
       }
     ],
     "campaign_visitors": [
@@ -860,6 +1084,38 @@
       },
       {
         "date": "2026-08-19",
+        "value": 0
+      },
+      {
+        "date": "2026-08-20",
+        "value": 1
+      },
+      {
+        "date": "2026-08-21",
+        "value": 0
+      },
+      {
+        "date": "2026-08-22",
+        "value": 0
+      },
+      {
+        "date": "2026-08-23",
+        "value": 0
+      },
+      {
+        "date": "2026-08-24",
+        "value": 0
+      },
+      {
+        "date": "2026-08-25",
+        "value": 0
+      },
+      {
+        "date": "2026-08-26",
+        "value": 0
+      },
+      {
+        "date": "2026-08-27",
         "value": 0
       }
     ],
@@ -967,6 +1223,38 @@
       {
         "date": "2026-08-19",
         "value": 2844
+      },
+      {
+        "date": "2026-08-20",
+        "value": 3667
+      },
+      {
+        "date": "2026-08-21",
+        "value": 3023
+      },
+      {
+        "date": "2026-08-22",
+        "value": 3747
+      },
+      {
+        "date": "2026-08-23",
+        "value": 3354
+      },
+      {
+        "date": "2026-08-24",
+        "value": 3898
+      },
+      {
+        "date": "2026-08-25",
+        "value": 3059
+      },
+      {
+        "date": "2026-08-26",
+        "value": 4085
+      },
+      {
+        "date": "2026-08-27",
+        "value": 2728
       }
     ],
     "call_taps": [
@@ -1061,6 +1349,38 @@
       {
         "date": "2026-08-19",
         "value": 0
+      },
+      {
+        "date": "2026-08-20",
+        "value": 0
+      },
+      {
+        "date": "2026-08-21",
+        "value": 0
+      },
+      {
+        "date": "2026-08-22",
+        "value": 0
+      },
+      {
+        "date": "2026-08-23",
+        "value": 0
+      },
+      {
+        "date": "2026-08-24",
+        "value": 0
+      },
+      {
+        "date": "2026-08-25",
+        "value": 0
+      },
+      {
+        "date": "2026-08-26",
+        "value": 0
+      },
+      {
+        "date": "2026-08-27",
+        "value": 0
       }
     ],
     "ai_calls": [
@@ -1150,6 +1470,38 @@
       },
       {
         "date": "2026-08-19",
+        "value": 0
+      },
+      {
+        "date": "2026-08-20",
+        "value": 0
+      },
+      {
+        "date": "2026-08-21",
+        "value": 0
+      },
+      {
+        "date": "2026-08-22",
+        "value": 0
+      },
+      {
+        "date": "2026-08-23",
+        "value": 0
+      },
+      {
+        "date": "2026-08-24",
+        "value": 0
+      },
+      {
+        "date": "2026-08-25",
+        "value": 0
+      },
+      {
+        "date": "2026-08-26",
+        "value": 0
+      },
+      {
+        "date": "2026-08-27",
         "value": 0
       }
     ],
@@ -1257,6 +1609,38 @@
       {
         "date": "2026-08-19",
         "value": 0
+      },
+      {
+        "date": "2026-08-20",
+        "value": 0
+      },
+      {
+        "date": "2026-08-21",
+        "value": 0
+      },
+      {
+        "date": "2026-08-22",
+        "value": 0
+      },
+      {
+        "date": "2026-08-23",
+        "value": 0
+      },
+      {
+        "date": "2026-08-24",
+        "value": 0
+      },
+      {
+        "date": "2026-08-25",
+        "value": 0
+      },
+      {
+        "date": "2026-08-26",
+        "value": 0
+      },
+      {
+        "date": "2026-08-27",
+        "value": 0
       }
     ],
     "phone_leads": [
@@ -1362,6 +1746,38 @@
       },
       {
         "date": "2026-08-19",
+        "value": 0
+      },
+      {
+        "date": "2026-08-20",
+        "value": 0
+      },
+      {
+        "date": "2026-08-21",
+        "value": 0
+      },
+      {
+        "date": "2026-08-22",
+        "value": 0
+      },
+      {
+        "date": "2026-08-23",
+        "value": 0
+      },
+      {
+        "date": "2026-08-24",
+        "value": 0
+      },
+      {
+        "date": "2026-08-25",
+        "value": 0
+      },
+      {
+        "date": "2026-08-26",
+        "value": 0
+      },
+      {
+        "date": "2026-08-27",
         "value": 0
       }
     ],
@@ -1469,6 +1885,38 @@
       {
         "date": "2026-08-19",
         "value": 0
+      },
+      {
+        "date": "2026-08-20",
+        "value": 0
+      },
+      {
+        "date": "2026-08-21",
+        "value": 0
+      },
+      {
+        "date": "2026-08-22",
+        "value": 0
+      },
+      {
+        "date": "2026-08-23",
+        "value": 0
+      },
+      {
+        "date": "2026-08-24",
+        "value": 0
+      },
+      {
+        "date": "2026-08-25",
+        "value": 0
+      },
+      {
+        "date": "2026-08-26",
+        "value": 0
+      },
+      {
+        "date": "2026-08-27",
+        "value": 0
       }
     ]
   },
@@ -1481,22 +1929,22 @@
     "by_town": {
       "county": {
         "total": 103,
-        "covered": 37,
+        "covered": 45,
         "top3": 2
       },
       "hanover": {
         "total": 10,
-        "covered": 4,
+        "covered": 5,
         "top3": 0
       },
       "dover": {
         "total": 16,
-        "covered": 7,
+        "covered": 8,
         "top3": 0
       },
       "red-lion": {
         "total": 11,
-        "covered": 3,
+        "covered": 4,
         "top3": 0
       },
       "dallastown": {
@@ -1506,23 +1954,23 @@
       },
       "spring-grove": {
         "total": 11,
-        "covered": 3,
+        "covered": 4,
         "top3": 0
       },
       "york": {
         "total": 33,
-        "covered": 5,
+        "covered": 13,
         "top3": 0
       }
     },
     "by_intent": {
       "hire": {
         "total": 118,
-        "covered": 55
+        "covered": 66
       },
       "price": {
         "total": 47,
-        "covered": 3
+        "covered": 8
       },
       "diy": {
         "total": 8,
@@ -1530,7 +1978,7 @@
       },
       "check": {
         "total": 22,
-        "covered": 4
+        "covered": 8
       }
     },
     "uncovered": [
@@ -1539,15 +1987,11 @@
       "copper gutter installation york pa",
       "copper half round gutters historic home pennsylvania",
       "copper half round gutters pennsylvania",
-      "downspout extension installation dover pa",
       "downspout extension installation red lion pa",
       "downspout extension installation york pa",
       "downspout installations york",
       "downspout repair near me york pa",
       "emergency gutter repair near me dallastown pa",
-      "emergency gutter repair near me york pa",
-      "emergency gutter repair york county",
-      "emergency gutter repair york county pa",
       "fascia and soffit repair dover pa",
       "fascia and soffit repair spring grove pa",
       "fascia and soffit repair york pa",
@@ -1570,21 +2014,16 @@
       "gutter installers york pa",
       "gutter overflowing in heavy rain who to call",
       "gutter repair dallastown pa",
-      "gutter repair hanover pa",
       "gutter repair near me york pa",
       "gutter replacement after new roof york pa",
       "gutter replacement dover pa",
       "gutters overflowing during rain who to call",
       "half round copper gutter installers york pa",
       "half round copper gutters near me",
-      "half round copper gutters york pa",
       "half round gutters hanover pa",
       "half round gutters historic home pa",
-      "half round gutters near me",
       "ice dam damage gutter replacement york county pa",
       "ice dam damaged gutters repair pa",
-      "instalacion de canaletas york pa",
-      "seamless gutter company spring grove pa",
       "seamless gutter installation hanover pa",
       "seamless gutter installation york pa",
       "seamless gutter installer dallastown pa",
@@ -1593,17 +2032,11 @@
       "seamless gutter installers near me red lion pa",
       "soffit and fascia repair dover pa",
       "soffit and fascia repair spring grove pa",
-      "soffit and fascia repair york pa",
       "who installs gutters in dover pa",
-      "who installs gutters in red lion pa",
       "who installs half round gutters near me",
       "5 inch vs 6 inch gutters",
-      "5 inch vs 6 inch gutters which do i need",
-      "5 inch vs 6 inch gutters which is better",
       "are gutter guards worth it",
-      "best gutter company in york county pa",
       "copper gutter installation cost york pa",
-      "copper gutters york pa cost",
       "copper half round gutters cost pa",
       "cost to replace gutters and downspouts york pa",
       "cost to replace gutters on a 1500 sq ft house",
@@ -1617,10 +2050,8 @@
       "gutter cleaning cost per foot pennsylvania",
       "gutter cleaning cost red lion pa",
       "gutter cleaning prices dallastown pa",
-      "gutter cleaning york pa cost",
       "gutter companies dover pa reviews",
       "gutter companies york pa reviews",
-      "gutter guard cost pa",
       "gutter guard cost per foot pa",
       "gutter guard installation cost",
       "gutter guard installation cost per foot",
@@ -1630,8 +2061,6 @@
       "gutter overflowing during heavy rain what to do",
       "gutter overflowing in heavy rain",
       "gutter overflowing in heavy rain what to do",
-      "gutter pulling away from house repair",
-      "gutter pulling away from house repair cost",
       "gutter replacement cost dover pa",
       "gutter replacement cost per foot pa",
       "gutter replacement cost per foot york pa",
@@ -1652,7 +2081,6 @@
       "ice dam damaged gutters replace or repair york pa",
       "ice dam gutter damage repair pa",
       "leaffilter cost vs local gutter company",
-      "leaffilter cost york pa",
       "leaffilter vs local gutter guard cost",
       "seamless gutter cost per foot installed pa",
       "seamless gutter cost per foot installed pennsylvania",
@@ -1684,12 +2112,6 @@
         "query": "seamless gutter company wayne pa",
         "position": 17.2,
         "impressions": 499,
-        "clicks": 0
-      },
-      {
-        "query": "gutter installer",
-        "position": 1,
-        "impressions": 470,
         "clicks": 0
       },
       {
@@ -1732,6 +2154,12 @@
         "query": "seamless gutter contractor norristown pa",
         "position": 13.9,
         "impressions": 370,
+        "clicks": 0
+      },
+      {
+        "query": "gutter installer",
+        "position": 1,
+        "impressions": 362,
         "clicks": 0
       },
       {
@@ -1802,8 +2230,8 @@
       },
       {
         "query": "seamless gutter horsham pa",
-        "position": 30.0,
-        "impressions": 250,
+        "position": 29.9,
+        "impressions": 249,
         "clicks": 0
       },
       {
@@ -1911,13 +2339,13 @@
     ]
   },
   "gsc": {
-    "date": "2026-08-20",
+    "date": "2026-08-28",
     "ok": true,
     "connected": true,
-    "rows": 964,
-    "matched": 25,
-    "clicks": 18,
-    "impressions": 26613,
+    "rows": 967,
+    "matched": 24,
+    "clicks": 19,
+    "impressions": 26646,
     "avg_position": 25.1
   },
   "techniques": [
@@ -1938,7 +2366,17 @@
       "activated": "2026-07-27",
       "retired": null,
       "notes": "",
-      "verdict": null,
+      "verdict": {
+        "decided": "2026-08-28",
+        "works": true,
+        "why": "7 owned visitors in 32d (median 0.0/day and flat)",
+        "measured": {
+          "total_owned_visitors": 7,
+          "recent_median": 0.0,
+          "prior_median": 0.0,
+          "days_measured": 32
+        }
+      },
       "owned_visitors": [
         {
           "date": "2026-07-27",
@@ -2035,6 +2473,38 @@
         {
           "date": "2026-08-19",
           "value": 0
+        },
+        {
+          "date": "2026-08-20",
+          "value": 0
+        },
+        {
+          "date": "2026-08-21",
+          "value": 0
+        },
+        {
+          "date": "2026-08-22",
+          "value": 0
+        },
+        {
+          "date": "2026-08-23",
+          "value": 0
+        },
+        {
+          "date": "2026-08-24",
+          "value": 0
+        },
+        {
+          "date": "2026-08-25",
+          "value": 0
+        },
+        {
+          "date": "2026-08-26",
+          "value": 1
+        },
+        {
+          "date": "2026-08-27",
+          "value": 0
         }
       ]
     },
@@ -2055,7 +2525,17 @@
       "activated": "2026-07-27",
       "retired": null,
       "notes": "",
-      "verdict": null,
+      "verdict": {
+        "decided": "2026-08-28",
+        "works": true,
+        "why": "5 owned visitors in 32d (median 0.0/day and flat)",
+        "measured": {
+          "total_owned_visitors": 5,
+          "recent_median": 0.0,
+          "prior_median": 0.0,
+          "days_measured": 32
+        }
+      },
       "owned_visitors": [
         {
           "date": "2026-07-27",
@@ -2151,6 +2631,38 @@
         },
         {
           "date": "2026-08-19",
+          "value": 0
+        },
+        {
+          "date": "2026-08-20",
+          "value": 0
+        },
+        {
+          "date": "2026-08-21",
+          "value": 0
+        },
+        {
+          "date": "2026-08-22",
+          "value": 0
+        },
+        {
+          "date": "2026-08-23",
+          "value": 0
+        },
+        {
+          "date": "2026-08-24",
+          "value": 0
+        },
+        {
+          "date": "2026-08-25",
+          "value": 0
+        },
+        {
+          "date": "2026-08-26",
+          "value": 0
+        },
+        {
+          "date": "2026-08-27",
           "value": 0
         }
       ]
@@ -2427,7 +2939,17 @@
       "activated": "2026-07-27",
       "retired": null,
       "notes": "",
-      "verdict": null,
+      "verdict": {
+        "decided": "2026-08-28",
+        "works": true,
+        "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
+        "measured": {
+          "metric": "gsc_clicks",
+          "median_after": 18.0,
+          "median_before": null,
+          "days_measured": 32
+        }
+      },
       "owned_visitors": null
     },
     {
@@ -2447,7 +2969,17 @@
       "activated": "2026-07-27",
       "retired": null,
       "notes": "",
-      "verdict": null,
+      "verdict": {
+        "decided": "2026-08-28",
+        "works": true,
+        "why": "15 owned visitors in 32d (median 0.0/day and flat)",
+        "measured": {
+          "total_owned_visitors": 15,
+          "recent_median": 0.0,
+          "prior_median": 0.0,
+          "days_measured": 32
+        }
+      },
       "owned_visitors": [
         {
           "date": "2026-07-27",
@@ -2544,6 +3076,38 @@
         {
           "date": "2026-08-19",
           "value": 0
+        },
+        {
+          "date": "2026-08-20",
+          "value": 0
+        },
+        {
+          "date": "2026-08-21",
+          "value": 0
+        },
+        {
+          "date": "2026-08-22",
+          "value": 0
+        },
+        {
+          "date": "2026-08-23",
+          "value": 0
+        },
+        {
+          "date": "2026-08-24",
+          "value": 0
+        },
+        {
+          "date": "2026-08-25",
+          "value": 0
+        },
+        {
+          "date": "2026-08-26",
+          "value": 0
+        },
+        {
+          "date": "2026-08-27",
+          "value": 0
         }
       ]
     },
@@ -2562,7 +3126,17 @@
       "activated": "2026-07-27",
       "retired": null,
       "notes": "",
-      "verdict": null,
+      "verdict": {
+        "decided": "2026-08-28",
+        "works": true,
+        "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
+        "measured": {
+          "metric": "gsc_clicks",
+          "median_after": 18.0,
+          "median_before": null,
+          "days_measured": 32
+        }
+      },
       "owned_visitors": null
     },
     {
@@ -2580,7 +3154,17 @@
       "activated": "2026-07-27",
       "retired": null,
       "notes": "",
-      "verdict": null,
+      "verdict": {
+        "decided": "2026-08-28",
+        "works": true,
+        "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
+        "measured": {
+          "metric": "gsc_clicks",
+          "median_after": 18.0,
+          "median_before": null,
+          "days_measured": 32
+        }
+      },
       "owned_visitors": null
     },
     {
@@ -3554,16 +4138,38 @@
       "notes": "first step: Test the AI phone agent in Spanish; if it cannot hold a Spanish conversation and capture a name, address and problem, fix that first and publish nothing until it can.\neffort: days\ncost: free\nexpected: Top-3 for 4\u20136 Spanish gutter queries in York within 90 days (near-zero competing pages), and 2\u20134 Spanish-language calls a month by November \u2014 a lane no competitor is bidding on.",
       "verdict": null,
       "owned_visitors": null
+    },
+    {
+      "id": "T075",
+      "slug": "pa_hic_insurance_warranty_trust_bar",
+      "name": "PA HIC number + insurance + written warranty trust bar",
+      "kind": "conversion",
+      "status": "candidate",
+      "hypothesis": "The weak number is calls, not eyeballs: ~300 profile views a month and a handful of site visits produce zero rings. A stranger at 4.2 stars with 13 reviews has to clear a trust threshold before dialling a one-truck contractor about a $2,400 job. Pennsylvania already requires a registered home improvement contractor to show the PA HIC registration number in advertising, so publishing HIC number, insurance carrier and a plain-English written workmanship warranty beside a tap-to-call on every page, in the GBP business description and on each Services entry, is free, legally required anyway, and is exactly the missing permission-to-dial. It is also the one differentiator a national gutter-guard telemarketer cannot claim locally.",
+      "evidence": "2026 contractor-conversion write-ups consistently name licence numbers, insurance, guarantees and real project photos as the trust block that decides whether a visitor calls: <cite index=\"15-12,15-13\">reviews, star ratings, license numbers, insurance and real project photos matter because home services is a trust purchase</cite> (https://hubtondigital.com/blog/contractor-website-design/). On the same point, <cite index=\"13-13,13-14,13-15\">real reviews with reviewer names, dates and specific service detail determine whether a visitor trusts you enough to call, while generic five-star badges do not move conversion</cite> (https://www.garretthandley.com/contractor-website-conversion-rate-in-2026-why-most-sites-convert-under-3-and-what-to-fix). Benchmark to aim at: <cite index=\"12-16\">service business sites convert 2-5% of visitors to calls, home services at the higher end</cite> (https://seolevelup.com/how-do-i-get-more-phone-calls-from-my-business-website/).",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-28",
+      "added": "2026-08-28",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Look up Eric's PA HIC registration number on the PA Attorney General HIC search, confirm the current certificate of insurance expiry, then put one line \u2014 'PA HIC #XXXXX \u00b7 insured through [carrier] \u00b7 written 2-year workmanship warranty \u00b7 call Eric: [number]' \u2014 in the site header trust bar and the GBP business description. Only publish a warranty term Eric will actually honour.\neffort: hours\ncost: free\nexpected: Trust block live on homepage, all 7 service pages and all 15 town pages within a week. Target tel: click rate of 3-5% of site visitors and at least one attributable call per 30 site visits; on GBP, call clicks per 100 profile views moving off zero within 30 days.",
+      "verdict": null,
+      "owned_visitors": null
     }
   ],
   "scoreboard": {
     "works": [
-      "T010"
+      "T018",
+      "T001",
+      "T002",
+      "T010",
+      "T017",
+      "T019",
+      "T020"
     ],
     "does_not_work": [],
     "not_yet_judged": [
-      "T001",
-      "T002",
       "T003",
       "T004",
       "T005",
@@ -3577,10 +4183,6 @@
       "T014",
       "T015",
       "T016",
-      "T017",
-      "T018",
-      "T019",
-      "T020",
       "T021",
       "T022",
       "T023",
@@ -3634,11 +4236,12 @@
       "T071",
       "T072",
       "T073",
-      "T074"
+      "T074",
+      "T075"
     ]
   },
   "last_build": {
-    "date": "2026-08-20",
+    "date": "2026-08-28",
     "log": [
       {
         "ok": true,
@@ -3653,13 +4256,14 @@
         "slug": "improve_ctr"
       },
       {
-        "ok": false,
-        "detail": "1 page(s) failed, last: generation failed for /areas/seamless-gutters-spring-grove-pa.html: anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CeDVNbYvVhiuNbmFvsYMu\"}",
+        "ok": true,
+        "noop": true,
+        "detail": "every ranking page already opens with a direct answer",
         "slug": "geo_answer_first_content_pass"
       },
       {
-        "ok": false,
-        "detail": "3 candidate(s) failed, last: generation failed for 'half round copper gutters york pa': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CeDVNe11w6fbDAcgoXBuG\"}",
+        "ok": true,
+        "detail": "added \"Who Installs Gutters in Red Lion, PA? Meet the Crew Behind N\" to /areas/seamless-gutters-red-lion-pa.html for 'who installs gutters in red lion pa'",
         "slug": "strengthen_pages"
       },
       {
@@ -3675,8 +4279,9 @@
         "slug": "area_pages"
       },
       {
-        "ok": false,
-        "detail": "content generation failed for 'instalacion de canaletas york pa': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CeDVNeqNM2U8AVFMJeaXV\"}",
+        "ok": true,
+        "noop": true,
+        "detail": "no query needs its own page \u2014 the remaining gaps all belong on pages that exist, which strengthen_pages handles",
         "slug": "money_pages"
       },
       {
@@ -3693,24 +4298,27 @@
       },
       {
         "ok": true,
-        "noop": true,
-        "detail": "sitemap.xml unchanged",
+        "noop": false,
+        "detail": "[gen_sitemap] wrote 42 URLs to sitemap.xml",
         "slug": "rebuild_sitemap"
       },
       {
         "ok": true,
-        "noop": true,
-        "detail": "nothing new to submit",
+        "detail": "submitted 1 URL(s), HTTP 200",
         "slug": "ping_indexnow"
       }
     ],
     "new": 0,
-    "changed": 0
+    "changed": 1
   },
   "last_scout": {
-    "date": "2026-08-20",
-    "ok": false,
-    "detail": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CeDVNgScFBMuWu3EsnVfE\"}"
+    "date": "2026-08-28",
+    "ok": true,
+    "techniques_added": [
+      "pa_hic_insurance_warranty_trust_bar"
+    ],
+    "keywords_added": [],
+    "notes": ""
   },
   "pages": {
     "areas": [
@@ -3742,6 +4350,7 @@
       "gutters-york-pa.html",
       "how-much-do-seamless-gutters-cost.html",
       "ice-dams-gutters-pennsylvania.html",
+      "instalacion-de-canaletas-york-pa.html",
       "leaffilter-alternative-york-pa.html",
       "seamless-vs-sectional-gutters.html",
       "signs-your-gutters-need-replacing-york-county-pa.html",
