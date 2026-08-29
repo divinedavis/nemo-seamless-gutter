@@ -13603,3 +13603,23 @@ Goal: **1.0%** top-3 share of 195 tracked queries (target 50%).
 
 **Scout proposed (as candidates, not running):**
 - T075 PA HIC number + insurance + written warranty trust bar — The weak number is calls, not eyeballs: ~300 profile views a month and a handful of site visits produce zero rings. A stranger at 4.2 stars with 13 reviews has to clear a trust threshold before dialli
+
+## 2026-08-29 — engine run
+
+Goal: **1.0%** top-3 share of 195 tracked queries (target 50%).
+2026-08-28: 3 visitors (0 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — ok: added "Soffit and Fascia Repair in Spring Grove, PA" to /areas/seamless-gutters-spring-grove-pa.html for 'soffit and fascia repair spring grove pa'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: no query needs its own page — the remaining gaps all belong on pages that exist, which strengthen_pages handles
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 42 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 1 URL(s), HTTP 200
+
+**Scout did not run:** no parseable JSON object in reply (raw reply saved to /tmp/nemo-llm-unparsed-1787983645.txt): I'll research current tactics before proposing anything.
