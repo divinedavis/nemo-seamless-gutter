@@ -13623,3 +13623,465 @@ Goal: **1.0%** top-3 share of 195 tracked queries (target 50%).
 - `ping_indexnow` — ok: submitted 1 URL(s), HTTP 200
 
 **Scout did not run:** no parseable JSON object in reply (raw reply saved to /tmp/nemo-llm-unparsed-1787983645.txt): I'll research current tactics before proposing anything.
+
+## 2026-08-29 — review agent
+
+### The blackout is over. The deploy landed yesterday afternoon.
+
+`snapshot.json` reads `2026-08-29T06:07:25`. It is the first fresh snapshot this
+review has seen in nine days, and the second in two.
+
+The sequence is legible in `git log --date=iso`:
+
+| when (UTC) | commit | what |
+| --- | --- | --- |
+| 08-28 06:05:22 | `6f3b7c8` | cron publish — **no `snapshot.json`**, old code |
+| 08-28 11:17:32 | `1722f2a` | my entry proving the deploy gap |
+| 08-28 **13:12:13** | `167021e` | publish — `snapshot.json` **+759 lines** |
+| 08-29 06:07:29 | `e7c2659` | cron publish, on schedule, snapshot fresh |
+
+`snapshot.json` had not moved since `cfe94a9` on **08-20 06:00:16**. It moved at
+13:12 on 08-28, about two hours after the entry that argued for it, and then
+again on the normal cron the next morning. **Recommendation 2, carried for
+twenty-four days, was actioned.** The publish time also shifted 06:05 → 06:07,
+which is what more work in the run looks like.
+
+I am not going to claim the entry caused it. I will say the measurement blackout
+ended, that the daily cron has now completed twice under the new code, and that
+every number below is from **today**, not from 08-20. That is the first time
+that sentence has been true since 08-21.
+
+Two of yesterday's four checkable predictions resolved. The other two did not,
+and one of them is now day thirteen.
+
+### Where the numbers stand
+
+**The goal metric did not move.**
+
+| | 08-20 | 08-29 |
+| --- | --- | --- |
+| `top3` / tracked | **2 / 195** | **2 / 195** |
+| `share_pct` | 1.0% | **1.0%** (target 50%) |
+| `top10` | 7 | 8 |
+| `ranked_known` | 25 | 25 |
+| `coverage_pct` | 32.3% | 43.1% |
+
+**Direction: flat.** Nine days, zero change in the number the owner actually
+cares about. `top10` +1 is one query and is noise.
+
+Per town — `total / covered / top3`:
+
+| town | 08-20 | 08-29 |
+| --- | --- | --- |
+| county | 103 / 37 / **2** | 103 / 45 / **2** |
+| york | 33 / 5 / **0** | 33 / 13 / **0** |
+| dover | 16 / 7 / **0** | 16 / 8 / **0** |
+| hanover | 10 / 4 / **0** | 10 / 5 / **0** |
+| red-lion | 11 / 3 / **0** | 11 / 4 / **0** |
+| dallastown | 11 / 4 / **0** | 11 / 4 / **0** |
+| spring-grove | 11 / 3 / **0** | 11 / 5 / **0** |
+
+**Zero top-3 positions in every named town, on day thirty-four.** Both of the
+site's two top-3 queries are in the county bucket. Coverage rose everywhere —
+york 5 → 13 is the big one, and `price` intent 3 → 8 of 47 — which is real work
+by `strengthen_pages`, but **coverage is "we have a page for it", not "we rank
+for it"**, and the two are not moving together. That gap is the finding: eight
+mornings of page-strengthening bought +8 covered queries in York and **+0
+top-3s anywhere.**
+
+**Search Console**, 28-day rolling window ending 3 days back (`gsc.py`
+`WINDOW_DAYS = 28`, `LAG_DAYS = 3`):
+
+| | 08-20 | 08-29 |
+| --- | --- | --- |
+| rows | 964 | 968 |
+| matched to tracked | 25 | 24 |
+| clicks | 18 | **18** |
+| impressions | 26,613 | **26,724** |
+| avg position | 25.1 | 25.2 |
+
+**Traffic**: 08-21 → 08-28 = 2, 0, 0, 1, 2, 2, 2, 3. Median 2/day. Organic 0–2.
+`ai_visitors` **0 for all 33 measured days**. `local_visitors` 0 since 08-17.
+
+**Leads: 3 bookings all time, 0 phone leads ever, 13 owner rows excluded.**
+Thirty-four days. That is the number that matters and it has never moved.
+
+The prompt's stated baseline (77 rows, 17 matched, 3 clicks, 429 impressions,
+avg 12.4, county 2 of 50) is a month stale and off by ~60× on impressions.
+Carried correction, sixth time.
+
+### Finding 1 — the ledger recorded six "works" verdicts yesterday morning, and every one of them is false
+
+This is the most important thing in today's snapshot and it is a defect in the
+engine's own judgement, not in the business.
+
+`scoreboard.works` went from `['T010']` on 08-20 to **`['T018','T001','T002',
+'T010','T017','T019','T020']`** today. All six new entries carry
+`"decided": "2026-08-29"` — they were stamped by the first `review.run()` that
+executed after the deploy. Quoting the ledger verbatim:
+
+- **T001** — `works: True`, why: *"7 owned visitors in 33d (median 0.0/day and flat)"*
+- **T002** — `works: True`, why: *"5 owned visitors in 33d (median 0.0/day and flat)"*
+- **T018** — `works: True`, why: *"15 owned visitors in 33d (median 0.0/day and flat)"*
+- **T017 / T019 / T020** — `works: True`, why: *"gsc_clicks median 18.0/day since activation (no pre-activation baseline)"*
+
+A `why` string that states the failure next to a field that reports success.
+Two separate bugs produce it, both in `review.py`:
+
+**(a) The positive verdict has no bar at all.** `review.py:227-229` (pre-edit)
+stamped `works: True` on *any* active technique past the 30-day grace period
+whose `action` was `"keep"` and whose `measured` dict was non-empty. `"keep"` is
+the default branch — it is whatever is left when the retire test fails.
+
+**(b) The retire test can never fire.** `evaluate` retires on
+`total < MIN_TOTAL_VISITORS and (recent or 0) < MIN_RECENT_MEDIAN`.
+`MIN_RECENT_MEDIAN = 0`, and a median of a non-negative visitor count is never
+below zero. **The second half of that condition is always False.** No technique
+with URLs of its own can ever be retired for underperformance.
+
+Together: pass thirty days, get `works: True` forever. **`does_not_work` has
+been empty since the ledger was created because the code that fills it is
+unreachable — not because nothing has failed.** Nine entries of this journal,
+mine included, have reported "`does_not_work` empty on day N" as though it were
+an observation about the techniques. It never was. Withdrawn.
+
+**And the `gsc_clicks` metric is in the wrong units.** `gsc.py:283` records
+`gsc_clicks` as the **28-day window total**, once per day. `review.py` reads
+that series as a daily rate and prints *"median 18.0/day"*. The true figure is
+**18 clicks in 28 days ≈ 0.64/day** — a 28× overstatement in the one number
+three techniques are being judged on. And it took the `b_med is None` branch
+(`review.py:148-149`), so those three are "working" on the strength of having
+**no baseline to compare against**.
+
+Why this is worth leading with: the scoreboard is the one artifact whose entire
+purpose is to tell Eric at the end of the year what worked. As of yesterday it
+asserts six successes for a business with **2 visitors a day, 3 bookings ever
+and zero phone calls ever**. An empty ledger is honest. This one is worse than
+empty.
+
+### Finding 2 — the Philadelphia impression flood is unchanged, and it is not new
+
+All **40** rows of `keywords.discovered_untracked` are Montgomery/Chester County
+towns — Glenside, Audubon, Wayne, Plymouth Meeting, Royersford, Eagleville,
+Horsham, Phoenixville, Norristown, Abington, Malvern, Exton, Devon, Upper
+Merion, Blue Bell, Willow Grove, Hatboro, Radnor, Spring City, Lower Gwynedd,
+East Norriton — ninety-odd miles east of York. **11,956 impressions, zero
+clicks, 44.7% of the whole property**, and that is a floor because the list is
+capped at 40 rows out of 968.
+
+**This is not a discovery.** The 08-02 entry found it and named the same towns
+(line 3141). I am re-reading it because a fresh snapshot lets me date it, and
+because it disposes of two things:
+
+**It corrects the 08-25 entry.** That entry said the flood "began around
+**2026-08-14**". It cannot have. The 08-20 reading covers roughly 07-20 → 08-17
+and already carried **26,613 impressions and 12,066 in these same 40 rows** —
+overwhelmingly pre-08-14 days. The flood predates mid-August; the 08-02 entry's
+date is the better one.
+
+**It gives me a side on the 2026-09-08 impression-flood test, after four entries
+of having none.** The window shifted **9 days** between readings — it drops ~9
+days and gains ~9 — and total impressions moved **26,613 → 26,724, +0.4%**. For
+that to happen, late-August days must be producing impressions at about the same
+rate as late-July days. The flood is **steady-state, not a decaying transient**.
+
+> **Prediction, 2026-09-08: site impressions stay in the 24,000–29,000 band and
+> do not fall materially.** This is an extrapolation from a flat 9-day window
+> shift, **not a mechanism** — I still have no explanation for why the site
+> ranks 10–35 in Philadelphia suburbs whose names appear nowhere in it
+> (`grep -ril` over every `.html` in the repo returns only `growth/test_*.py`
+> and `snapshot.json` itself). A fall below 20,000 refutes me.
+
+Two consequences for how this journal reads its own metrics, and I want them
+carried:
+
+1. **Stop quoting `avg_position` as a health measure.** 25.2 is a mean over a
+   query set that is at minimum 45% out-of-market by impression volume. It
+   cannot move for any reason Eric could act on.
+2. **The 0.067% site CTR is not a snippet problem and must not be "fixed".**
+   Nearly half those impressions are for towns two hours away where **0% is the
+   correct outcome**. Rewriting titles to chase it would be optimising for
+   people who cannot hire NEMO. Relatedly, `improve_ctr` reported *"no page is
+   due a snippet rewrite"* this morning, and `adopt_queries` reported *"no new
+   in-area searches worth tracking"* — **the engine correctly declined all 40 of
+   these queries.** The in-area filter works. That is the one piece of good news
+   in this section and it is worth recording as a thing that is right.
+
+`gutter installer` — position **1.0**, **0 clicks** — fell 470 → **362**
+impressions across the nine days. Still the cleanest anomaly on the property and
+still unexplained; a genuine position-1 result with 362 impressions does not
+return zero clicks. I am not building a story on it.
+
+### Did previous changes work?
+
+**1 — "Deploy the `growth/` package" (rec 2, carried since 08-04; rec 1 since
+08-26). ACTIONED, 08-28 13:12 UTC.** The evidence is `snapshot.json` moving
+after eight days frozen, then again on the 08-29 cron. Twenty-four days of the
+same recommendation, actioned the day it was reframed around evidence Divine
+himself had pasted into a commit message. **Effect on the goal metric so far:
+none, and it was never going to be direct** — the deploy restores measurement
+and stops the letter-shredding; it does not rank anything.
+
+**2 — "Check two inboxes" (yesterday's rec 1). No answer visible to me**, and it
+is now moot: the deploy makes the question historical. Recording that it went
+unanswered rather than dropping it.
+
+**3 — "Repair the live half-round page" (rec 3, day thirteen). NOT ACTIONED.**
+`services/half-round-gutters.html` is still **1,600 lines with 1,254
+single-letter `<p>` elements**, and today's publish `e7c2659` did not touch it.
+The repair script `deploy/repair_letter_paragraphs.py` shipped on 08-28 and has
+not been run. **Thirteen days of a live customer-facing page rendering one
+letter per paragraph.** The deploy happened and this two-minute command in the
+same session did not.
+
+**4 — `_strlist` (my 08-27 change). Now deployed** — `techniques.py:166,200,202`
+is in the tree the droplet is running. It cannot un-break the existing page; it
+prevents recurrence. **No effect measurable yet and none expected**: this is a
+guard, and the correct verdict is *nothing to measure*.
+
+**5 — Anthropic credit top-up (actioned 08-24). Holding, day five.**
+`strengthen_pages` published again this morning — a "Soffit and Fascia Repair in
+Spring Grove, PA" section. Content generation is working.
+
+**6 — "Extend `internal_links` to guides" (rec 8, carried from 08-24). NOT
+ACTIONED.** Re-verified in code today, not carried: `techniques.py:567,574` —
+`internal_links` calls `_all_area_pages(ctx)` and nothing else. Area-only.
+
+**7 — "Output sanity check on generated pages" (rec 7, from 08-27). NOT
+ACTIONED.** Re-verified: `grep -nE "median|paragraph_count|sanity|_validate"
+growth/techniques.py` returns **nothing**.
+
+**8 — Eric's list (recs from 08-21). Unactioned, day thirty-four.** GBP, reviews,
+HIC registration. Not restating; see recommendations 1 and 2.
+
+**9 — Coverage work by `strengthen_pages`, eight mornings.** Covered queries
++8 in York, +8 in the county bucket, `price` intent 3 → 8. **Top-3 positions:
++0.** Verdict: **too early to tell, and I want to be exact about why.** Pages
+published 08-24 → 08-29 are 0–5 days old; indexing plus ranking on local
+commercial terms takes weeks, so *no* movement was expected yet and its absence
+refutes nothing. The thing to watch is whether `top3` moves by **mid-September**.
+If coverage keeps climbing while `top3` sits at 2 through 09-20, "publish more
+page sections" is failing and the ledger will not tell us, because of Finding 1.
+
+### What I researched today
+
+- **Whitespark's 2026 Local Search Ranking Factors**, the survey this journal has
+  been citing second-hand. Weights: **GBP signals 32%**, **review signals ~20%
+  (up from 16% in 2023)**, on-page 19%, links 15%, behavioural 8%, citations 7%.
+  The new detail worth having: **review *recency* moved from roughly #93 in 2023
+  to #11 in 2026** — reported as the largest single positional jump in the study
+  — and recency/sentiment now outweigh raw review count. That sharpens the
+  standing review recommendation from "get reviews" to **"get reviews in the
+  last 90 days, and keep them coming"**. NEMO has 13 reviews at 4.2 stars and I
+  have no evidence any of them is recent.
+  https://whitespark.ca/local-search-ranking-factors/ ·
+  https://harmo.me/en/blog/local-seo-ranking-factors-2026-whitespark
+- **Behavioural signals from the profile** — calls, direction requests, clicks —
+  rose again year-over-year, and GBP-driven actions grew ~41% YoY 2025→2026.
+  Consistent with everything this journal has concluded since 08-13: for this
+  business the profile outranks the website.
+  https://wolfpackadvising.com/blog/how-to-rank-higher-on-google-maps/
+- **High impressions / no clicks, the 2026 framing.** The general advice is that
+  it signals a title, description or intent mismatch. **I checked it against the
+  data and it does not apply here** — the mismatch is geographic, not editorial,
+  and the recommended remedy (rewrite snippets) would be actively wrong for this
+  property. Recording the rejection because it is exactly the plausible-sounding
+  fix a future run might adopt without checking Finding 2.
+  https://www.webnetinnovation.com/blog/getting-impressions-in-google-search-console-but-no-clicks-heres-why/ ·
+  https://yositeup.com/blog/google-search-console-data-guide-2026
+- **Click-to-call conversion for contractor sites**: median contractor site
+  converts 2–4% of visits to a call; the standard fixes are a tappable number
+  above the fold, sticky on mobile, trust badges near the CTA.
+  **Rejected — already shipped, and I checked before writing it down.**
+  `index.html` carries **8 `href="tel:"` links**; `styles.css:229-241` is a
+  fixed-position `.call-bar` at `bottom:0`, mobile-only (`:262`), and it even
+  hides itself when a form field has focus (`:268`) so it cannot sit under the
+  keyboard. This is better than the article's checklist. **At 2 visitors/day, a
+  conversion-rate change is unmeasurable anyway** — 2–4% of 2 is zero.
+  https://tradesadmin.ca/insights/click-to-call/ ·
+  https://www.garretthandley.com/contractor-website-conversion-rate-in-2026-why-most-sites-convert-under-3-and-what-to-fix
+- **Rejected, unchanged:** Local Services Ads (costs money, T011 already a
+  candidate); call tracking / DNI (2 visitors/day attributes nothing, monthly
+  cost, NAP-consistency risk); re-opening AI-answer-engine work (`ai_visitors`
+  0 for 33 straight days, and the 08-28 entry's finding stands — AI Overviews
+  cite whoever already wins the map pack, so there is no separate lever).
+
+### Recommendations
+
+**Nothing in this commit is live.** The site and engine run from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout;
+`publish_state.sh` copies droplet → repo only. Everything below needs a deploy
+or a human. `areas/`, `guides/`, `services/`, `index.html` and `sitemap.xml` in
+this repo are a **read-only mirror** — a page cannot be fixed here.
+
+1. **Eric — ask every completed customer for a Google review, and reply to every
+   existing one.** *(Minutes per job. Free. Day thirty-four.)* Promoted to first
+   because today's research strengthened it: **review recency is now ~#11 among
+   all local ranking factors, up from ~#93 in 2023**, and review signals are
+   ~20% of local-pack weight. 13 reviews at 4.2 stars with no recent ones is a
+   weak profile on exactly the axis that moved most. No incentive, no gating —
+   both are Google TOS violations and a suspension would cost more than any
+   tactic here could earn. **Seventeen days to the mid-September leaf-season
+   window.** This needs no deploy, no working engine, and no code.
+   *Checked:* nothing in `growth/*.py` touches reviews or the Business Profile —
+   every active technique writes files into the site. Cannot be automated.
+
+2. **Eric — twenty minutes on the Business Profile.** *(Free. T016/T051/T022,
+   day 34.)* (a) primary category exact; (b) **delete loosely-related secondary
+   categories, keep 2–4** — secondaries dilute the primary; (c) each town as its
+   own service-area entry, **up to the 20-area cap**, only towns Eric will
+   actually drive to; (d) itemised Services. Skip T016's Q&A half — the feature
+   is gone. *Checked:* T016, T051, T022 all still `candidate` / `activated: null`
+   in `snapshot.json`.
+
+3. **Divine — run the half-round repair. Two minutes. Day thirteen.** Unchanged
+   from yesterday and now the only unactioned item from that list that is
+   actively harming a human being who lands on the page:
+   ```
+   git -C /root/nemo-repo fetch origin main && git -C /root/nemo-repo reset --hard origin/main
+   python3 /root/nemo-repo/deploy/repair_letter_paragraphs.py --root /var/www/nemo-seamless-gutter
+   python3 /root/nemo-repo/deploy/repair_letter_paragraphs.py --root /var/www/nemo-seamless-gutter --apply
+   ```
+   Dry-run first, backs up, idempotent, imports nothing from `growth/`.
+   *How you would know:* tomorrow's publish commit shows that file **shrinking**
+   by ~1,260 lines. *Checked:* the file is still 1,600 lines / 1,254
+   single-letter `<p>` in today's mirror, and `e7c2659` did not touch it.
+
+4. **Divine — deploy the `review.py` / `ledger.py` fix in this commit.**
+   *(Minutes. Ships with the next `growth/` deploy — no separate step.)* Stops
+   the engine writing unfounded `works: True` verdicts and **withdraws the six
+   already written**, on the next run, automatically. Details under "what I
+   changed" below. *Checked:* `review.py:227-229` as it stood this morning, and
+   the six verdicts dated `2026-08-29` in `snapshot.json`.
+
+5. **Eric and Divine — decide what `MIN_RECENT_MEDIAN` should be. A judgement
+   call, not a bug fix, which is why I did not make it.** *(One constant.)* As
+   written the retire branch is unreachable and **nothing can ever be marked
+   `does_not_work`**. Changing it starts auto-retiring live techniques on a bar
+   nobody has agreed to, so it needs a human. My suggestion: leave the constant
+   and change the test to `total < MIN_TOTAL_VISITORS` alone, after ~60 days
+   rather than 30. *Checked:* `review.py:113-118`; I added
+   `RetireThresholdTest` which documents the defect without changing behaviour.
+
+6. **Engine — output sanity check on every generated page.** *(~20 lines. Carried
+   from 08-27, unbuilt.)* `<p>` count, median paragraph length, file-size delta;
+   median under ~20 chars or >3× single-pass growth marks the technique
+   `ok: false`. Would have caught 08-16 on 08-16 instead of day thirteen.
+   *Checked today:* `grep -nE "median|paragraph_count|sanity|_validate"
+   growth/techniques.py` returns nothing. **Not already implemented.**
+
+7. **Engine — extend `internal_links` to guides.** *(~30 lines. Carried from
+   08-24.)* *Checked today:* `techniques.py:567,574` — `internal_links` reads
+   `_all_area_pages(ctx)` only. **Not already shipped.**
+
+8. **Nobody — the scout failure is one day old. Read the file, don't patch the
+   parser.** This morning: *"no parseable JSON object in reply (raw reply saved
+   to /tmp/nemo-llm-unparsed-*.txt): I'll research current tactics before
+   proposing anything."* It is **not** a billing cap — the scout ran fine on
+   08-28 and proposed T075. *Checked:* `llm.py:244-271` already tries every block
+   reversed, code fences, quote repair and truncation salvage; `_extract`
+   returned None because the reply contains **no `{` at all**, which means the
+   model narrated its research and never began the JSON — most likely the token
+   budget went on web search. The raw reply is on the droplet and answers this
+   for free. **Do not harden the parser against a single failure.** If it
+   recurs three days running, cap the research or retry once.
+
+### What I changed in this repo today
+
+228 tests pass (`python3 -m unittest discover -s growth -t .`). I touched no
+runtime state (`techniques.json`, `keywords.json`, `results.jsonl`,
+`state.json`), activated or retired nothing, and edited no keyword list or page.
+
+1. **`growth/review.py` — added `earned(res)` and gated the running verdict on
+   it.** A technique is only stamped `works: True` when its own measurement
+   supports it: a technique with URLs must clear `MIN_TOTAL_VISITORS` — the
+   module's *already-declared* bar for being alive, now applied to the positive
+   verdict as well as the negative one — and a site-wide technique must beat the
+   window before it was activated. **No baseline is not a pass.** Returning
+   False is *not* a finding of failure: it means "no claim yet", and the caller
+   withdraws a previous stamp rather than writing `works: False`.
+   Under this rule today's six become: **T018 keeps** `works: True` (15 owned
+   visitors ≥ 8, thin but over the declared bar); **T001, T002, T017, T019, T020
+   are withdrawn**. `T010` is untouched — it predates this and was not stamped
+   by the buggy path.
+
+2. **`growth/ledger.py` — added `clear_verdict(tech_id)`.** A verdict is
+   permanent by design, which is right for a deliberate decision and wrong for
+   an automatic stamp made on evidence that did not support it. Without this the
+   six false verdicts sit in `techniques.json` on the droplet forever regardless
+   of any code fix.
+
+3. **`growth/test_review.py` — 7 tests**, written against the six real verdict
+   strings from this morning's snapshot rather than invented fixtures, plus
+   `RetireThresholdTest`, which asserts the *current* broken behaviour so that
+   the defect is recorded in the test suite while the decision about it stays
+   with a human (rec 5).
+
+I deliberately did **not**: change `MIN_RECENT_MEDIAN` (rec 5 — a live
+auto-retirement policy is not mine to set), re-repair the half-round page (the
+mirror overwrites it at 06:05), or touch `gsc.py`'s `gsc_clicks` units (renaming
+a recorded metric orphans the existing `results.jsonl` series on the droplet;
+`earned()` makes the wrong units harmless by refusing the no-baseline branch,
+which is the smaller change).
+
+**Corrections to my standing instructions.** *New today, three:* (a)
+**`does_not_work` being empty is a code artifact, not a finding** — nine entries
+including four of mine reported it as though it meant something; (b) **never
+quote `avg_position` or site-wide CTR as health** — both are dominated by
+out-of-market impressions, see Finding 2; (c) the 08-25 entry's "the flood began
+around 2026-08-14" **is wrong on the 08-20 window's own arithmetic** — it
+predates mid-August, and the 08-02 entry had it right. *Carried:* the prompt's
+07-28 GSC baseline is a month stale and ~60× low on impressions; its 08-01
+usage-cap story is obsolete (credit resolved 08-24; today's scout failure is a
+parse failure, not billing); the engine publishes ~5 hours before this review,
+not one; `areas/`, `guides/`, `services/`, `index.html`, `sitemap.xml` are a
+read-only mirror; read the engine's output, not only its source; read **Divine's**
+commits and their messages, not only the review agent's.
+
+### Reasoning and uncertainties
+
+Day thirty-four. First day with live data.
+
+**What I would defend hardest.** Finding 1. It does not rest on inference about
+a machine I cannot reach — the verdict strings are in the snapshot, dated
+yesterday, and the code path that wrote them is three lines I can point at. A
+`why` field reading "median 0.0/day and flat" beside `works: True` is not a
+matter of interpretation.
+
+**Where I am least confident.** Whether `earned()`'s bar is the *right* bar.
+`MIN_TOTAL_VISITORS = 8` is a documented product judgement ("eight of the right
+people is a job"), and I chose it deliberately over inventing a threshold — but
+it means **T018 keeps a `works: True` verdict on 15 visitors across 33 days with
+a flat median of zero**, which I would not call working in plain English. I
+applied the module's own declared standard rather than substituting my taste,
+and I would rather be conservative in a change I am making autonomously. If Eric
+wants a real bar, rec 5 is the conversation.
+
+**What I am not claiming.** That the deploy will move anything. It restores
+measurement and stops one class of damage; it ranks nothing. The goal metric has
+been 2/195 since before the blackout began and the honest expectation is that it
+stays there until either the Business Profile work happens or the strengthened
+pages age into the index.
+
+**What I got wrong, or nearly.** I came close to recommending a snippet/CTR
+programme off the back of a 0.067% click-through rate before checking *which*
+impressions produce it. Step 3b caught the click-to-call recommendation too —
+`styles.css:229-268` is a more careful mobile call bar than the article
+recommending one. Two would-be recommendations killed by reading the repo. That
+check is earning its place in the prompt.
+
+**What would change my mind, dated.**
+1. **Tomorrow's publish commit.** `services/half-round-gutters.html` shrinking to
+   ~340 lines says rec 3 landed. Staying at 1,600 says day fourteen.
+2. **The morning after the next `growth/` deploy.** `scoreboard.works` dropping
+   from 7 to 2 confirms the fix ran; still 7 means it did not deploy.
+3. **2026-09-08 — the impression-flood test.** I finally have a side:
+   **impressions hold in the 24,000–29,000 band.** Below 20,000 refutes me.
+4. **2026-09-20 — the coverage-versus-rank test, new today.** Coverage rose
+   32.3% → 43.1% in nine days with `top3` flat at 2. If coverage keeps climbing
+   and `top3` is still 2 on 09-20, page-strengthening is not converting into
+   rank and the engine's main daily activity needs rethinking. That is a real
+   test with a date and I am setting it now, while I have the baseline.
+5. **2026-09-15 — the seasonal window closes. Seventeen days.** Recommendations
+   1 and 2 cost nothing, need no deploy and no working engine, and have not been
+   done in thirty-four days. **That, not the engine, is what decides autumn.**

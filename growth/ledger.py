@@ -158,6 +158,28 @@ def set_verdict(tech_id, works, why, measured=None):
     return None
 
 
+def clear_verdict(tech_id):
+    """Drop a verdict that the evidence no longer supports.
+
+    Only for withdrawing a *running* verdict that was written automatically —
+    a deliberate retirement verdict is a decision and stays. This exists
+    because a verdict is permanent by design: once `works: True` is on a
+    technique, the scoreboard repeats it forever and `propose` treats the
+    idea as settled. A stamp made on evidence that did not support it has to
+    be retractable, or one bad rule poisons the ledger for the rest of the year.
+    """
+    with _LOCK:
+        techs = load_techniques()
+        for t in techs:
+            if t["id"] == tech_id or t.get("slug") == tech_id:
+                if t.get("verdict") is None:
+                    return t
+                t["verdict"] = None
+                save_techniques(techs)
+                return t
+    return None
+
+
 # ------------------------------------------------------------------ results
 
 def record_result(date, technique, metric, value, meta=None):

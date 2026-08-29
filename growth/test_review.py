@@ -90,5 +90,66 @@ class SinceTest(unittest.TestCase):
         self.assertIsNone(R._since(_tech(added=None, activated=None)))
 
 
+class EarnedTest(unittest.TestCase):
+    """The verdict bar, written against the six real verdicts stamped on
+    2026-08-29 — the first review run after the droplet deploy. Every one of
+    them said `works: True`, and the `why` strings are quoted below verbatim
+    from that morning's snapshot."""
+
+    def test_flat_zero_median_below_the_visitor_bar_is_not_a_pass(self):
+        """T001: '7 owned visitors in 33d (median 0.0/day and flat)'."""
+        self.assertFalse(R.earned({"measured": {
+            "total_owned_visitors": 7, "recent_median": 0.0,
+            "prior_median": 0.0, "days_measured": 33}}))
+
+    def test_clearing_the_visitor_bar_is_a_pass(self):
+        """T018: 15 owned visitors — over MIN_TOTAL_VISITORS, the module's own
+        stated bar for 'alive'. Thin, but it is the declared threshold."""
+        self.assertTrue(R.earned({"measured": {
+            "total_owned_visitors": 15, "recent_median": 0.0,
+            "prior_median": 0.0, "days_measured": 33}}))
+
+    def test_no_pre_activation_baseline_is_not_a_pass(self):
+        """T017/T019/T020: 'gsc_clicks median 18.0/day since activation (no
+        pre-activation baseline)'. Nothing to compare against is not evidence
+        of working, and 18 is a 28-day window total besides — gsc.py records
+        the window, not a daily rate."""
+        self.assertFalse(R.earned({"measured": {
+            "metric": "gsc_clicks", "median_after": 18.0,
+            "median_before": None, "days_measured": 33}}))
+
+    def test_site_wide_lift_over_its_own_baseline_is_a_pass(self):
+        self.assertTrue(R.earned({"measured": {
+            "metric": "organic_visitors", "median_after": 4,
+            "median_before": 1, "days_measured": 33}}))
+
+    def test_no_lift_over_baseline_is_not_a_pass(self):
+        self.assertFalse(R.earned({"measured": {
+            "metric": "organic_visitors", "median_after": 1,
+            "median_before": 1, "days_measured": 33}}))
+
+    def test_no_measurement_at_all_is_not_a_pass(self):
+        self.assertFalse(R.earned({"measured": {}}))
+        self.assertFalse(R.earned({}))
+
+
+class RetireThresholdTest(unittest.TestCase):
+    def test_the_retire_branch_is_currently_unreachable(self):
+        """Documents a live defect rather than asserting desired behaviour.
+
+        `evaluate` retires on `total < MIN_TOTAL_VISITORS and recent <
+        MIN_RECENT_MEDIAN`. MIN_RECENT_MEDIAN is 0 and an owned-visitor median
+        is never negative, so the second half is always False and nothing can
+        ever be retired for underperformance. That — not any finding about the
+        techniques — is why `does_not_work` has been empty since the ledger was
+        created. Changing the constant would start auto-retiring live
+        techniques, so this run only records the fact; the fix is Eric's and
+        Divine's call, and it is recommendation 5 in the 2026-08-29 journal
+        entry.
+        """
+        self.assertEqual(R.MIN_RECENT_MEDIAN, 0)
+        self.assertFalse(0.0 < R.MIN_RECENT_MEDIAN)
+
+
 if __name__ == "__main__":
     unittest.main()

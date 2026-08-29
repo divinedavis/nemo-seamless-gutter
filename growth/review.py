@@ -153,6 +153,38 @@ def evaluate(t):
     return res
 
 
+def earned(res):
+    """Does this technique's own measurement support the claim that it WORKS?
+
+    `evaluate` returns action "keep" for two quite different situations: the
+    evidence is good, and there is no evidence. Before this existed, `run`
+    stamped `works: True` on both, so T001 carried the verdict
+    "7 owned visitors in 33d (median 0.0/day and flat)" with `works: True` —
+    a sentence that states the failure and a field that reports success.
+
+    The bar here is not a new one. It is the module's own already-declared
+    threshold, applied to the positive verdict as well as the negative one:
+
+      * a technique with URLs of its own must clear MIN_TOTAL_VISITORS, the
+        same count `evaluate` uses to decide it is alive at all;
+      * a site-wide technique must beat the window before it was switched on.
+        No baseline is not a pass — it is an unanswerable question, and the
+        honest record is no verdict rather than a favourable one.
+
+    Returning False is NOT a finding of failure. It means "no claim yet", and
+    the caller withdraws any running verdict rather than writing `works: False`.
+    """
+    m = res.get("measured") or {}
+    if not m:
+        return False
+    if "total_owned_visitors" in m:
+        return m["total_owned_visitors"] >= MIN_TOTAL_VISITORS
+    before, after = m.get("median_before"), m.get("median_after")
+    if before is None or after is None:
+        return False
+    return after > before
+
+
 def find_redundant(techs):
     """Techniques whose URLs overlap and whose traffic is a rounding error next
     to the overlapping one. Running both costs build time and splits link equity."""
@@ -224,8 +256,20 @@ def run(apply=True):
             ledger.set_verdict(r["id"], False, r["why"], r["measured"])
             actions.append(f"RETIRED {r['id']} {r['slug']} — {r['why']}")
         elif r["action"] == "keep" and r["days_active"] >= GRACE_DAYS and r["measured"] and apply:
-            # record a running verdict so the year-end list is always current
-            ledger.set_verdict(r["id"], True, r["why"], r["measured"])
+            # Record a running verdict so the year-end list is always current —
+            # but only where the measurement actually supports one. Where it
+            # does not, withdraw any verdict a previous run stamped, so the
+            # scoreboard heals itself instead of carrying the claim all year.
+            if earned(r):
+                ledger.set_verdict(r["id"], True, r["why"], r["measured"])
+            else:
+                v = ledger.get(r["id"]) or {}
+                v = v.get("verdict") or {}
+                if v.get("works"):
+                    ledger.clear_verdict(r["id"])
+                    actions.append(
+                        f"WITHDREW verdict on {r['id']} {r['slug']} — "
+                        f"not supported by its own measurement: {r['why']}")
 
     for rr in redundant:
         if rr["weak"] in red_ids and apply:
