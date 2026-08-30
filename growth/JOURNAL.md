@@ -14085,3 +14085,24 @@ check is earning its place in the prompt.
 5. **2026-09-15 — the seasonal window closes. Seventeen days.** Recommendations
    1 and 2 cost nothing, need no deploy and no working engine, and have not been
    done in thirty-four days. **That, not the engine, is what decides autumn.**
+
+## 2026-08-30 — engine run
+
+Goal: **1.0%** top-3 share of 195 tracked queries (target 50%).
+2026-08-29: 1 visitors (0 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — ok: added "Emergency Gutter Repair in Dallastown, PA" to /areas/seamless-gutters-dallastown-pa.html for 'emergency gutter repair near me dallastown pa'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: no query needs its own page — the remaining gaps all belong on pages that exist, which strengthen_pages handles
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 42 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 1 URL(s), HTTP 200
+
+**Scout proposed (as candidates, not running):**
+- T076 Named review quotes on every town + service page — 300 GBP views and ~18 GSC clicks a day produce zero calls. A stranger landing on seamless-gutters-dover-pa sees a 4.2-star business with no human proof and bounces to the LeafFilter ad. Conversion res

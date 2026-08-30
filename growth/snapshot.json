@@ -1,6 +1,6 @@
 {
-  "generated": "2026-08-29T06:07:25+00:00",
-  "date": "2026-08-29",
+  "generated": "2026-08-30T06:08:25+00:00",
+  "date": "2026-08-30",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
@@ -8,10 +8,10 @@
     "share_pct": 1.0,
     "measured": true,
     "why_unmeasured": null,
-    "coverage_pct": 43.1,
+    "coverage_pct": 43.6,
     "tracked_queries": 195,
     "top3": 2,
-    "top10": 8,
+    "top10": 9,
     "ranked_known": 25
   },
   "traffic": {
@@ -155,6 +155,10 @@
       {
         "date": "2026-08-28",
         "value": 3
+      },
+      {
+        "date": "2026-08-29",
+        "value": 1
       }
     ],
     "pageviews": [
@@ -297,6 +301,10 @@
       {
         "date": "2026-08-28",
         "value": 3
+      },
+      {
+        "date": "2026-08-29",
+        "value": 1
       }
     ],
     "organic_visitors": [
@@ -438,6 +446,10 @@
       },
       {
         "date": "2026-08-28",
+        "value": 0
+      },
+      {
+        "date": "2026-08-29",
         "value": 0
       }
     ],
@@ -581,6 +593,10 @@
       {
         "date": "2026-08-28",
         "value": 0
+      },
+      {
+        "date": "2026-08-29",
+        "value": 0
       }
     ],
     "ai_visitors": [
@@ -722,6 +738,10 @@
       },
       {
         "date": "2026-08-28",
+        "value": 0
+      },
+      {
+        "date": "2026-08-29",
         "value": 0
       }
     ],
@@ -865,6 +885,10 @@
       {
         "date": "2026-08-28",
         "value": 2
+      },
+      {
+        "date": "2026-08-29",
+        "value": 1
       }
     ],
     "referral_visitors": [
@@ -1007,6 +1031,10 @@
       {
         "date": "2026-08-28",
         "value": 1
+      },
+      {
+        "date": "2026-08-29",
+        "value": 0
       }
     ],
     "campaign_visitors": [
@@ -1148,6 +1176,10 @@
       },
       {
         "date": "2026-08-28",
+        "value": 0
+      },
+      {
+        "date": "2026-08-29",
         "value": 0
       }
     ],
@@ -1291,6 +1323,10 @@
       {
         "date": "2026-08-28",
         "value": 5029
+      },
+      {
+        "date": "2026-08-29",
+        "value": 4177
       }
     ],
     "call_taps": [
@@ -1421,6 +1457,10 @@
       {
         "date": "2026-08-28",
         "value": 0
+      },
+      {
+        "date": "2026-08-29",
+        "value": 0
       }
     ],
     "ai_calls": [
@@ -1546,6 +1586,10 @@
       },
       {
         "date": "2026-08-28",
+        "value": 0
+      },
+      {
+        "date": "2026-08-29",
         "value": 0
       }
     ],
@@ -1689,6 +1733,10 @@
       {
         "date": "2026-08-28",
         "value": 0
+      },
+      {
+        "date": "2026-08-29",
+        "value": 0
       }
     ],
     "phone_leads": [
@@ -1830,6 +1878,10 @@
       },
       {
         "date": "2026-08-28",
+        "value": 0
+      },
+      {
+        "date": "2026-08-29",
         "value": 0
       }
     ],
@@ -1973,6 +2025,10 @@
       {
         "date": "2026-08-28",
         "value": 0
+      },
+      {
+        "date": "2026-08-29",
+        "value": 0
       }
     ]
   },
@@ -2005,7 +2061,7 @@
       },
       "dallastown": {
         "total": 11,
-        "covered": 4,
+        "covered": 5,
         "top3": 0
       },
       "spring-grove": {
@@ -2022,7 +2078,7 @@
     "by_intent": {
       "hire": {
         "total": 118,
-        "covered": 67
+        "covered": 68
       },
       "price": {
         "total": 47,
@@ -2047,7 +2103,6 @@
       "downspout extension installation york pa",
       "downspout installations york",
       "downspout repair near me york pa",
-      "emergency gutter repair near me dallastown pa",
       "fascia and soffit repair dover pa",
       "fascia and soffit repair spring grove pa",
       "fascia and soffit repair york pa",
@@ -2394,14 +2449,14 @@
     ]
   },
   "gsc": {
-    "date": "2026-08-29",
+    "date": "2026-08-30",
     "ok": true,
     "connected": true,
-    "rows": 968,
+    "rows": 964,
     "matched": 24,
-    "clicks": 18,
-    "impressions": 26724,
-    "avg_position": 25.2
+    "clicks": 17,
+    "impressions": 26623,
+    "avg_position": 25.1
   },
   "techniques": [
     {
@@ -2422,14 +2477,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-08-29",
+        "decided": "2026-08-30",
         "works": true,
-        "why": "7 owned visitors in 33d (median 0.0/day and flat)",
+        "why": "7 owned visitors in 34d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 7,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 33
+          "days_measured": 34
         }
       },
       "owned_visitors": [
@@ -2564,6 +2619,10 @@
         {
           "date": "2026-08-28",
           "value": 0
+        },
+        {
+          "date": "2026-08-29",
+          "value": 0
         }
       ]
     },
@@ -2585,14 +2644,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-08-29",
+        "decided": "2026-08-30",
         "works": true,
-        "why": "5 owned visitors in 33d (median 0.0/day and flat)",
+        "why": "5 owned visitors in 34d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 5,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 33
+          "days_measured": 34
         }
       },
       "owned_visitors": [
@@ -2726,6 +2785,10 @@
         },
         {
           "date": "2026-08-28",
+          "value": 0
+        },
+        {
+          "date": "2026-08-29",
           "value": 0
         }
       ]
@@ -3003,14 +3066,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-08-29",
+        "decided": "2026-08-30",
         "works": true,
         "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 18.0,
           "median_before": null,
-          "days_measured": 33
+          "days_measured": 34
         }
       },
       "owned_visitors": null
@@ -3033,14 +3096,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-08-29",
+        "decided": "2026-08-30",
         "works": true,
-        "why": "15 owned visitors in 33d (median 0.0/day and flat)",
+        "why": "15 owned visitors in 34d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 15,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 33
+          "days_measured": 34
         }
       },
       "owned_visitors": [
@@ -3175,6 +3238,10 @@
         {
           "date": "2026-08-28",
           "value": 0
+        },
+        {
+          "date": "2026-08-29",
+          "value": 0
         }
       ]
     },
@@ -3194,14 +3261,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-08-29",
+        "decided": "2026-08-30",
         "works": true,
         "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 18.0,
           "median_before": null,
-          "days_measured": 33
+          "days_measured": 34
         }
       },
       "owned_visitors": null
@@ -3222,14 +3289,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-08-29",
+        "decided": "2026-08-30",
         "works": true,
         "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 18.0,
           "median_before": null,
-          "days_measured": 33
+          "days_measured": 34
         }
       },
       "owned_visitors": null
@@ -4223,6 +4290,24 @@
       "notes": "first step: Look up Eric's PA HIC registration number on the PA Attorney General HIC search, confirm the current certificate of insurance expiry, then put one line \u2014 'PA HIC #XXXXX \u00b7 insured through [carrier] \u00b7 written 2-year workmanship warranty \u00b7 call Eric: [number]' \u2014 in the site header trust bar and the GBP business description. Only publish a warranty term Eric will actually honour.\neffort: hours\ncost: free\nexpected: Trust block live on homepage, all 7 service pages and all 15 town pages within a week. Target tel: click rate of 3-5% of site visitors and at least one attributable call per 30 site visits; on GBP, call clicks per 100 profile views moving off zero within 30 days.",
       "verdict": null,
       "owned_visitors": null
+    },
+    {
+      "id": "T076",
+      "slug": "real_review_quotes_on_every_money_page",
+      "name": "Named review quotes on every town + service page",
+      "kind": "conversion",
+      "status": "candidate",
+      "hypothesis": "300 GBP views and ~18 GSC clicks a day produce zero calls. A stranger landing on seamless-gutters-dover-pa sees a 4.2-star business with no human proof and bounces to the LeafFilter ad. Conversion research on contractor sites in 2026 is blunt about this: generic five-star badges do nothing, but specific, attributable reviews with a name, a date and a described job are what decide whether a visitor dials. Eric already owns 13 real reviews \u2014 their text is sitting unused on the profile instead of on the 22 pages where the decision to call actually happens. Pull each review's actual words, first name, month and (where the reviewer said it) town and service, and place two or three above the fold on the matching town/service page: a Dover review on the Dover page, a cleaning review on gutter-cleaning-repair. This is the cheapest lift available to the weakest number, because the traffic and the proof both already exist and have simply never been introduced to each other.",
+      "evidence": "PipelineOn/Garrett Handley 2026 contractor benchmark: median contractor site converts 2-4% of visitors to a tracked call or form, top sites 8-12% on identical traffic; the stated differentiator is specific attributable reviews with names, dates and service detail placed on the homepage and key service pages rather than a separate testimonials page. https://www.garretthandley.com/contractor-website-conversion-rate-in-2026-why-most-sites-convert-under-3-and-what-to-fix \u2014 reinforced by https://gohighpointdigital.com/guide/what-every-contractor-website-needs-to-convert-visitors-into-calls/ (trust validation in the first viewport, most contractor leads convert by phone) and https://instantbusinesspro.ai/post/contractor-website-getting-visitors-no-calls-conversion-fix (visitors who see no evidence of satisfied customers on the first screen stay low-trust).",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-08-30",
+      "added": "2026-08-30",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Copy the full text, reviewer first name and month of all 13 Google reviews into one file, tag each with the town and the service it describes, and paste the best-matching two into the hero area of the Dover, Dallastown, Red Lion, Hanover and Spring Grove town pages first.\neffort: hours\ncost: free\nexpected: 22 pages carrying 2-3 real quotes each within a week. Target: site-wide call+booking conversion moves from ~0% to 3-5% of sessions, i.e. roughly 15-25 tel: taps or bookings a month at current traffic instead of 0. Measured against the tel:-click tracking the ledger already plans.",
+      "verdict": null,
+      "owned_visitors": null
     }
   ],
   "scoreboard": {
@@ -4304,11 +4389,12 @@
       "T072",
       "T073",
       "T074",
-      "T075"
+      "T075",
+      "T076"
     ]
   },
   "last_build": {
-    "date": "2026-08-29",
+    "date": "2026-08-30",
     "log": [
       {
         "ok": true,
@@ -4330,7 +4416,7 @@
       },
       {
         "ok": true,
-        "detail": "added \"Soffit and Fascia Repair in Spring Grove, PA\" to /areas/seamless-gutters-spring-grove-pa.html for 'soffit and fascia repair spring grove pa'",
+        "detail": "added \"Emergency Gutter Repair in Dallastown, PA\" to /areas/seamless-gutters-dallastown-pa.html for 'emergency gutter repair near me dallastown pa'",
         "slug": "strengthen_pages"
       },
       {
@@ -4379,9 +4465,13 @@
     "changed": 1
   },
   "last_scout": {
-    "date": "2026-08-29",
-    "ok": false,
-    "detail": "no parseable JSON object in reply (raw reply saved to /tmp/nemo-llm-unparsed-[redacted phone number].txt): I'll research current tactics before proposing anything."
+    "date": "2026-08-30",
+    "ok": true,
+    "techniques_added": [
+      "real_review_quotes_on_every_money_page"
+    ],
+    "keywords_added": [],
+    "notes": ""
   },
   "pages": {
     "areas": [
@@ -4436,15 +4526,11 @@
     ]
   },
   "redactions": {
-    "count": 2,
+    "count": 1,
     "items": [
       {
         "kind": "street address",
         "sample": "123 Maple St"
-      },
-      {
-        "kind": "phone number",
-        "sample": "1787983645"
       }
     ],
     "note": "Anything shaped like a phone number, email or street address is removed before publishing. A non-zero count is usually an example quoted in scout research, not customer data \u2014 but a hit in a field fed by the bookings database would be a real bug worth chasing."
