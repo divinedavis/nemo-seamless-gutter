@@ -131,6 +131,14 @@ function clientIp(req) {
   return req.ip || 'unknown';
 }
 
+/** Constant-time compare, so a token check can't be narrowed by timing. */
+function secretEquals(a, b) {
+  const ab = Buffer.from(String(a));
+  const bb = Buffer.from(String(b));
+  if (ab.length !== bb.length) return false;
+  return crypto.timingSafeEqual(ab, bb);
+}
+
 // Shared guard for the signed-link pages (/booking/*, /owner/*) and the setup
 // endpoint. The signatures are 128-bit so guessing is not the threat; this caps
 // the damage from someone hammering these routes — each hit costs a DB read,
@@ -433,7 +441,7 @@ function requireAdmin(req, res) {
   const auth = req.headers['authorization'] || '';
   const bearer = auth.startsWith('Bearer ') ? auth.slice(7) : '';
   const token = req.headers['x-admin-token'] || bearer;
-  if (!config.adminToken || token !== config.adminToken) {
+  if (!config.adminToken || !secretEquals(token, config.adminToken)) {
     res.status(401).json({ error: 'unauthorized' });
     return false;
   }
