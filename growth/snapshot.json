@@ -1,6 +1,6 @@
 {
-  "generated": "2026-08-30T06:08:25+00:00",
-  "date": "2026-08-30",
+  "generated": "2026-08-31T06:05:02+00:00",
+  "date": "2026-08-31",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
@@ -11,8 +11,8 @@
     "coverage_pct": 43.6,
     "tracked_queries": 195,
     "top3": 2,
-    "top10": 9,
-    "ranked_known": 25
+    "top10": 10,
+    "ranked_known": 26
   },
   "traffic": {
     "visitors": [
@@ -159,6 +159,10 @@
       {
         "date": "2026-08-29",
         "value": 1
+      },
+      {
+        "date": "2026-08-30",
+        "value": 0
       }
     ],
     "pageviews": [
@@ -305,6 +309,10 @@
       {
         "date": "2026-08-29",
         "value": 1
+      },
+      {
+        "date": "2026-08-30",
+        "value": 0
       }
     ],
     "organic_visitors": [
@@ -450,6 +458,10 @@
       },
       {
         "date": "2026-08-29",
+        "value": 0
+      },
+      {
+        "date": "2026-08-30",
         "value": 0
       }
     ],
@@ -597,6 +609,10 @@
       {
         "date": "2026-08-29",
         "value": 0
+      },
+      {
+        "date": "2026-08-30",
+        "value": 0
       }
     ],
     "ai_visitors": [
@@ -742,6 +758,10 @@
       },
       {
         "date": "2026-08-29",
+        "value": 0
+      },
+      {
+        "date": "2026-08-30",
         "value": 0
       }
     ],
@@ -889,6 +909,10 @@
       {
         "date": "2026-08-29",
         "value": 1
+      },
+      {
+        "date": "2026-08-30",
+        "value": 0
       }
     ],
     "referral_visitors": [
@@ -1034,6 +1058,10 @@
       },
       {
         "date": "2026-08-29",
+        "value": 0
+      },
+      {
+        "date": "2026-08-30",
         "value": 0
       }
     ],
@@ -1181,6 +1209,10 @@
       {
         "date": "2026-08-29",
         "value": 0
+      },
+      {
+        "date": "2026-08-30",
+        "value": 0
       }
     ],
     "bot_hits": [
@@ -1327,6 +1359,10 @@
       {
         "date": "2026-08-29",
         "value": 4177
+      },
+      {
+        "date": "2026-08-30",
+        "value": 5356
       }
     ],
     "call_taps": [
@@ -1461,6 +1497,10 @@
       {
         "date": "2026-08-29",
         "value": 0
+      },
+      {
+        "date": "2026-08-30",
+        "value": 0
       }
     ],
     "ai_calls": [
@@ -1590,6 +1630,10 @@
       },
       {
         "date": "2026-08-29",
+        "value": 0
+      },
+      {
+        "date": "2026-08-30",
         "value": 0
       }
     ],
@@ -1737,6 +1781,10 @@
       {
         "date": "2026-08-29",
         "value": 0
+      },
+      {
+        "date": "2026-08-30",
+        "value": 0
       }
     ],
     "phone_leads": [
@@ -1883,6 +1931,10 @@
       {
         "date": "2026-08-29",
         "value": 0
+      },
+      {
+        "date": "2026-08-30",
+        "value": 0
       }
     ],
     "total_leads": [
@@ -2028,6 +2080,10 @@
       },
       {
         "date": "2026-08-29",
+        "value": 0
+      },
+      {
+        "date": "2026-08-30",
         "value": 0
       }
     ]
@@ -2449,13 +2505,13 @@
     ]
   },
   "gsc": {
-    "date": "2026-08-30",
+    "date": "2026-08-31",
     "ok": true,
     "connected": true,
-    "rows": 964,
-    "matched": 24,
+    "rows": 987,
+    "matched": 25,
     "clicks": 17,
-    "impressions": 26623,
+    "impressions": 26860,
     "avg_position": 25.1
   },
   "techniques": [
@@ -2477,14 +2533,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-08-30",
+        "decided": "2026-08-31",
         "works": true,
-        "why": "7 owned visitors in 34d (median 0.0/day and flat)",
+        "why": "7 owned visitors in 35d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 7,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 34
+          "days_measured": 35
         }
       },
       "owned_visitors": [
@@ -2623,6 +2679,10 @@
         {
           "date": "2026-08-29",
           "value": 0
+        },
+        {
+          "date": "2026-08-30",
+          "value": 0
         }
       ]
     },
@@ -2644,14 +2704,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-08-30",
+        "decided": "2026-08-31",
         "works": true,
-        "why": "5 owned visitors in 34d (median 0.0/day and flat)",
+        "why": "5 owned visitors in 35d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 5,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 34
+          "days_measured": 35
         }
       },
       "owned_visitors": [
@@ -2789,6 +2849,10 @@
         },
         {
           "date": "2026-08-29",
+          "value": 0
+        },
+        {
+          "date": "2026-08-30",
           "value": 0
         }
       ]
@@ -3066,14 +3130,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-08-30",
+        "decided": "2026-08-31",
         "works": true,
         "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 18.0,
           "median_before": null,
-          "days_measured": 34
+          "days_measured": 35
         }
       },
       "owned_visitors": null
@@ -3096,14 +3160,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-08-30",
+        "decided": "2026-08-31",
         "works": true,
-        "why": "15 owned visitors in 34d (median 0.0/day and flat)",
+        "why": "15 owned visitors in 35d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 15,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 34
+          "days_measured": 35
         }
       },
       "owned_visitors": [
@@ -3242,6 +3306,10 @@
         {
           "date": "2026-08-29",
           "value": 0
+        },
+        {
+          "date": "2026-08-30",
+          "value": 0
         }
       ]
     },
@@ -3261,14 +3329,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-08-30",
+        "decided": "2026-08-31",
         "works": true,
         "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 18.0,
           "median_before": null,
-          "days_measured": 34
+          "days_measured": 35
         }
       },
       "owned_visitors": null
@@ -3289,14 +3357,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-08-30",
+        "decided": "2026-08-31",
         "works": true,
         "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 18.0,
           "median_before": null,
-          "days_measured": 34
+          "days_measured": 35
         }
       },
       "owned_visitors": null
@@ -4394,7 +4462,7 @@
     ]
   },
   "last_build": {
-    "date": "2026-08-30",
+    "date": "2026-08-31",
     "log": [
       {
         "ok": true,
@@ -4415,8 +4483,8 @@
         "slug": "geo_answer_first_content_pass"
       },
       {
-        "ok": true,
-        "detail": "added \"Emergency Gutter Repair in Dallastown, PA\" to /areas/seamless-gutters-dallastown-pa.html for 'emergency gutter repair near me dallastown pa'",
+        "ok": false,
+        "detail": "3 candidate(s) failed, last: generation failed for 'half round copper gutters near me': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CeaKeDahBYL3gSYNzgyJm\"}",
         "slug": "strengthen_pages"
       },
       {
@@ -4451,27 +4519,24 @@
       },
       {
         "ok": true,
-        "noop": false,
-        "detail": "[gen_sitemap] wrote 42 URLs to sitemap.xml",
+        "noop": true,
+        "detail": "sitemap.xml unchanged",
         "slug": "rebuild_sitemap"
       },
       {
         "ok": true,
-        "detail": "submitted 1 URL(s), HTTP 200",
+        "noop": true,
+        "detail": "nothing new to submit",
         "slug": "ping_indexnow"
       }
     ],
     "new": 0,
-    "changed": 1
+    "changed": 0
   },
   "last_scout": {
-    "date": "2026-08-30",
-    "ok": true,
-    "techniques_added": [
-      "real_review_quotes_on_every_money_page"
-    ],
-    "keywords_added": [],
-    "notes": ""
+    "date": "2026-08-31",
+    "ok": false,
+    "detail": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CeaKeJ35htbvTj9aQFZtu\"}"
   },
   "pages": {
     "areas": [

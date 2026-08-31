@@ -14531,3 +14531,23 @@ aggregate instead of the rows underneath it.
    activity needs rethinking.
 5. **2026-09-15 — the seasonal window. Sixteen days.** Unchanged and still the whole
    argument: recommendations 1 and 2 are free, need nobody's code, and decide autumn.
+
+## 2026-08-31 — engine run
+
+Goal: **1.0%** top-3 share of 195 tracked queries (target 50%).
+2026-08-30: 0 visitors (0 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — FAILED: 3 candidate(s) failed, last: generation failed for 'half round copper gutters near me': anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CeaKeDahBYL3gSYNzgyJm"}
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: no query needs its own page — the remaining gaps all belong on pages that exist, which strengthen_pages handles
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: sitemap.xml unchanged
+- `ping_indexnow` — ok: nothing new to submit
+
+**Scout did not run:** anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CeaKeJ35htbvTj9aQFZtu"}
