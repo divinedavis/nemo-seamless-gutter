@@ -11,10 +11,38 @@ This is not hypothetical. It has already happened twice:
 | 2026-07-27 | Account credit balance hit $0 | `area_pages`, `money_pages` and `scout` all no-op'd; only the non-LLM techniques ran |
 | 2026-07-28 | Self-imposed usage cap reached, locked until 08-01 | `scout` failed at 6am with a 400 — the build still ran, so the report looked healthy at a glance |
 | 2026-08-05 | Credit balance hit $0 again, five days after the 08-01 cap lifted | `strengthen_pages` failed after 3 candidates and `scout` failed; the other nine steps reported `ok` because they had nothing to do, so `last_build` read `new: 0, changed: 0` — a run that produced nothing and looked calm |
+| 2026-08-12 → 08-13 | Balance $0 again | Same shape: `strengthen_pages` + `scout` failed, everything else `ok`, `new: 0, changed: 0` for two days |
+| 2026-08-19 → 08-20 | Balance $0 again | Same shape, two more days. On 08-20 `geo_answer_first_content_pass` failed too |
+| 2026-08-31 | Balance $0 again, three days after the 08-24 top-up was first drawn on | Same shape. `new: 0, changed: 0` |
 
-All three times the engine kept reporting `[ok]` on most steps. **A cost failure
+Every time, the engine kept reporting `[ok]` on most steps. **A cost failure
 here looks like a quiet, partial success**, which is exactly why it needs a rule
 rather than vigilance.
+
+## How long a top-up actually lasts — measured, not estimated
+
+Every published `snapshot.json` in this repo records whether that morning's build
+and scout hit `credit balance is too low`. Reading them end to end gives the real
+duty cycle rather than a guess:
+
+| Window | Days | State |
+|---|---|---|
+| 08-12 → 08-13 | 2 | dead — no credit |
+| 08-14 → 08-18 | 5 | **alive** — 1 new page, 7 page edits |
+| 08-19 → 08-20 | 2 | dead — no credit |
+| 08-21 → 08-27 | 7 | dead — unrelated crash in `growth_daily.py` |
+| 08-28 → 08-30 | 3 | **alive** — 3 page edits |
+| 08-31 | 1 | dead — no credit |
+
+**A top-up has bought 3–5 productive mornings, twice in a row.** Over the twenty
+days 08-12 → 08-31 the engine did billable work on **8 of 20**; an empty balance
+accounts for 5 of the 12 lost days and the crash for the other 7.
+
+This is a funding-shape problem, not a spending problem. Rule 1 above still holds
+— a run is cents — so the fix is **an auto-reload threshold on the Anthropic
+account**, not a bigger manual top-up, which only lengthens the gap between
+stalls. Whoever sets it should also set a monthly cap, so rule 1 stays enforced
+by the console rather than by whoever remembers to check.
 
 ## The rules
 
