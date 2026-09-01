@@ -1381,11 +1381,32 @@ SERVICE_AREA_WORDS = ("york", "hanover", "dover", "red lion", "dallastown",
                       "new freedom", "glen rock", "manchester", "mount wolf",
                       "wrightsville", "hallam", "jacobus", "seven valleys",
                       "emigsville", "windsor", "yoe")
+# The vocabulary that makes a search a gutter search. Regional synonyms belong
+# here or the intake filter cannot see the query at all: "spouting" is what
+# south-central Pennsylvania calls a gutter — Wilhelm Spouting (Central PA),
+# Century Spouting and J&D Gutters (Harrisburg) all trade under it — and on
+# 2026-09-01 Search Console reported "lemoyne seamless spouting system
+# installers" at position 24.1, which `adopt_queries` discarded for naming no
+# trade word. The list already carried "eavestrough", the Great Lakes term,
+# and not the Pennsylvania one. Adding it only admits searches; nothing that
+# passed before is now rejected.
 TRADE_WORDS = ("gutter", "downspout", "soffit", "fascia", "leaf guard",
-               "leafguard", "eavestrough")
+               "leafguard", "eavestrough", "spouting", "rainspout")
 # Places that are emphatically not York County, seen in the real data.
+#
+# "york springs" is the one that reads as ours and is not. York Springs is a
+# borough of 683 people in *Adams* County, twenty-five miles west of York, and
+# `SERVICE_AREA_WORDS` tests "york" as a substring — so on 2026-09-01
+# `adopt_queries` scored four "… york springs pa" searches as in-area and put
+# them in the tracked universe, which is the goal's denominator. The same
+# morning `money_pages` picked "5 inch gutter service york springs pa" off the
+# front of the queue and tried to write it a guide; only the empty Anthropic
+# balance stopped a permanent page about somewhere NEMO does not serve — the
+# exact failure the Schuylkill County comment above records. Blocklisting it
+# closes both ends at once: `adopt_queries` reads OUT_OF_AREA at intake and
+# `_names_other_market` reads it where the build queues are read.
 OUT_OF_AREA = ("perkasie", "yorkville", "york sc", "york ne", "york me",
-               "new york", "yorktown", "york uk", "york maine",
+               "new york", "yorktown", "york uk", "york maine", "york springs",
                "akron", "essington", "crum lynne", "myerstown", "newmanstown")
 
 STATE_WORDS = frozenset(("pa", "penna", "pennsylvania"))

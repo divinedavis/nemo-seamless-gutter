@@ -472,6 +472,35 @@ class StatewideQueryTest(unittest.TestCase):
         self.assertFalse(T._names_other_market("gutter repair spring grove pa"))
         self.assertTrue(T._names_other_market("gutter repair spring city pa"))
 
+    def test_spouting_is_a_pennsylvania_gutter_word(self):
+        # TRADE_WORDS gates what adopt_queries can even see. It carried
+        # "eavestrough" — the Great Lakes term — and not "spouting", which is
+        # what south-central PA calls a gutter, so a York County spouting
+        # search was invisible to the goal's denominator.
+        for q in ("seamless spouting installation york pa",
+                  "spouting repair dover pa", "rainspout replacement york pa"):
+            self.assertTrue(any(w in q for w in T.TRADE_WORDS), msg=q)
+            self.assertFalse(T._names_other_market(q), msg=q)
+        # Out-of-area spouting is still somebody else's.
+        self.assertTrue(T._names_other_market("spouting installers lancaster county pa"))
+
+    def test_york_springs_is_adams_county_not_ours(self):
+        # The near-miss that a "york" substring test cannot see. York Springs
+        # is in Adams County, twenty-five miles west of York, and on
+        # 2026-09-01 four of its searches were adopted into the tracked
+        # universe — the goal's own denominator — and one reached the front of
+        # the money_pages queue. Both ends read OUT_OF_AREA, so assert both.
+        for q in ("gutter guard installation york springs pa",
+                  "gutter replacement york springs pa",
+                  "5 inch gutter service york springs pa",
+                  "gutter cleaning services york springs pa"):
+            self.assertTrue(T._names_other_market(q), msg=q)
+            self.assertTrue(any(bad in q for bad in T.OUT_OF_AREA), msg=q)
+        # …without taking York County's own towns down with it.
+        for q in ("gutter repair york pa", "gutter cleaning spring grove pa",
+                  "seamless gutters york county pa"):
+            self.assertFalse(T._names_other_market(q), msg=q)
+
     def test_a_geo_neutral_search_is_untouched(self):
         # The site's largest single source of impressions names no place at
         # all, and the rule must not start reading "no place" as "wrong place".
