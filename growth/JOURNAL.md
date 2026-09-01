@@ -14945,3 +14945,23 @@ zero.
    forward from the 09-15 marker I have been carrying: fall campaigns want 6–8
    weeks of lead time on peak leaf-drop, and a page first published in October
    ranks in December. Recommendations 1 and 2 are free and decide autumn.
+
+## 2026-09-01 — engine run
+
+Goal: **1.0%** top-3 share of 199 tracked queries (target 50%).
+2026-08-31: 3 visitors (1 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: adopted 4 real search(es) into the tracked universe: gutter guard installation york springs pa, gutter replacement york springs pa, 5 inch gutter service york springs pa, gutter cleaning services york springs pa
+- `improve_ctr` — FAILED: generation failed for services/half-round-gutters.html: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CecDSjYEEJUe9UXBuhC5t"}
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — FAILED: 3 candidate(s) failed, last: generation failed for 'half round copper gutters near me': anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CecDSo9GsThNQpEu4MSAV"}
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — FAILED: content generation failed for '5 inch gutter service york springs pa': anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CecDSpLTaAzzTVDQxPfky"}
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: sitemap.xml unchanged
+- `ping_indexnow` — ok: nothing new to submit
+
+**Scout did not run:** anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CecDSqrEsWL1hsEti9Z8C"}
