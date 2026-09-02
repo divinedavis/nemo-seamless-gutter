@@ -15468,3 +15468,456 @@ Goal: **1.0%** top-3 share of 201 tracked queries (target 50%).
 - `ping_indexnow` — ok: nothing new to submit
 
 **Scout did not run:** anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011Cee7FayHdxw3528t7rc8V"}
+
+## 2026-09-02 — review agent
+
+### The Maps channel is not empty. It is unmeasurable, and the fix was dropped from this journal fifteen days ago.
+
+Every review entry since 08-17 has repeated some version of *"`local_visitors` 0
+since 08-17 — nothing is arriving from Maps, which is the channel the whole goal
+depends on."* I wrote a shorter version of it myself yesterday. **The inference is
+unsound, and I can show it by executing the shipped classifier rather than reading
+it.**
+
+```
+$ python3 -c "from growth.metrics import classify; ..."
+organic    <- GBP website button, desktop (referrer policy = origin)
+direct     <- GBP website button, mobile app (referrer stripped)
+direct     <- nginx no-referrer
+local      <- Maps with full path (rare)
+organic    <- ordinary organic
+local      <- GBP button IF the URL were tagged
+```
+
+`LOCAL_HOSTS` (`metrics.py:63`) tests for the substring `google.com/maps` against
+the **full referrer string**. A click on the Website button of a Business Profile
+does not send that. It sends bare `https://www.google.com/` when a referrer
+survives at all, and on mobile — where local trade searches mostly happen — it
+usually sends nothing. So a Maps visit is classified `organic` or `direct`.
+**`local_visitors` cannot count the channel it is named after**, except in the rare
+case where a full `/maps/place/…` path survives. That has happened three times in
+thirty-seven days, and those three are the entire series.
+
+Where would the missing visits be? `direct_visitors` is **159 of 215 visitors
+(74%)** over the measured period. For a site with no bookmarks, no email list and
+no print run, a 74% direct share is not a plausible reading of reality; it is the
+signature of stripped referrers. I am **not** claiming those 159 are Maps clicks —
+I cannot see referrers from here and most of them sit in the 08-03 direct spike
+that predates the beacon era. I am claiming the weaker and sufficient thing:
+**"Maps delivers nothing" has never been supported by this data, and eight review
+entries have asserted it anyway.**
+
+The fix costs two minutes and no code. `classify()` already maps
+`utm_source=gbp|google-business|gmb` → `local` (`metrics.py:352`), and the pageview
+beacon already carries `location.search` in its `p` parameter
+(`analytics.js:65`), so a tagged URL reaches the classifier end to end. The
+capability is cited against the then-live file in the 08-03 entry, so unlike
+`tracked_totals` it predates the deploy freeze and **works on the droplet today**.
+Nothing needs deploying. Someone needs to paste `?utm_source=gbp` onto the website
+URL in the Business Profile.
+
+**That recommendation was first made on 2026-08-03.** It was carried as
+`?utm_source=gbp` **day 1 … day 15**, through the 08-17 entry (`JOURNAL.md:9014`).
+Then it vanished. Sixteen consecutive review entries — 08-18 through 09-01, mine
+included — never mention it again. It was never actioned, never resolved, never
+declared dead. It was dropped, which my standing instructions explicitly forbid:
+*"If you previously recommended something and it was never acted on, say so rather
+than silently dropping it."* Today is **day 30**.
+
+This matters beyond one metric. Recommendations 1 and 2 — get reviews, fix and
+feed the Business Profile — have been the top two items for thirty-seven days.
+They are the right recommendations. **But there is currently no instrument that
+could tell anyone whether they worked**, because the one channel that would show
+it is blind. If Eric does the profile work tomorrow, the review that assesses it
+in October will read `local_visitors: 0` and conclude it failed.
+
+### Where the numbers stand
+
+**The goal metric did not move. Day thirty-seven.**
+
+| | 09-01 | 09-02 |
+| --- | --- | --- |
+| `top3` / tracked | 2 / 199 | **2 / 201** |
+| `share_pct` | 1.0% | **1.0%** (target 50%) |
+| `top10` | 10 | **12** |
+| `ranked_known` | 27 | **31** |
+| `coverage_pct` | 42.7% | **42.3%** |
+
+Per town, `total / covered / top3`:
+
+| town | 09-02 |
+| --- | --- |
+| county | 109 / 45 / **2** |
+| york | 33 / 13 / **0** |
+| dover | 16 / 8 / **0** |
+| hanover | 10 / 5 / **0** |
+| red-lion | 11 / 4 / **0** |
+| dallastown | 11 / 5 / **0** |
+| spring-grove | 11 / 5 / **0** |
+
+**Zero top-3 positions in every named town, day thirty-seven.**
+
+**On the `top10` 10 → 12 and `ranked_known` 27 → 31.** This is the first movement
+in the rank distribution in some time and I want to be careful with it, because it
+is the sort of number that is easy to report as progress. `gsc.matched` went
+**26 → 30** on the same day. Both `ranked_known` and `matched` rose by **exactly
+four**. The most economical reading is that four tracked queries newly appeared in
+the Search Console window and arrived with positions already inside the top ten —
+i.e. the site is being *measured* on four more queries, not *ranking better* on
+four. I cannot settle it from here: the snapshot has no per-keyword rank list
+(`keywords.ranked` is one of the keys my predecessor named as the tell that
+`growth/` is undeployed, and it is still absent). **Verdict: not evidence of
+improvement.** If it were real movement, `top3` would be the place to see it, and
+`top3` is 2, as it has been since before the measurement blackout.
+
+**Search Console**, 28-day window: rows 995 → **947**, matched 26 → **30**, clicks
+17 → **17**, impressions 8,978 → **7,887**, avg position 24.9 → **24.8**. The
+impression drain continues as predicted and continues to cost nothing: **clicks
+have been 17 for three consecutive days across a 19,000-impression collapse.**
+Per the standing correction I do not read `avg_position` or site CTR as health.
+
+**Traffic**: 09-01 was **2 visitors** — 0 organic, 0 local, 0 AI, 2 direct. The
+last ten days are 1, 2, 2, 2, 3, 1, 0, 3, 2. `ai_visitors` **0 for all 37 measured
+days**. `call_taps` **0 for the last 14 days**; one tap all time, on 08-12.
+
+**Leads: 3 bookings all time, 0 phone leads ever.** Last booking **2026-08-11**,
+twenty-two days ago. This is the number that matters and it has not moved in
+twenty-two days.
+
+**Measurement-suspicion threshold:** visitors are 0–3 rather than a hard zero run
+and `bot_hits` (2,859) is being separated out rather than swallowing everything, so
+I am **not** calling `metrics.py` broken for total visitors. The channel split is
+a different matter and is the subject of the finding above.
+
+### Did previous changes work?
+
+**1 — Deploy `growth/` (rec 3). NOT ACTIONED, day four — and now provably so from
+the engine's own output, not just from missing keys.** Test was: *"tomorrow's
+snapshot carries a `gsc.tracked` block and a `gsc.pages` block."* Today's `gsc`
+keys are `date, ok, connected, rows, matched, clicks, impressions, avg_position` —
+**neither block present**. `scoreboard.works` is still the same seven. Resolved
+negative.
+
+The sharper proof is in this morning's build log. `adopt_queries` reported:
+
+> `ok: adopted 2 real search(es) into the tracked universe: gutter guards york
+> springs pa, gutter installation services york springs pa`
+
+**The live engine adopted two more Adams County queries today.** My predecessor
+added `"york springs"` to `OUT_OF_AREA` yesterday and it is in this repo — I
+verified it executes correctly on both of today's strings — but the droplet has
+never seen it. `tracked_queries` 195 → 199 → **201**. `coverage_pct` 43.6% → 42.7%
+→ **42.3%**, falling three days running purely on a denominator filling with
+queries NEMO cannot serve.
+
+**The bug is still armed and the queue is worse than yesterday.** There are now
+**six** York Springs queries in `uncovered`, and `5 inch gutter service york
+springs pa` is still **position one in the uncovered queue** — the exact string
+`money_pages` failed on this morning and will reach for again on the first morning
+it has credit. Verified by execution, not by reading:
+
+```
+$ python3 -c "from growth import techniques as T; print(T._names_other_market('5 inch gutter service york springs pa'))"
+True     # in this repo. On the droplet: False, and it publishes a page.
+```
+
+**Deploy before topping up. This is now the second day that ordering has been
+correct and the second day it has not been done.**
+
+**2 — Anthropic credit (rec 4). NOT ACTIONED. Day three of the outage.**
+`last_build`: **`new: 0, changed: 0`**. `improve_ctr`, `strengthen_pages` and
+`money_pages` all failing on `credit balance is too low`; `last_scout` the same.
+Duty-cycle table extended: over **08-12 → 09-02 (22 days)** the engine did billable
+work on **8**, lost **7** to an empty balance and **7** to the `growth_daily.py`
+crash. It has now been non-productive on 14 of the last 22 mornings.
+
+**3 — Repair the live half-round page (rec 5). NOT ACTIONED, day seventeen.**
+Test was: *"~340 lines says it landed; 1,600 says day seventeen."* Today: **1,600
+lines**, and `git log` on the file still shows its last change as the 08-28
+publish — byte-identical across five publishes now. Resolved negative. (I count
+1,021 exact `<p>X</p>` single-letter elements where my predecessor counted 1,254
+with a looser pattern; the file has not changed, so this is a grep difference
+between us, not movement. The page is equally broken either way.)
+
+**4 — Remove the York Springs rows from live `keywords.json` (rec 6). NOT
+ACTIONED, day one.** Test was: *"`tracked_queries` returns to 195."* Today: 201,
+moving the wrong way. Resolved negative.
+
+**5 — `?utm_source=gbp` on the Business Profile URL. NOT ACTIONED, day 30 — and
+silently dropped from this journal for the last fifteen entries.** See the finding
+above. Test remains what it was on 08-03: **any non-zero day in `local_visitors`
+attributable to a tagged URL.** Series is 0 on every day since 08-17 and 3 in 37
+days total.
+
+**6 — Coverage work by `strengthen_pages`. TOO EARLY TO TELL, and stalled three
+days.** Coverage 32.3% (08-20) → 42.3%, `top3` **2 → 2**. No new page has been
+written since 08-30. Dated test stands: **2026-09-20**.
+
+**7 — Eric's list — reviews, Business Profile, HIC. UNACTIONED, day thirty-seven.**
+
+**8 — Carried engine items, all NOT ACTIONED, all re-verified today:**
+`gsc_clicks` unit fix (`gsc.py:283` still records a 28-day total under a
+daily-rate name); `strengthen_pages` demand ordering (`techniques.py:1024-1028`
+still round-robins on `intent`); output sanity check (`grep -nE
+"median|paragraph_count|sanity|_validate" growth/techniques.py` still returns
+nothing); `internal_links` to guides (today's log again reads *"refreshed
+nearby-links on 0 page(s)"*); `MIN_RECENT_MEDIAN` (`scoreboard.does_not_work`
+still empty after thirty-seven days).
+
+Eight items. Four resolved by dated test, **all four negative**. Nothing was
+actioned yesterday.
+
+### What I researched today
+
+- **GBP website-button clicks do not identify themselves.** The referrer passes as
+  bare `google.com` when it survives, and mobile browsers and in-app webviews
+  frequently strip it entirely, landing the visit in Direct. UTM tagging is the
+  standard remedy precisely because referrer data is unreliable. This is the
+  external corroboration for the finding above; the classifier execution is the
+  local proof.
+  https://searchengineland.com/guide/utms-for-google-business-profile ·
+  https://www.brightlocal.com/learn/google-business-profile-utm-tracking/ ·
+  https://www.sequoiageo.com/blog/gbp-utm-tracking-ga4
+- **Profile *activity* became a ranking input in 2026, not just profile
+  completeness.** The March 2026 core update is reported to have adjusted
+  proximity weighting and profile-completeness scoring, and 2026 write-ups
+  consistently describe Google reading an inactive profile as a signal the
+  business may not be operating. Review **recency and response engagement** gained
+  weight relative to raw review count. This sharpens standing recommendations 1
+  and 2 rather than adding a new one — it says the trickle matters more than the
+  pile, and that replying to reviews is part of the work, not a nicety.
+  https://www.digitalapplied.com/blog/local-seo-march-2026-core-update-gbp-optimization-guide ·
+  https://www.theadfirm.net/dynamic-profiles-are-the-new-local-ranking-factor-heres-how-to-win/ ·
+  https://seolocale.com/google-map-pack-ranking-in-2026-how-the-local-3-pack-really-works/
+- **AI Overviews now appear on ~68% of local searches while local packs appear on
+  ~39%**, with reported CTR down substantially where an Overview is present. I am
+  recording this as **context for why clicks stay at 17 while impressions swing by
+  twenty thousand**, not as a call to action. The site's own controlled experiment
+  — 19,000 impressions leaving with zero click change — already says impressions
+  are not convertible here.
+  https://www.searchenginejournal.com/ai-overviews-now-answer-most-local-searches-how-to-get-your-business-cited/580757/ ·
+  https://hookagency.com/blog/local-seo-for-home-service-businesses/
+- **Service-area businesses rank on relevance, distance and prominence, and
+  prominence is the only one a business without a storefront can move.** Reviews,
+  consistent citations and a real website are the named levers. Nothing here is
+  new, but it is the direct answer to "why is every named town at top3 = 0": York
+  is where the pin is, and Hanover, Dover and Red Lion are distance-penalised
+  until prominence grows. It argues that town pages alone were never going to
+  produce town-level pack positions.
+  https://www.sterlingsky.ca/does-the-service-area-in-google-my-business-impact-ranking/ ·
+  https://wolfpackadvising.com/blog/how-to-rank-higher-on-google-maps/
+- **Rejected — CTR/snippet rewriting to convert the impression pile.** The
+  sources push it hard and it is the obvious read of 7,887 impressions and 17
+  clicks. It is dead on this property: the impressions are Philadelphia, Lancaster
+  and Berks, and the 19,000-impression drain cost zero clicks. Same verdict as
+  yesterday, now with a third day of flat clicks behind it.
+- **Rejected — treating "position 1 on `gutter installer`" as a CTR problem.**
+  360 impressions at position 1, zero clicks. A geo-neutral head term averaged
+  across locales where the site is irrelevant explains it without any CTR theory.
+  Not actionable.
+- **Rejected, unchanged:** review incentives or gating (terms violation; a
+  suspension costs more than any tactic earns); paid channels — Meta, LSA,
+  call-only ads (not mine to spend, and all three already sit in the ledger as
+  candidates); bought "exclusive leads"; call tracking / DNI (at 0–3 visitors a
+  day it attributes nothing and carries NAP risk); AI-generated job photography
+  (misrepresentation — `job_proof_pages` is the honest version and is already a
+  candidate).
+
+### Recommendations
+
+**Nothing in this commit is live.** The site and engine run from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout; `publish_state.sh`
+copies droplet → repo only. `areas/`, `guides/`, `services/`, `index.html` and
+`sitemap.xml` here are a **read-only mirror**. The developer report is weekly:
+next email **Friday 2026-09-04**.
+
+Ranked by what makes the phone ring, except item 3, which is ranked on urgency —
+it must happen before item 4 or a bad page ships.
+
+1. **Eric — ask every completed customer for a Google review, and reply to every
+   review you have.** *(Minutes per job. Free. Day thirty-seven.)* 2026 reporting
+   is consistent that review **recency** and owner **response engagement** now
+   carry more weight than raw count, so a steady trickle plus replies beats a
+   stale pile. No incentive, no gating — both violate Google's terms. **Labor Day
+   is 2026-09-07, five days away, and it is the start of the leaf-fall window, not
+   the middle.** Needs no deploy, no code, no API credit.
+   *Checked:* `grep -ni review growth/templates.py growth/techniques.py` returns
+   only prompt text forbidding the model from inventing reviews. Nothing in the
+   engine touches reviews. **Cannot be automated.**
+2. **Eric — twenty minutes on the Business Profile, then a post or photo every
+   fortnight.** *(Free. T016 / T051 / T022, day thirty-seven.)* (a) primary
+   category exact; (b) secondary categories trimmed to 2–4; (c) each town its own
+   service-area entry, capped at towns Eric will really drive to; (d) itemised
+   Services; (e) Products and attributes filled in; (f) then keep it fresh —
+   jobsite photos in real neighbourhoods are the form that 2026 sources single
+   out for home services.
+   *Checked:* T016, T051 and T022 are all still `candidate` with `activated: null`
+   in today's snapshot, and no candidate in the ledger covers a posting cadence.
+3. **Eric — while you are in the Business Profile for item 2, change the website
+   URL to `https://nemoseamlessgutter.com/?utm_source=gbp`.** *(Two minutes.
+   Free. Day thirty. Do it in the same sitting as item 2 — that is the only
+   reason it is not ranked below 4.)* This is the instrument for items 1 and 2.
+   Without it, nothing can measure whether the profile work paid off, and the
+   review that assesses it in October will read `local_visitors: 0` and wrongly
+   call it a failure — as eight entries of this journal have already done.
+   *How you would know:* `local_visitors` goes non-zero within days of the first
+   Maps click, and `direct_visitors` stops being 74% of the total.
+   *Checked:* `classify()` at `growth/metrics.py:352` maps
+   `utm_source=gbp|google-business|gmb` → `local`; the beacon sends
+   `location.pathname + location.search` at `analytics.js:65`; I executed
+   `classify()` on six realistic referrer/path pairs and the tagged case is the
+   only one that returns `local`. **No deploy and no credit needed** — the mapping
+   is cited against the live file in the 08-03 entry, so it predates the freeze.
+4. **Divine — deploy `growth/`, and deploy it BEFORE topping up the balance.**
+   *(One minute, read-only first. Day four.)*
+   ```
+   bash /root/nemo-repo/deploy/deploy_growth.sh              # report only, writes nothing
+   bash /root/nemo-repo/deploy/deploy_growth.sh --apply      # then this
+   ```
+   Today the live `adopt_queries` took in two more Adams County queries, bringing
+   the count to six, and `5 inch gutter service york springs pa` is still first in
+   the uncovered queue. **On the first morning with credit and without this
+   deploy, the site publishes `/guides/5-inch-gutter-service-york-springs-pa.html`
+   — a permanent page about a town in another county.** Deploying also lands
+   `tracked_totals` (written 08-11, never run), the county-only rank view that
+   makes the impression swings a non-event.
+   *How you would know:* tomorrow's snapshot carries `gsc.tracked` and `gsc.pages`.
+   *Checked:* both keys absent today; `scoreboard.works` still at 7.
+5. **Divine — then switch on Anthropic auto-reload, with a monthly cap.**
+   *(One minute, console setting.)* Seven of the last twenty-two mornings were
+   lost to an empty balance; a manual top-up has bought 3–5 productive mornings
+   twice running, so a bigger top-up only lengthens the gap between stalls. A cap
+   keeps `BUDGET.md` rule 1 enforced by the console rather than by memory.
+   **Order matters — item 4 first.** *How you would know:* `last_build` shows
+   `changed: 1` and `last_scout.ok: true`. *Checked:* today's failure text is
+   `credit balance is too low`, which per `BUDGET.md` is an empty account, not the
+   08-01 usage cap the standing prompt still describes.
+6. **Divine — run the half-round repair. Two minutes. Day seventeen.**
+   ```
+   git -C /root/nemo-repo fetch origin main && git -C /root/nemo-repo reset --hard origin/main
+   python3 /root/nemo-repo/deploy/repair_letter_paragraphs.py --root /var/www/nemo-seamless-gutter
+   python3 /root/nemo-repo/deploy/repair_letter_paragraphs.py --root /var/www/nemo-seamless-gutter --apply
+   ```
+   Dry-run first; backs up; idempotent; imports nothing from `growth/`.
+   *How you would know:* that file shrinks by ~1,000 lines in the next publish.
+   *Checked:* 1,600 lines / 1,021 single-letter `<p>` in today's mirror, unchanged
+   across five publishes.
+7. **Eric / Divine — remove the six York Springs rows from the live
+   `keywords.json`.** *(Two minutes. Was four rows yesterday.)* Item 4 stops new
+   ones entering and pulls the six out of both build queues, but it does not
+   delete rows already written on the droplet, so the denominator stays inflated
+   until someone removes them. *How you would know:* `tracked_queries` returns to
+   195 and `coverage_pct` rises back above 43%. *Checked:* `keywords.json` is
+   gitignored and owned by the droplet — I cannot touch it from here.
+8. **Divine — one command, and it decides whether item 9 is worth building:**
+   ```
+   python3 -c "import json;k=json.load(open('/var/www/nemo-seamless-gutter/growth/keywords.json'));u=[x for x in k if not x.get('covered')];print(len(u),'uncovered,',sum(1 for x in u if x.get('impressions')),'with GSC impressions')"
+   ```
+   *Checked:* still unanswerable from this repo; `keywords.json` is gitignored.
+9. **Engine — order the `strengthen_pages` queue by demand, if item 8 says the
+   data exists.** *(~4 lines.)* 116 uncovered queries, one section a day when
+   credit exists, and the order is currently arbitrary within intent.
+   *Checked:* `techniques.py:1024-1028`. **Not implemented.**
+10. **Engine — fix the `gsc_clicks` units at the source.** *(Small.)* `gsc.py:283`
+    records a 28-day total that `review.py` and `scout.py` read as a daily rate —
+    a 28× overstatement now written into T076's hypothesis as fact. Add a
+    correctly-named series; leave the old one, because renaming in situ orphans
+    `results.jsonl` on the droplet. *Checked:* `gsc.py:283` and T076's hypothesis.
+11. **Engine — output sanity check on every generated page.** *(~20 lines. Carried
+    from 08-27.)* `<p>` count, median paragraph length, file-size delta; a median
+    under ~20 characters or >3× single-pass growth marks the technique
+    `ok: false`. Would have caught 08-16 on 08-16 rather than on day seventeen.
+    *Checked:* the grep above returns nothing.
+12. **Engine — extend `internal_links` to guides.** *(~30 lines. Carried from
+    08-24.)* It reports *"refreshed nearby-links on 0 page(s)"* — it does nothing
+    at all. *Checked:* `_all_area_pages` in `techniques.py`, area pages only.
+13. **Eric and Divine — decide what `MIN_RECENT_MEDIAN` should be.** *(Carried,
+    unanswered.)* As written the retire branch is unreachable and nothing can ever
+    be marked `does_not_work`. Suggestion stands: test on
+    `total < MIN_TOTAL_VISITORS` alone, after ~60 days. A human call, not mine.
+
+### What I changed in this repo today
+
+**Nothing. I shipped no code.**
+
+I want to be explicit about that, because shipping something is the easy way to
+look productive. My main finding needs no code — the classifier already handles
+`utm_source=gbp` correctly and the beacon already carries the query string; what
+is missing is a setting in a Google account I cannot reach. Items 9–12 would add
+behaviour to an engine where nothing under `growth/` has shipped in twenty-eight
+days, and yesterday's two-word filter fix is itself still sitting undeployed while
+the bug it fixes took in two more queries this morning. **Adding a fourteenth
+undeployed change to that tree is not progress.** That argument flips the moment
+item 4 is run.
+
+I considered and rejected one code change: widening `LOCAL_HOSTS` so that a bare
+`google.com` referrer with no search query counts as `local`. It would guess, it
+would corrupt organic attribution in the other direction, and the correct
+instrument already exists and merely needs switching on. Rejected.
+
+**Corrections to my standing instructions.** *New today:* **"`local_visitors` is
+0, therefore Maps delivers nothing" is not a supported inference** and should stop
+being written — the classifier structurally cannot see the channel until the GBP
+URL is tagged. Also new: a recommendation was carried for fifteen days and then
+silently dropped for fifteen more; future runs should grep the journal for their
+own dropped items rather than trusting yesterday's list to be complete.
+*Carried, unchanged:* the standing prompt says to expect the 08-01 **usage cap**;
+the real error is `credit balance is too low`, an empty account, needing the
+opposite response. The prompt's 07-28 GSC baseline (429 impressions, avg position
+12.4) is five weeks stale. The prompt's `discovered_untracked` framing — "propose
+the good ones" — is refuted a third time today: 40 rows, 1,436 impressions, 0
+clicks, and every geo-tagged row is out of area. Never quote `avg_position` or
+site CTR as health. The engine publishes ~5 hours before this review, not one.
+`areas/`, `guides/`, `services/`, `index.html`, `sitemap.xml` are a read-only
+mirror. Read the engine's output, not only its source.
+
+### Reasoning and uncertainties
+
+Day thirty-seven. Goal metric 2/201, unchanged. Leads zero for twenty-two days.
+The engine did no billable work for the third consecutive morning. Nothing was
+actioned yesterday.
+
+**What I would defend hardest.** The classifier execution. Six referrer/path
+pairs through the shipped `classify()`, and only the tagged one returns `local`.
+That does not depend on a model of anything, and it retires a claim this journal
+has repeated eight times.
+
+**Where I am least confident.** The 74% direct share as evidence. It is
+suggestive, not probative — most of those 159 visits sit in the 08-03 spike that
+predates the beacon era, and I cannot see referrers from this repo. I have tried
+to keep the strong claim (the channel is blind) separate from the weak one (the
+visits are probably in `direct`), because only the first one carries the
+recommendation.
+
+**What I am least confident about for the whole enterprise, unchanged.** Coverage
+has gone 32.3% → 42.3% since 08-20 with `top3` dead flat at 2, and today's
+`top10` rise is best explained as four more queries being measured rather than
+four ranking better. Today's research adds a mechanism for why: a service-area
+business is ranked on relevance, distance and prominence, and town pages move
+relevance while the pin stays in York. Distance is why every named town reads
+top3 = 0, and no volume of pages fixes distance. **2026-09-20** is when this stops
+being an open question.
+
+**What I am not claiming.** That anything in this entry makes the phone ring.
+Items 1 and 2 plausibly do. Item 3 does not — it makes items 1 and 2 measurable,
+which is a different and lesser thing, and I have ranked it accordingly.
+
+**What would change my mind, dated.**
+1. **Tomorrow's snapshot.** A `gsc.tracked` block says item 4 landed; its absence
+   says day five. If credit lands *before* the deploy, watch `pages.guides` for
+   `5-inch-gutter-service-york-springs-pa.html` — that is the bug shipping, and it
+   becomes a page to delete rather than a filter to fix.
+2. **Tomorrow's snapshot.** `last_build` at `changed: 1` says item 5 landed.
+3. **Tomorrow's snapshot.** `tracked_queries` at 195 says item 7 landed; anything
+   above 201 says the intake is still admitting Adams County.
+4. **Tomorrow's publish.** `services/half-round-gutters.html` at ~340 lines says
+   item 6 landed; 1,600 says day eighteen.
+5. **Any non-zero `local_visitors` day.** That says item 3 landed and the Maps
+   channel is finally visible. Thirty days and counting.
+6. **2026-09-07 — Labor Day. Five days.** Items 1, 2 and 3 are free, need no
+   deploy, no credit and nobody's code, and decide autumn. A page first published
+   in October ranks in December, after the season ends.
+7. **2026-09-20 — the coverage-versus-rank test.** Coverage 32.3% → 42.3% with
+   `top3` flat at 2. If coverage keeps climbing and `top3` is still 2 on 09-20,
+   page-strengthening is not converting into rank and the engine's one remaining
+   daily activity needs rethinking.
