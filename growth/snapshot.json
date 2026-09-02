@@ -1,6 +1,6 @@
 {
-  "generated": "2026-09-01T06:04:57+00:00",
-  "date": "2026-09-01",
+  "generated": "2026-09-02T06:04:55+00:00",
+  "date": "2026-09-02",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
@@ -8,11 +8,11 @@
     "share_pct": 1.0,
     "measured": true,
     "why_unmeasured": null,
-    "coverage_pct": 42.7,
-    "tracked_queries": 199,
+    "coverage_pct": 42.3,
+    "tracked_queries": 201,
     "top3": 2,
-    "top10": 10,
-    "ranked_known": 27
+    "top10": 12,
+    "ranked_known": 31
   },
   "traffic": {
     "visitors": [
@@ -167,6 +167,10 @@
       {
         "date": "2026-08-31",
         "value": 3
+      },
+      {
+        "date": "2026-09-01",
+        "value": 2
       }
     ],
     "pageviews": [
@@ -321,6 +325,10 @@
       {
         "date": "2026-08-31",
         "value": 4
+      },
+      {
+        "date": "2026-09-01",
+        "value": 2
       }
     ],
     "organic_visitors": [
@@ -475,6 +483,10 @@
       {
         "date": "2026-08-31",
         "value": 1
+      },
+      {
+        "date": "2026-09-01",
+        "value": 0
       }
     ],
     "local_visitors": [
@@ -628,6 +640,10 @@
       },
       {
         "date": "2026-08-31",
+        "value": 0
+      },
+      {
+        "date": "2026-09-01",
         "value": 0
       }
     ],
@@ -783,6 +799,10 @@
       {
         "date": "2026-08-31",
         "value": 0
+      },
+      {
+        "date": "2026-09-01",
+        "value": 0
       }
     ],
     "direct_visitors": [
@@ -937,6 +957,10 @@
       {
         "date": "2026-08-31",
         "value": 1
+      },
+      {
+        "date": "2026-09-01",
+        "value": 2
       }
     ],
     "referral_visitors": [
@@ -1090,6 +1114,10 @@
       },
       {
         "date": "2026-08-31",
+        "value": 0
+      },
+      {
+        "date": "2026-09-01",
         "value": 0
       }
     ],
@@ -1245,6 +1273,10 @@
       {
         "date": "2026-08-31",
         "value": 1
+      },
+      {
+        "date": "2026-09-01",
+        "value": 0
       }
     ],
     "bot_hits": [
@@ -1399,6 +1431,10 @@
       {
         "date": "2026-08-31",
         "value": 4303
+      },
+      {
+        "date": "2026-09-01",
+        "value": 2859
       }
     ],
     "call_taps": [
@@ -1541,6 +1577,10 @@
       {
         "date": "2026-08-31",
         "value": 0
+      },
+      {
+        "date": "2026-09-01",
+        "value": 0
       }
     ],
     "ai_calls": [
@@ -1678,6 +1718,10 @@
       },
       {
         "date": "2026-08-31",
+        "value": 0
+      },
+      {
+        "date": "2026-09-01",
         "value": 0
       }
     ],
@@ -1833,6 +1877,10 @@
       {
         "date": "2026-08-31",
         "value": 0
+      },
+      {
+        "date": "2026-09-01",
+        "value": 0
       }
     ],
     "phone_leads": [
@@ -1986,6 +2034,10 @@
       },
       {
         "date": "2026-08-31",
+        "value": 0
+      },
+      {
+        "date": "2026-09-01",
         "value": 0
       }
     ],
@@ -2141,6 +2193,10 @@
       {
         "date": "2026-08-31",
         "value": 0
+      },
+      {
+        "date": "2026-09-01",
+        "value": 0
       }
     ]
   },
@@ -2152,7 +2208,7 @@
   "keywords": {
     "by_town": {
       "county": {
-        "total": 107,
+        "total": 109,
         "covered": 45,
         "top3": 2
       },
@@ -2189,7 +2245,7 @@
     },
     "by_intent": {
       "hire": {
-        "total": 122,
+        "total": 124,
         "covered": 68
       },
       "price": {
@@ -2235,6 +2291,8 @@
       "gutter guard installation dover pa",
       "gutter guard installation red lion pa",
       "gutter guard installation york springs pa",
+      "gutter guards york springs pa",
+      "gutter installation services york springs pa",
       "gutter installers red lion pa",
       "gutter installers spring grove pa",
       "gutter installers york pa",
@@ -2325,25 +2383,25 @@
       {
         "query": "gutter installer",
         "position": 1,
-        "impressions": 362,
+        "impressions": 360,
         "clicks": 0
       },
       {
         "query": "gutters",
         "position": 5.1,
-        "impressions": 96,
+        "impressions": 95,
         "clicks": 0
       },
       {
         "query": "gutter replacement",
-        "position": 16.6,
-        "impressions": 82,
+        "position": 15.6,
+        "impressions": 81,
         "clicks": 0
       },
       {
         "query": "seamless+gutters+perkasie+pa",
-        "position": 18.8,
-        "impressions": 75,
+        "position": 18.7,
+        "impressions": 74,
         "clicks": 0
       },
       {
@@ -2354,62 +2412,62 @@
       },
       {
         "query": "gutter guards in akron pa",
-        "position": 25.0,
-        "impressions": 47,
+        "position": 24.7,
+        "impressions": 48,
         "clicks": 0
       },
       {
         "query": "seamless gutter installation in myerstown pa",
-        "position": 41,
-        "impressions": 44,
+        "position": 40.8,
+        "impressions": 45,
         "clicks": 0
       },
       {
         "query": "gutter repair",
-        "position": 5.6,
-        "impressions": 38,
+        "position": 5.5,
+        "impressions": 39,
         "clicks": 0
       },
       {
         "query": "gutter installation wilkes barre, pa",
-        "position": 60.3,
+        "position": 60.0,
         "impressions": 35,
         "clicks": 0
       },
       {
         "query": "seamless gutter installation in akron pa",
-        "position": 37.1,
+        "position": 36.7,
         "impressions": 35,
         "clicks": 0
       },
       {
         "query": "gutter guards in new holland pa",
         "position": 33.9,
-        "impressions": 31,
+        "impressions": 33,
         "clicks": 0
       },
       {
         "query": "gutter replacement services",
         "position": 10.7,
-        "impressions": 29,
+        "impressions": 30,
         "clicks": 0
       },
       {
         "query": "gutter guards in myerstown pa",
-        "position": 68.5,
-        "impressions": 28,
+        "position": 69.4,
+        "impressions": 29,
+        "clicks": 0
+      },
+      {
+        "query": "gutter guards in lititz pa",
+        "position": 27.5,
+        "impressions": 26,
         "clicks": 0
       },
       {
         "query": "seamless gutter installation in stevens pa",
         "position": 40.5,
         "impressions": 26,
-        "clicks": 0
-      },
-      {
-        "query": "gutter guards in lititz pa",
-        "position": 27.6,
-        "impressions": 25,
         "clicks": 0
       },
       {
@@ -2425,30 +2483,6 @@
         "clicks": 0
       },
       {
-        "query": "seamless gutter services upper black eddy pa",
-        "position": 17.8,
-        "impressions": 22,
-        "clicks": 0
-      },
-      {
-        "query": "seamless gutter company villanova pa",
-        "position": 17.4,
-        "impressions": 21,
-        "clicks": 0
-      },
-      {
-        "query": "seamless gutter services quakertown pa",
-        "position": 16.6,
-        "impressions": 21,
-        "clicks": 0
-      },
-      {
-        "query": "seamless gutter services kutztown pa",
-        "position": 19.1,
-        "impressions": 20,
-        "clicks": 0
-      },
-      {
         "query": "seamless gutter services mercersburg pa",
         "position": 10.8,
         "impressions": 19,
@@ -2458,12 +2492,6 @@
         "query": "seamless gutters plymouth meeting pa",
         "position": 17.2,
         "impressions": 19,
-        "clicks": 0
-      },
-      {
-        "query": "seamless gutter company macungie pa",
-        "position": 14.3,
-        "impressions": 18,
         "clicks": 0
       },
       {
@@ -2485,20 +2513,8 @@
         "clicks": 0
       },
       {
-        "query": "seamless gutter company leesport pa",
-        "position": 17.1,
-        "impressions": 17,
-        "clicks": 0
-      },
-      {
-        "query": "seamless gutter repair perkiomenville pa",
-        "position": 14.8,
-        "impressions": 17,
-        "clicks": 0
-      },
-      {
-        "query": "seamless gutter repair villanova pa",
-        "position": 34.5,
+        "query": "gutter guards in stevens pa",
+        "position": 56.9,
         "impressions": 17,
         "clicks": 0
       },
@@ -2515,8 +2531,8 @@
         "clicks": 0
       },
       {
-        "query": "gutter guards in stevens pa",
-        "position": 57.1,
+        "query": "lemoyne seamless spouting system installers",
+        "position": 23.7,
         "impressions": 16,
         "clicks": 0
       },
@@ -2527,20 +2543,14 @@
         "clicks": 0
       },
       {
-        "query": "seamless gutter company warrington pa",
-        "position": 8.5,
-        "impressions": 16,
+        "query": "gutter guards in leola pa",
+        "position": 31.3,
+        "impressions": 15,
         "clicks": 0
       },
       {
-        "query": "seamless gutters leesport pa",
-        "position": 26.6,
-        "impressions": 16,
-        "clicks": 0
-      },
-      {
-        "query": "lemoyne seamless spouting system installers",
-        "position": 24.1,
+        "query": "gutter guards in newmanstown pa",
+        "position": 46,
         "impressions": 15,
         "clicks": 0
       },
@@ -2551,28 +2561,76 @@
         "clicks": 0
       },
       {
-        "query": "seamless gutter repair dublin pa",
-        "position": 17,
+        "query": "seamless gutter repair villanova pa",
+        "position": 36.2,
         "impressions": 15,
         "clicks": 0
       },
       {
-        "query": "seamless gutter warrington pa",
-        "position": 13.7,
+        "query": "seamless gutters central pa",
+        "position": 20.6,
         "impressions": 15,
+        "clicks": 0
+      },
+      {
+        "query": "gutter cleaning",
+        "position": 7.8,
+        "impressions": 14,
+        "clicks": 0
+      },
+      {
+        "query": "gutter guards in lancaster pa",
+        "position": 42.6,
+        "impressions": 14,
+        "clicks": 0
+      },
+      {
+        "query": "gutter guards waynesboro pa",
+        "position": 29.4,
+        "impressions": 14,
+        "clicks": 0
+      },
+      {
+        "query": "seamless gutter company east norriton pa",
+        "position": 28.2,
+        "impressions": 14,
+        "clicks": 0
+      },
+      {
+        "query": "seamless gutter company villanova pa",
+        "position": 19.1,
+        "impressions": 14,
+        "clicks": 0
+      },
+      {
+        "query": "seamless gutter services essington pa",
+        "position": 14.4,
+        "impressions": 14,
+        "clicks": 0
+      },
+      {
+        "query": "seamless gutter services kutztown pa",
+        "position": 16.8,
+        "impressions": 14,
+        "clicks": 0
+      },
+      {
+        "query": "seamless gutter services monessen pa",
+        "position": 10.6,
+        "impressions": 14,
         "clicks": 0
       }
     ]
   },
   "gsc": {
-    "date": "2026-09-01",
+    "date": "2026-09-02",
     "ok": true,
     "connected": true,
-    "rows": 995,
-    "matched": 26,
+    "rows": 947,
+    "matched": 30,
     "clicks": 17,
-    "impressions": 8978,
-    "avg_position": 24.9
+    "impressions": 7887,
+    "avg_position": 24.8
   },
   "techniques": [
     {
@@ -2593,14 +2651,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-01",
+        "decided": "2026-09-02",
         "works": true,
-        "why": "7 owned visitors in 36d (median 0.0/day and flat)",
+        "why": "7 owned visitors in 37d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 7,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 36
+          "days_measured": 37
         }
       },
       "owned_visitors": [
@@ -2747,6 +2805,10 @@
         {
           "date": "2026-08-31",
           "value": 0
+        },
+        {
+          "date": "2026-09-01",
+          "value": 0
         }
       ]
     },
@@ -2768,14 +2830,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-01",
+        "decided": "2026-09-02",
         "works": true,
-        "why": "5 owned visitors in 36d (median 0.0/day and flat)",
+        "why": "5 owned visitors in 37d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 5,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 36
+          "days_measured": 37
         }
       },
       "owned_visitors": [
@@ -2921,6 +2983,10 @@
         },
         {
           "date": "2026-08-31",
+          "value": 0
+        },
+        {
+          "date": "2026-09-01",
           "value": 0
         }
       ]
@@ -3198,14 +3264,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-01",
+        "decided": "2026-09-02",
         "works": true,
         "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 18.0,
           "median_before": null,
-          "days_measured": 36
+          "days_measured": 37
         }
       },
       "owned_visitors": null
@@ -3228,14 +3294,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-01",
+        "decided": "2026-09-02",
         "works": true,
-        "why": "15 owned visitors in 36d (median 0.0/day and flat)",
+        "why": "15 owned visitors in 37d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 15,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 36
+          "days_measured": 37
         }
       },
       "owned_visitors": [
@@ -3382,6 +3448,10 @@
         {
           "date": "2026-08-31",
           "value": 0
+        },
+        {
+          "date": "2026-09-01",
+          "value": 0
         }
       ]
     },
@@ -3401,14 +3471,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-01",
+        "decided": "2026-09-02",
         "works": true,
         "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 18.0,
           "median_before": null,
-          "days_measured": 36
+          "days_measured": 37
         }
       },
       "owned_visitors": null
@@ -3429,14 +3499,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-01",
+        "decided": "2026-09-02",
         "works": true,
         "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 18.0,
           "median_before": null,
-          "days_measured": 36
+          "days_measured": 37
         }
       },
       "owned_visitors": null
@@ -4534,16 +4604,16 @@
     ]
   },
   "last_build": {
-    "date": "2026-09-01",
+    "date": "2026-09-02",
     "log": [
       {
         "ok": true,
-        "detail": "adopted 4 real search(es) into the tracked universe: gutter guard installation york springs pa, gutter replacement york springs pa, 5 inch gutter service york springs pa, gutter cleaning services york springs pa",
+        "detail": "adopted 2 real search(es) into the tracked universe: gutter guards york springs pa, gutter installation services york springs pa",
         "slug": "adopt_queries"
       },
       {
         "ok": false,
-        "detail": "generation failed for services/half-round-gutters.html: anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CecDSjYEEJUe9UXBuhC5t\"}",
+        "detail": "generation failed for services/half-round-gutters.html: anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011Cee7FVJy97H7sRWS8hQJb\"}",
         "slug": "improve_ctr"
       },
       {
@@ -4554,7 +4624,7 @@
       },
       {
         "ok": false,
-        "detail": "3 candidate(s) failed, last: generation failed for 'half round copper gutters near me': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CecDSo9GsThNQpEu4MSAV\"}",
+        "detail": "3 candidate(s) failed, last: generation failed for 'half round copper gutters near me': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011Cee7FYqo9dis8vdXkb9BZ\"}",
         "slug": "strengthen_pages"
       },
       {
@@ -4571,7 +4641,7 @@
       },
       {
         "ok": false,
-        "detail": "content generation failed for '5 inch gutter service york springs pa': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CecDSpLTaAzzTVDQxPfky\"}",
+        "detail": "content generation failed for '5 inch gutter service york springs pa': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011Cee7FZfAD8pZEMqhkrrgn\"}",
         "slug": "money_pages"
       },
       {
@@ -4603,9 +4673,9 @@
     "changed": 0
   },
   "last_scout": {
-    "date": "2026-09-01",
+    "date": "2026-09-02",
     "ok": false,
-    "detail": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CecDSqrEsWL1hsEti9Z8C\"}"
+    "detail": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011Cee7FayHdxw3528t7rc8V\"}"
   },
   "pages": {
     "areas": [

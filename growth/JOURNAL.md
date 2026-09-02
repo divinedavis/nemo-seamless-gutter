@@ -15448,3 +15448,23 @@ is still zero.
    `top3` flat at 2. If coverage keeps climbing and `top3` is still 2 on 09-20,
    page-strengthening is not converting into rank and the engine's one remaining
    daily activity needs rethinking.
+
+## 2026-09-02 — engine run
+
+Goal: **1.0%** top-3 share of 201 tracked queries (target 50%).
+2026-09-01: 2 visitors (0 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: adopted 2 real search(es) into the tracked universe: gutter guards york springs pa, gutter installation services york springs pa
+- `improve_ctr` — FAILED: generation failed for services/half-round-gutters.html: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011Cee7FVJy97H7sRWS8hQJb"}
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — FAILED: 3 candidate(s) failed, last: generation failed for 'half round copper gutters near me': anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011Cee7FYqo9dis8vdXkb9BZ"}
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — FAILED: content generation failed for '5 inch gutter service york springs pa': anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011Cee7FZfAD8pZEMqhkrrgn"}
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: sitemap.xml unchanged
+- `ping_indexnow` — ok: nothing new to submit
+
+**Scout did not run:** anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011Cee7FayHdxw3528t7rc8V"}
