@@ -1,6 +1,6 @@
 {
-  "generated": "2026-09-02T06:04:55+00:00",
-  "date": "2026-09-02",
+  "generated": "2026-09-03T06:09:43+00:00",
+  "date": "2026-09-03",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
@@ -8,11 +8,11 @@
     "share_pct": 1.0,
     "measured": true,
     "why_unmeasured": null,
-    "coverage_pct": 42.3,
-    "tracked_queries": 201,
+    "coverage_pct": 43.1,
+    "tracked_queries": 202,
     "top3": 2,
-    "top10": 12,
-    "ranked_known": 31
+    "top10": 13,
+    "ranked_known": 34
   },
   "traffic": {
     "visitors": [
@@ -171,6 +171,10 @@
       {
         "date": "2026-09-01",
         "value": 2
+      },
+      {
+        "date": "2026-09-02",
+        "value": 7
       }
     ],
     "pageviews": [
@@ -329,6 +333,10 @@
       {
         "date": "2026-09-01",
         "value": 2
+      },
+      {
+        "date": "2026-09-02",
+        "value": 8
       }
     ],
     "organic_visitors": [
@@ -487,6 +495,10 @@
       {
         "date": "2026-09-01",
         "value": 0
+      },
+      {
+        "date": "2026-09-02",
+        "value": 2
       }
     ],
     "local_visitors": [
@@ -644,6 +656,10 @@
       },
       {
         "date": "2026-09-01",
+        "value": 0
+      },
+      {
+        "date": "2026-09-02",
         "value": 0
       }
     ],
@@ -803,6 +819,10 @@
       {
         "date": "2026-09-01",
         "value": 0
+      },
+      {
+        "date": "2026-09-02",
+        "value": 0
       }
     ],
     "direct_visitors": [
@@ -961,6 +981,10 @@
       {
         "date": "2026-09-01",
         "value": 2
+      },
+      {
+        "date": "2026-09-02",
+        "value": 5
       }
     ],
     "referral_visitors": [
@@ -1118,6 +1142,10 @@
       },
       {
         "date": "2026-09-01",
+        "value": 0
+      },
+      {
+        "date": "2026-09-02",
         "value": 0
       }
     ],
@@ -1277,6 +1305,10 @@
       {
         "date": "2026-09-01",
         "value": 0
+      },
+      {
+        "date": "2026-09-02",
+        "value": 0
       }
     ],
     "bot_hits": [
@@ -1435,6 +1467,10 @@
       {
         "date": "2026-09-01",
         "value": 2859
+      },
+      {
+        "date": "2026-09-02",
+        "value": 3859
       }
     ],
     "call_taps": [
@@ -1581,6 +1617,10 @@
       {
         "date": "2026-09-01",
         "value": 0
+      },
+      {
+        "date": "2026-09-02",
+        "value": 0
       }
     ],
     "ai_calls": [
@@ -1722,6 +1762,10 @@
       },
       {
         "date": "2026-09-01",
+        "value": 0
+      },
+      {
+        "date": "2026-09-02",
         "value": 0
       }
     ],
@@ -1881,6 +1925,10 @@
       {
         "date": "2026-09-01",
         "value": 0
+      },
+      {
+        "date": "2026-09-02",
+        "value": 1
       }
     ],
     "phone_leads": [
@@ -2038,6 +2086,10 @@
       },
       {
         "date": "2026-09-01",
+        "value": 0
+      },
+      {
+        "date": "2026-09-02",
         "value": 0
       }
     ],
@@ -2197,11 +2249,15 @@
       {
         "date": "2026-09-01",
         "value": 0
+      },
+      {
+        "date": "2026-09-02",
+        "value": 1
       }
     ]
   },
   "lead_totals": {
-    "bookings_all_time": 3,
+    "bookings_all_time": 4,
     "phone_leads_all_time": 0,
     "own_rows_excluded": 13
   },
@@ -2209,12 +2265,12 @@
     "by_town": {
       "county": {
         "total": 109,
-        "covered": 45,
+        "covered": 46,
         "top3": 2
       },
       "hanover": {
-        "total": 10,
-        "covered": 5,
+        "total": 11,
+        "covered": 6,
         "top3": 0
       },
       "dover": {
@@ -2245,8 +2301,8 @@
     },
     "by_intent": {
       "hire": {
-        "total": 124,
-        "covered": 68
+        "total": 125,
+        "covered": 70
       },
       "price": {
         "total": 47,
@@ -2262,7 +2318,6 @@
       }
     },
     "uncovered": [
-      "5 inch gutter service york springs pa",
       "best gutter company spring grove pa",
       "best gutter company york pa",
       "copper gutter installation york pa",
@@ -2292,6 +2347,7 @@
       "gutter guard installation red lion pa",
       "gutter guard installation york springs pa",
       "gutter guards york springs pa",
+      "gutter installation hanover",
       "gutter installation services york springs pa",
       "gutter installers red lion pa",
       "gutter installers spring grove pa",
@@ -2313,7 +2369,6 @@
       "seamless gutter installation york pa",
       "seamless gutter installer dallastown pa",
       "seamless gutter installers dallastown pa",
-      "seamless gutter installers hanover pa",
       "seamless gutter installers near me red lion pa",
       "soffit and fascia repair dover pa",
       "who installs gutters in dover pa",
@@ -2383,18 +2438,18 @@
       {
         "query": "gutter installer",
         "position": 1,
-        "impressions": 360,
+        "impressions": 138,
         "clicks": 0
       },
       {
         "query": "gutters",
-        "position": 5.1,
-        "impressions": 95,
+        "position": 4.5,
+        "impressions": 111,
         "clicks": 0
       },
       {
         "query": "gutter replacement",
-        "position": 15.6,
+        "position": 16.2,
         "impressions": 81,
         "clicks": 0
       },
@@ -2407,43 +2462,43 @@
       {
         "query": "gutter contractor",
         "position": 1,
-        "impressions": 72,
+        "impressions": 49,
         "clicks": 0
       },
       {
         "query": "gutter guards in akron pa",
-        "position": 24.7,
+        "position": 23.1,
         "impressions": 48,
         "clicks": 0
       },
       {
         "query": "seamless gutter installation in myerstown pa",
-        "position": 40.8,
-        "impressions": 45,
+        "position": 41.0,
+        "impressions": 44,
         "clicks": 0
       },
       {
         "query": "gutter repair",
-        "position": 5.5,
-        "impressions": 39,
+        "position": 5.7,
+        "impressions": 41,
         "clicks": 0
       },
       {
         "query": "gutter installation wilkes barre, pa",
-        "position": 60.0,
-        "impressions": 35,
+        "position": 59.1,
+        "impressions": 36,
         "clicks": 0
       },
       {
         "query": "seamless gutter installation in akron pa",
-        "position": 36.7,
+        "position": 36.4,
         "impressions": 35,
         "clicks": 0
       },
       {
         "query": "gutter guards in new holland pa",
         "position": 33.9,
-        "impressions": 33,
+        "impressions": 34,
         "clicks": 0
       },
       {
@@ -2454,25 +2509,19 @@
       },
       {
         "query": "gutter guards in myerstown pa",
-        "position": 69.4,
+        "position": 70,
         "impressions": 29,
         "clicks": 0
       },
       {
         "query": "gutter guards in lititz pa",
         "position": 27.5,
-        "impressions": 26,
-        "clicks": 0
-      },
-      {
-        "query": "seamless gutter installation in stevens pa",
-        "position": 40.5,
-        "impressions": 26,
+        "impressions": 27,
         "clicks": 0
       },
       {
         "query": "seamless gutters",
-        "position": 22.5,
+        "position": 19.8,
         "impressions": 24,
         "clicks": 0
       },
@@ -2480,6 +2529,12 @@
         "query": "seamless gutter contractors essington pa",
         "position": 16.6,
         "impressions": 23,
+        "clicks": 0
+      },
+      {
+        "query": "seamless gutter installation in stevens pa",
+        "position": 39.2,
+        "impressions": 22,
         "clicks": 0
       },
       {
@@ -2495,6 +2550,18 @@
         "clicks": 0
       },
       {
+        "query": "gutter",
+        "position": 4.4,
+        "impressions": 18,
+        "clicks": 0
+      },
+      {
+        "query": "gutter guards in stevens pa",
+        "position": 56.7,
+        "impressions": 18,
+        "clicks": 0
+      },
+      {
         "query": "seamless gutter company willow grove pa",
         "position": 26.8,
         "impressions": 18,
@@ -2507,14 +2574,8 @@
         "clicks": 0
       },
       {
-        "query": "gutter",
-        "position": 4.5,
-        "impressions": 17,
-        "clicks": 0
-      },
-      {
-        "query": "gutter guards in stevens pa",
-        "position": 56.9,
+        "query": "gutter guards in newmanstown pa",
+        "position": 45.8,
         "impressions": 17,
         "clicks": 0
       },
@@ -2531,6 +2592,12 @@
         "clicks": 0
       },
       {
+        "query": "gutter guards in leola pa",
+        "position": 31.2,
+        "impressions": 16,
+        "clicks": 0
+      },
+      {
         "query": "lemoyne seamless spouting system installers",
         "position": 23.7,
         "impressions": 16,
@@ -2543,14 +2610,20 @@
         "clicks": 0
       },
       {
-        "query": "gutter guards in leola pa",
-        "position": 31.3,
+        "query": "seamless gutters central pa",
+        "position": 20.2,
+        "impressions": 16,
+        "clicks": 0
+      },
+      {
+        "query": "gutter cleaning",
+        "position": 9,
         "impressions": 15,
         "clicks": 0
       },
       {
-        "query": "gutter guards in newmanstown pa",
-        "position": 46,
+        "query": "gutter guards in lancaster pa",
+        "position": 42.4,
         "impressions": 15,
         "clicks": 0
       },
@@ -2567,21 +2640,9 @@
         "clicks": 0
       },
       {
-        "query": "seamless gutters central pa",
-        "position": 20.6,
+        "query": "seamless gutters perkasie pa",
+        "position": 18.9,
         "impressions": 15,
-        "clicks": 0
-      },
-      {
-        "query": "gutter cleaning",
-        "position": 7.8,
-        "impressions": 14,
-        "clicks": 0
-      },
-      {
-        "query": "gutter guards in lancaster pa",
-        "position": 42.6,
-        "impressions": 14,
         "clicks": 0
       },
       {
@@ -2613,24 +2674,18 @@
         "position": 16.8,
         "impressions": 14,
         "clicks": 0
-      },
-      {
-        "query": "seamless gutter services monessen pa",
-        "position": 10.6,
-        "impressions": 14,
-        "clicks": 0
       }
     ]
   },
   "gsc": {
-    "date": "2026-09-02",
+    "date": "2026-09-03",
     "ok": true,
     "connected": true,
-    "rows": 947,
-    "matched": 30,
-    "clicks": 17,
-    "impressions": 7887,
-    "avg_position": 24.8
+    "rows": 948,
+    "matched": 33,
+    "clicks": 18,
+    "impressions": 7689,
+    "avg_position": 25.5
   },
   "techniques": [
     {
@@ -2651,14 +2706,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-02",
+        "decided": "2026-09-03",
         "works": true,
-        "why": "7 owned visitors in 37d (median 0.0/day and flat)",
+        "why": "7 owned visitors in 38d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 7,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 37
+          "days_measured": 38
         }
       },
       "owned_visitors": [
@@ -2809,6 +2864,10 @@
         {
           "date": "2026-09-01",
           "value": 0
+        },
+        {
+          "date": "2026-09-02",
+          "value": 0
         }
       ]
     },
@@ -2830,14 +2889,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-02",
+        "decided": "2026-09-03",
         "works": true,
-        "why": "5 owned visitors in 37d (median 0.0/day and flat)",
+        "why": "6 owned visitors in 38d (median 0.0/day and flat)",
         "measured": {
-          "total_owned_visitors": 5,
+          "total_owned_visitors": 6,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 37
+          "days_measured": 38
         }
       },
       "owned_visitors": [
@@ -2988,6 +3047,10 @@
         {
           "date": "2026-09-01",
           "value": 0
+        },
+        {
+          "date": "2026-09-02",
+          "value": 1
         }
       ]
     },
@@ -3264,14 +3327,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-02",
+        "decided": "2026-09-03",
         "works": true,
         "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 18.0,
           "median_before": null,
-          "days_measured": 37
+          "days_measured": 38
         }
       },
       "owned_visitors": null
@@ -3294,14 +3357,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-02",
+        "decided": "2026-09-03",
         "works": true,
-        "why": "15 owned visitors in 37d (median 0.0/day and flat)",
+        "why": "15 owned visitors in 38d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 15,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 37
+          "days_measured": 38
         }
       },
       "owned_visitors": [
@@ -3452,6 +3515,10 @@
         {
           "date": "2026-09-01",
           "value": 0
+        },
+        {
+          "date": "2026-09-02",
+          "value": 0
         }
       ]
     },
@@ -3471,14 +3538,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-02",
+        "decided": "2026-09-03",
         "works": true,
         "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 18.0,
           "median_before": null,
-          "days_measured": 37
+          "days_measured": 38
         }
       },
       "owned_visitors": null
@@ -3499,14 +3566,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-02",
+        "decided": "2026-09-03",
         "works": true,
         "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 18.0,
           "median_before": null,
-          "days_measured": 37
+          "days_measured": 38
         }
       },
       "owned_visitors": null
@@ -4518,6 +4585,42 @@
       "notes": "first step: Copy the full text, reviewer first name and month of all 13 Google reviews into one file, tag each with the town and the service it describes, and paste the best-matching two into the hero area of the Dover, Dallastown, Red Lion, Hanover and Spring Grove town pages first.\neffort: hours\ncost: free\nexpected: 22 pages carrying 2-3 real quotes each within a week. Target: site-wide call+booking conversion moves from ~0% to 3-5% of sessions, i.e. roughly 15-25 tel: taps or bookings a month at current traffic instead of 0. Measured against the tel:-click tracking the ledger already plans.",
       "verdict": null,
       "owned_visitors": null
+    },
+    {
+      "id": "T077",
+      "slug": "monthly_payment_on_every_quote",
+      "name": "Financing shown as a monthly payment on every quote",
+      "kind": "conversion",
+      "status": "candidate",
+      "hypothesis": "NEMO's leak is not eyeballs, it's the moment a York County homeowner hears '$2,400 for 140 feet of 6-inch seamless' on a phone call or a countertop quote. A second line that says 'or about $X/month' turns a deferred decision into a yes, and \u2014 because it can be published on the cost guides and the gutter-guard page that already pull traffic \u2014 it also gives a price-shocked visitor a reason to dial instead of bounce. It matters most on exactly the jobs NEMO wins on quality rather than price: copper and half-round on historic York homes, and full-house guard jobs against the LeafFilter pitch.",
+      "evidence": "PipelineOn's 2026 benchmark: <cite index=\"21-6,21-7\">a shop that mentions financing only when asked finances 5-10% of jobs, while a shop presenting financing as a monthly payment on every quote tier finances 35-55% and closes 20-40% more deals at higher tickets</cite>, and <cite index=\"21-3,21-4\">the largest segment is prime borrowers protecting savings, not subprime \u2014 Wisetack's 2026 benchmark shows the average approved customer at 730 FICO and $98K household income</cite> (https://pipelineon.com/blog/contractor-financing-for-customers/). Enrollment is free with a per-funded-job merchant fee \u2014 <cite index=\"16-2\">Wisetack's merchant transaction fee is 3.9%</cite> (https://www.wisetack.com/press/wisetack-raises-financing-limit-to-65-000-introduces-lower-rates-for-7--and-10-year-terms). Note the honesty guardrail from the same category research: <cite index=\"20-7\">use 'let's see what you qualify for' language, not 'you're approved'</cite> (https://contractortoolstack.com/software/wisetack/).",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-09-03",
+      "added": "2026-09-03",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Apply to Wisetack (self-serve, no contract) today, then add one honest line to the seamless-gutter-installation and gutter-guards pages: 'Payment plans available \u2014 most whole-house jobs land near $XX/month; APR 0-35.9% depending on credit, and we'll tell you the real number before you sign.'\neffort: days\ncost: free\nexpected: Enrolled and live within 10 days. Every quote from mid-September carries two lines (cash price, est. monthly). Target: 3 of the next 10 quotes financed, quote-to-job close rate up from roughly 1-in-4 to 1-in-3 over the Sept-Nov season, and at least 2 whole-house guard or copper jobs that would otherwise have been downsized to a repair.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T078",
+      "slug": "call_now_aerial_ballpark",
+      "name": "Five-minute aerial-measured ballpark, given on the phone",
+      "kind": "conversion",
+      "status": "candidate",
+      "hypothesis": "300 profile views a month and zero calls means the profile's only offer \u2014 'phone a contractor you've never met and invite him to your driveway' \u2014 is too big an ask. Eric can measure a York County roofline off free county aerial imagery while the caller is still on the line and give a real range in under five minutes with no home visit. That converts a browsing homeowner into a live conversation, and the phone is where this trade actually closes. It also gives the GBP posts, the homepage hero and the AI phone agent one specific, dateable thing to promise instead of 'free estimates'.",
+      "evidence": "<cite index=\"14-7\">Invoca's 2025 data: 37% of phone leads convert during the call across industries, and in home services that rises to 46%</cite> (https://constructionsnapshotforghl.com/blog/construction-lead-conversion-rate/) \u2014 the call is worth roughly ten times a form fill, so the job is to buy calls with a concrete offer. Conversion research for contractors says the same thing about the promise itself: <cite index=\"12-6,12-7\">high-converting hero copy sounds like 'we answer every call even when we are on the job' or 'repairs scheduled within 24 hours' \u2014 lead with the transformation, not the credentials</cite> (https://instantbusinesspro.ai/post/contractor-website-getting-visitors-no-calls-conversion-fix), and <cite index=\"11-15,11-16\">a 2026 ServiceTitan report found 73% of customers cite clear upfront pricing as a primary reason for choosing a home service provider</cite> (https://gohighpointdigital.com/guide/what-every-contractor-website-needs-to-convert-visitors-into-calls/).",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-09-03",
+      "added": "2026-09-03",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Price three real past jobs off York County's public parcel/aerial viewer, time yourself, and write the resulting per-foot bands on an index card taped to the truck dash \u2014 then publish the offer as one sentence: 'Call and get a real price range for your house in five minutes. No visit needed to get the number.'\neffort: hours\ncost: free\nexpected: Offer live on GBP (post + services description), homepage hero, and the AI agent script inside a week. Target: GBP call clicks from ~0 to 8-12/month by mid-October, 1 in 3 ballpark calls booked as an on-site measure, first 5 booked estimates traceable to the offer by 30 November.",
+      "verdict": null,
+      "owned_visitors": null
     }
   ],
   "scoreboard": {
@@ -4600,20 +4703,22 @@
       "T073",
       "T074",
       "T075",
-      "T076"
+      "T076",
+      "T077",
+      "T078"
     ]
   },
   "last_build": {
-    "date": "2026-09-02",
+    "date": "2026-09-03",
     "log": [
       {
         "ok": true,
-        "detail": "adopted 2 real search(es) into the tracked universe: gutter guards york springs pa, gutter installation services york springs pa",
+        "detail": "adopted 1 real search(es) into the tracked universe: gutter installation hanover",
         "slug": "adopt_queries"
       },
       {
-        "ok": false,
-        "detail": "generation failed for services/half-round-gutters.html: anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011Cee7FVJy97H7sRWS8hQJb\"}",
+        "ok": true,
+        "detail": "rewrote title/description on /services/half-round-gutters.html (26 impressions, 0 clicks, pos 12.3) \u2014 Put the searched wording (half-round, seamless, York PA) at the front of the title while keeping the brand for",
         "slug": "improve_ctr"
       },
       {
@@ -4623,8 +4728,8 @@
         "slug": "geo_answer_first_content_pass"
       },
       {
-        "ok": false,
-        "detail": "3 candidate(s) failed, last: generation failed for 'half round copper gutters near me': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011Cee7FYqo9dis8vdXkb9BZ\"}",
+        "ok": true,
+        "detail": "added \"Hiring Seamless Gutter Installers in Hanover, PA: What to Ex\" to /areas/seamless-gutters-hanover-pa.html for 'seamless gutter installers hanover pa'",
         "slug": "strengthen_pages"
       },
       {
@@ -4640,8 +4745,8 @@
         "slug": "area_pages"
       },
       {
-        "ok": false,
-        "detail": "content generation failed for '5 inch gutter service york springs pa': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011Cee7FZfAD8pZEMqhkrrgn\"}",
+        "ok": true,
+        "detail": "published '5 inch gutter service york springs pa' \u2192 /guides/5-inch-gutter-service-york-springs-pa.html",
         "slug": "money_pages"
       },
       {
@@ -4658,24 +4763,28 @@
       },
       {
         "ok": true,
-        "noop": true,
-        "detail": "sitemap.xml unchanged",
+        "noop": false,
+        "detail": "[gen_sitemap] wrote 43 URLs to sitemap.xml",
         "slug": "rebuild_sitemap"
       },
       {
         "ok": true,
-        "noop": true,
-        "detail": "nothing new to submit",
+        "detail": "submitted 3 URL(s), HTTP 200",
         "slug": "ping_indexnow"
       }
     ],
-    "new": 0,
-    "changed": 0
+    "new": 1,
+    "changed": 2
   },
   "last_scout": {
-    "date": "2026-09-02",
-    "ok": false,
-    "detail": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011Cee7FayHdxw3528t7rc8V\"}"
+    "date": "2026-09-03",
+    "ok": true,
+    "techniques_added": [
+      "monthly_payment_on_every_quote",
+      "call_now_aerial_ballpark"
+    ],
+    "keywords_added": [],
+    "notes": ""
   },
   "pages": {
     "areas": [
@@ -4696,6 +4805,7 @@
       "seamless-gutters-wrightsville-pa.html"
     ],
     "guides": [
+      "5-inch-gutter-service-york-springs-pa.html",
       "5-vs-6-inch-gutters-right-size-for-york-county-homes.html",
       "best-gutter-company-york-county-pa.html",
       "copper-gutters-historic-home-york-pa.html",
