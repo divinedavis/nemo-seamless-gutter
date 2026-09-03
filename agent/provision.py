@@ -100,8 +100,12 @@ MANAGED_TOOL_NAMES = {
     # and emails it over; Eric rings them back and sets the time himself. Deleting
     # these rather than leaving them detached is deliberate — a tool sitting in the
     # workspace still points at a live endpoint and can be re-attached by accident.
-    "check_openings",
-    "book_appointment",
+    #
+    # "check_openings" and "book_appointment" are NOT listed any more: since
+    # 2026-09-02 the Skills in Bloom assistant (same ElevenLabs workspace) owns
+    # tools with exactly those names, attached to its own agent. Listing them here
+    # made this script try to delete another client's live tools — the API 409s
+    # and the run exits non-zero. NEMO's own copies were deleted on 2026-07-22.
     "get_booking_info",
     "check_availability",
 }
