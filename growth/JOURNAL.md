@@ -16454,3 +16454,504 @@ Goal: **1.0%** top-3 share of 205 tracked queries (target 50%).
 - T079 "We call you back in 60 seconds" button — 300 GBP views and ~6 site visits a day produce zero contacts because every action asks a nervous stranger to dial a contractor they've never met and start a sales conversation. Flipping the direction 
 - T080 Weekly job-site clip on YouTube, town-named — The ledger already plans to shoot 30-second phone video for the profile and town pages — this is the same footage, published to a second surface that has its own search demand and is one of the two mo
 - T081 Get listed on manufacturer & supplier installer locators — The coil, guard and half-round products Eric already buys come from brands that run free 'find an installer near you' locators, and so do the local supply houses he buys from. Those locators are high-
+
+## 2026-09-04 — review agent
+
+### Two corrections to how this journal has been reading its own numbers
+
+Today's entry leads with method rather than news, because I think two of the
+readings this journal has been repeating are wrong, and both of them point the
+same way: **the traffic story is less bad than we have been telling Eric, and
+the visibility story is worse.**
+
+**Correction 1 — the "traffic halved" reading is an instrument artifact.**
+Yesterday I wrote that the *"trailing-14 median is 2.0 against a prior-14 median
+of 4.0."* That comparison straddles **2026-08-14**, the day commit `588ae32`
+(*"Count visitors from a JS pageview beacon, not raw log heuristics"*) set
+`metrics.PV_START = "2026-08-14"` and changed what the word `visitors` means.
+The 08-15 entry established this and warned about it explicitly. I then
+compared across the boundary anyway, and so did the entries before mine.
+
+Both windows have to sit inside the beacon era for the comparison to mean
+anything. First full beacon day is **08-15**, so:
+
+| window (beacon-era only) | days | visitors | organic | median |
+| --- | --- | --- | --- | --- |
+| 08-15 → 08-24 | 10 | **16** | 5 | 2.0 |
+| 08-25 → 09-03 | 10 | **28** | 10 | 2.0 |
+
+**Traffic is directionally up, not down — 16 → 28, with organic 5 → 10.** I am
+not calling it a result. Splitting 44 events between two equal windows, a 28/16
+split has a two-sided p ≈ 0.10 under the null; that is suggestive and nothing
+more, and both medians are still 2.0. **Verdict: too early to tell.** But
+"too early to tell, pointing up" is a different sentence from "traffic halved",
+and the second one is the one that has been in this journal.
+
+The log era (07-25 → 08-13, mean **9.1**/day) is not comparable to the beacon
+era (08-15 → 09-03, mean **2.2**/day) and should never again be put in the same
+series without that caveat attached.
+
+**Correction 2 — conversion is roughly at benchmark. The denominator is the
+problem.** Today's research puts most contractor sites at **2–4%** of visitors
+converting. Beacon-era: **1 booking / 44 visitors = 2.27%**. That is inside the
+benchmark band. (All-time 4/228 = 1.75% mixes the two instruments and should not
+be quoted.)
+
+This matters because it changes what is worth building. A site converting at
+2.27% on 2.2 visitors a day does not have a conversion problem that anyone can
+fix — 2.2 visitors a day cannot produce a business at *any* conversion rate. It
+has a visibility problem. I am flagging this specifically against **T079**, the
+"we call you back in 60 seconds" button the scout proposed this morning, whose
+own rationale says *"~6 site visits a day produce zero contacts"*. The premise is
+wrong twice: it is 2.2 visits a day, not 6, and they do not produce zero — they
+produce about the industry rate. T079 is a reasonable idea aimed at the wrong
+bottleneck. Ranked accordingly below.
+
+### Where the numbers stand
+
+**The goal metric did not move. Day thirty-nine.**
+
+| | 09-03 | 09-04 |
+| --- | --- | --- |
+| `top3` / tracked | 2 / 202 | **2 / 205** |
+| `share_pct` | 1.0% | **1.0%** (target 50%) |
+| `top10` | 13 | **12** |
+| `ranked_known` | 34 | **35** |
+| `coverage_pct` | 43.1% | **42.9%** |
+
+Per town, `total / covered / top3`:
+
+| town | 09-03 | 09-04 |
+| --- | --- | --- |
+| county | 109 / 46 / **2** | 109 / 46 / **2** |
+| york | 33 / 13 / **0** | 36 / 14 / **0** |
+| dover | 16 / 8 / **0** | 16 / 8 / **0** |
+| hanover | 11 / 6 / **0** | 11 / 6 / **0** |
+| red-lion | 11 / 4 / **0** | 11 / 4 / **0** |
+| dallastown | 11 / 5 / **0** | 11 / 5 / **0** |
+| spring-grove | 11 / 5 / **0** | 11 / 5 / **0** |
+
+**Zero top-3 positions in every named town, day thirty-nine.** Six of seven town
+buckets are byte-identical to yesterday. Only `york` moved, by exactly the three
+in-area keywords the scout added this morning (`gutter guard cost york pa`,
+`rotted fascia board replacement york pa`, `half round gutter cost york pa`) —
+denominator, not rank. `top10` went **down** 13 → 12 and `coverage_pct` down
+43.1% → 42.9%, both for the same arithmetic reason in reverse.
+
+**A note on the headline 1.0%.** `share_pct` is `top3 / total` where `total` is
+all 205 tracked queries, but only **35** of those have a position from Search
+Console at all. So 1.0% blends "we rank badly" with "we have no data yet". On
+the measurable subset it is **2/35 = 5.7%** (yesterday 2/34 = 5.9%). Both are a
+long way from 50% and the conclusion is identical, but the two numbers move for
+different reasons, and `share_pct` can drift on GSC coverage alone with no rank
+change. *Checked:* `keywords.py:360-383` — `ranked` is queries with a position,
+`share_pct` divides by `total`.
+
+**The goal metric is not contaminated by the impression flood.** Worth stating
+once: `keywords.py:336-369` folds GSC rows onto **tracked** keywords only, and
+the tracked universe is in-area. So while site-wide `avg_position` (25.2) is
+polluted by the out-of-area rank-tracker rows, `top3` is not. The standing rule
+stands — never quote `avg_position` as health — but `top3` is clean.
+
+**Search Console**, 28-day window: rows 948 → **952**, matched 33 → **34**,
+clicks 18 → **18**, impressions 7,689 → **7,755**, avg position 25.5 → **25.2**.
+Clicks flat.
+
+**Traffic**: 09-03 was **6 visitors, 4 of them organic** — the highest organic
+day of the beacon era. 0 bookings. Second-best visitor day in three weeks after
+09-02's 7. Two good days in a row is still two days.
+
+`ai_visitors` **0 for all 41 measured days**. `call_taps` **0 for 16 days**; one
+tap all time, on 08-12. `local_visitors` 0 since 08-17, and per 09-02's finding
+that remains a blind instrument.
+
+**Leads: 4 bookings all time, 0 phone leads ever.**
+
+**Measurement-suspicion threshold: not tripped, but one instrument is still
+missing.** Visitors are 0–7 rather than a hard zero run. However `log_visitors`
+and `log_pageviews` — added to `snapshot.py` on 08-15 precisely so a dead beacon
+reads as *"log says 12, beacon says 0"* — are **still absent from
+`traffic`** (keys today: `visitors, pageviews, organic_visitors, local_visitors,
+ai_visitors, direct_visitors, referral_visitors, campaign_visitors, bot_hits,
+call_taps, ai_calls, bookings, phone_leads, total_leads`). So on the three
+zero-visitor days (08-22, 08-23, 08-30) I still cannot distinguish "nobody came"
+from "the beacon stopped". That diagnostic is undeployed along with everything
+else.
+
+**One thing I confirmed rather than assumed.** Before blaming instrumentation
+for `call_taps: 0`, I checked it. All 40 generated pages carry `analytics.js`
+(areas 15/15, guides 18/18, services 7/7) and all 40 carry a `tel:` link, and
+`analytics.js:73-74` binds a **delegated** click listener on
+`a[href^="tel:"], a[href^="sms:"]` with `sendBeacon` (`analytics.js:30-38`),
+which survives the dialer opening. **`call_taps: 0` is a real zero, not a blind
+instrument** — unlike `local_visitors`. Nobody is tapping the phone number
+because almost nobody is on the site.
+
+### Did previous changes work?
+
+**1 — Deploy `growth/` (rec 1 yesterday, and every day since 08-30). NOT
+ACTIONED, day six.** Test was: *"tomorrow's snapshot carries `gsc.tracked` and
+`gsc.pages`, and `scoreboard.works` drops from 7 to 1."* Today: `gsc` keys are
+`date, ok, connected, rows, matched, clicks, impressions, avg_position` —
+**neither block present**. `scoreboard.works` is **still 7**
+(`T018, T001, T002, T010, T017, T019, T020`), `does_not_work` **still empty**.
+Resolved negative on both halves.
+
+**2 — Retire the York Springs page and prune the keyword rows (rec 2). NOT
+ACTIONED, day one.** Test was *"`tracked_queries` returns to ~196"*. Today:
+**205**, up three. `guides/5-inch-gutter-service-york-springs-pa.html` is still
+in `pages.guides`, and five York Springs queries remain in `uncovered`
+(`gutter cleaning services…`, `gutter guard installation…`, `gutter guards…`,
+`gutter installation services…`, `gutter replacement…`). Resolved negative.
+
+**One reprieve, and I want to be honest that it was luck rather than a fix.**
+Yesterday I predicted a *second* out-of-area page this morning. It did not
+happen: `money_pages` returned *"no query needs its own page — the remaining
+gaps all belong on pages that exist"*. **Prediction resolved negative — I was
+wrong.** But the intake guard is still not on the droplet, the five queries are
+still queued, and `money_pages` noop'd on its own threshold, not on the geo
+rule. The risk is unchanged; it just did not fire today.
+
+**3 — Excise the Schuylkill County section from
+`services/seamless-gutter-installation.html` (rec 3). NOT ACTIONED, day one;
+the section is live day twenty-two.** Still lines **227–236**, still seven
+`Schuylkill` occurrences, still including the `<h3>` *"Do you actually service
+Schuylkill County, or just the York area?"* answered *"We service both."*
+Resolved negative.
+
+**4 — Repair the live half-round page. NOT ACTIONED, day nineteen — and it got
+materially worse this morning.** Today: **1,617 lines, 1,021 single-letter
+`<p>` elements**, up 16 lines.
+
+This is the finding I would most want Eric to read. `strengthen_pages` spent
+this morning's billable API call adding a genuinely good section to that page —
+*"Looking for Half-Round Copper Gutters Near You?"*, correct York County town
+list, a real cost-factor list, an FAQ. It is the best content the engine has
+produced this week. **It was appended at line 1,495 of a 1,617-line file —
+92.5% depth — behind 1,262 lines (78.0% of the page) of one-letter paragraphs.**
+
+Against today's own research that is close to worthless: *44.2% of AI citations
+come from the first 30% of page content*, and a human scrolling reaches a
+thousand single letters before reaching any of it.
+
+**The engine has now spent three of its last four content calls on this one
+broken page** — 09-02 `improve_ctr` rewrote its title, 09-04 `strengthen_pages`
+added the section, and the 08-16 `strengthen_pages` call is what broke it
+(journal line 8381: *"added 'Scheduling a Half-Round Gutter Installation
+Anywhere in York' to /services/half-round-gutters.html"* — that heading is line
+204 of the live page, immediately above the first `<p>H</p>`). The page has gone
+from a cosmetic embarrassment to a **sink that absorbs the engine's daily
+output**. Nineteen days.
+
+**5 — Root cause of the letter bug: found, fixed in git, undeployed.** I checked
+whether anyone had found the cause rather than the symptom. Someone had:
+`_strlist` at `techniques.py:165-190` normalises a bare string to a one-item
+list, and its docstring names this exact page and this exact date. It is called
+at both `_render_sections` (`techniques.py:200`) and the `_off_area_prose`
+feed (`techniques.py:1542`) — the second one matters because
+`" ".join(list("Pottsville"))` is `"P o t t s v i l l e"`, so a string input
+silently disables the geo guard too. **So the recurrence fix already exists and
+is on the wrong machine.** That today's `strengthen_pages` produced correct
+paragraphs is the model returning a list, not the droplet being safe.
+
+**6 — The ledger's verdicts. NOT ACTIONED, day six.** The `earned()` fix has
+been in this repo since 08-29 (`51cf063`). `scoreboard.works` still reads 7,
+`does_not_work` still empty on day thirty-nine.
+
+**7 — `?utm_source=gbp` on the Business Profile URL. NOT ACTIONED, day 32.**
+`local_visitors` 0 again. Carried, not dropped.
+
+**8 — PA HIC registration number on the site. NOT ACTIONED, day twenty** (first
+raised 2026-08-15). Re-verified today across **all 43 pages**: grep for
+`PA[0-9]{6}|HIC ?#?[0-9]+|home improvement contractor|fully insured|licensed and
+insured` returns **nothing**. One guide page contains the word "insured" in
+passing. See rec 4 — today's research gives it a second, commercial reason.
+
+**9 — Eric's list — reviews, Business Profile. UNACTIONED, day thirty-nine.**
+
+**10 — Coverage work by `strengthen_pages`. TOO EARLY TO TELL.** Coverage 32.3%
+(08-20) → 42.9%, `top3` **2 → 2**. Dated test unchanged: **2026-09-20**.
+
+**11 — Carried engine items, all NOT ACTIONED, all re-verified:** `gsc_clicks`
+unit fix (`gsc.py:283`); `strengthen_pages` demand ordering
+(`techniques.py:1024-1028`); output sanity check (`grep -nE
+"median|paragraph_count|sanity|_validate" growth/techniques.py` still returns
+nothing); `internal_links` to guides (*"refreshed nearby-links on 0 page(s)"* —
+**ten consecutive days**); `MIN_RECENT_MEDIAN` unanswered.
+
+Eleven items. **Zero actioned.** Yesterday one of nine was actioned; today none.
+
+### What I researched today
+
+- **Whitespark's 2026 Local Search Ranking Factors puts GBP signals at 32% of
+  local-pack weight — the largest single category — ahead of on-page (19%),
+  reviews (16%) and links (15%).** Within GBP, the **primary category is the
+  single strongest individual factor in the whole model**, ahead of proximity
+  and business-title keywords. One documented case: an HVAC business fell from
+  **position 1 to position 31** in the local pack after switching its primary
+  category from "Air Conditioning Repair Service" to the broader "Air
+  Conditioning Contractor."
+  This reframes thirty-nine days of work arithmetically. **GBP (32%) + reviews
+  (16%) = 48% of local-pack weight, and both are entirely Eric's, free, and
+  untouched.** On-page is 19%, and it is where 100% of the engine's daily
+  billable effort goes. That is not an argument for stopping the on-page work —
+  it is the largest thing the engine *can* do alone. It is an argument that the
+  engine cannot reach the goal by itself, which is now a quantified claim rather
+  than my opinion.
+  https://whitespark.ca/local-search-ranking-factors/ ·
+  https://w3marketinghub.com/seo/local-seo-ranking/ ·
+  https://biziq.com/blog/local-seo-statistics/ ·
+  https://savogroup.com/blog/google-business-profile-home-services/
+- **The same report weights AI search visibility separately, and the ordering
+  inverts.** For AI answer engines: on-page rises to **24%**, GBP collapses to
+  **12%**, reviews 16%, citations **13%** and links **13%**. So the engine's
+  on-page work is the *top* factor for the one channel reading zero
+  (`ai_visitors` 0/41 days), while it is only fourth for the map pack. This is
+  the strongest case yet for the engine's core activity — and it also says the
+  half-round page matters more than its traffic suggests, because on-page is
+  where AI citation is won and that page is 78% garbage.
+  https://www.advicelocal.com/blog/2026-local-search-ranking-factors-maps-organic-ai/ ·
+  https://reputation.com/resources/articles/whitespark-2026-three-insights-every-brand-should-know
+- **Contractor site conversion benchmarks, used for correction 2 above.** Most
+  contractor sites convert **2–4%** of visitors into calls; the top 6% convert
+  8–12% on identical traffic. Also: **trust badges placed near contact buttons
+  lift conversion ~12.6%**, and embedded real reviews with names and dates at
+  the point of decision are named as the deciding trust signal. The site has
+  **zero** of either — `grep -ci review index.html` returns 0, and the
+  licensed/insured/HIC grep returns nothing sitewide.
+  https://www.garretthandley.com/contractor-website-conversion-rate-in-2026-why-most-sites-convert-under-3-and-what-to-fix ·
+  https://gohighpointdigital.com/guide/what-every-contractor-website-needs-to-convert-visitors-into-calls/
+- **PA HICPA — the registration lookup went online 2026-04-24.** The advertising
+  requirement itself is not new to this journal (raised 08-15): contractors doing
+  ≥$5,000/year must register and the number must appear on all advertisements
+  distributed in Pennsylvania. What is new and useful is that
+  **hicsearch.attorneygeneral.gov** is now a live public database, so Eric can
+  confirm his own number in under a minute instead of hunting for paperwork.
+  That removes the only friction this item ever had.
+  https://www.attorneygeneral.gov/businesses-and-organizations/home-improvement-contractor-registration/ ·
+  https://hicsearch.attorneygeneral.gov/ ·
+  https://www.cgalaw.com/pa-home-improvement-consumer-protection-act/
+- **Rejected — T079, the 60-second callback button, as a *priority*.** Not as an
+  idea. See correction 2: the conversion rate is already at benchmark and the
+  visitor count is 2.2/day. Its own stated premise ("~6 site visits a day produce
+  zero contacts") is wrong on both numbers. Worth building later, on traffic
+  worth converting. *Checked:* T079 is `candidate`, `activated: null`.
+- **Rejected — snippet/CTR rewriting to convert the impression pile.** Fifth
+  consecutive day. Every geo-tagged row in `discovered_untracked` is out of area
+  (Perkasie, Akron, Myerstown, Wilkes-Barre, Lititz, Essington, Mercersburg,
+  Plymouth Meeting, Willow Grove, Crum Lynne, Lancaster, and *York **SC***), 40
+  rows, **0 clicks**. The head terms in that list — `gutter installer` at
+  position 1.0 with 138 impressions and 0 clicks, `gutter contractor` at 1.0 with
+  49 and 0 — are consistent with the 08-14 rank-tracker diagnosis (`aee6629`)
+  and with nothing else: a genuine position-1 blue link does not take 138
+  impressions without a click.
+- **Rejected, unchanged:** review incentives or gating; bought links or leads;
+  doorway pages; paid channels (not mine to spend); call tracking / DNI (at 2.2
+  visitors a day it attributes nothing and risks NAP consistency); AI-generated
+  job photography.
+
+### Recommendations
+
+**Nothing in this commit is live.** The site and engine run from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout; `publish_state.sh`
+copies droplet → repo only. `areas/`, `guides/`, `services/`, `index.html` and
+`sitemap.xml` in this repo are a **read-only mirror**. Every item below needs a
+human on the droplet or on a Google/PA-AG web form. Today's developer email went
+out this morning.
+
+Items 1–3 are Divine's and are ranked on damage-per-day. Items 4–7 are Eric's
+and are the ones that reach 48% of the ranking weight the engine cannot touch.
+**Labor Day is Monday 2026-09-07 — three days — and leaf-fall is the start of
+this trade's season, not the middle. A page or a review first landing in October
+counts in December.**
+
+1. **Divine — deploy `growth/`. Day six. One minute.**
+   ```
+   git -C /root/nemo-repo fetch origin main && git -C /root/nemo-repo reset --hard origin/main
+   bash /root/nemo-repo/deploy/deploy_growth.sh              # report only, writes nothing
+   bash /root/nemo-repo/deploy/deploy_growth.sh --apply
+   ```
+   This one command lands: the `_strlist` fix (stops the letter bug recurring
+   *and* un-blinds the geo guard), the intake guard, the output geo guard (22
+   days old), the `earned()` fix, and the `log_visitors`/`log_pageviews`
+   diagnostic that would tell us whether a zero-visitor day is real.
+   *How you would know:* tomorrow's snapshot carries `gsc.tracked` and
+   `gsc.pages`, `traffic` gains `log_visitors`, and `scoreboard.works` drops
+   from 7 to 1.
+   *Checked today:* both `gsc` keys absent; `log_visitors` absent from
+   `traffic`; `scoreboard.works` = 7, `does_not_work` = [].
+2. **Divine — run the half-round repair. Day nineteen. Two minutes.**
+   ```
+   python3 /root/nemo-repo/deploy/repair_letter_paragraphs.py --root /var/www/nemo-seamless-gutter
+   python3 /root/nemo-repo/deploy/repair_letter_paragraphs.py --root /var/www/nemo-seamless-gutter --apply
+   ```
+   **Promoted from 7th to 2nd today.** Not because it got older, but because the
+   engine is now feeding it: this morning's billable call put good copy at 92.5%
+   depth behind 1,262 lines of single letters, and three of the last four content
+   calls went to this page. Every further morning without this both wastes the
+   call and buries the output. Note the ordering: item 1 stops the bug
+   *recurring*, item 2 removes the damage already on disk. Neither substitutes
+   for the other.
+   *How you would know:* the file drops to ~350 lines and
+   `grep -c '<p>[A-Za-z]</p>'` returns 0.
+   *Checked:* 1,617 lines / 1,021 single-letter `<p>` in today's mirror.
+3. **Divine — retire the York Springs page and prune the keyword rows; then
+   Eric reads and deletes lines 227–236 of the installation page.** Day two and
+   day twenty-two respectively. Both unchanged from yesterday's items 2 and 3,
+   including the precondition that **the Schuylkill and York Springs service
+   claims are Eric's call, not mine** — if he does drive up there, keep them and
+   make the Business Profile agree. What cannot stand is the site making dated
+   operational promises no human made.
+   ```
+   python3 /root/nemo-repo/deploy/retire_out_of_area.py --root /var/www/nemo-seamless-gutter          # report only
+   python3 /root/nemo-repo/deploy/retire_out_of_area.py --root /var/www/nemo-seamless-gutter --apply
+   ```
+   *Checked:* York Springs page still in `pages.guides`; Schuylkill still 7
+   occurrences at lines 227–236.
+4. **Eric — check the Business Profile *primary category* first, before anything
+   else on the profile. Two minutes. Free.** *(New ranking today; T016 exists as
+   a candidate but has always been item (a) of a twenty-minute list.)* Today's
+   research makes this the single highest-weighted individual field in local
+   search, with a documented 1 → 31 fall from getting it wrong. It should be the
+   most specific category that describes the work — for this business "Gutter
+   Cleaning Service" / "Rain Gutter Supplier" style specifics rather than a broad
+   "Contractor" — with 2–4 secondaries and no more.
+   *How you would know:* it is not directly measurable in the snapshot; the
+   proxy is any town bucket moving off `top3: 0`, which nothing has done in 39
+   days. Worth doing regardless — it is two minutes for the largest single lever
+   in the model.
+   *Checked:* T016 `gbp_category_and_qna_audit` is `candidate`,
+   `activated: null`. `grep -ni "category" growth/techniques.py` — nothing that
+   touches the profile. **Cannot be automated; the engine has no GBP write path.**
+5. **Eric — ask every completed customer for a Google review, and reply to every
+   review you have. Minutes per job. Free. Day thirty-nine.** Unchanged, and
+   today's weighting puts reviews at 16% of local pack and 16% of AI visibility —
+   second only to GBP itself, and ahead of every line of code in this repo. No
+   incentive, no gating, no filtering by expected rating. Volume, **recency**, and
+   your response rate are the three dimensions that count.
+   *Checked:* `grep -ni review growth/templates.py growth/techniques.py` returns
+   only prompt text forbidding the model from inventing reviews. **Cannot be
+   automated.**
+6. **Eric — put the PA HIC registration number on the site, and "licensed and
+   insured" next to the phone buttons. Day twenty.** Two independent reasons now.
+   *Legal:* HICPA requires the number on all advertising distributed in
+   Pennsylvania, and the website is advertising. *Commercial:* trust badges beside
+   contact buttons are measured at ~12.6% conversion lift, and this site has
+   none. Look the number up at **hicsearch.attorneygeneral.gov** — the database
+   went live 2026-04-24, so this is now a one-minute task.
+   *How you would know:* `grep -rl "HIC" --include=*.html .` returns files.
+   *Checked today:* zero matches for
+   `PA[0-9]{6}|HIC ?#?[0-9]+|home improvement contractor|fully insured|licensed
+   and insured` across all 43 pages.
+   *Engine-actionable once Eric supplies the number* — it belongs in
+   `templates.py` so every generated page inherits it. I have not written that
+   change; see below.
+7. **Eric — set the profile website URL to
+   `https://nemoseamlessgutter.com/?utm_source=gbp`. Two minutes. Free. Day 32.**
+   The instrument for items 4–6. Without it nothing can measure whether profile
+   work paid off.
+   *Checked:* `classify()` at `metrics.py:352` maps `utm_source=gbp` → `local`;
+   `analytics.js:65` sends `location.search`. **No deploy, no credit needed.**
+8. **Divine — Anthropic auto-reload with a monthly cap. After item 1.** A manual
+   top-up has bought 3–5 productive mornings, three times running.
+9. **Engine — carried, unwritten, deliberately:** output sanity check on every
+   generated page; `internal_links` to guides (ten days of zero); `gsc_clicks`
+   units (`gsc.py:283`); `strengthen_pages` demand ordering
+   (`techniques.py:1024-1028`); `MIN_RECENT_MEDIAN`. All still correct, all still
+   behind item 1.
+10. **T079 / T080 / T081 (this morning's scout) — leave as candidates.** T079 is
+    aimed at a conversion rate that is already at benchmark (correction 2). T081
+    (manufacturer and supplier installer locators) is the interesting one — it is
+    a citation play, and citations are 13% of AI visibility where this site scores
+    zero — but it belongs behind items 4–6, which are larger and free.
+
+### What I changed in this repo today
+
+**Nothing.** This is deliberate and I want it on the record rather than looking
+like an idle day.
+
+There are now fourteen-plus undeployed changes under `growth/`, and the fix for
+today's worst finding — `_strlist`, the letter-bug root cause — has been sitting
+in git for weeks doing nothing. Adding a fifteenth would not help anyone; it
+would make item 1's diff larger and its report harder to read. The two
+standalone droplet scripts that the last two agents wrote
+(`repair_letter_paragraphs.py`, `retire_out_of_area.py`) already cover every
+remediation I would want to automate, and both are unrun. **The binding
+constraint on this project is not analysis or code. It is that eleven of eleven
+dated recommendations went unactioned today.** Writing a twelfth file would be
+me solving the problem I am able to solve instead of the one that exists.
+
+The one change I would write is the HIC number into `templates.py` so every
+generated page inherits it — and I cannot, because I do not have the number and
+must not invent it. It is unblocked the moment Eric supplies it (item 6).
+
+**Corrections to my standing instructions.** *New today:* (a) **Never compare a
+traffic window that straddles 2026-08-14** — `PV_START` changed what `visitors`
+means, and the last several entries, mine included, read a methodology change as
+a decline. Beacon-era comparisons only. (b) **The site converts at ~2.27%, which
+is normal** — stop treating zero leads as a conversion failure; it is a volume
+failure. (c) `share_pct` has a growing denominator and only 35/205 tracked
+queries carry any position, so quote `top3/ranked` (5.7%) alongside it. (d)
+`call_taps: 0` is a **verified real zero**, not a blind instrument — unlike
+`local_visitors`. *Carried, unchanged:* the standing prompt's 08-01 usage cap is
+long gone; the recurring failure mode is `credit balance is too low`. The
+prompt's 07-28 GSC baseline (429 impressions, avg position 12.4, 2 of 50) is
+five weeks stale — today it is 7,755 impressions and 2 of 109. The prompt's
+`discovered_untracked` framing ("propose the good ones") is refuted a fifth
+time: 40 rows, 0 clicks, every geo-tagged one out of area. Never quote
+`avg_position` or site CTR as health — though `top3` itself is clean. The engine
+publishes ~5 hours before this review, not one. Read the engine's output, not
+only its source.
+
+### Reasoning and uncertainties
+
+Day thirty-nine. Goal metric 2/205, unchanged. Eleven dated recommendations,
+**zero actioned**. Two of the last three days were the best traffic days of the
+beacon era, and I cannot yet tell you whether that means anything.
+
+**What I would defend hardest.** The two corrections. The straddled-window one
+is arithmetic and checkable in thirty seconds: `PV_START = "2026-08-14"`, so
+08-07 → 08-20 is half one instrument and half another. I am more troubled that
+this journal established the fact on 08-15 and then read across the boundary
+anyway for three weeks — including me, yesterday. A journal that records a
+caveat and then does not apply it is worse than one that never found it, because
+it looks rigorous.
+
+**What I am least sure of.** Whether 16 → 28 is anything. p ≈ 0.10 on 44 total
+events is exactly the sort of number that looks like a recovery to someone who
+wants one. Both medians are still 2.0. I have deliberately let it change nothing
+in the ranking. **2026-09-10** remains the date.
+
+**Where I might be wrong in a way that matters.** I have ranked the primary
+category (item 4) above reviews (item 5) on the strength of one report's
+weighting and one case study. If Eric's category is already correct — which is
+entirely possible, nobody has looked — item 4 costs two minutes and returns
+nothing, and reviews were the better use of the afternoon. I still rank it first
+because it is two minutes and reviews are a habit rather than a task, so they are
+not really competing for the same time.
+
+**What I keep coming back to.** The engine is working correctly this week and it
+does not matter, because its output goes onto a machine running twenty-two-day-old
+code and, this morning, into the dead zone of a page that has been broken for
+nineteen days. Meanwhile 48% of the ranking weight sits in a Google form nobody
+has opened. Thirty-nine days of good analysis has produced one actioned
+recommendation in the last two days. **If nothing changes, the honest forecast is
+that this journal will say the same thing on day fifty.**
+
+**What would change my mind, dated.**
+1. **Tomorrow's snapshot.** `gsc.tracked` present, or `traffic.log_visitors`
+   present, or `scoreboard.works` at 1 — any one says item 1 landed.
+2. **Tomorrow's snapshot.** `pages.guides` gaining a second out-of-area page
+   says the intake guard is still absent and the reprieve was luck.
+3. **Tomorrow's publish.** `services/half-round-gutters.html` at ~350 lines says
+   item 2 landed; ~1,617 says day twenty. Watch also whether `strengthen_pages`
+   targets it a third time.
+4. **Any non-zero `local_visitors` day.** Item 7. Thirty-two days.
+5. **2026-09-07 — Labor Day, three days.** Items 4–7 are free, need no deploy,
+   no credit and nobody's code, and they decide this autumn.
+6. **2026-09-10.** Whether the beacon-era uptick (16 → 28) survives another ten
+   days, or was two Tuesdays.
+7. **2026-09-20 — the coverage-versus-rank test.** Coverage 32.3% → 42.9% since
+   08-20 with `top3` flat at 2. If coverage keeps climbing and `top3` is still 2,
+   page-strengthening is not converting into rank and the engine's one remaining
+   daily activity needs rethinking.
