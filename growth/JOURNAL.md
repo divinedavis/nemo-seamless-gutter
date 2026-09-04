@@ -16431,3 +16431,26 @@ fixes distance. **2026-09-20** is when this stops being an open question.
 8. **2026-09-20 — the coverage-versus-rank test.** If coverage keeps climbing
    and `top3` is still 2, page-strengthening is not converting into rank and the
    engine's one remaining daily activity needs rethinking.
+
+## 2026-09-04 — engine run
+
+Goal: **1.0%** top-3 share of 205 tracked queries (target 50%).
+2026-09-03: 6 visitors (4 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — ok: added "Looking for Half-Round Copper Gutters Near You? We Install T" to /services/half-round-gutters.html for 'half round copper gutters near me'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: no query needs its own page — the remaining gaps all belong on pages that exist, which strengthen_pages handles
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 43 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 1 URL(s), HTTP 200
+
+**Scout proposed (as candidates, not running):**
+- T079 "We call you back in 60 seconds" button — 300 GBP views and ~6 site visits a day produce zero contacts because every action asks a nervous stranger to dial a contractor they've never met and start a sales conversation. Flipping the direction 
+- T080 Weekly job-site clip on YouTube, town-named — The ledger already plans to shoot 30-second phone video for the profile and town pages — this is the same footage, published to a second surface that has its own search demand and is one of the two mo
+- T081 Get listed on manufacturer & supplier installer locators — The coil, guard and half-round products Eric already buys come from brands that run free 'find an installer near you' locators, and so do the local supply houses he buys from. Those locators are high-

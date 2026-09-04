@@ -1,6 +1,6 @@
 {
-  "generated": "2026-09-03T06:09:43+00:00",
-  "date": "2026-09-03",
+  "generated": "2026-09-04T06:09:14+00:00",
+  "date": "2026-09-04",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
@@ -8,11 +8,11 @@
     "share_pct": 1.0,
     "measured": true,
     "why_unmeasured": null,
-    "coverage_pct": 43.1,
-    "tracked_queries": 202,
+    "coverage_pct": 42.9,
+    "tracked_queries": 205,
     "top3": 2,
-    "top10": 13,
-    "ranked_known": 34
+    "top10": 12,
+    "ranked_known": 35
   },
   "traffic": {
     "visitors": [
@@ -175,6 +175,10 @@
       {
         "date": "2026-09-02",
         "value": 7
+      },
+      {
+        "date": "2026-09-03",
+        "value": 6
       }
     ],
     "pageviews": [
@@ -336,6 +340,10 @@
       },
       {
         "date": "2026-09-02",
+        "value": 8
+      },
+      {
+        "date": "2026-09-03",
         "value": 8
       }
     ],
@@ -499,6 +507,10 @@
       {
         "date": "2026-09-02",
         "value": 2
+      },
+      {
+        "date": "2026-09-03",
+        "value": 4
       }
     ],
     "local_visitors": [
@@ -660,6 +672,10 @@
       },
       {
         "date": "2026-09-02",
+        "value": 0
+      },
+      {
+        "date": "2026-09-03",
         "value": 0
       }
     ],
@@ -823,6 +839,10 @@
       {
         "date": "2026-09-02",
         "value": 0
+      },
+      {
+        "date": "2026-09-03",
+        "value": 0
       }
     ],
     "direct_visitors": [
@@ -985,6 +1005,10 @@
       {
         "date": "2026-09-02",
         "value": 5
+      },
+      {
+        "date": "2026-09-03",
+        "value": 2
       }
     ],
     "referral_visitors": [
@@ -1146,6 +1170,10 @@
       },
       {
         "date": "2026-09-02",
+        "value": 0
+      },
+      {
+        "date": "2026-09-03",
         "value": 0
       }
     ],
@@ -1309,6 +1337,10 @@
       {
         "date": "2026-09-02",
         "value": 0
+      },
+      {
+        "date": "2026-09-03",
+        "value": 0
       }
     ],
     "bot_hits": [
@@ -1471,6 +1503,10 @@
       {
         "date": "2026-09-02",
         "value": 3859
+      },
+      {
+        "date": "2026-09-03",
+        "value": 3004
       }
     ],
     "call_taps": [
@@ -1621,6 +1657,10 @@
       {
         "date": "2026-09-02",
         "value": 0
+      },
+      {
+        "date": "2026-09-03",
+        "value": 0
       }
     ],
     "ai_calls": [
@@ -1766,6 +1806,10 @@
       },
       {
         "date": "2026-09-02",
+        "value": 0
+      },
+      {
+        "date": "2026-09-03",
         "value": 0
       }
     ],
@@ -1929,6 +1973,10 @@
       {
         "date": "2026-09-02",
         "value": 1
+      },
+      {
+        "date": "2026-09-03",
+        "value": 0
       }
     ],
     "phone_leads": [
@@ -2090,6 +2138,10 @@
       },
       {
         "date": "2026-09-02",
+        "value": 0
+      },
+      {
+        "date": "2026-09-03",
         "value": 0
       }
     ],
@@ -2253,6 +2305,10 @@
       {
         "date": "2026-09-02",
         "value": 1
+      },
+      {
+        "date": "2026-09-03",
+        "value": 0
       }
     ]
   },
@@ -2294,18 +2350,18 @@
         "top3": 0
       },
       "york": {
-        "total": 33,
-        "covered": 13,
+        "total": 36,
+        "covered": 14,
         "top3": 0
       }
     },
     "by_intent": {
       "hire": {
-        "total": 125,
-        "covered": 70
+        "total": 126,
+        "covered": 71
       },
       "price": {
-        "total": 47,
+        "total": 49,
         "covered": 8
       },
       "diy": {
@@ -2360,11 +2416,11 @@
       "gutter replacement york springs pa",
       "gutters overflowing during rain who to call",
       "half round copper gutter installers york pa",
-      "half round copper gutters near me",
       "half round gutters hanover pa",
       "half round gutters historic home pa",
       "ice dam damage gutter replacement york county pa",
       "ice dam damaged gutters repair pa",
+      "rotted fascia board replacement york pa",
       "seamless gutter installation hanover pa",
       "seamless gutter installation york pa",
       "seamless gutter installer dallastown pa",
@@ -2392,6 +2448,7 @@
       "gutter companies dover pa reviews",
       "gutter companies york pa reviews",
       "gutter guard cost per foot pa",
+      "gutter guard cost york pa",
       "gutter guard installation cost",
       "gutter guard installation cost per foot",
       "gutter guard installation cost york pa",
@@ -2408,6 +2465,7 @@
       "gutters overflowing in heavy rain",
       "gutters overflowing in heavy rain what to do",
       "half round gutter cost per foot",
+      "half round gutter cost york pa",
       "half round gutters cost per foot",
       "half round gutters historic home pennsylvania",
       "how much do new gutters cost in pa",
@@ -2443,8 +2501,8 @@
       },
       {
         "query": "gutters",
-        "position": 4.5,
-        "impressions": 111,
+        "position": 4.7,
+        "impressions": 112,
         "clicks": 0
       },
       {
@@ -2467,14 +2525,20 @@
       },
       {
         "query": "gutter guards in akron pa",
-        "position": 23.1,
+        "position": 22.8,
+        "impressions": 49,
+        "clicks": 0
+      },
+      {
+        "query": "gutter installation",
+        "position": 3.3,
         "impressions": 48,
         "clicks": 0
       },
       {
         "query": "seamless gutter installation in myerstown pa",
-        "position": 41.0,
-        "impressions": 44,
+        "position": 40.7,
+        "impressions": 45,
         "clicks": 0
       },
       {
@@ -2485,20 +2549,26 @@
       },
       {
         "query": "gutter installation wilkes barre, pa",
-        "position": 59.1,
-        "impressions": 36,
+        "position": 58.5,
+        "impressions": 37,
         "clicks": 0
       },
       {
         "query": "seamless gutter installation in akron pa",
         "position": 36.4,
-        "impressions": 35,
+        "impressions": 36,
         "clicks": 0
       },
       {
         "query": "gutter guards in new holland pa",
-        "position": 33.9,
-        "impressions": 34,
+        "position": 33.8,
+        "impressions": 35,
+        "clicks": 0
+      },
+      {
+        "query": "gutter cleaning",
+        "position": 5.2,
+        "impressions": 33,
         "clicks": 0
       },
       {
@@ -2509,14 +2579,14 @@
       },
       {
         "query": "gutter guards in myerstown pa",
-        "position": 70,
+        "position": 70.6,
         "impressions": 29,
         "clicks": 0
       },
       {
         "query": "gutter guards in lititz pa",
         "position": 27.5,
-        "impressions": 27,
+        "impressions": 28,
         "clicks": 0
       },
       {
@@ -2538,6 +2608,12 @@
         "clicks": 0
       },
       {
+        "query": "gutter guards in stevens pa",
+        "position": 56.5,
+        "impressions": 19,
+        "clicks": 0
+      },
+      {
         "query": "seamless gutter services mercersburg pa",
         "position": 10.8,
         "impressions": 19,
@@ -2556,8 +2632,8 @@
         "clicks": 0
       },
       {
-        "query": "gutter guards in stevens pa",
-        "position": 56.7,
+        "query": "gutter guards in newmanstown pa",
+        "position": 45.7,
         "impressions": 18,
         "clicks": 0
       },
@@ -2574,8 +2650,8 @@
         "clicks": 0
       },
       {
-        "query": "gutter guards in newmanstown pa",
-        "position": 45.8,
+        "query": "gutter guards in leola pa",
+        "position": 31.3,
         "impressions": 17,
         "clicks": 0
       },
@@ -2592,14 +2668,14 @@
         "clicks": 0
       },
       {
-        "query": "gutter guards in leola pa",
-        "position": 31.2,
+        "query": "gutter guards in lancaster pa",
+        "position": 42.2,
         "impressions": 16,
         "clicks": 0
       },
       {
         "query": "lemoyne seamless spouting system installers",
-        "position": 23.7,
+        "position": 23.6,
         "impressions": 16,
         "clicks": 0
       },
@@ -2616,18 +2692,6 @@
         "clicks": 0
       },
       {
-        "query": "gutter cleaning",
-        "position": 9,
-        "impressions": 15,
-        "clicks": 0
-      },
-      {
-        "query": "gutter guards in lancaster pa",
-        "position": 42.4,
-        "impressions": 15,
-        "clicks": 0
-      },
-      {
         "query": "seamless gutter installation south mountain pa",
         "position": 17.5,
         "impressions": 15,
@@ -2641,7 +2705,7 @@
       },
       {
         "query": "seamless gutters perkasie pa",
-        "position": 18.9,
+        "position": 18.6,
         "impressions": 15,
         "clicks": 0
       },
@@ -2668,24 +2732,18 @@
         "position": 14.4,
         "impressions": 14,
         "clicks": 0
-      },
-      {
-        "query": "seamless gutter services kutztown pa",
-        "position": 16.8,
-        "impressions": 14,
-        "clicks": 0
       }
     ]
   },
   "gsc": {
-    "date": "2026-09-03",
+    "date": "2026-09-04",
     "ok": true,
     "connected": true,
-    "rows": 948,
-    "matched": 33,
+    "rows": 952,
+    "matched": 34,
     "clicks": 18,
-    "impressions": 7689,
-    "avg_position": 25.5
+    "impressions": 7755,
+    "avg_position": 25.2
   },
   "techniques": [
     {
@@ -2706,14 +2764,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-03",
+        "decided": "2026-09-04",
         "works": true,
-        "why": "7 owned visitors in 38d (median 0.0/day and flat)",
+        "why": "7 owned visitors in 39d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 7,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 38
+          "days_measured": 39
         }
       },
       "owned_visitors": [
@@ -2868,6 +2926,10 @@
         {
           "date": "2026-09-02",
           "value": 0
+        },
+        {
+          "date": "2026-09-03",
+          "value": 0
         }
       ]
     },
@@ -2889,14 +2951,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-03",
+        "decided": "2026-09-04",
         "works": true,
-        "why": "6 owned visitors in 38d (median 0.0/day and flat)",
+        "why": "6 owned visitors in 39d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 6,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 38
+          "days_measured": 39
         }
       },
       "owned_visitors": [
@@ -3051,6 +3113,10 @@
         {
           "date": "2026-09-02",
           "value": 1
+        },
+        {
+          "date": "2026-09-03",
+          "value": 0
         }
       ]
     },
@@ -3327,14 +3393,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-03",
+        "decided": "2026-09-04",
         "works": true,
         "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 18.0,
           "median_before": null,
-          "days_measured": 38
+          "days_measured": 39
         }
       },
       "owned_visitors": null
@@ -3357,14 +3423,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-03",
+        "decided": "2026-09-04",
         "works": true,
-        "why": "15 owned visitors in 38d (median 0.0/day and flat)",
+        "why": "17 owned visitors in 39d (median 0.0/day and flat)",
         "measured": {
-          "total_owned_visitors": 15,
+          "total_owned_visitors": 17,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 38
+          "days_measured": 39
         }
       },
       "owned_visitors": [
@@ -3519,6 +3585,10 @@
         {
           "date": "2026-09-02",
           "value": 0
+        },
+        {
+          "date": "2026-09-03",
+          "value": 2
         }
       ]
     },
@@ -3538,14 +3608,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-03",
+        "decided": "2026-09-04",
         "works": true,
         "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 18.0,
           "median_before": null,
-          "days_measured": 38
+          "days_measured": 39
         }
       },
       "owned_visitors": null
@@ -3566,14 +3636,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-03",
+        "decided": "2026-09-04",
         "works": true,
         "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 18.0,
           "median_before": null,
-          "days_measured": 38
+          "days_measured": 39
         }
       },
       "owned_visitors": null
@@ -4621,6 +4691,60 @@
       "notes": "first step: Price three real past jobs off York County's public parcel/aerial viewer, time yourself, and write the resulting per-foot bands on an index card taped to the truck dash \u2014 then publish the offer as one sentence: 'Call and get a real price range for your house in five minutes. No visit needed to get the number.'\neffort: hours\ncost: free\nexpected: Offer live on GBP (post + services description), homepage hero, and the AI agent script inside a week. Target: GBP call clicks from ~0 to 8-12/month by mid-October, 1 in 3 ballpark calls booked as an on-site measure, first 5 booked estimates traceable to the offer by 30 November.",
       "verdict": null,
       "owned_visitors": null
+    },
+    {
+      "id": "T079",
+      "slug": "sixty_second_callback_button",
+      "name": "\"We call you back in 60 seconds\" button",
+      "kind": "conversion",
+      "status": "candidate",
+      "hypothesis": "300 GBP views and ~6 site visits a day produce zero contacts because every action asks a nervous stranger to dial a contractor they've never met and start a sales conversation. Flipping the direction \u2014 homeowner types a number, Eric's phone rings within a minute and the homeowner's phone rings too \u2014 removes the courage step entirely and puts NEMO in a live voice conversation while the wet stain on the siding is still bothering them. It is different from the missed-call text-back (which only fires on inbound rings) and from the 5-minute callback on AI-agent leads (which only fires after someone already called): this creates a call from a visitor who was never going to dial. Speed is the whole point in leaf season, when the same homeowner is opening three tabs.",
+      "evidence": "PipelineOn's 2026 contractor benchmark reports the median contractor site converts 2-4% of visitors while the top 6% hit 8-12% on identical traffic, and lists response time as one of the seven deciding factors \u2014 <cite index=\"18-11,18-12,18-13\">it cites CallRail's 2026 home-services research that responding within 60 seconds lifts conversion 391%, while waiting five minutes cuts qualifying odds by 80%</cite> (https://pipelineon.com/blog/contractor-website-conversion-rate/). <cite index=\"11-1\">HighPoint Digital cites 2026 CloudTalk data that phone calls convert 10 to 15 times higher than standard digital leads</cite> (https://gohighpointdigital.com/guide/what-every-contractor-website-needs-to-convert-visitors-into-calls/).",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-09-04",
+      "added": "2026-09-04",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Add a single-field callback widget (name + mobile, 'Eric calls you back in 60 seconds, 7am-7pm') to the sticky mobile bar on the homepage, the three cleaning/repair pages and all 15 town pages, with the request going to Eric's phone as an SMS and to the AI agent as a fallback after 90 seconds.\neffort: days\ncost: under $100/mo\nexpected: 3-6 callback requests a week in Sept-Nov from existing traffic (no new visitors needed); at least 1 booked estimate a week attributable to the widget; site contact rate moving from ~0% toward the 4-8% band.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T080",
+      "slug": "youtube_jobsite_clips",
+      "name": "Weekly job-site clip on YouTube, town-named",
+      "kind": "distribution",
+      "status": "candidate",
+      "hypothesis": "The ledger already plans to shoot 30-second phone video for the profile and town pages \u2014 this is the same footage, published to a second surface that has its own search demand and is one of the two most-cited domains in AI answers. A York homeowner who asks an assistant 'how do I know if my gutters need replacing' or searches 'seamless gutter machine' on YouTube can watch Eric's brake forming a run of 6-inch aluminium on a real Dover street. That is proof a 4.2-star, 13-review stranger cannot buy any other way, and each video's description carries the phone number and a link to the matching town page. Zero marginal filming cost once the ledger's video item runs.",
+      "evidence": "Averi.ai citation research reported via Search Engine Journal and summarised by Elev8: <cite index=\"26-2,26-3\">community and video platforms dominate AI answer citations, with Reddit around 21% and YouTube around 18.8% of AI Overview citations</cite> (https://www.elev8operations.com/guides/ai-search-statistics-for-local-businesses-2026); a separate 2026 analysis puts <cite index=\"51-3\">YouTube's average citation share across AI platforms at 20%</cite> (https://micro.sketchweb.net/2026/01/11/youtube-seo-in-get-cited.html). On shelf life: <cite index=\"49-1\">a YouTube video posted today can still bring in leads two years later if it ranks for a relevant search</cite> (https://www.stellabots.com/blog/the-video-marketing-strategy-that-works-for-local-contractors-4bc3d).",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-09-04",
+      "added": "2026-09-04",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Create the YouTube channel under the exact business name, NAP and phone in the About and every description, and upload one clip already on Eric's phone titled by job and town \u2014 e.g. '6-Inch Seamless Gutter Formed On Site in Dover, PA' \u2014 linking to seamless-gutters-dover-pa.\neffort: hours\ncost: free\nexpected: One 60-90 second video a week, 12 by end of November; 500+ total views by January with the majority from York/Hanover/Dover viewers; NEMO named in at least one AI assistant answer for a York County gutter question by the February AI audit; 1-2 calls a quarter that mention 'I saw your video'.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T081",
+      "slug": "manufacturer_installer_locators",
+      "name": "Get listed on manufacturer & supplier installer locators",
+      "kind": "distribution",
+      "status": "candidate",
+      "hypothesis": "The coil, guard and half-round products Eric already buys come from brands that run free 'find an installer near you' locators, and so do the local supply houses he buys from. Those locators are high-authority pages that rank for brand-plus-location searches and are exactly the third-party surface an AI assistant checks when a homeowner asks who installs a given guard in York PA. Two payoffs: a real editorial-quality link and mention (prominence, which is NEMO's actual gap at 1% top-3), and warm inbound calls from the homeowner who just sat through a national in-home gutter-guard pitch and is now looking for the same product installed locally. It is free, honest \u2014 Eric genuinely is a purchaser/installer \u2014 and takes phone calls to reps, not a budget. This is not the ledger's chamber/historic-group link item: those are civic links, these are lead-producing product locators.",
+      "evidence": "On why third-party surfaces decide AI recommendations: <cite index=\"25-2,25-3,25-4\">consistent name/address/phone across every directory and citation source builds the trust an assistant needs before it will state something as fact, and inconsistent NAP, missing schema and a stale profile are the three most common reasons a good local business gets skipped in favour of a mediocre competitor with cleaner data</cite> (https://donovandigitalsolutions.com/blog/how-ai-assistants-pick-local-businesses/). <cite index=\"24-1\">Local AEO sources include your site, your Google Business Profile, third-party review platforms and structured data</cite> (https://www.rocketdriver.com/local-aeo-local-businesses-ai-search-2026/). And on prominence generally, Google still ties it to links and mentions: <cite index=\"4-10\">local results are mainly shaped by relevance, distance and prominence, with prominence tied to signals like links and reviews</cite> (https://emarketed.com/seo/local-seo-2026-service-business-rankings/).",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-09-04",
+      "added": "2026-09-04",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Call the York-area branch rep for the gutter-guard line Eric installs most and ask to be added to the brand's installer locator for the York County ZIPs, giving the exact business name, phone and nemoseamlessgutter.com URL used on the Google profile.\neffort: hours\ncost: free\nexpected: 3-5 locator listings live within 30 days (guard brand, coil/accessory brand, 1-2 supply-house contractor finders); 3-5 new authority mentions with exact-match NAP; first brand-locator phone call inside 90 days.",
+      "verdict": null,
+      "owned_visitors": null
     }
   ],
   "scoreboard": {
@@ -4705,20 +4829,25 @@
       "T075",
       "T076",
       "T077",
-      "T078"
+      "T078",
+      "T079",
+      "T080",
+      "T081"
     ]
   },
   "last_build": {
-    "date": "2026-09-03",
+    "date": "2026-09-04",
     "log": [
       {
         "ok": true,
-        "detail": "adopted 1 real search(es) into the tracked universe: gutter installation hanover",
+        "noop": true,
+        "detail": "no new in-area searches worth tracking",
         "slug": "adopt_queries"
       },
       {
         "ok": true,
-        "detail": "rewrote title/description on /services/half-round-gutters.html (26 impressions, 0 clicks, pos 12.3) \u2014 Put the searched wording (half-round, seamless, York PA) at the front of the title while keeping the brand for",
+        "noop": true,
+        "detail": "no page is due a snippet rewrite",
         "slug": "improve_ctr"
       },
       {
@@ -4729,7 +4858,7 @@
       },
       {
         "ok": true,
-        "detail": "added \"Hiring Seamless Gutter Installers in Hanover, PA: What to Ex\" to /areas/seamless-gutters-hanover-pa.html for 'seamless gutter installers hanover pa'",
+        "detail": "added \"Looking for Half-Round Copper Gutters Near You? We Install T\" to /services/half-round-gutters.html for 'half round copper gutters near me'",
         "slug": "strengthen_pages"
       },
       {
@@ -4746,7 +4875,8 @@
       },
       {
         "ok": true,
-        "detail": "published '5 inch gutter service york springs pa' \u2192 /guides/5-inch-gutter-service-york-springs-pa.html",
+        "noop": true,
+        "detail": "no query needs its own page \u2014 the remaining gaps all belong on pages that exist, which strengthen_pages handles",
         "slug": "money_pages"
       },
       {
@@ -4769,21 +4899,26 @@
       },
       {
         "ok": true,
-        "detail": "submitted 3 URL(s), HTTP 200",
+        "detail": "submitted 1 URL(s), HTTP 200",
         "slug": "ping_indexnow"
       }
     ],
-    "new": 1,
-    "changed": 2
+    "new": 0,
+    "changed": 1
   },
   "last_scout": {
-    "date": "2026-09-03",
+    "date": "2026-09-04",
     "ok": true,
     "techniques_added": [
-      "monthly_payment_on_every_quote",
-      "call_now_aerial_ballpark"
+      "sixty_second_callback_button",
+      "youtube_jobsite_clips",
+      "manufacturer_installer_locators"
     ],
-    "keywords_added": [],
+    "keywords_added": [
+      "gutter guard cost york pa",
+      "rotted fascia board replacement york pa",
+      "half round gutter cost york pa"
+    ],
     "notes": ""
   },
   "pages": {
