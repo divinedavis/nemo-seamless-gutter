@@ -89,31 +89,14 @@ def _sleep_for(attempt, retry_after=None):
     return base + random.uniform(0, base * 0.25)
 
 
-def call_blocks(system, prompt, max_tokens=4000, tools=None, timeout=240,
-                key=None, retries=None):
-    """One message round-trip. Returns the text blocks as a list.
+def _post(body, key, timeout, attempts):
+    """One request, retried on the transient statuses. Returns the parsed reply.
 
-    With web search on, a reply is a sequence of blocks — the model narrates
-    ("I'll research what's working..."), searches, then answers. Only the last
-    text block carries the answer, so a JSON caller needs them kept apart;
-    call() joins them for everyone else.
-
-    Transient API failures are retried with exponential backoff; the error that
-    finally escapes is the last one seen, so the report still names the cause.
+    Split out of call_blocks so a paused turn (below) can be resumed without
+    duplicating the backoff logic. The error that finally escapes is the last
+    one seen, so the report still names the cause.
     """
-    max_tokens = max(max_tokens, MIN_MAX_TOKENS)
-    key = key or load_key()
-    if not key:
-        raise RuntimeError(
-            "no Anthropic key — expected ANTHROPIC_API_KEY in the environment "
-            "or seo/.env on the droplet")
-    body = {"model": MODEL, "max_tokens": max_tokens, "system": system,
-            "messages": [{"role": "user", "content": prompt}]}
-    if tools:
-        body["tools"] = tools
     data = json.dumps(body).encode()
-    attempts = (RETRIES if retries is None else retries) + 1
-
     last = None
     for attempt in range(attempts):
         req = urllib.request.Request(
@@ -122,9 +105,7 @@ def call_blocks(system, prompt, max_tokens=4000, tools=None, timeout=240,
                      "anthropic-version": "2023-06-01"})
         try:
             with urllib.request.urlopen(req, timeout=timeout) as r:
-                resp = json.loads(r.read().decode())
-            return [b.get("text", "") for b in resp.get("content", [])
-                    if b.get("type") == "text"]
+                return json.loads(r.read().decode())
         except urllib.error.HTTPError as e:
             detail = e.read()[:300].decode(errors="replace")
             last = RuntimeError(f"anthropic {e.code}: {detail}")
@@ -141,6 +122,66 @@ def call_blocks(system, prompt, max_tokens=4000, tools=None, timeout=240,
             break
         time.sleep(wait)
     raise last
+
+
+# A reply that ends `pause_turn` is not finished. With a server-side tool, the
+# API runs its own sampling loop and pauses at 10 iterations; the reply carries
+# whatever was produced so far and the caller is expected to send it back to
+# resume. The scout never did, so on 2026-08-29 and 2026-09-05 it kept only the
+# model's opening narration — "I'll research what's working right now..." — and
+# died in the JSON parser with no brace in sight, which reads like a prompt bug
+# rather than a truncated conversation. Resume instead, with a ceiling so a
+# model that pauses forever cannot bill forever.
+MAX_CONTINUATIONS = int(os.environ.get("NEMO_LLM_CONTINUATIONS", "4"))
+
+# The stop_reason of the last reply, so a parse failure can say whether the
+# reply was finished, cut off at max_tokens, or still paused.
+LAST_STOP_REASON = None
+
+
+def call_blocks(system, prompt, max_tokens=4000, tools=None, timeout=240,
+                key=None, retries=None):
+    """One exchange. Returns the text blocks as a list.
+
+    With web search on, a reply is a sequence of blocks — the model narrates
+    ("I'll research what's working..."), searches, then answers. Only the last
+    text block carries the answer, so a JSON caller needs them kept apart;
+    call() joins them for everyone else.
+
+    A `pause_turn` reply is resumed rather than returned, because the answer is
+    in the part that has not been generated yet. Text from every leg is kept and
+    returned in order, so the resumed answer is the last block either way.
+    """
+    global LAST_STOP_REASON
+    max_tokens = max(max_tokens, MIN_MAX_TOKENS)
+    key = key or load_key()
+    if not key:
+        raise RuntimeError(
+            "no Anthropic key — expected ANTHROPIC_API_KEY in the environment "
+            "or seo/.env on the droplet")
+    messages = [{"role": "user", "content": prompt}]
+    body = {"model": MODEL, "max_tokens": max_tokens, "system": system,
+            "messages": messages}
+    if tools:
+        body["tools"] = tools
+    attempts = (RETRIES if retries is None else retries) + 1
+
+    texts = []
+    LAST_STOP_REASON = None
+    for _ in range(MAX_CONTINUATIONS + 1):
+        resp = _post(body, key, timeout, attempts)
+        content = resp.get("content", [])
+        texts.extend(b.get("text", "") for b in content
+                     if b.get("type") == "text")
+        LAST_STOP_REASON = resp.get("stop_reason")
+        if LAST_STOP_REASON != "pause_turn":
+            return texts
+        # Send the paused turn straight back. No "continue" message: the API
+        # resumes off the trailing server-tool block, and an extra user turn
+        # would restart the model instead of continuing it.
+        messages = messages + [{"role": "assistant", "content": content}]
+        body = dict(body, messages=messages)
+    return texts
 
 
 def call(system, prompt, **kw):
@@ -309,4 +350,11 @@ def call_json(system, prompt, **kw):
             return parsed
     path = _dump_unparsed(blocks)
     where = f" (raw reply saved to {path})" if path else ""
-    raise ValueError(f"no parseable JSON object in reply{where}: {joined[:300]}")
+    # The stop reason separates the three failures that look identical in the
+    # journal: end_turn means the model answered in prose, max_tokens means the
+    # budget ran out mid-answer, pause_turn means it is still mid-research and
+    # MAX_CONTINUATIONS was too low. Without it every one of them reads as
+    # "no parseable JSON object" and costs another paid call to tell apart.
+    why = f" [stop_reason={LAST_STOP_REASON}]" if LAST_STOP_REASON else ""
+    raise ValueError(
+        f"no parseable JSON object in reply{why}{where}: {joined[:300]}")

@@ -151,5 +151,86 @@ class RetryTest(unittest.TestCase):
         self.assertEqual(self.sleeps, [7.0])
 
 
+def _reply(blocks, stop_reason="end_turn"):
+    """A urlopen context manager returning one API reply."""
+    ok = mock.MagicMock()
+    ok.__enter__.return_value.read.return_value = json.dumps(
+        {"content": blocks, "stop_reason": stop_reason}).encode()
+    return ok
+
+
+class PauseTurnTest(unittest.TestCase):
+    """The 2026-08-29 and 2026-09-05 scout failures.
+
+    With a server-side tool the API runs its own sampling loop and stops at 10
+    iterations with `stop_reason: "pause_turn"`. The reply holds only the
+    model's opening narration; the answer has not been generated yet. Returning
+    it as if the turn were over is what produced "no parseable JSON object in
+    reply: I'll research what's working right now...".
+    """
+
+    def setUp(self):
+        self.sleeps = []
+        p = mock.patch.object(llm.time, "sleep", self.sleeps.append)
+        p.start()
+        self.addCleanup(p.stop)
+
+    def _run(self, replies, **kw):
+        with mock.patch.object(llm.urllib.request, "urlopen",
+                               side_effect=replies) as u:
+            return llm.call_blocks("sys", "prompt", key="sk-test", **kw), u
+
+    def test_paused_turn_is_resumed_and_all_text_kept(self):
+        narration = {"type": "text", "text": "I'll research what's working."}
+        search = {"type": "server_tool_use", "id": "s1", "name": "web_search"}
+        answer = {"type": "text", "text": '{"techniques": []}'}
+        out, u = self._run([_reply([narration, search], "pause_turn"),
+                            _reply([answer])])
+        self.assertEqual(u.call_count, 2)
+        # Both legs are kept, answer last — call_json tries the last block first.
+        self.assertEqual(out, ["I'll research what's working.",
+                               '{"techniques": []}'])
+        self.assertEqual(llm.LAST_STOP_REASON, "end_turn")
+
+    def test_resume_sends_the_paused_turn_back_with_no_extra_user_message(self):
+        content = [{"type": "text", "text": "searching"},
+                   {"type": "server_tool_use", "id": "s1", "name": "web_search"}]
+        _, u = self._run([_reply(content, "pause_turn"), _reply([])])
+        sent = json.loads(u.call_args_list[1].args[0].data.decode())
+        self.assertEqual([m["role"] for m in sent["messages"]],
+                         ["user", "assistant"])
+        # The server resumes off the trailing server-tool block; a "continue"
+        # user turn would restart the model instead.
+        self.assertEqual(sent["messages"][1]["content"], content)
+
+    def test_a_turn_that_never_unpauses_stops_at_the_ceiling(self):
+        paused = [_reply([{"type": "text", "text": "."}], "pause_turn")] * 20
+        with mock.patch.object(llm, "MAX_CONTINUATIONS", 2):
+            out, u = self._run(paused)
+        self.assertEqual(u.call_count, 3)  # first call plus two continuations
+        self.assertEqual(len(out), 3)
+
+    def test_unpaused_reply_is_a_single_round_trip(self):
+        out, u = self._run([_reply([{"type": "thinking", "thinking": "..."},
+                                    {"type": "text", "text": "done"}])])
+        self.assertEqual(u.call_count, 1)
+        self.assertEqual(out, ["done"])
+
+    def test_a_reply_with_no_stop_reason_is_not_treated_as_paused(self):
+        ok = mock.MagicMock()
+        ok.__enter__.return_value.read.return_value = json.dumps(
+            {"content": [{"type": "text", "text": "done"}]}).encode()
+        out, u = self._run([ok])
+        self.assertEqual((out, u.call_count), (["done"], 1))
+
+    def test_parse_failure_names_the_stop_reason(self):
+        """So the next one is diagnosable from the journal, not the droplet."""
+        with mock.patch.object(llm, "call_blocks", return_value=["prose"]), \
+             mock.patch.object(llm, "LAST_STOP_REASON", "max_tokens"):
+            with self.assertRaises(ValueError) as cm:
+                llm.call_json("sys", "prompt")
+        self.assertIn("stop_reason=max_tokens", str(cm.exception))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
