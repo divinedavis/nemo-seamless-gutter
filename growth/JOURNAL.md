@@ -16955,3 +16955,23 @@ that this journal will say the same thing on day fifty.**
    08-20 with `top3` flat at 2. If coverage keeps climbing and `top3` is still 2,
    page-strengthening is not converting into rank and the engine's one remaining
    daily activity needs rethinking.
+
+## 2026-09-05 — engine run
+
+Goal: **1.0%** top-3 share of 205 tracked queries (target 50%).
+2026-09-04: 1 visitors (0 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — ok: added "Gutter Repair in Dallastown, PA" to /areas/seamless-gutters-dallastown-pa.html for 'gutter repair dallastown pa'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: no query needs its own page — the remaining gaps all belong on pages that exist, which strengthen_pages handles
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 43 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 1 URL(s), HTTP 200
+
+**Scout did not run:** no parseable JSON object in reply (raw reply saved to /tmp/nemo-llm-unparsed-1788588480.txt): I'll research what's working right now for local home-service contractors.

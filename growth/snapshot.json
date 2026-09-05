@@ -1,6 +1,6 @@
 {
-  "generated": "2026-09-04T06:09:14+00:00",
-  "date": "2026-09-04",
+  "generated": "2026-09-05T06:08:00+00:00",
+  "date": "2026-09-05",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
@@ -8,7 +8,7 @@
     "share_pct": 1.0,
     "measured": true,
     "why_unmeasured": null,
-    "coverage_pct": 42.9,
+    "coverage_pct": 43.9,
     "tracked_queries": 205,
     "top3": 2,
     "top10": 12,
@@ -179,6 +179,10 @@
       {
         "date": "2026-09-03",
         "value": 6
+      },
+      {
+        "date": "2026-09-04",
+        "value": 1
       }
     ],
     "pageviews": [
@@ -345,6 +349,10 @@
       {
         "date": "2026-09-03",
         "value": 8
+      },
+      {
+        "date": "2026-09-04",
+        "value": 1
       }
     ],
     "organic_visitors": [
@@ -511,6 +519,10 @@
       {
         "date": "2026-09-03",
         "value": 4
+      },
+      {
+        "date": "2026-09-04",
+        "value": 0
       }
     ],
     "local_visitors": [
@@ -676,6 +688,10 @@
       },
       {
         "date": "2026-09-03",
+        "value": 0
+      },
+      {
+        "date": "2026-09-04",
         "value": 0
       }
     ],
@@ -843,6 +859,10 @@
       {
         "date": "2026-09-03",
         "value": 0
+      },
+      {
+        "date": "2026-09-04",
+        "value": 0
       }
     ],
     "direct_visitors": [
@@ -1009,6 +1029,10 @@
       {
         "date": "2026-09-03",
         "value": 2
+      },
+      {
+        "date": "2026-09-04",
+        "value": 1
       }
     ],
     "referral_visitors": [
@@ -1174,6 +1198,10 @@
       },
       {
         "date": "2026-09-03",
+        "value": 0
+      },
+      {
+        "date": "2026-09-04",
         "value": 0
       }
     ],
@@ -1341,6 +1369,10 @@
       {
         "date": "2026-09-03",
         "value": 0
+      },
+      {
+        "date": "2026-09-04",
+        "value": 0
       }
     ],
     "bot_hits": [
@@ -1507,6 +1539,10 @@
       {
         "date": "2026-09-03",
         "value": 3004
+      },
+      {
+        "date": "2026-09-04",
+        "value": 3402
       }
     ],
     "call_taps": [
@@ -1661,6 +1697,10 @@
       {
         "date": "2026-09-03",
         "value": 0
+      },
+      {
+        "date": "2026-09-04",
+        "value": 0
       }
     ],
     "ai_calls": [
@@ -1810,6 +1850,10 @@
       },
       {
         "date": "2026-09-03",
+        "value": 0
+      },
+      {
+        "date": "2026-09-04",
         "value": 0
       }
     ],
@@ -1977,6 +2021,10 @@
       {
         "date": "2026-09-03",
         "value": 0
+      },
+      {
+        "date": "2026-09-04",
+        "value": 0
       }
     ],
     "phone_leads": [
@@ -2142,6 +2190,10 @@
       },
       {
         "date": "2026-09-03",
+        "value": 0
+      },
+      {
+        "date": "2026-09-04",
         "value": 0
       }
     ],
@@ -2309,6 +2361,10 @@
       {
         "date": "2026-09-03",
         "value": 0
+      },
+      {
+        "date": "2026-09-04",
+        "value": 0
       }
     ]
   },
@@ -2341,7 +2397,7 @@
       },
       "dallastown": {
         "total": 11,
-        "covered": 5,
+        "covered": 6,
         "top3": 0
       },
       "spring-grove": {
@@ -2351,18 +2407,18 @@
       },
       "york": {
         "total": 36,
-        "covered": 14,
+        "covered": 15,
         "top3": 0
       }
     },
     "by_intent": {
       "hire": {
         "total": 126,
-        "covered": 71
+        "covered": 72
       },
       "price": {
         "total": 49,
-        "covered": 8
+        "covered": 9
       },
       "diy": {
         "total": 8,
@@ -2409,7 +2465,6 @@
       "gutter installers spring grove pa",
       "gutter installers york pa",
       "gutter overflowing in heavy rain who to call",
-      "gutter repair dallastown pa",
       "gutter repair near me york pa",
       "gutter replacement after new roof york pa",
       "gutter replacement dover pa",
@@ -2448,7 +2503,6 @@
       "gutter companies dover pa reviews",
       "gutter companies york pa reviews",
       "gutter guard cost per foot pa",
-      "gutter guard cost york pa",
       "gutter guard installation cost",
       "gutter guard installation cost per foot",
       "gutter guard installation cost york pa",
@@ -2501,20 +2555,26 @@
       },
       {
         "query": "gutters",
-        "position": 4.7,
-        "impressions": 112,
+        "position": 5.1,
+        "impressions": 98,
         "clicks": 0
       },
       {
         "query": "gutter replacement",
-        "position": 16.2,
-        "impressions": 81,
+        "position": 16.7,
+        "impressions": 79,
         "clicks": 0
       },
       {
         "query": "seamless+gutters+perkasie+pa",
         "position": 18.7,
         "impressions": 74,
+        "clicks": 0
+      },
+      {
+        "query": "gutter installation",
+        "position": 3.2,
+        "impressions": 52,
         "clicks": 0
       },
       {
@@ -2525,50 +2585,44 @@
       },
       {
         "query": "gutter guards in akron pa",
-        "position": 22.8,
-        "impressions": 49,
-        "clicks": 0
-      },
-      {
-        "query": "gutter installation",
-        "position": 3.3,
+        "position": 21.1,
         "impressions": 48,
         "clicks": 0
       },
       {
-        "query": "seamless gutter installation in myerstown pa",
-        "position": 40.7,
-        "impressions": 45,
-        "clicks": 0
-      },
-      {
         "query": "gutter repair",
-        "position": 5.7,
-        "impressions": 41,
+        "position": 5.8,
+        "impressions": 43,
         "clicks": 0
       },
       {
-        "query": "gutter installation wilkes barre, pa",
-        "position": 58.5,
-        "impressions": 37,
-        "clicks": 0
-      },
-      {
-        "query": "seamless gutter installation in akron pa",
-        "position": 36.4,
-        "impressions": 36,
+        "query": "seamless gutter installation in myerstown pa",
+        "position": 41.4,
+        "impressions": 43,
         "clicks": 0
       },
       {
         "query": "gutter guards in new holland pa",
         "position": 33.8,
+        "impressions": 36,
+        "clicks": 0
+      },
+      {
+        "query": "gutter installation wilkes barre, pa",
+        "position": 58.3,
+        "impressions": 36,
+        "clicks": 0
+      },
+      {
+        "query": "seamless gutter installation in akron pa",
+        "position": 36.3,
         "impressions": 35,
         "clicks": 0
       },
       {
         "query": "gutter cleaning",
-        "position": 5.2,
-        "impressions": 33,
+        "position": 5.3,
+        "impressions": 34,
         "clicks": 0
       },
       {
@@ -2578,21 +2632,15 @@
         "clicks": 0
       },
       {
-        "query": "gutter guards in myerstown pa",
-        "position": 70.6,
+        "query": "gutter guards in lititz pa",
+        "position": 27.4,
         "impressions": 29,
         "clicks": 0
       },
       {
-        "query": "gutter guards in lititz pa",
-        "position": 27.5,
+        "query": "gutter guards in myerstown pa",
+        "position": 70.8,
         "impressions": 28,
-        "clicks": 0
-      },
-      {
-        "query": "seamless gutters",
-        "position": 19.8,
-        "impressions": 24,
         "clicks": 0
       },
       {
@@ -2602,14 +2650,26 @@
         "clicks": 0
       },
       {
-        "query": "seamless gutter installation in stevens pa",
-        "position": 39.2,
-        "impressions": 22,
+        "query": "seamless gutters",
+        "position": 20.6,
+        "impressions": 23,
         "clicks": 0
       },
       {
         "query": "gutter guards in stevens pa",
-        "position": 56.5,
+        "position": 56.4,
+        "impressions": 20,
+        "clicks": 0
+      },
+      {
+        "query": "seamless gutter installation in stevens pa",
+        "position": 39.1,
+        "impressions": 20,
+        "clicks": 0
+      },
+      {
+        "query": "gutter guards in newmanstown pa",
+        "position": 45.5,
         "impressions": 19,
         "clicks": 0
       },
@@ -2632,8 +2692,8 @@
         "clicks": 0
       },
       {
-        "query": "gutter guards in newmanstown pa",
-        "position": 45.7,
+        "query": "gutter guards in leola pa",
+        "position": 31.3,
         "impressions": 18,
         "clicks": 0
       },
@@ -2650,8 +2710,8 @@
         "clicks": 0
       },
       {
-        "query": "gutter guards in leola pa",
-        "position": 31.3,
+        "query": "gutter guards in lancaster pa",
+        "position": 42.1,
         "impressions": 17,
         "clicks": 0
       },
@@ -2668,12 +2728,6 @@
         "clicks": 0
       },
       {
-        "query": "gutter guards in lancaster pa",
-        "position": 42.2,
-        "impressions": 16,
-        "clicks": 0
-      },
-      {
         "query": "lemoyne seamless spouting system installers",
         "position": 23.6,
         "impressions": 16,
@@ -2687,7 +2741,13 @@
       },
       {
         "query": "seamless gutters central pa",
-        "position": 20.2,
+        "position": 20.1,
+        "impressions": 16,
+        "clicks": 0
+      },
+      {
+        "query": "seamless gutters perkasie pa",
+        "position": 18.4,
         "impressions": 16,
         "clicks": 0
       },
@@ -2700,12 +2760,6 @@
       {
         "query": "seamless gutter repair villanova pa",
         "position": 36.2,
-        "impressions": 15,
-        "clicks": 0
-      },
-      {
-        "query": "seamless gutters perkasie pa",
-        "position": 18.6,
         "impressions": 15,
         "clicks": 0
       },
@@ -2736,14 +2790,14 @@
     ]
   },
   "gsc": {
-    "date": "2026-09-04",
+    "date": "2026-09-05",
     "ok": true,
     "connected": true,
-    "rows": 952,
+    "rows": 969,
     "matched": 34,
-    "clicks": 18,
-    "impressions": 7755,
-    "avg_position": 25.2
+    "clicks": 20,
+    "impressions": 7732,
+    "avg_position": 25.0
   },
   "techniques": [
     {
@@ -2764,14 +2818,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-04",
+        "decided": "2026-09-05",
         "works": true,
-        "why": "7 owned visitors in 39d (median 0.0/day and flat)",
+        "why": "7 owned visitors in 40d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 7,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 39
+          "days_measured": 40
         }
       },
       "owned_visitors": [
@@ -2930,6 +2984,10 @@
         {
           "date": "2026-09-03",
           "value": 0
+        },
+        {
+          "date": "2026-09-04",
+          "value": 0
         }
       ]
     },
@@ -2951,14 +3009,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-04",
+        "decided": "2026-09-05",
         "works": true,
-        "why": "6 owned visitors in 39d (median 0.0/day and flat)",
+        "why": "6 owned visitors in 40d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 6,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 39
+          "days_measured": 40
         }
       },
       "owned_visitors": [
@@ -3116,6 +3174,10 @@
         },
         {
           "date": "2026-09-03",
+          "value": 0
+        },
+        {
+          "date": "2026-09-04",
           "value": 0
         }
       ]
@@ -3393,14 +3455,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-04",
+        "decided": "2026-09-05",
         "works": true,
         "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 18.0,
           "median_before": null,
-          "days_measured": 39
+          "days_measured": 40
         }
       },
       "owned_visitors": null
@@ -3423,14 +3485,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-04",
+        "decided": "2026-09-05",
         "works": true,
-        "why": "17 owned visitors in 39d (median 0.0/day and flat)",
+        "why": "17 owned visitors in 40d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 17,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 39
+          "days_measured": 40
         }
       },
       "owned_visitors": [
@@ -3589,6 +3651,10 @@
         {
           "date": "2026-09-03",
           "value": 2
+        },
+        {
+          "date": "2026-09-04",
+          "value": 0
         }
       ]
     },
@@ -3608,14 +3674,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-04",
+        "decided": "2026-09-05",
         "works": true,
         "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 18.0,
           "median_before": null,
-          "days_measured": 39
+          "days_measured": 40
         }
       },
       "owned_visitors": null
@@ -3636,14 +3702,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-04",
+        "decided": "2026-09-05",
         "works": true,
         "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 18.0,
           "median_before": null,
-          "days_measured": 39
+          "days_measured": 40
         }
       },
       "owned_visitors": null
@@ -4836,7 +4902,7 @@
     ]
   },
   "last_build": {
-    "date": "2026-09-04",
+    "date": "2026-09-05",
     "log": [
       {
         "ok": true,
@@ -4858,7 +4924,7 @@
       },
       {
         "ok": true,
-        "detail": "added \"Looking for Half-Round Copper Gutters Near You? We Install T\" to /services/half-round-gutters.html for 'half round copper gutters near me'",
+        "detail": "added \"Gutter Repair in Dallastown, PA\" to /areas/seamless-gutters-dallastown-pa.html for 'gutter repair dallastown pa'",
         "slug": "strengthen_pages"
       },
       {
@@ -4907,19 +4973,9 @@
     "changed": 1
   },
   "last_scout": {
-    "date": "2026-09-04",
-    "ok": true,
-    "techniques_added": [
-      "sixty_second_callback_button",
-      "youtube_jobsite_clips",
-      "manufacturer_installer_locators"
-    ],
-    "keywords_added": [
-      "gutter guard cost york pa",
-      "rotted fascia board replacement york pa",
-      "half round gutter cost york pa"
-    ],
-    "notes": ""
+    "date": "2026-09-05",
+    "ok": false,
+    "detail": "no parseable JSON object in reply (raw reply saved to /tmp/nemo-llm-unparsed-[redacted phone number].txt): I'll research what's working right now for local home-service contractors."
   },
   "pages": {
     "areas": [
@@ -4975,11 +5031,15 @@
     ]
   },
   "redactions": {
-    "count": 1,
+    "count": 2,
     "items": [
       {
         "kind": "street address",
         "sample": "123 Maple St"
+      },
+      {
+        "kind": "phone number",
+        "sample": "1788588480"
       }
     ],
     "note": "Anything shaped like a phone number, email or street address is removed before publishing. A non-zero count is usually an example quoted in scout research, not customer data \u2014 but a hit in a field fed by the bookings database would be a real bug worth chasing."
