@@ -1,6 +1,6 @@
 {
-  "generated": "2026-09-05T06:08:00+00:00",
-  "date": "2026-09-05",
+  "generated": "2026-09-06T06:09:18+00:00",
+  "date": "2026-09-06",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
@@ -8,8 +8,8 @@
     "share_pct": 1.0,
     "measured": true,
     "why_unmeasured": null,
-    "coverage_pct": 43.9,
-    "tracked_queries": 205,
+    "coverage_pct": 43.5,
+    "tracked_queries": 209,
     "top3": 2,
     "top10": 12,
     "ranked_known": 35
@@ -183,6 +183,10 @@
       {
         "date": "2026-09-04",
         "value": 1
+      },
+      {
+        "date": "2026-09-05",
+        "value": 3
       }
     ],
     "pageviews": [
@@ -353,6 +357,10 @@
       {
         "date": "2026-09-04",
         "value": 1
+      },
+      {
+        "date": "2026-09-05",
+        "value": 3
       }
     ],
     "organic_visitors": [
@@ -522,6 +530,10 @@
       },
       {
         "date": "2026-09-04",
+        "value": 0
+      },
+      {
+        "date": "2026-09-05",
         "value": 0
       }
     ],
@@ -693,6 +705,10 @@
       {
         "date": "2026-09-04",
         "value": 0
+      },
+      {
+        "date": "2026-09-05",
+        "value": 0
       }
     ],
     "ai_visitors": [
@@ -862,6 +878,10 @@
       },
       {
         "date": "2026-09-04",
+        "value": 0
+      },
+      {
+        "date": "2026-09-05",
         "value": 0
       }
     ],
@@ -1033,6 +1053,10 @@
       {
         "date": "2026-09-04",
         "value": 1
+      },
+      {
+        "date": "2026-09-05",
+        "value": 2
       }
     ],
     "referral_visitors": [
@@ -1203,6 +1227,10 @@
       {
         "date": "2026-09-04",
         "value": 0
+      },
+      {
+        "date": "2026-09-05",
+        "value": 1
       }
     ],
     "campaign_visitors": [
@@ -1372,6 +1400,10 @@
       },
       {
         "date": "2026-09-04",
+        "value": 0
+      },
+      {
+        "date": "2026-09-05",
         "value": 0
       }
     ],
@@ -1543,6 +1575,10 @@
       {
         "date": "2026-09-04",
         "value": 3402
+      },
+      {
+        "date": "2026-09-05",
+        "value": 2541
       }
     ],
     "call_taps": [
@@ -1701,6 +1737,10 @@
       {
         "date": "2026-09-04",
         "value": 0
+      },
+      {
+        "date": "2026-09-05",
+        "value": 0
       }
     ],
     "ai_calls": [
@@ -1854,6 +1894,10 @@
       },
       {
         "date": "2026-09-04",
+        "value": 0
+      },
+      {
+        "date": "2026-09-05",
         "value": 0
       }
     ],
@@ -2025,6 +2069,10 @@
       {
         "date": "2026-09-04",
         "value": 0
+      },
+      {
+        "date": "2026-09-05",
+        "value": 0
       }
     ],
     "phone_leads": [
@@ -2194,6 +2242,10 @@
       },
       {
         "date": "2026-09-04",
+        "value": 0
+      },
+      {
+        "date": "2026-09-05",
         "value": 0
       }
     ],
@@ -2365,6 +2417,10 @@
       {
         "date": "2026-09-04",
         "value": 0
+      },
+      {
+        "date": "2026-09-05",
+        "value": 0
       }
     ]
   },
@@ -2376,7 +2432,7 @@
   "keywords": {
     "by_town": {
       "county": {
-        "total": 109,
+        "total": 111,
         "covered": 46,
         "top3": 2
       },
@@ -2392,7 +2448,7 @@
       },
       "red-lion": {
         "total": 11,
-        "covered": 4,
+        "covered": 5,
         "top3": 0
       },
       "dallastown": {
@@ -2406,18 +2462,18 @@
         "top3": 0
       },
       "york": {
-        "total": 36,
+        "total": 38,
         "covered": 15,
         "top3": 0
       }
     },
     "by_intent": {
       "hire": {
-        "total": 126,
-        "covered": 72
+        "total": 128,
+        "covered": 73
       },
       "price": {
-        "total": 49,
+        "total": 51,
         "covered": 9
       },
       "diy": {
@@ -2435,7 +2491,6 @@
       "copper gutter installation york pa",
       "copper half round gutters historic home pennsylvania",
       "copper half round gutters pennsylvania",
-      "downspout extension installation red lion pa",
       "downspout extension installation york pa",
       "downspout installations york",
       "downspout repair near me york pa",
@@ -2471,10 +2526,12 @@
       "gutter replacement york springs pa",
       "gutters overflowing during rain who to call",
       "half round copper gutter installers york pa",
+      "half round gutter installers near me",
       "half round gutters hanover pa",
       "half round gutters historic home pa",
       "ice dam damage gutter replacement york county pa",
       "ice dam damaged gutters repair pa",
+      "rotted fascia board repair york pa",
       "rotted fascia board replacement york pa",
       "seamless gutter installation hanover pa",
       "seamless gutter installation york pa",
@@ -2486,6 +2543,7 @@
       "who installs half round gutters near me",
       "5 inch vs 6 inch gutters",
       "are gutter guards worth it",
+      "copper gutter cost per foot installed",
       "copper gutter installation cost york pa",
       "copper half round gutters cost pa",
       "cost to replace gutters and downspouts york pa",
@@ -2526,6 +2584,7 @@
       "how much does a gutter guard cost per foot",
       "how much does it cost to replace gutters on a house in pa",
       "how much does it cost to replace gutters on a ranch house",
+      "how much does leaffilter cost per foot",
       "how much to replace gutters on a 1500 sq ft house",
       "how much to replace gutters on a house",
       "how often should gutters be cleaned in pa",
@@ -2555,14 +2614,14 @@
       },
       {
         "query": "gutters",
-        "position": 5.1,
+        "position": 5.2,
         "impressions": 98,
         "clicks": 0
       },
       {
         "query": "gutter replacement",
-        "position": 16.7,
-        "impressions": 79,
+        "position": 17.1,
+        "impressions": 77,
         "clicks": 0
       },
       {
@@ -2585,8 +2644,8 @@
       },
       {
         "query": "gutter guards in akron pa",
-        "position": 21.1,
-        "impressions": 48,
+        "position": 20.8,
+        "impressions": 49,
         "clicks": 0
       },
       {
@@ -2597,26 +2656,26 @@
       },
       {
         "query": "seamless gutter installation in myerstown pa",
-        "position": 41.4,
+        "position": 41.8,
         "impressions": 43,
         "clicks": 0
       },
       {
         "query": "gutter guards in new holland pa",
-        "position": 33.8,
-        "impressions": 36,
-        "clicks": 0
-      },
-      {
-        "query": "gutter installation wilkes barre, pa",
-        "position": 58.3,
-        "impressions": 36,
+        "position": 33.7,
+        "impressions": 39,
         "clicks": 0
       },
       {
         "query": "seamless gutter installation in akron pa",
-        "position": 36.3,
-        "impressions": 35,
+        "position": 35.8,
+        "impressions": 37,
+        "clicks": 0
+      },
+      {
+        "query": "gutter installation wilkes barre, pa",
+        "position": 58.1,
+        "impressions": 36,
         "clicks": 0
       },
       {
@@ -2627,19 +2686,19 @@
       },
       {
         "query": "gutter replacement services",
-        "position": 10.7,
-        "impressions": 30,
+        "position": 10.3,
+        "impressions": 31,
         "clicks": 0
       },
       {
         "query": "gutter guards in lititz pa",
-        "position": 27.4,
-        "impressions": 29,
+        "position": 27.5,
+        "impressions": 30,
         "clicks": 0
       },
       {
         "query": "gutter guards in myerstown pa",
-        "position": 70.8,
+        "position": 72.1,
         "impressions": 28,
         "clicks": 0
       },
@@ -2651,25 +2710,31 @@
       },
       {
         "query": "seamless gutters",
-        "position": 20.6,
-        "impressions": 23,
+        "position": 21.0,
+        "impressions": 22,
         "clicks": 0
       },
       {
         "query": "gutter guards in stevens pa",
-        "position": 56.4,
-        "impressions": 20,
+        "position": 56,
+        "impressions": 21,
         "clicks": 0
       },
       {
-        "query": "seamless gutter installation in stevens pa",
-        "position": 39.1,
-        "impressions": 20,
+        "query": "gutter guards in leola pa",
+        "position": 31.3,
+        "impressions": 19,
         "clicks": 0
       },
       {
         "query": "gutter guards in newmanstown pa",
         "position": 45.5,
+        "impressions": 19,
+        "clicks": 0
+      },
+      {
+        "query": "seamless gutter installation in stevens pa",
+        "position": 39,
         "impressions": 19,
         "clicks": 0
       },
@@ -2692,8 +2757,8 @@
         "clicks": 0
       },
       {
-        "query": "gutter guards in leola pa",
-        "position": 31.3,
+        "query": "gutter guards in lancaster pa",
+        "position": 42.2,
         "impressions": 18,
         "clicks": 0
       },
@@ -2710,8 +2775,8 @@
         "clicks": 0
       },
       {
-        "query": "gutter guards in lancaster pa",
-        "position": 42.1,
+        "query": "lemoyne seamless spouting system installers",
+        "position": 23.4,
         "impressions": 17,
         "clicks": 0
       },
@@ -2728,12 +2793,6 @@
         "clicks": 0
       },
       {
-        "query": "lemoyne seamless spouting system installers",
-        "position": 23.6,
-        "impressions": 16,
-        "clicks": 0
-      },
-      {
         "query": "seamless gutter company morgan pa",
         "position": 15.8,
         "impressions": 16,
@@ -2747,7 +2806,7 @@
       },
       {
         "query": "seamless gutters perkasie pa",
-        "position": 18.4,
+        "position": 18.2,
         "impressions": 16,
         "clicks": 0
       },
@@ -2790,13 +2849,13 @@
     ]
   },
   "gsc": {
-    "date": "2026-09-05",
+    "date": "2026-09-06",
     "ok": true,
     "connected": true,
-    "rows": 969,
+    "rows": 968,
     "matched": 34,
-    "clicks": 20,
-    "impressions": 7732,
+    "clicks": 21,
+    "impressions": 7778,
     "avg_position": 25.0
   },
   "techniques": [
@@ -2818,14 +2877,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-05",
+        "decided": "2026-09-06",
         "works": true,
-        "why": "7 owned visitors in 40d (median 0.0/day and flat)",
+        "why": "7 owned visitors in 41d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 7,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 40
+          "days_measured": 41
         }
       },
       "owned_visitors": [
@@ -2988,6 +3047,10 @@
         {
           "date": "2026-09-04",
           "value": 0
+        },
+        {
+          "date": "2026-09-05",
+          "value": 0
         }
       ]
     },
@@ -3009,14 +3072,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-05",
+        "decided": "2026-09-06",
         "works": true,
-        "why": "6 owned visitors in 40d (median 0.0/day and flat)",
+        "why": "6 owned visitors in 41d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 6,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 40
+          "days_measured": 41
         }
       },
       "owned_visitors": [
@@ -3178,6 +3241,10 @@
         },
         {
           "date": "2026-09-04",
+          "value": 0
+        },
+        {
+          "date": "2026-09-05",
           "value": 0
         }
       ]
@@ -3455,14 +3522,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-05",
+        "decided": "2026-09-06",
         "works": true,
         "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 18.0,
           "median_before": null,
-          "days_measured": 40
+          "days_measured": 41
         }
       },
       "owned_visitors": null
@@ -3485,14 +3552,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-05",
+        "decided": "2026-09-06",
         "works": true,
-        "why": "17 owned visitors in 40d (median 0.0/day and flat)",
+        "why": "17 owned visitors in 41d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 17,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 40
+          "days_measured": 41
         }
       },
       "owned_visitors": [
@@ -3655,6 +3722,10 @@
         {
           "date": "2026-09-04",
           "value": 0
+        },
+        {
+          "date": "2026-09-05",
+          "value": 0
         }
       ]
     },
@@ -3674,14 +3745,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-05",
+        "decided": "2026-09-06",
         "works": true,
         "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 18.0,
           "median_before": null,
-          "days_measured": 40
+          "days_measured": 41
         }
       },
       "owned_visitors": null
@@ -3702,14 +3773,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-05",
+        "decided": "2026-09-06",
         "works": true,
         "why": "gsc_clicks median 18.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 18.0,
           "median_before": null,
-          "days_measured": 40
+          "days_measured": 41
         }
       },
       "owned_visitors": null
@@ -4811,6 +4882,60 @@
       "notes": "first step: Call the York-area branch rep for the gutter-guard line Eric installs most and ask to be added to the brand's installer locator for the York County ZIPs, giving the exact business name, phone and nemoseamlessgutter.com URL used on the Google profile.\neffort: hours\ncost: free\nexpected: 3-5 locator listings live within 30 days (guard brand, coil/accessory brand, 1-2 supply-house contractor finders); 3-5 new authority mentions with exact-match NAP; first brand-locator phone call inside 90 days.",
       "verdict": null,
       "owned_visitors": null
+    },
+    {
+      "id": "T082",
+      "slug": "gbp_messaging_five_minute_sla",
+      "name": "Turn on GBP messaging with a 5-minute reply rule",
+      "kind": "conversion",
+      "status": "candidate",
+      "hypothesis": "The profile gets ~300 views a month and produces zero contacts because the only action it offers a nervous stranger is dialling a contractor they have never met. A Message button is the low-commitment door: a homeowner with a gutter spilling over the front door will type 'how much to rehang 40ft?' at 9pm when they will not call. Every message is a named York County lead with a stated problem, and Eric can convert it to a phone call in the second reply. Roughly two thirds of verified profiles leave messaging off, so it is a door his local competitors mostly have not opened. Only turn it on with a real reply discipline \u2014 Google auto-disables the button if replies drag past 24 hours, and slow replies are worse than no chat.",
+      "evidence": "Google enforces a response-time SLA on the Message button and auto-disables it for slow repliers; messaging is described as a conversion channel most SMBs still leave off, with only about a third of verified profiles using it. See https://www.digitalapplied.com/blog/google-business-profile-guide-every-feature-2026 and https://smartprocess.blog/2026/08/03/google-business-profile-the-complete-guide-to-turning-your-listing-into-a-lead-m/ ; on speed, CallRail's 2026 home-services data cited at https://pipelineon.com/blog/contractor-website-conversion-rate/ reports a large conversion lift for responses inside 60 seconds and an 80% drop in qualifying odds by 5 minutes.",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-09-06",
+      "added": "2026-09-06",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: In the Google Business Profile app, switch Messaging on, install SMS/push alerts, and write a short honest welcome message: 'Eric here \u2014 I am often on a roof. Send your address and a photo of the gutter and I will reply with a ballpark and a time I can look at it, usually within the hour, 7am-7pm.'\neffort: hours\ncost: free\nexpected: 3-8 inbound messages a month off the existing ~300 profile views by November, 50%+ converted to a phone call or booked measurement, first booked estimate from messaging within 30 days. Watch the 'usually responds in X' label settle at minutes, not hours.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T083",
+      "slug": "gbp_photo_backfill_100_real_jobs",
+      "name": "One-sitting backfill of 100 real job photos to the profile",
+      "kind": "distribution",
+      "status": "candidate",
+      "hypothesis": "Eric's phone already holds hundreds of photos of finished runs, the brake on the truck, copper half-round on Springettsbury and Farquhar-district homes, and rotted fascia before/after. A one-time bulk upload does two jobs at once: it is a prominence and freshness signal on the 32% of pack weight that sits inside GBP, and it is the trust evidence that decides whether a stranger looking at 4.2 stars and 13 reviews dials. The ledger's weekly-photo cadence takes years to reach the photo depth of top-ranked profiles; a backfill gets there in one evening. Real photos only \u2014 Google can tell stock from original, and stock earns nothing.",
+      "evidence": "Whitespark's 2026 Local Search Ranking Factors puts GBP signals at ~32% of local pack weight (https://lanternrow.com/blog/google-business-profile-optimization-for-local-service-businesses/); profiles ranking in the top three average around 250 images, which only comes from continuous uploading (https://smartprocess.blog/2026/08/03/google-business-profile-the-complete-guide-to-turning-your-listing-into-a-lead-m/); Google's Vision AI distinguishes stock from original photography and stock provides no semantic ranking signal (https://www.connecticallc.com/google-business-profile-optimization-the-complete-guide-for-south-florida-businesses/).",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-09-06",
+      "added": "2026-09-06",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Tonight, sort the camera roll into four albums \u2014 finished seamless run, guards installed, half-round/copper, fascia and downspout repair \u2014 pick the 100 sharpest, and upload them in one session with plain captions naming the town and the work ('6-inch seamless, Dallastown, Aug 2026').\neffort: hours\ncost: free\nexpected: Profile photo count from single digits to 100+ in one week, then 5-10 a week; GBP photo views and 'website clicks' up 2-3x within 60 days; measurable as an increase in profile-driven calls during leaf season.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T084",
+      "slug": "mobile_speed_pass_money_pages",
+      "name": "Get the money pages under 3 seconds on a phone",
+      "kind": "conversion",
+      "status": "candidate",
+      "hypothesis": "Every other item in the ledger \u2014 LSAs, EDDM, town pages, GBP posts \u2014 pushes a York County homeowner onto this site from a phone, usually on a mobile connection while standing in the rain looking at an overflowing gutter. If the homepage, the town pages and the emergency-repair page take more than three seconds, a third of that traffic never sees the phone number, and the spend behind it is wasted. There is not one technical performance item anywhere in the ledger, and Core Web Vitals also feed local visibility, so this is one fix that protects both the ranking work and the call work.",
+      "evidence": "2026 contractor benchmarks: median contractor sites convert 2-4% of visitors into a tracked call or form, top sites 8-12% on identical traffic, and the gap is page speed, call-button placement, real reviews and response time rather than design; 53% of mobile visitors abandon a page taking over 3 seconds, and Core Web Vitals feed local pack visibility. https://pipelineon.com/blog/contractor-website-conversion-rate/ and https://hubtondigital.com/blog/contractor-website-design/",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-09-06",
+      "added": "2026-09-06",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Run PageSpeed Insights (mobile) on nemoseamlessgutter.com homepage and /emergency-gutter-repair, note the two worst offenders \u2014 almost always oversized uncompressed job photos and render-blocking scripts \u2014 and fix those two first.\neffort: hours\ncost: free\nexpected: Largest Contentful Paint under 2.5s on 4G for homepage, seamless-gutter-installation, emergency-gutter-repair and the top 5 town pages; Search Console Core Web Vitals 'good' on mobile within 30 days; conversion rate from the current ~0% toward the 3-8% band as call CTAs get seen.",
+      "verdict": null,
+      "owned_visitors": null
     }
   ],
   "scoreboard": {
@@ -4898,11 +5023,14 @@
       "T078",
       "T079",
       "T080",
-      "T081"
+      "T081",
+      "T082",
+      "T083",
+      "T084"
     ]
   },
   "last_build": {
-    "date": "2026-09-05",
+    "date": "2026-09-06",
     "log": [
       {
         "ok": true,
@@ -4924,7 +5052,7 @@
       },
       {
         "ok": true,
-        "detail": "added \"Gutter Repair in Dallastown, PA\" to /areas/seamless-gutters-dallastown-pa.html for 'gutter repair dallastown pa'",
+        "detail": "added \"Downspout Extension Installation in Red Lion, PA\" to /areas/seamless-gutters-red-lion-pa.html for 'downspout extension installation red lion pa'",
         "slug": "strengthen_pages"
       },
       {
@@ -4973,9 +5101,20 @@
     "changed": 1
   },
   "last_scout": {
-    "date": "2026-09-05",
-    "ok": false,
-    "detail": "no parseable JSON object in reply (raw reply saved to /tmp/nemo-llm-unparsed-[redacted phone number].txt): I'll research what's working right now for local home-service contractors."
+    "date": "2026-09-06",
+    "ok": true,
+    "techniques_added": [
+      "gbp_messaging_five_minute_sla",
+      "gbp_photo_backfill_100_real_jobs",
+      "mobile_speed_pass_money_pages"
+    ],
+    "keywords_added": [
+      "how much does leaffilter cost per foot",
+      "copper gutter cost per foot installed",
+      "rotted fascia board repair york pa",
+      "half round gutter installers near me"
+    ],
+    "notes": ""
   },
   "pages": {
     "areas": [
@@ -5031,15 +5170,11 @@
     ]
   },
   "redactions": {
-    "count": 2,
+    "count": 1,
     "items": [
       {
         "kind": "street address",
         "sample": "123 Maple St"
-      },
-      {
-        "kind": "phone number",
-        "sample": "1788588480"
       }
     ],
     "note": "Anything shaped like a phone number, email or street address is removed before publishing. A non-zero count is usually an example quoted in scout research, not customer data \u2014 but a hit in a field fed by the bookings database would be a real bug worth chasing."

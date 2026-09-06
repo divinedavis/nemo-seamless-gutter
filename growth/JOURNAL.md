@@ -17453,3 +17453,26 @@ engine is not the bottleneck and has not been for weeks.
    08-20 with `top3` flat at 2. If coverage keeps climbing and `top3` is still 2,
    page-strengthening is not converting into rank and the engine's one remaining
    daily activity needs rethinking.
+
+## 2026-09-06 — engine run
+
+Goal: **1.0%** top-3 share of 209 tracked queries (target 50%).
+2026-09-05: 3 visitors (0 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — ok: added "Downspout Extension Installation in Red Lion, PA" to /areas/seamless-gutters-red-lion-pa.html for 'downspout extension installation red lion pa'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: no query needs its own page — the remaining gaps all belong on pages that exist, which strengthen_pages handles
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 43 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 1 URL(s), HTTP 200
+
+**Scout proposed (as candidates, not running):**
+- T082 Turn on GBP messaging with a 5-minute reply rule — The profile gets ~300 views a month and produces zero contacts because the only action it offers a nervous stranger is dialling a contractor they have never met. A Message button is the low-commitment
+- T083 One-sitting backfill of 100 real job photos to the profile — Eric's phone already holds hundreds of photos of finished runs, the brake on the truck, copper half-round on Springettsbury and Farquhar-district homes, and rotted fascia before/after. A one-time bulk
+- T084 Get the money pages under 3 seconds on a phone — Every other item in the ledger — LSAs, EDDM, town pages, GBP posts — pushes a York County homeowner onto this site from a phone, usually on a mobile connection while standing in the rain looking at an
