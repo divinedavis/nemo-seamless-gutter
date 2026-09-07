@@ -17969,3 +17969,26 @@ this project right now.
    08-20 with `top3` flat at 2. If coverage keeps climbing and `top3` is still
    2, page-strengthening is not converting into rank and the engine's one
    remaining daily activity needs rethinking.
+
+## 2026-09-07 — engine run
+
+Goal: **0.9%** top-3 share of 215 tracked queries (target 50%).
+2026-09-06: 3 visitors (1 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: adopted 2 real search(es) into the tracked universe: best 6 inch gutter company york springs pa, gutter leaf guard york springs pa
+- `improve_ctr` — ok: rewrote title/description on /index.html (884 impressions, 10 clicks, pos 7.1) — Led the title with the two highest-volume searches (gutter replacement, gutter cleaning) instead of the vaguer
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — ok: added "Who Installs Gutters in Dover, PA — What to Expect When You " to /areas/seamless-gutters-dover-pa.html for 'who installs gutters in dover pa'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: published 'how much does leaffilter cost per foot' → /guides/how-much-does-leaffilter-cost-per-foot.html
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 44 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 3 URL(s), HTTP 200
+
+**Scout proposed (as candidates, not running):**
+- T085 Biannual gutter care plan, sold at job close — Eric's calendar, not his ad budget, is the constraint — and every completed job in York County today is a one-off that forgets him by next October. A written two-visit plan (late-November after York's
+- T086 60-day capped shared-lead test (Thumbtack, then Networx) — Every owned channel here is 8-12 weeks from producing a ring, and leaf-fall in York County starts in about three. A shared-lead marketplace is the only channel that hands Eric the phone number of a na
+- T087 Seasonal expert pitch to York County news outlets — This profile's problem is prominence, not pages: 0.9% top-3 across 211 queries while national aggregators outrank a real local contractor. Google's own account of local ranking ties prominence to link
