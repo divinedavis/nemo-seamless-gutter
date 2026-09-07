@@ -592,5 +592,53 @@ class DuplicateBusinessNodeTest(unittest.TestCase):
         self.assertLess(body.index("_foreign_ld_nodes"), body.index("blob = _ld("))
 
 
+class UnfinishedText(unittest.TestCase):
+    """The 2026-09-07 Dover regression: `<p>paragraphs2_placeholder</p>` live.
+
+    The model returned the right JSON shape and wrote its own field name into
+    the middle slot of {"paragraphs": [...]}. Nothing checked that what came
+    back was prose, so it was escaped, rendered and published between two good
+    paragraphs.
+    """
+
+    def test_the_exact_string_that_shipped_is_dropped(self):
+        self.assertEqual(
+            T._strlist(["Real copy about gutters.", "paragraphs2_placeholder",
+                        "More real copy."]),
+            ["Real copy about gutters.", "More real copy."])
+
+    def test_scaffolding_wording(self):
+        for bad in ("paragraphs2_placeholder", "PLACEHOLDER", "Lorem ipsum dolor",
+                    "{{ town }}", "[insert town here]", "TODO: write this",
+                    "meta_desc", "   "):
+            self.assertTrue(T._looks_unfinished(bad), bad)
+
+    def test_real_copy_survives(self):
+        for good in (
+                "We roll every run to length on site, so a 40-foot back wall "
+                "is one continuous piece with no seams.",
+                "6-inch K-style with hidden hangers",
+                "Call or text (717) 578-0073.",
+                "Dover Borough, Dover Township and out toward Weigelstown."):
+            self.assertFalse(T._looks_unfinished(good), good)
+
+    def test_a_placeholder_heading_is_not_rendered(self):
+        html = T._render_sections([{"h2": "sections0_h2_placeholder",
+                                    "paragraphs": ["Real copy."]}])
+        self.assertNotIn("placeholder", html)
+        self.assertIn("<p>Real copy.</p>", html)
+
+    def test_a_payload_that_is_only_scaffolding_still_fails_loudly(self):
+        """Dropping must not quietly turn junk into an empty published section."""
+        self.assertEqual(T._strlist(["{{p1}}", "TODO"]), [])
+
+    def test_scaffolding_stays_out_of_the_faq_markup_as_well_as_the_page(self):
+        faqs = [{"q": "Do you serve Dover?", "a": "Yes, every week."},
+                {"q": "How much?", "a": "answer_placeholder"}]
+        self.assertNotIn("placeholder", T._render_faqs(faqs))
+        self.assertNotIn("placeholder", T._faq_ld(faqs))
+        self.assertIn("Do you serve Dover?", T._faq_ld(faqs))
+
+
 if __name__ == "__main__":
     unittest.main()

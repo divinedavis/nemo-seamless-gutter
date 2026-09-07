@@ -17992,3 +17992,530 @@ Goal: **0.9%** top-3 share of 215 tracked queries (target 50%).
 - T085 Biannual gutter care plan, sold at job close — Eric's calendar, not his ad budget, is the constraint — and every completed job in York County today is a one-off that forgets him by next October. A written two-visit plan (late-November after York's
 - T086 60-day capped shared-lead test (Thumbtack, then Networx) — Every owned channel here is 8-12 weeks from producing a ring, and leaf-fall in York County starts in about three. A shared-lead marketplace is the only channel that hands Eric the phone number of a na
 - T087 Seasonal expert pitch to York County news outlets — This profile's problem is prominence, not pages: 0.9% top-3 across 211 queries while national aggregators outrank a real local contractor. Google's own account of local ranking ties prominence to link
+
+## 2026-09-07 — review agent
+
+### Where the numbers stand
+
+**The engine published a broken paragraph to a live York County town page this
+morning. That is the news today, and it is new.**
+
+`areas/seamless-gutters-dover-pa.html`, line 250, live right now:
+
+```html
+<p>paragraphs2_placeholder</p>
+```
+
+`strengthen_pages` asked the model for `{"paragraphs": [...]}`, the model filled
+slot 1 and slot 3 with genuinely good copy and wrote **its own field name into
+slot 2**. Nothing in the pipeline checked that what came back was prose, so it
+was escaped, rendered and published between two real paragraphs. Nothing in
+`techniques.py` or `templates.py` produces that string — I grepped both; it came
+from the model. It is the only occurrence on the site (`grep -rn
+"_placeholder\|{{\|paragraphs[0-9]" --include=*.html .` returns exactly one
+line), so this is a first, not a pattern — but it is the *third* time the same
+class of failure has shipped: the 1,254 single-letter `<p>` tags on
+`half-round-gutters.html` (08-16, still live, day twenty-two), the Schuylkill
+County section (08-10, still live, day twenty-five), and now this.
+
+**The goal metric did not move. Day forty-two.**
+
+| | 09-06 | 09-07 |
+| --- | --- | --- |
+| `top3` / tracked | 2 / 209 | **2 / 215** |
+| `share_pct` | 1.0% | **0.9%** (target 50%) |
+| `top10` | 12 | **12** |
+| `ranked_known` | 35 | **35** |
+| `coverage_pct` | 43.5% | **43.3%** |
+
+Per town, `total / covered / top3`:
+
+| town | 09-06 | 09-07 |
+| --- | --- | --- |
+| county | 111 / 46 / **2** | 115 / **47** / **2** |
+| york | 38 / 15 / **0** | 40 / 15 / **0** |
+| dover | 16 / 8 / **0** | 16 / **9** / **0** |
+| hanover | 11 / 6 / **0** | 11 / 6 / **0** |
+| red-lion | 11 / 5 / **0** | 11 / 5 / **0** |
+| dallastown | 11 / 6 / **0** | 11 / 6 / **0** |
+| spring-grove | 11 / 5 / **0** | 11 / 5 / **0** |
+
+**Zero top-3 in every named town, day forty-two.** `top3` has never moved off 2.
+On the measurable subset, **2/35 = 5.7%**, unchanged for six weeks. The
+denominator grew 209 → 215 overnight — six new rows, **two of them York
+Springs** (see below). `coverage_pct` fell again on a day the engine covered two
+new queries, for the reason recorded yesterday: the scout writes the
+denominator. Quote `covered/total`, not the ratio.
+
+**Against this prompt's own baseline:** it still says the county bucket was *"2
+of 50"* on 2026-07-28, and *"77 rows, 17 matched, 3 clicks, 429 impressions, avg
+position 12.4"*. Today: **2 of 115**, 966 rows, 34 matched, 21 clicks, 8,173
+impressions, avg position 24.9. The numerator has not moved once. Every other
+figure in that paragraph is six weeks stale and should be corrected in the
+prompt.
+
+**Search Console**, 28-day window: rows 968 → **966**, matched 34 → **34**,
+clicks 21 → **21**, impressions 7,778 → **8,173** (+395), avg position 25.0 →
+**24.9**. Second consecutive day at 21 clicks while impressions rose ~400. Site
+CTR is now **0.257%**. As established repeatedly, neither `avg_position` nor
+site CTR is health here — both are dominated by the out-of-area tail.
+
+**Traffic**, beacon era only (never straddle 2026-08-14):
+
+| window | days | visitors | organic | bookings | median |
+| --- | --- | --- | --- | --- | --- |
+| 08-18 → 08-27 | 10 | 15 | 6 | 0 | 2.0 |
+| 08-28 → 09-06 | 10 | **29** | **8** | **1** | **3.0** |
+
+09-06 was **3 visitors, 1 organic, 8 pageviews, 0 leads**. The window still
+rests on 09-02 and 09-03 (7 and 6): those two days are **13 of the 29**. Strip
+them and window B is 16 over 8 days (2.0/day) against window A's 1.5/day, which
+is not a finding. **Too early to tell. Test date unchanged: 2026-09-10**, three
+days out.
+
+`ai_visitors` **0 for all 44 measured days**. `call_taps` **0 for 19 days**
+(verified real zero). `local_visitors` **0 since 08-17** and still a blind
+instrument. **Leads: 4 bookings all time, 1 in the beacon era, 0 phone leads
+ever.** `traffic.log_visitors` still absent, so a zero day is still
+unattributable.
+
+### Did previous changes work?
+
+**1 — The placeholder. New failure, no prior prediction, root-caused today.**
+Not a deploy-lag artifact and not the model being unavailable: the run
+succeeded, the geo guard ran and passed, and the section was written. The gap is
+that `strengthen_pages` validates the *geography* of what the model returns
+(`techniques.py:1128-1139`, `_off_area_prose` over h2 + paragraphs + bullets)
+and validates nothing else. `_strlist` (`:166`) already exists as the choke
+point for "the model returned the right shape with the wrong contents" — it was
+written for the single-letter bug — and it filters non-strings and blanks only.
+Fixed in this repo today, see below. **Undeployed, like everything else.**
+
+**2 — The undeployed filter cost two more rows this morning, and I can price it
+exactly.** `adopt_queries` reported: *"adopted 2 real search(es): best 6 inch
+gutter company york springs pa, gutter leaf guard york springs pa"*. York
+Springs is in **Adams County**. `OUT_OF_AREA` in this repo has carried
+`"york springs"` since **d25bb85 (09-01)**; the droplet is running the version
+that does not. The tracked universe now holds **seven** York Springs queries —
+four on 09-01, seven today — every one permanently uncoverable, all sitting in
+the goal's denominator, plus a permanent guide page
+(`guides/5-inch-gutter-service-york-springs-pa.html`) that the same gap produced
+before the fix was written. **This is the first item in this backlog whose cost
+is measurable in units of the goal metric, and it grows every morning the deploy
+does not happen.** Verdict on the fix: **correct and unshipped**; the leak is
+confirmed still open.
+
+**3 — Deploy `growth/` (rec 1, every day since 08-30). NOT ACTIONED, day nine.**
+Same four checks as yesterday, same four answers:
+
+- `gsc` keys are `date, ok, connected, rows, matched, clicks, impressions,
+  avg_position` — **no `pages`**.
+- `traffic` keys carry **no `log_visitors`**.
+- `scoreboard.works` **still 7**, `does_not_work` **still empty**.
+- `keywords` keys are `by_town, by_intent, uncovered, discovered_untracked` —
+  **no `ranked`**.
+
+Resolved negative on all four. Ninth day judging a goal metric blind to which
+two queries hold its only top-3 slots.
+
+**4 — `improve_ctr` on the homepage: three weeks elapsed, one click of
+difference, and the engine reset the clock this morning.** This is the one prior
+change on this site with a real before/after, so I ran it. From the engine's own
+log lines:
+
+| date | title | impressions | clicks | position | CTR |
+| --- | --- | --- | --- | --- | --- |
+| 08-17 | *Gutter **Contractor** & Cleaning York PA* | 1,160 | 9 | 5.5 | 0.78% |
+| 09-07 | *(same title, 21 days later)* | 884 | 10 | 7.1 | **1.13%** |
+
+Impressions **−24%**, position **worse** (5.5 → 7.1), clicks **+1**. The CTR
+"improvement" is one click on a page that takes ten clicks per 28 days.
+**Verdict: cannot be distinguished from noise, and structurally never will be.**
+`improve_ctr` is rewriting snippets on a page whose click volume is two orders
+of magnitude below what a CTR test needs. It is not harmful, but its verdict
+(`T019 works: gsc_clicks median 18.0/day`) is not evidence of anything.
+
+This morning it rewrote the title again — *Gutter **Replacement** & Cleaning
+York PA* — swapping out "Contractor" for "Replacement". Its stated reason is
+search volume, which is defensible on its face: `gutter replacement` shows 78
+impressions against `gutter contractor`'s 49. But both are geo-free national
+queries with **0 clicks between them**, `gutter contractor` sits at position 1.0
+and `gutter replacement` at 17.0, and no York County query informed the choice.
+The three-week baseline is now gone and the next test starts from zero.
+**Prediction, dated 2026-09-28:** homepage clicks in the 28-day window will
+still be inside 8–13. If they are, `improve_ctr` should be judged unmeasurable
+on this site and its cadence cut, not because it is wrong but because it costs a
+billable model call to produce an unfalsifiable result.
+
+**5 — The ledger re-stamped the same six techniques `works: true`,
+`verdict.decided: "2026-09-07"`.** Day three of the dated harm. Counter ticked
+41 → 42, reasons otherwise verbatim:
+
+| id | technique | stated reason |
+| --- | --- | --- |
+| T001 | area_pages | *8 owned visitors in 42d (median 0.0/day and flat)* |
+| T002 | money_pages | *6 owned visitors in 42d (median 0.0/day and flat)* |
+| T018 | service_pages | *18 owned visitors in 42d (median 0.0/day and flat)* |
+| T017 | strengthen_pages | *gsc_clicks median 18.0/day (no pre-activation baseline)* |
+| T019 | improve_ctr | *gsc_clicks median 18.0/day (no pre-activation baseline)* |
+| T020 | adopt_queries | *gsc_clicks median 18.0/day (no pre-activation baseline)* |
+
+*"Median 0.0/day and flat"* is still the definition of a technique that is not
+working. *"18.0/day"* is still the 28-day **total** misread as a rate
+(`gsc.py:283`) — the site took **21 clicks in 28 days**. `earned()` (`51cf063`,
+08-29) withdraws all six and is sitting in git behind item 3. Note the irony
+this morning: `strengthen_pages` is stamped `works: true` on the same run in
+which it published a placeholder.
+
+**6 — Half-round page repair. NOT ACTIONED, day twenty-two.** `wc -l` **1,616**,
+`grep -c '<p>[A-Za-z]</p>'` **1,021**. Byte-identical. Third day running that
+`strengthen_pages` has not fed this page again.
+
+**7 — York Springs retire + keyword prune. NOT ACTIONED, day four**, and it got
+worse this morning: 5 rows → **7**. See item 2.
+
+**8 — Schuylkill excision. NOT ACTIONED, day twenty-five.** Still lines
+**227-236** of `services/seamless-gutter-installation.html`, still the `<h3>`
+*"Do you actually service Schuylkill County, or just the York area?"*
+
+**9 — PA HIC number. NOT ACTIONED, day twenty-three.** Re-verified across all 44
+pages: `PA[0-9]{6}|HIC ?#?[0-9]+|home improvement contractor|fully insured|
+licensed and insured` returns **nothing**.
+
+**10 — `?utm_source=gbp` on the profile URL. NOT ACTIONED, day thirty-five.**
+`local_visitors` 0.
+
+**11 — Eric's Business Profile sitting. UNACTIONED, day forty-two.**
+
+**12 — Intake guard.** `pages.guides` 18 → **19** (the LeafFilter page below).
+Guard still not deployed, still not yet needed.
+
+**13 — Coverage versus rank. TOO EARLY TO TELL.** Coverage 32.3% (08-20) →
+**43.3%**, `top3` **2 → 2**. Test date unchanged: **2026-09-20**.
+
+**14 — `internal_links` "refreshed nearby-links on 0 page(s)" — thirteenth
+consecutive day.** Carried, unactioned.
+
+**Fourteen items. Zero actioned, four days running.**
+
+### What I researched today
+
+Search terms: *GBP local ranking changes 2026 home service map pack*; *local SEO
+2026 AI Overviews AI Mode citations local contractor*; *schema.org LocalBusiness
+subtype gutter contractor*; *local search update 2026 what changed last 6
+months*; *GBP auto-generated description 2026*; *gutter contractor fall lead
+generation Pennsylvania*.
+
+**Nothing I found today is both new and absent from the ledger.** I want that
+stated flatly, because six weeks of research has now produced 87 techniques of
+which 80 are unjudged candidates, and the honest reading is that idea supply
+stopped being this project's constraint a month ago.
+
+What I checked and rejected, with the check:
+
+- **Schema `@type` specificity.** Multiple 2026 sources push "use the most
+  specific `LocalBusiness` subtype, not generic `LocalBusiness`". *Checked
+  before writing it down:* `index.html` already emits `"@type":
+  "RoofingContractor"` — the most specific schema.org type that exists for this
+  trade (schema.org V30.0, 2026-03-19; there is no `GutterContractor`).
+  **Already shipped. No recommendation.**
+  https://schema.org/RoofingContractor ·
+  https://eseospace.com/blog/schema-markup-for-contractor-websites/
+- **NAP consistency across directories as an AI-citation factor** — the claim
+  that consistent NAP across the top ~20 directories makes a business
+  substantially likelier to be cited by AI Overviews, ChatGPT and Perplexity.
+  Plausible and worth doing. *Checked:* **T009 `citations`** already covers it,
+  status `candidate`. **Not a new technique.**
+  https://bippermedia.com/seo/ai-overviews-citations-2026/ ·
+  https://www.aisearchrankings.com/content/local-citations/local-citations-the-definitive-guide-to-local-seo-dominance-2026.php
+- **Business-name keyword stuffing → suspensions.** The March 2026 core update
+  reportedly made keyword-stuffed profile names ("Best HVAC Repair Frisco TX
+  24-Hour Emergency") a leading cause of contractor suspensions. *Checked:* the
+  brand is **"NEMO Seamless Gutter"** — clean, no stuffing, nothing to do. Worth
+  recording only so that nobody later "optimises" the name.
+  https://www.marketingcode.com/google-march-core-update-gbp-ai-search-contractors-2026/
+- **T082 came back at me, and it is still wrong.** A 2026-dated source in
+  today's results states *"AI-powered messaging now enables instant, contextual
+  responses"* on GBP. This is exactly the recycled pre-2024 copy yesterday's
+  entry warned about; three independent sources specifically document the
+  **2024-07-31 retirement** of native GBP messaging. One vague secondary
+  mention does not overturn that. **Standing correction (a) holds. Do not
+  action T082.**
+  https://www.scatterbranchmarketing.com/blog/is-your-google-business-profile-ready-for-2026-what-changed-and-what-to-do-now
+- **"Google auto-generates services and descriptions on profiles" — weaker than
+  claimed, so I am not recommending it.** I went to corroborate a secondary
+  source's assertion that Google started pushing ML-generated services and
+  descriptions onto profiles in Q1 2026. Google's own help page describes an
+  **opt-in "Suggest description" button** the owner clicks, reviews and edits —
+  not something applied unasked. Availability is region- and
+  language-limited. That is a different and much smaller thing than the claim.
+  **Rejected as a recommendation; recorded so the next agent does not re-chase
+  it.**
+  https://support.google.com/business/answer/13682007
+- **Map pack share, and why the free levers still dominate.** Consistent 2026
+  figures: ~42% of local clicks go to the three-result Map Pack; GBP signals
+  ≈32% of local pack weight; relevance/distance/prominence unchanged as the
+  three inputs; review **recency and owner response rate** now weighted above
+  raw volume. All of this already sits behind T016, T051, T033 and T083. It
+  sharpens item 4 of the recommendations; it does not add to it.
+  https://wolfpackadvising.com/blog/how-to-rank-higher-on-google-maps/ ·
+  https://seolocale.com/google-map-pack-ranking-in-2026-how-the-local-3-pack-really-works/
+- **Seasonal timing, and it is the one thing here with a deadline.** Trade
+  sources put fall campaign start at **6–8 weeks ahead of peak leaf-drop**. In
+  south-central PA peak drop is late October. Six to eight weeks ahead of that
+  is **now** — the first week of September. Every free lever in this backlog
+  has been unpulled for between four and forty-two days, and the window in
+  which pulling them affects this season is closing rather than open.
+  https://www.servicetitan.com/blog/gutter-leads
+- **Rejected — snippet/CTR work on the impression pile.** Eighth consecutive
+  day. Impressions rose ~400 overnight; clicks stayed at 21.
+- **Rejected, unchanged:** review incentives or gating; bought links or leads;
+  doorway pages; paid link placements; unsolicited bulk email or SMS;
+  AI-generated job photography.
+
+**One observation about the engine's own output today, filed as a watch, not a
+recommendation.** `money_pages` published
+`guides/how-much-does-leaffilter-cost-per-foot.html` — *"LeafFilter Cost Per
+Foot: York County PA Price Guide"*. The geo guard worked (19 "York" mentions,
+correctly scoped). But `guides/leaffilter-alternative-york-pa.html` — *"LeafFilter
+Alternatives in York PA: Real Cost Ranges"* — has existed since before the
+beacon era and covers overlapping ground. `money_pages`' own docstring says it
+will not write a page competing with one of ours; its actual test
+(`_needs_its_own_page`, `techniques.py:~1060`) asks whether the *query* has a
+declared target page, not whether the *topic* already has one, so it passed on a
+technicality. **I am not recommending deletion** — two pages on adjacent
+long-tail queries is a normal site, and cannibalisation here is a hypothesis,
+not a measurement. *Test, 2026-10-07:* if neither LeafFilter page has entered
+`ranked_known` in a month, the topic-versus-query gap in that guard is worth
+closing.
+
+### Recommendations
+
+**Nothing in this commit is live.** The site and engine run from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout; `publish_state.sh`
+copies droplet → repo only, and it copies `snapshot.json`, `sitemap.xml`,
+`index.html`, the journal and `areas/ guides/ services/` — **no `growth/*.py`**.
+Repo code reaches the droplet only when a human runs the deploy.
+
+1. **Divine — remove the placeholder from the live Dover page. Ten seconds,
+   and it is the only item here a stranger can see.**
+   ```
+   sed -i '/<p>paragraphs2_placeholder<\/p>/d' \
+     /var/www/nemo-seamless-gutter/areas/seamless-gutters-dover-pa.html
+   ```
+   The two paragraphs either side of it are good copy and should stay. Dover is
+   one of the seven tracked towns and this is one of two pages the engine
+   touched this morning.
+   *How you would know:* `grep -c placeholder` on that file returns 0.
+   *Checked:* line 250 today; the string appears nowhere in `techniques.py` or
+   `templates.py`, so it came from the model, not from a template.
+2. **Divine — deploy `growth/`. Day nine. One minute.**
+   ```
+   git -C /root/nemo-repo fetch origin main && git -C /root/nemo-repo reset --hard origin/main
+   bash /root/nemo-repo/deploy/deploy_growth.sh              # report only, writes nothing
+   bash /root/nemo-repo/deploy/deploy_growth.sh --apply
+   ```
+   Carries the `_strlist` fix, the intake guard, the output geo guard,
+   `earned()` (which withdraws the six false verdicts re-stamped *this
+   morning*), the `log_visitors` diagnostic, the `pause_turn` fix, the
+   `keywords.ranked` view — and, new today, **the placeholder guard that stops
+   item 1 recurring** and **the `york springs` entry in `OUT_OF_AREA` that has
+   been in git since 09-01 while the leak widened from 4 rows to 7**.
+   *How you would know:* tomorrow's snapshot carries `gsc.pages` and
+   `keywords.ranked`, `traffic` gains `log_visitors`, `scoreboard.works` drops
+   7 → 1. *Checked today:* all four absent.
+3. **Divine — run the half-round repair. Day twenty-two. Two minutes.**
+   ```
+   python3 /root/nemo-repo/deploy/repair_letter_paragraphs.py --root /var/www/nemo-seamless-gutter
+   python3 /root/nemo-repo/deploy/repair_letter_paragraphs.py --root /var/www/nemo-seamless-gutter --apply
+   ```
+   1,021 single-letter paragraphs, 63% of a live page. *How you would know:*
+   the file drops to ~350 lines and `grep -c '<p>[A-Za-z]</p>'` returns 0.
+4. **Eric — one Business Profile sitting, ten minutes, free. Day forty-two.**
+   Unchanged from yesterday because nothing about it has changed, and it is
+   still the only item on this list that can plausibly move the goal metric:
+   1. **Primary category** — the most specific gutter category, not roofing or
+      general contractor. Highest-weighted single field. 2–4 secondaries. (T016)
+   2. **Service area** — the real York County towns you drive to. Not the whole
+      state, not one pin. (T051)
+   3. **Website URL** → `https://nemoseamlessgutter.com/?utm_source=gbp`. This
+      is the instrument: without it nothing measures whether 1, 2 or 5 paid off.
+      (`metrics.py:352` maps it to `local`.)
+   4. **Read off the review count and average** and tell us. Third-party
+      readings disagree (4.1/15 vs 4.2/13); nobody has seen the real one, and
+      three agents have now written recommendations around a guess.
+   5. **New, and it takes thirty seconds while you are in there:** does the
+      profile show your street address, or is it hidden as a service-area
+      business? The site publishes **808 W Mason Ave, York PA 17401** in its
+      schema. Distance is measured from the verified address *or* the
+      service-area centroid; if the profile hides an address the site
+      advertises, that is both a NAP inconsistency and a lost proximity
+      signal. *Checked:* `index.html` `_provider_ld()` carries the street
+      address; whether GBP does is unknowable from here.
+   *How you would know:* any non-zero `local_visitors` day proves 3 landed.
+   *Checked:* T016 and T051 both `candidate`, `activated: null`; `grep -ni
+   "category" growth/techniques.py` finds nothing touching the profile.
+   **Cannot be automated — the engine has no GBP write path.**
+5. **Eric — the photo backfill (T083) and reply to every existing review
+   (T033).** One evening, free. Recency and owner response rate now outweigh
+   review volume; both are entirely within your control and neither costs
+   anything. Real photos of real jobs only. No incentives, no gating, no
+   filtering by expected rating.
+6. **Eric — PA HIC number on the site, and "licensed and insured" beside the
+   phone buttons. Day twenty-three.** Legal (HICPA requires the number on
+   advertising distributed in PA, and a website is advertising) and commercial.
+   Look it up at **hicsearch.attorneygeneral.gov**. *Engine-actionable the
+   moment Eric supplies the number* — it belongs in `templates.py` so every
+   generated page inherits it. I must not invent a number. *Checked:* zero
+   matches across 44 pages.
+7. **Eric — decide on Local Services Ads (T011), or decide against, this week.**
+   Numbers unchanged from yesterday: ~$20–55/lead for gutters, 43.9% book rate,
+   ~$233 per booked customer. **This is a spend decision and entirely yours.**
+   The only thing I will add is the date: fall campaigns are meant to start 6–8
+   weeks before peak leaf-drop, peak drop in York County is late October, and
+   that puts the start of the window at this week. A "no" is also progress.
+8. **Eric — the Schuylkill and York Springs service claims.** Day twenty-five
+   and day four. **Whether NEMO actually drives to Schuylkill County and York
+   Springs is Eric's call, not mine.** If he does, keep them and make the
+   Business Profile agree. If he does not, they come out — what cannot stand is
+   the site making operational promises no human made. Item 2 stops *new* York
+   Springs rows; it does not remove the seven already in `keywords.json`.
+   ```
+   python3 /root/nemo-repo/deploy/retire_out_of_area.py --root /var/www/nemo-seamless-gutter
+   python3 /root/nemo-repo/deploy/retire_out_of_area.py --root /var/www/nemo-seamless-gutter --apply
+   ```
+9. **Nobody — still do not action T082, and still do not schedule T084.**
+   Re-confirmed today against a fresh source that repeats the error. Zero
+   minutes; the cost is only that someone reads the ledger and spends an
+   evening on a button that has not existed since 2024.
+10. **Engine — the `gsc_clicks` unit bug (`gsc.py:283`). Described, still
+    deliberately not written.** Unchanged: the API returns a 28-day windowed
+    total and there is no honest per-day number without requesting per-day rows,
+    so the fix touches `review.py`, `seed.py`, `report.py` and
+    `email_report.py`. `earned()` already withdraws all three affected
+    verdicts, so item 2 removes the harm without it.
+11. **Carried, unwritten, deliberately:** `internal_links` to guides (thirteen
+    days of zero); `MIN_RECENT_MEDIAN`; the topic-versus-query gap in
+    `money_pages._needs_its_own_page` (watch dated 2026-10-07 above).
+
+### What I changed in this repo today
+
+**One change: a guard against publishing the model's scaffolding.**
+`growth/techniques.py`, `growth/test_techniques.py`. **242 tests pass (236
+before; 6 added).** Runtime state untouched — `techniques.json`,
+`keywords.json`, `results.jsonl`, `state.json` are droplet-owned and I did not
+go near them. I activated and retired nothing.
+
+- **`_looks_unfinished(s)`** — a deliberately narrow predicate: the word
+  *placeholder*, *lorem ipsum*, `{{`, `[insert`/`[your`/`[todo`, a bare *todo*,
+  or a single token containing an underscore and no spaces. Nothing else. A
+  false positive here silently deletes real copy, which is worse than the bug.
+- **`_strlist` drops such items** rather than rejecting the payload. The Dover
+  section was two good paragraphs, five good bullets and one bad slot; dropping
+  keeps the good copy, and the callers already refuse a section whose
+  `paragraphs` come back empty, so a payload that is *entirely* scaffolding
+  still fails loudly. This is the same choke point, chosen for the same reason,
+  as the 08-16 single-letter fix.
+- **`_render_sections` skips a scaffolding `<h2>`**, which `_strlist` cannot
+  reach, and **`_usable_faqs` filters Q/A pairs for both `_render_faqs` and
+  `_faq_ld`** — filtering only the renderer would have left the placeholder in
+  the FAQPage JSON-LD, which is the copy Google actually quotes.
+  `strengthen_pages` now also rejects a section whose `h2` is scaffolding.
+
+**Why I broke yesterday's "write no more undeployed code" rule.** Yesterday's
+agent set that rule and named its exception: *"something had broken that morning
+and the fix had to exist before a deploy could carry it."* That is precisely
+today. The engine shipped a defect to a live page this morning; the deploy is
+one command whenever it happens; and this fix is nine lines of predicate plus
+four call sites. Leaving it unwritten would mean the deploy, when it lands,
+carries every other guard but not the one for the failure that happened today.
+
+**Verification, because a guard that eats real copy is worse than the bug.** I
+ran `_looks_unfinished` over every `<p>`, `<li>`, `<h2>` and `<h3>` on all 44
+published pages: **3,225 text nodes scanned, exactly one flagged** — the Dover
+placeholder. Zero false positives against three thousand paragraphs of the
+site's real copy.
+
+**Corrections to my standing instructions.** *New today:* (h) **The model can
+return the right JSON shape with a field name inside it** — `_strlist` and
+`_looks_unfinished` now cover paragraphs, bullets, headings and FAQ pairs; if a
+new technique adds a text field, route it through them. (i) **The homepage
+CTR test is structurally unmeasurable at ~10 clicks per 28 days** — do not read
+an `improve_ctr` rewrite as an improvement without a click count that could
+carry one. (j) **The schema `@type` is already `RoofingContractor`**, the most
+specific type that exists for this trade — do not re-propose schema
+specificity. (k) **The brand name is clean of keyword stuffing** — do not
+"optimise" it; that is a leading suspension cause in 2026. (l) **GBP's
+"auto-generated description" is an opt-in button, not something Google
+applies** — do not re-chase it. (m) **The `york springs` leak is priced**: 4
+rows on 09-01, 7 today, growing every morning the deploy does not run.
+*Carried, unchanged:* (a) T082 is impossible, re-confirmed today against a
+source that repeats the error; (b) T084 is a non-problem (115,754 B homepage);
+(c) verify scout proposals before they reach Eric; (d) `areaServed` is clean on
+all structured-data pages; (e) not one discovered untracked query is a York
+County PA geo query; (f) `coverage_pct` can fall on a productive day; (g) a
+successful scout run does not prove the `pause_turn` fix shipped; never compare
+a traffic window straddling 2026-08-14; the site converts at ~2.27%, which is
+normal — it is a volume problem; quote `top3/ranked` alongside `share_pct`;
+`call_taps: 0` is a verified real zero, `local_visitors` is blind; never quote
+`avg_position`, site CTR or the "18.0/day" figure as health; `ai_visitors` is
+structurally blind to AI Overviews; this session cannot reach
+nemoseamlessgutter.com, support.google.com or developers.google.com.
+
+### Reasoning and uncertainties
+
+Day forty-two. Goal metric **2/215**, unchanged since the day it was first
+measured. **Fourteen dated recommendations, zero actioned, four days running.**
+
+**What I would defend hardest today.** That the placeholder and the York Springs
+leak are the same story told twice, and that story is the deploy. Both are
+failures the repo already knows how to prevent. One of them ran this morning and
+put broken markup in front of a Dover homeowner; the other ran this morning and
+put two more uncoverable rows into the denominator of the number this whole
+project exists to move. Neither is a hard problem. Both are one command.
+
+**What I am least sure of.** Whether item 1 is worth ranking above item 2. A
+single stray paragraph on one town page is, in traffic terms, nothing — that
+page took a handful of visits all month. I put it first because it is ten
+seconds, because it is the only defect on this list a customer could actually
+see, and because a site whose entire purpose is to look like a real local
+contractor cannot afford to look like a broken template. But if Divine has one
+minute and not two, **item 2 is the one that matters**, and I would rather the
+placeholder sat there another day than the deploy did.
+
+**Where I might be wrong in a way that matters.** I have written for two days now
+that the free levers are the whole story and the engine is not the bottleneck.
+This morning weakens that. The engine published a defect, re-stamped six false
+verdicts, widened a keyword leak it has a committed fix for, wrote a second page
+on a topic it already covers, and spent a billable model call rewriting a title
+on a page where CTR cannot be measured. None of those is fatal, and every one is
+a fix that already exists in git. But "the engine is fine, the humans are the
+blockage" is a comfortable conclusion for an agent that only reads the engine's
+own output, and today is the first day the output argued against it.
+
+**What I keep coming back to.** Six weeks, 215 tracked queries, 43.3% coverage,
+87 techniques, 44 published pages, and **two top-3 positions — the same two it
+started with**. The measurable subset has been 2/35 for six weeks. That is not a
+number moving slowly; it is a number that has not moved at all.
+
+**What would change my mind, dated.**
+1. **Tomorrow's snapshot.** `keywords.ranked` present, or `traffic.log_visitors`
+   present, or `scoreboard.works` at 1 — any one says item 2 landed.
+2. **`grep -c placeholder` on the Dover page returning 0** says item 1 landed.
+3. **`services/half-round-gutters.html` at ~350 lines** says item 3 landed;
+   ~1,616 says day twenty-three.
+4. **`tracked_queries` falling, or the York Springs count staying at 7** — the
+   first says item 8 ran, the second says item 2 did.
+5. **Any non-zero `local_visitors` day.** Item 4.3. Thirty-five days.
+6. **A review count read off the actual profile.** Item 4.4.
+7. **2026-09-10.** Whether the beacon-era uptick (15 → 29) survives, or was two
+   Tuesdays. Three days out.
+8. **2026-09-20 — the coverage-versus-rank test.** Coverage 32.3% → 43.3% since
+   08-20 with `top3` flat at 2. If coverage keeps climbing and `top3` is still
+   2, page-strengthening is not converting into rank and the engine's one
+   remaining daily activity needs rethinking.
+9. **2026-09-28 — the `improve_ctr` test.** Homepage clicks outside 8–13 in the
+   28-day window would mean a snippet rewrite can register on this site after
+   all. Inside it means the technique is unfalsifiable here.
+10. **2026-10-07 — the two LeafFilter pages.** Neither in `ranked_known` by then
+    argues the topic-versus-query gap in `money_pages` is real.

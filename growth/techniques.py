@@ -163,6 +163,34 @@ def _ld(obj):
     return json.dumps(obj, indent=2).replace("<", "\\u003c")
 
 
+# Text the model emitted as scaffolding rather than as copy. On 2026-09-07
+# `strengthen_pages` published `<p>paragraphs2_placeholder</p>` to the live
+# Dover area page, between two perfectly good paragraphs — the model filled
+# slot 1 and slot 3 of its own {"paragraphs": [...]} and wrote the field name
+# into slot 2. Nothing in this module produces that string; there was simply
+# no check that what came back was prose.
+#
+# Same class of failure as the one _strlist below was written for: the model
+# returns the right shape with the wrong contents, and the renderer publishes
+# whatever it is handed. Deliberately narrow — a false positive silently
+# deletes real copy, so this matches only wording no gutter page would ever
+# carry.
+_UNFINISHED_RE = re.compile(
+    r"placeholder|lorem ipsum|\{\{|\[(?:insert|your|todo)\b|\btodo\b", re.I)
+
+
+def _looks_unfinished(s):
+    """True if `s` is scaffolding text rather than something to publish."""
+    t = (s or "").strip()
+    if not t:
+        return True
+    if _UNFINISHED_RE.search(t):
+        return True
+    # A single token carrying an underscore and no spaces is a variable name.
+    # Real body copy is never one word, and never one word with an underscore.
+    return " " not in t and "_" in t
+
+
 def _strlist(v):
     """Model list-of-strings fields, normalised so a bare string is one item.
 
@@ -182,12 +210,20 @@ def _strlist(v):
 
     A dict or a number is dropped rather than str()'d — writing "None" or
     "{'h2': ...}" into the page reads worse than writing nothing.
+
+    Scaffolding items are dropped for the same reason. Dropping rather than
+    rejecting the whole payload is the right trade here: the Dover section that
+    carried `paragraphs2_placeholder` was two good paragraphs, five good
+    bullets and one bad slot, and the callers already refuse a section whose
+    paragraphs come back empty — so a payload that is *all* scaffolding still
+    fails loudly, and one that is mostly usable still ships.
     """
     if v is None:
         return []
     if isinstance(v, str):
-        return [v] if v.strip() else []
-    return [x for x in v if isinstance(x, str) and x.strip()]
+        v = [v]
+    return [x for x in v
+            if isinstance(x, str) and x.strip() and not _looks_unfinished(x)]
 
 
 def _render_sections(sections):
@@ -195,7 +231,10 @@ def _render_sections(sections):
     headings and paragraphs directly, no extra wrapper divs."""
     out = []
     for s in sections or []:
-        if s.get("h2"):
+        # A heading cannot be normalised through _strlist, so it needs the
+        # same check applied here. Dropping the heading and keeping the copy
+        # beats printing a field name at <h2> size.
+        if s.get("h2") and not _looks_unfinished(s["h2"]):
             out.append(f'      <h2>{_esc(s["h2"])}</h2>')
         for p in _strlist(s.get("paragraphs")):
             out.append(f"      <p>{_esc(p)}</p>")
@@ -208,7 +247,23 @@ def _render_sections(sections):
     return "\n".join(out)
 
 
+def _usable_faqs(faqs):
+    """Q/A pairs fit to publish.
+
+    A half-written Q or A reaches the reader through _render_faqs and Google
+    through _faq_ld, so both read this rather than the raw list — filtering in
+    the renderer alone would leave the scaffolding in the structured data,
+    which is the copy Google actually quotes. Drop the pair, not either half:
+    a question with no answer is worse markup than no question.
+    """
+    return [f for f in (faqs or [])
+            if isinstance(f, dict)
+            and not _looks_unfinished(f.get("q", ""))
+            and not _looks_unfinished(f.get("a", ""))]
+
+
 def _render_faqs(faqs):
+    faqs = _usable_faqs(faqs)
     if not faqs:
         return ""
     out = ["      <h2>Common questions</h2>"]
@@ -223,7 +278,7 @@ def _faq_ld(faqs):
         "@context": "https://schema.org", "@type": "FAQPage",
         "mainEntity": [{"@type": "Question", "name": f.get("q", ""),
                         "acceptedAnswer": {"@type": "Answer", "text": f.get("a", "")}}
-                       for f in (faqs or [])]})
+                       for f in _usable_faqs(faqs)]})
 
 
 def _provider_ld():
@@ -1059,7 +1114,10 @@ def strengthen_pages(ctx):
             continue
         paragraphs = _strlist(data.get("paragraphs"))
         bullets = _strlist(data.get("bullets"))
-        if not data.get("h2") or not paragraphs:
+        # `paragraphs` has already had scaffolding dropped by _strlist, so an
+        # empty list here also covers the payload that was nothing but slot
+        # names. The h2 is checked directly because nothing normalises it.
+        if not data.get("h2") or _looks_unfinished(data["h2"]) or not paragraphs:
             errors.append(f"model returned nothing usable for '{kw['query']}'")
             if len(errors) >= MAX_ITEM_FAILURES:
                 break
@@ -1083,7 +1141,10 @@ def strengthen_pages(ctx):
         block = _render_sections([{
             "h2": data["h2"], "paragraphs": paragraphs,
             "bullets": bullets}])
-        faq = data.get("faq") or {}
+        # One pair, not a list, so it cannot go through _usable_faqs — same
+        # rule applied by hand.
+        faq = _usable_faqs([data.get("faq") or {}])
+        faq = faq[0] if faq else {}
         if faq.get("q") and _off_area_prose(f'{faq["q"]} {faq.get("a", "")}'):
             faq = {}
         if faq.get("q"):
