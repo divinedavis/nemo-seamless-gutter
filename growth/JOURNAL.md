@@ -18519,3 +18519,23 @@ number moving slowly; it is a number that has not moved at all.
    all. Inside it means the technique is unfalsifiable here.
 10. **2026-10-07 — the two LeafFilter pages.** Neither in `ranked_known` by then
     argues the topic-versus-query gap in `money_pages` is real.
+
+## 2026-09-08 — engine run
+
+Goal: **0.9%** top-3 share of 216 tracked queries (target 50%).
+2026-09-07: 2 visitors (0 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: adopted 1 real search(es) into the tracked universe: best gutter guard york springs pa
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — FAILED: 3 candidate(s) failed, last: generation failed for 'gutter replacement dover pa': anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CeqU9ELt9d7aa32u1jpAo"}
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: no query needs its own page — the remaining gaps all belong on pages that exist, which strengthen_pages handles
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: sitemap.xml unchanged
+- `ping_indexnow` — ok: nothing new to submit
+
+**Scout did not run:** anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CeqU9GWMj9bw8SQuEnnfe"}
