@@ -13,7 +13,8 @@ This is not hypothetical. It has already happened twice:
 | 2026-08-05 | Credit balance hit $0 again, five days after the 08-01 cap lifted | `strengthen_pages` failed after 3 candidates and `scout` failed; the other nine steps reported `ok` because they had nothing to do, so `last_build` read `new: 0, changed: 0` — a run that produced nothing and looked calm |
 | 2026-08-12 → 08-13 | Balance $0 again | Same shape: `strengthen_pages` + `scout` failed, everything else `ok`, `new: 0, changed: 0` for two days |
 | 2026-08-19 → 08-20 | Balance $0 again | Same shape, two more days. On 08-20 `geo_answer_first_content_pass` failed too |
-| 2026-08-31 | Balance $0 again, three days after the 08-24 top-up was first drawn on | Same shape. `new: 0, changed: 0` |
+| 2026-08-31 → 09-02 | Balance $0 again, three days after the 08-24 top-up was first drawn on | Same shape. `new: 0, changed: 0` |
+| 2026-09-08 | Balance $0 again, five days after the 09-03 top-up was first drawn on | Same shape — but now every other technique is a `noop` too (`area_pages`, `service_pages` and `money_pages` have exhausted their queues), so a no-credit morning produces **nothing at all**, not merely less |
 
 Every time, the engine kept reporting `[ok]` on most steps. **A cost failure
 here looks like a quiet, partial success**, which is exactly why it needs a rule
@@ -32,11 +33,23 @@ duty cycle rather than a guess:
 | 08-19 → 08-20 | 2 | dead — no credit |
 | 08-21 → 08-27 | 7 | dead — unrelated crash in `growth_daily.py` |
 | 08-28 → 08-30 | 3 | **alive** — 3 page edits |
-| 08-31 | 1 | dead — no credit |
+| 08-31 → 09-02 | 3 | dead — no credit |
+| 09-03 → 09-07 | 5 | **alive** — 2 new pages, 7 page edits |
+| 09-08 | 1 | dead — no credit |
 
-**A top-up has bought 3–5 productive mornings, twice in a row.** Over the twenty
-days 08-12 → 08-31 the engine did billable work on **8 of 20**; an empty balance
-accounts for 5 of the 12 lost days and the crash for the other 7.
+**A top-up has bought 3–5 productive mornings, three times in a row.** The
+09-03 top-up lasted exactly five, the top of the predicted range, and then
+stopped dead — so this is now a measurement that predicts rather than a
+pattern that was noticed. Over the twenty-eight days 08-12 → 09-08 the engine
+did billable work on **13 of 28**; an empty balance accounts for **8** of the
+15 lost days and the August crash for the other 7.
+
+**As of 2026-09-08 the cost of a dead morning went up.** `area_pages`,
+`service_pages` and `money_pages` have each exhausted their queues and now
+report `noop` every run, so `strengthen_pages` is the engine's entire
+remaining output — and it is the technique that fails first on an empty
+balance. A no-credit morning is no longer a reduced run; it is a run that
+changes nothing on the site.
 
 This is a funding-shape problem, not a spending problem. Rule 1 above still holds
 — a run is cents — so the fix is **an auto-reload threshold on the Anthropic
