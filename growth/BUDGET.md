@@ -14,7 +14,7 @@ This is not hypothetical. It has already happened twice:
 | 2026-08-12 → 08-13 | Balance $0 again | Same shape: `strengthen_pages` + `scout` failed, everything else `ok`, `new: 0, changed: 0` for two days |
 | 2026-08-19 → 08-20 | Balance $0 again | Same shape, two more days. On 08-20 `geo_answer_first_content_pass` failed too |
 | 2026-08-31 → 09-02 | Balance $0 again, three days after the 08-24 top-up was first drawn on | Same shape. `new: 0, changed: 0` |
-| 2026-09-08 | Balance $0 again, five days after the 09-03 top-up was first drawn on | Same shape — but now every other technique is a `noop` too (`area_pages`, `service_pages` and `money_pages` have exhausted their queues), so a no-credit morning produces **nothing at all**, not merely less |
+| 2026-09-08 → 09-09 | Balance $0 again, five days after the 09-03 top-up was first drawn on | Same shape — but now every other technique is a `noop` too (`area_pages`, `service_pages` and `money_pages` have exhausted their queues), so a no-credit morning produces **nothing at all**, not merely less. Two consecutive mornings of `new: 0, changed: 0` with every step reporting `ok` or `noop` |
 
 Every time, the engine kept reporting `[ok]` on most steps. **A cost failure
 here looks like a quiet, partial success**, which is exactly why it needs a rule
@@ -35,14 +35,46 @@ duty cycle rather than a guess:
 | 08-28 → 08-30 | 3 | **alive** — 3 page edits |
 | 08-31 → 09-02 | 3 | dead — no credit |
 | 09-03 → 09-07 | 5 | **alive** — 2 new pages, 7 page edits |
-| 09-08 | 1 | dead — no credit |
+| 09-08 → 09-09 | 2 | dead — no credit |
 
 **A top-up has bought 3–5 productive mornings, three times in a row.** The
 09-03 top-up lasted exactly five, the top of the predicted range, and then
 stopped dead — so this is now a measurement that predicts rather than a
-pattern that was noticed. Over the twenty-eight days 08-12 → 09-08 the engine
-did billable work on **13 of 28**; an empty balance accounts for **8** of the
-15 lost days and the August crash for the other 7.
+pattern that was noticed. Over the twenty-nine days 08-12 → 09-09 the engine
+did billable work on **13 of 29**; an empty balance accounts for **9** of the
+16 lost days and the August crash for the other 7.
+
+## Since 2026-08-27, nothing tells a human the balance is empty
+
+This is not a gap in the checks. Every one of them works. The paths they
+report through were all closed on the same day, and the code says so:
+
+| Path | State | Where |
+|---|---|---|
+| 11:00 watchdog | Detects it — `cmd_watchdog` alerts on any `ok: false` step when `stale_days == 0`, and `strengthen_pages` fails exactly that way. **Mails nobody**: `--email` was removed 2026-08-27 at the owner's request. It writes the verdict to `/var/log/nemo-growth.log`. | `deploy/cron-nemo-growth`, `growth_daily.py:334` |
+| Developer's report | Carries the `BLOCKED` banner naming the exhausted balance. **Sends on Fridays only** — daily → weekly, 2026-08-27, at the owner's request. | `deploy/cron-nemo-growth`, `email_report.py:464` |
+| Eric's daily report | Sends every morning and **never mentions it**: `_blocked_banner` is in the `internal` section list only, not the owner's. | `email_report.py:533-556` |
+
+So an empty balance is reported to one person, one day a week. A stall that
+begins on a Saturday is not mailed to anyone until the following Friday, and
+the review agent's journal entry is in practice the fastest alarm the system
+has. Both 08-27 changes were reasonable on their own — an inbox that alerts
+daily stops being read — and together they removed every alarm on the failure
+that has since cost nine mornings.
+
+Two independent fixes, and they are not alternatives:
+
+1. **Restore the watchdog's alert.** One flag in `/etc/cron.d/nemo-growth`:
+   append `--email divinejdavis@gmail.com` to the 11:00 entry. `cmd_watchdog`
+   returns early when there are no problems, so this sends nothing on a
+   healthy morning — it does not reintroduce a daily email. The cron file's
+   own comment already says this.
+2. **Auto-reload threshold plus a monthly cap on the Anthropic account.**
+   Removes the need for anyone to be told at all.
+
+Fix 1 is a minute and needs no billing access; fix 2 is the real repair. Doing
+only 1 means someone gets told nine times a month. Doing only 2 means the next
+*different* silent failure gets the same nine mornings.
 
 **As of 2026-09-08 the cost of a dead morning went up.** `area_pages`,
 `service_pages` and `money_pages` have each exhausted their queues and now
