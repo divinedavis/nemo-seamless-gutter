@@ -14,7 +14,7 @@ This is not hypothetical. It has already happened twice:
 | 2026-08-12 → 08-13 | Balance $0 again | Same shape: `strengthen_pages` + `scout` failed, everything else `ok`, `new: 0, changed: 0` for two days |
 | 2026-08-19 → 08-20 | Balance $0 again | Same shape, two more days. On 08-20 `geo_answer_first_content_pass` failed too |
 | 2026-08-31 → 09-02 | Balance $0 again, three days after the 08-24 top-up was first drawn on | Same shape. `new: 0, changed: 0` |
-| 2026-09-08 → 09-09 | Balance $0 again, five days after the 09-03 top-up was first drawn on | Same shape — but now every other technique is a `noop` too (`area_pages`, `service_pages` and `money_pages` have exhausted their queues), so a no-credit morning produces **nothing at all**, not merely less. Two consecutive mornings of `new: 0, changed: 0` with every step reporting `ok` or `noop` |
+| 2026-09-08 → 09-10 | Balance $0 again, five days after the 09-03 top-up was first drawn on | Same shape — but now every other technique is a `noop` too (`area_pages`, `service_pages` and `money_pages` have exhausted their queues), so a no-credit morning produces **nothing at all**, not merely less. **Three** consecutive mornings of `new: 0, changed: 0` with every step reporting `ok` or `noop` |
 
 Every time, the engine kept reporting `[ok]` on most steps. **A cost failure
 here looks like a quiet, partial success**, which is exactly why it needs a rule
@@ -35,14 +35,14 @@ duty cycle rather than a guess:
 | 08-28 → 08-30 | 3 | **alive** — 3 page edits |
 | 08-31 → 09-02 | 3 | dead — no credit |
 | 09-03 → 09-07 | 5 | **alive** — 2 new pages, 7 page edits |
-| 09-08 → 09-09 | 2 | dead — no credit |
+| 09-08 → 09-10 | 3 | dead — no credit |
 
 **A top-up has bought 3–5 productive mornings, three times in a row.** The
 09-03 top-up lasted exactly five, the top of the predicted range, and then
 stopped dead — so this is now a measurement that predicts rather than a
-pattern that was noticed. Over the twenty-nine days 08-12 → 09-09 the engine
-did billable work on **13 of 29**; an empty balance accounts for **9** of the
-16 lost days and the August crash for the other 7.
+pattern that was noticed. Over the thirty days 08-12 → 09-10 the engine
+did billable work on **13 of 30**; an empty balance accounts for **10** of the
+17 lost days and the August crash for the other 7.
 
 ## Since 2026-08-27, nothing tells a human the balance is empty
 
@@ -60,9 +60,18 @@ begins on a Saturday is not mailed to anyone until the following Friday, and
 the review agent's journal entry is in practice the fastest alarm the system
 has. Both 08-27 changes were reasonable on their own — an inbox that alerts
 daily stops being read — and together they removed every alarm on the failure
-that has since cost nine mornings.
+that has since cost ten mornings.
 
-Two independent fixes, and they are not alternatives:
+**A third path exists and was overlooked for four days.** The cloud review agent
+runs daily at 07:00 ET and has its own notification channel to the account
+owner — phone and inbox — independent of this droplet's cron, the watchdog's
+`--email`, and the weekly developer report. It read `credit balance is too low`
+in `last_build` on each of 09-08, 09-09 and 09-10 and, on the first two, only
+wrote it in the journal. From **2026-09-10** it notifies as well: a billing
+stall, or a run that cannot execute its own instructions, is pushed the morning
+it is detected rather than waiting for someone to open this file.
+
+Two independent fixes on the droplet, and they are not alternatives:
 
 1. **Restore the watchdog's alert.** One flag in `/etc/cron.d/nemo-growth`:
    append `--email divinejdavis@gmail.com` to the 11:00 entry. `cmd_watchdog`
