@@ -20734,3 +20734,552 @@ Goal: **0.9%** top-3 share of 217 tracked queries (target 50%).
 - `ping_indexnow` — ok: nothing new to submit
 
 **Scout did not run:** anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011Cey3Na8jgNz9HtFvTF2aY"}
+
+## 2026-09-12 — review agent
+
+### Where the numbers stand
+
+**Fifth consecutive dead morning, and the stall has now matched the longest
+productive run this account has managed.** `strengthen_pages` failed after 3
+candidates and `scout` failed, both on `Your credit balance is too low`. Every
+other technique reported `ok`/`noop`. `new: 0, changed: 0`. Twelfth
+empty-balance morning since 08-12.
+
+The duty cycle, recomputed over 08-12 → 09-12 (32 days): **13 alive, 19 dead** —
+12 to an empty balance, 7 to the August crash. Productive runs have been 5, 3
+and 5 mornings. The current stall is **5**. Stalls are no longer *approaching*
+the length of the runs between them; as of this morning they have equalled them.
+
+**The goal metric did not move. Day forty-seven.**
+
+| | 09-11 | 09-12 |
+| --- | --- | --- |
+| `top3` / tracked | 2 / 217 | **2 / 217** |
+| `share_pct` | 0.9% | **0.9%** (target 50%) |
+| `top10` | 13 | **13** |
+| `ranked_known` | 38 | **39** (+1) |
+| `coverage_pct` | 42.9% | **42.9%** |
+
+Per town, `total / covered / top3`, diffed against `git show
+4cb4047:growth/snapshot.json`. **Every cell identical — not one number in the
+per-town table changed, fifth day running, every named town still at zero:**
+
+| town | 09-11 | 09-12 |
+| --- | --- | --- |
+| county | 117 / 47 / **2** | 117 / 47 / **2** |
+| york | 40 / 15 / **0** | 40 / 15 / **0** |
+| dover | 16 / 9 / **0** | 16 / 9 / **0** |
+| hanover | 11 / 6 / **0** | 11 / 6 / **0** |
+| red-lion | 11 / 5 / **0** | 11 / 5 / **0** |
+| dallastown | 11 / 6 / **0** | 11 / 6 / **0** |
+| spring-grove | 11 / 5 / **0** | 11 / 5 / **0** |
+
+`ranked_known` 38 → 39 is one query crossing into the ranked set. Per the
+standing rule it is not progress on its own, and today it is the only moving
+digit on the board.
+
+**Search Console**, 28-day window: rows 893 → **891**, matched 37 → **38**,
+clicks 20 → **20**, impressions 6,906 → **6,936**, avg position 26.7 → **26.9**.
+
+**Traffic.** 09-11 was **1 visitor** (1 organic, 0 maps, 0 direct), 1 pageview,
+0 leads. Last eight days: 3, 3, 2, 6, 3, 3, 1. **Measurement is not suspect** —
+that is a live low-volume series, not the flat-zero that would indict
+`metrics.py`'s bot filter.
+
+**Leads, all time: 4 bookings, 0 phone leads.** `call_taps` **0** for 24 days.
+`ai_calls` **0** for all 30 days in the series. `ai_visitors` **0** for every
+measured day. `local_visitors` 0 since 09-08 and still a twelve-host referrer
+bucket, not Maps.
+
+### Did previous changes work?
+
+**1 — Deploy `growth/`. NOT ACTIONED, day fifteen.** Today's snapshot top-level
+keys are unchanged from yesterday's and still carry **no `code_version`**, which
+`snapshot.py:231` emits unconditionally.
+
+The dated harm ran for the fifteenth time. Six verdicts re-stamped with
+**`"decided": "2026-09-12"`**, `works: true`:
+
+```
+T001 area_pages       works: true  "8 owned visitors in 47d (median 0.0/day and flat)"
+T002 money_pages      works: true  "6 owned visitors in 47d (median 0.0/day and flat)"
+T018 service_pages    works: true  "18 owned visitors in 47d (median 0.0/day and flat)"
+T017 strengthen_pages works: true  "gsc_clicks median 19.0/day since activation
+                                    (no pre-activation baseline)"
+T019 improve_ctr      works: true  "  (same)  "
+T020 adopt_queries    works: true  "  (same)  "
+```
+
+I read `earned()` out of the working tree rather than trusting yesterday's
+summary of it. `review.py:176-183`: a technique with owned URLs must clear
+`MIN_TOTAL_VISITORS` (`review.py:26`, **8**), so **T002 at 6 fails**; and
+`before is None` returns `False` outright, which is exactly the "no
+pre-activation baseline" case **T017, T019 and T020** all sit on. Under the
+committed code four of the six withdraw and only T001 (8, scraping the bar) and
+T018 (18) survive. Under the running code all six pass, for the fifteenth
+morning. `scoreboard.works` is **7**, `does_not_work` is **`[]`**, day eight.
+
+The `gsc_clicks` unit bug is visible in the same three lines: `gsc.py:283`
+records the 28-day *window total* as one day's value, so "19.0/day" is a median
+of window totals. The site's real click total for the whole 28 days is **20**.
+
+**2 — Auto-reload on the Anthropic account. NOT ACTIONED, day four of asking.**
+See the duty cycle above. The 3–5-mornings-per-top-up model has now predicted
+correctly four times and the current stall is on its fifth morning — past the
+top of the range, so this is a stall, not a run.
+
+**3 — Coverage versus rank. The formal test is 2026-09-20, eight days out, but I
+can now show the answer, and it is a null.** Reading `gsc` and `goal` out of
+every published snapshot end to end:
+
+| date | clicks | impressions | avg pos | top3 | tracked | cov% |
+| --- | --- | --- | --- | --- | --- | --- |
+| 08-20 | 18 | 26,613 | 25.1 | **2** | 195 | 32.3 |
+| 08-28 | 19 | 26,646 | 25.1 | **2** | 195 | 42.6 |
+| 08-31 | 17 | 26,860 | 25.1 | **2** | 195 | 43.6 |
+| 09-01 | 17 | 8,978 | 24.9 | **2** | 199 | 42.7 |
+| 09-05 | 20 | 7,732 | 25.0 | **2** | 205 | 43.9 |
+| 09-08 | 21 | 8,173 | 24.9 | **2** | 216 | 43.1 |
+| 09-11 | 20 | 6,906 | 26.7 | **2** | 217 | 42.9 |
+| 09-12 | 20 | 6,936 | 26.9 | **2** | 217 | 42.9 |
+
+**Coverage rose 32.3% → 43.9% and back to 42.9% — about ten points — while
+`top3` sat at exactly 2 for all twenty-four days and site-wide clicks stayed
+pinned in a 17–21 band.** Coverage and rank are not moving together at this
+site, at this scale, over this window. Two honest caveats: 20 clicks over 28
+days is small enough that the click band is nearly uninformative on its own, and
+the last five days of the window are a stalled engine, so the final stretch
+tests nothing. **The 09-20 verdict will be "no relationship detected, and
+weakened by the stall" rather than a clean null.** I am recording that now, in
+advance, so it cannot be quietly upgraded on the day.
+
+(The 09-01 impressions cliff — 26,860 → 8,978 — is the one-day 08-01 burst
+leaving the 28-day window, diagnosed on 09-08. Not re-litigated; noted so the
+table is not misread.)
+
+**4 — The York Springs geo guard. Still unshipped, day twelve, and the test did
+not run today.** Rows naming York Springs in `keywords.uncovered`: **8**,
+unchanged. But `adopt_queries` reported *"no new in-area searches worth
+tracking"* this morning — it adopted nothing — so unlike yesterday there was no
+adoption for the guard to be exercised against. Yesterday's weak pass stays weak
+and gains nothing today.
+
+**5 — Not one York County query among the discovered rows. Week seven, still
+zero.** All 40 geo-tagged rows are out of area: Perkasie, Akron, New Holland,
+Myerstown, Lititz, Stevens, Leola, Lancaster, Newmanstown, Kutztown, Villanova,
+Crum Lynne, Essington, Harleysville, Wilkes-Barre, Lemoyne, Marion Station, plus
+Bear (Delaware) and Media (Delaware County, PA).
+
+**6 — Yesterday's prediction that a device/page split would name the culprit.
+Could not be tested. The engine is not deployed and wrote nothing.**
+
+**Carried, all still NOT ACTIONED, all verified by grep in the working tree this
+morning:** Dover placeholder, day six (`grep -c placeholder
+areas/seamless-gutters-dover-pa.html` → **1**). Half-round page, day
+twenty-seven (`services/half-round-gutters.html`, 1,617 lines, **1,255**
+single-letter `<p>` elements by `<p>.</p>`; my regex differs from the 09-11
+count, the page itself is byte-identical — `git diff 4cb4047 f9b8796` shows
+`sitemap.xml` as the only changed site file). Schuylkill excision, day thirty
+(`services/seamless-gutter-installation.html:227-229`, still naming Pottsville,
+Schuylkill Haven, Orwigsburg, Frackville, Minersville, Tamaqua, Pine Grove,
+Ashland, Mahanoy City). PA HIC number, day twenty-eight (`grep -rl HIC` across
+all HTML → nothing). `?utm_source=gbp`, day forty (`grep -rn "utm_source=gbp"` →
+nothing, in pages or code). The watchdog `--email` flag — fifth stalled morning,
+still no evidence of mail, and still unverifiable from here because
+`publish_state.sh` does not publish `deploy/`. Eric's Business Profile sitting,
+day forty-seven.
+
+**Twenty items. Zero actioned, nine days running.**
+
+### What I researched today
+
+`WebSearch` worked. `WebFetch` did not — `EGRESS_BLOCKED` on the one page I most
+wanted to read. **Every citation below comes from the search tool's own summary;
+I could not open any of these pages and am not claiming I did.**
+
+**1. The machine-impression signature.** A 2026 write-up on separating human
+from machine impressions in Search Console gives the pattern as *"100 impressions
+in the top three positions producing zero clicks is the machine-issued
+signature"*. Separately, the two mechanisms this journal has previously tried and
+discarded are both dated **before** our data window and so cannot explain it:
+Google deprecated `&num=100` in September 2025 (which *removed* rank-tracker
+impressions), and the confirmed GSC impression-logging error was fixed starting
+early April 2026. ([freecodecamp.org](https://www.freecodecamp.org/news/how-to-tell-if-search-console-impressions-are-human-or-machine/),
+[getpassionfruit.com](https://www.getpassionfruit.com/research/your-search-console-data-has-been-wrong-for-a-year),
+[yotpo.com](https://www.yotpo.com/blog/rank-tracking-ai-first-era/))
+This matters because of the finding below: the *signature* survives even though
+both *mechanisms* this journal proposed are dead.
+
+**2. GBP `CALL_CLICKS` is alive in the Performance API.** The Business Profile
+Performance API's `DailyMetric` enum still carries `CALL_CLICKS`, alongside
+website clicks, direction requests and the `BUSINESS_IMPRESSIONS_*` series.
+([developers.google.com](https://developers.google.com/my-business/reference/performance/rest/v1/DailyMetric),
+[merchynt.com](https://www.merchynt.com/post/google-business-analytics-ultimate-guide-2026))
+The 09-04 entry correctly recorded that GBP *call history* was discontinued
+2024-07-31 and that T049's first half must be built against Performance. What is
+new today is the confirmation that the metric itself survives and is **readable
+by hand today, free, with no code** — which turns half of T049 from a build into
+a ten-minute look.
+
+**3. Local-pack weighting, re-confirmed not new.** GBP signals ~32% of local-pack
+weight, on-page ~19%, reviews ~16%; freshness (photos, posts, review replies) now
+feeds the pack directly. ([emarketed.com](https://emarketed.com/seo/local-seo-2026-service-business-rankings/),
+[digitalapplied.com](https://www.digitalapplied.com/blog/google-business-profile-guide-every-feature-2026))
+Recording as confirmation of the 09-11 reading, not as a finding.
+
+**4. Checked and dropped — the March 2026 core update / templated geo pages.**
+The reporting is a precise description of what `area_pages` could be producing,
+and it surfaced again in today's searches. **It has already been measured here
+and the site is clear**: 09-06 recorded 6-gram shingle containment across all 15
+area pages at median **0.14**, max **0.27** (a templated set runs 0.85+; guides
+max 0.16, services max 0.12). I am not re-raising it. Noting it so the next run
+that hits the same search result does not spend an afternoon rediscovering a
+settled question.
+([scorpion.co](https://www.scorpion.co/articles/news/industry-trends-news/googles-march-2026-core-update-what-local-servic/))
+
+**Rejected.** GEO/AI-visibility tool subscriptions — $50–500/month for a business
+with 2 visitors a day, and no source I found shows they answer the question we
+actually have. ([stackmatix.com](https://www.stackmatix.com/blog/geo-tools-guide))
+Anything built on bought citations or review volume, on the standing ToS rule.
+And I did not find any source confirming that GEO monitoring tools inflate GSC
+impressions — I looked for one specifically, to support the finding below, and
+**it does not exist as far as I can reach.** The finding below rests on this
+site's own data instead, which is the stronger footing anyway.
+
+### The finding of the day — the queries themselves are machine-written, and this does not depend on `&num=100`
+
+This journal has twice proposed a mechanism for the zero-click impressions
+(rank trackers via `&num=100`; the GSC logging bug) and twice refuted its own
+proposal, correctly, leaving 08-23 and 09-08 with *"whatever is generating
+these, it is not homeowners, but I no longer think this journal has correctly
+identified what."* Yesterday added the arithmetic that kills AI Overviews as a
+complete answer: P(0 clicks | n = 417) = **0.0012** at their worst published
+position-1 CTR of 1.6%, and **5×10⁻¹⁰** at an ordinary 5%.
+
+I went back to the raw query strings this morning instead of the aggregates.
+**Three fingerprints of machine authorship, in our own data, none of which
+requires any particular delivery mechanism to be true:**
+
+1. **A search operator.** `factors that affect gutter cleaning cost
+   -filetype:pdf` — 29 impressions, 0 clicks. No homeowner types `-filetype:pdf`
+   while looking for a gutter cleaner. That is a query composed by something
+   that speaks Google's operator syntax.
+2. **URL-encoded delimiters.** `seamless+gutters+perkasie+pa` — 59 impressions,
+   0 clicks, and it appears *alongside* the same phrase spelled with spaces
+   (`seamless gutters perkasie pa`, 18 impressions). GSC recorded both forms
+   separately, which means something submitted the `+`-joined form as a literal
+   query string rather than typing words into a box.
+3. **A cross-product, not a demand curve.** Eight rows share the exact template
+   `gutter guards in {town} pa` — Akron, New Holland, Lititz, Myerstown, Stevens,
+   Leola, Lancaster, Newmanstown. Three share `seamless gutter installation in
+   {town} pa`. Three more are `seamless gutter {services|repair|company}
+   villanova pa` — one town, three service verbs. Independent humans in eight
+   different Lancaster and Berks County towns do not converge on one identical
+   phrasing. **That is a keyword matrix being executed, town by town.**
+
+All 40 rows: **1,212 impressions, 0 clicks.** The nine at position < 10:
+**417 impressions, 0 clicks**, including `gutter installer` at position **1.0**
+with 103.
+
+**What I think this establishes, and what it does not.** It establishes that a
+substantial, identifiable share of this site's impressions are machine-issued —
+on evidence internal to the data, which survives the death of both mechanisms
+this journal previously proposed, because it is evidence of *authorship* rather
+than of *delivery*. It does **not** identify the operator. A competitor's rank
+tracker, an SEO tool crawling a Lancaster County service-area matrix that
+happens to return our URL, or an AI answer-engine harvester are all consistent
+with it, and I cannot separate them from here.
+
+**The consequence is practical and it cuts two ways.** Against: `avg_position`
+and site-wide `impressions` are contaminated by rows that were never human, so
+the standing rule "never quote `avg_position` or site CTR as health" now has a
+concrete cause rather than a suspicion. In favour: **`top3` is not
+contaminated** — it is computed over the 217 *tracked* York County queries, and
+`adopt_queries`' geo filter (`techniques.py:1613-1665`) has kept every one of
+these out of the tracked universe for six weeks. The guard everyone has been
+treating as unexercised has in fact been holding a lot of junk out of the goal
+metric this whole time. **The number Eric is judged on is the clean one.** That
+is the single best piece of news in this entry, and it is worth saying plainly
+after forty-seven days of a flat 2.
+
+### What I checked in the code before recommending anything
+
+| Claim I might have made | What I actually found | Where |
+| --- | --- | --- |
+| "Pull GBP call clicks automatically" | **Not implemented — nothing in the repo touches any Business Profile API.** `grep -rni "mybusiness\|businessprofile\|CALL_CLICKS"` across all `.py`/`.sh` returns only two prose hits inside `snapshot.json` evidence strings | repo-wide |
+| "Just add the scope to the existing credential" | **No.** `gsc.py:39,91-127` authenticates as a **service account** with `webmasters.readonly`. GBP Performance needs an owner/manager OAuth grant and Google's gated API application — this is not a scope edit | `gsc.py:39,91` |
+| "Add a machine-query filter to GSC" | Not implemented, and cheap: `_query` already takes `dimensions` | `gsc.py:130-143` |
+| "The area pages are thin templated geo pages" | **Already measured, site is clear** — 6-gram containment median 0.14, max 0.27 | JOURNAL 09-06 |
+| "Add click-to-call / a sticky call bar" | **Already shipped** — 215 `tel:+17175780073` links across the HTML, mobile `.call-bar` | `styles.css:229-268` |
+| "`call_taps: 0` means missing instrumentation" | **Measured zero** — tap tracking posts to `/e/call-tap` | `analytics.js:32,74` |
+| "Add FAQPage / LocalBusiness schema" | Already emitted on every generated page | `techniques.py` |
+| "The verdicts are stamped by broken code" | Confirmed against the committed fix, not from memory | `review.py:26,176-183` |
+
+### Recommendations
+
+**Nothing in this commit is live.** The site and engine run from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout; `publish_state.sh`
+copies droplet → repo only. Repo code reaches the droplet when a human runs the
+deploy, and not before.
+
+1. **Eric — auto-reload threshold on the Anthropic account, with a monthly cap.
+   Five minutes in a billing console. Day four of asking, and the stall is now as
+   long as the longest run.** Measured four times: a top-up buys **3–5 productive
+   mornings**, then the engine stops. **13 of the last 32 mornings did billable
+   work.** Since 09-08 a dead morning means *zero* site output, not merely less —
+   `area_pages`, `service_pages` and `money_pages` have exhausted their queues, so
+   `strengthen_pages` is the engine's entire productive capacity and it is the
+   technique that dies first. A run costs cents (`BUDGET.md` rule 1); this is
+   funding *shape*, not spend. *How you would know:* no `credit balance is too
+   low` in `last_build` for a fortnight. *Checked:* `growth/BUDGET.md`; the
+   failure text in every published snapshot from 08-12 on.
+
+2. **Divine — deploy `growth/`. Day fifteen. One minute.**
+   ```
+   [ -d /root/nemo-repo/.git ] \
+     || git clone https://github.com/divinedavis/nemo-seamless-gutter /root/nemo-repo
+   git -C /root/nemo-repo fetch origin main
+   git -C /root/nemo-repo reset --hard origin/main
+   bash /root/nemo-repo/deploy/deploy_growth.sh            # report only, writes nothing
+   bash /root/nemo-repo/deploy/deploy_growth.sh --apply
+   ```
+   The report half is read-only and safe at any time. *How you would know — one
+   check:* tomorrow's snapshot has a top-level **`code_version`** block.
+   *Checked today:* absent; and the six re-stamped verdicts above, four of which
+   the committed `earned()` refuses (`review.py:176-183`).
+
+3. **Eric — one Business Profile sitting. Fifteen minutes, free. Day forty-seven,
+   and still the only item on this list that can plausibly move `top3`.** GBP
+   signals are ~32% of local-pack weight and reviews ~16% — the two heaviest
+   factors on the board and the two the engine structurally cannot touch.
+   1. **Primary category** — the most specific gutter category, plus 2–4
+      secondaries. Single highest-weighted field. (T016)
+   2. **Is the street address shown, or hidden as a service-area business?** The
+      site publishes a York street address in its schema. If NEMO travels to the
+      customer and the address is shown, hiding it is a free ranking change.
+   3. **Website URL** → `https://nemoseamlessgutter.com/?utm_source=gbp`.
+      Without it, `local_visitors` is a twelve-host referrer bucket
+      (`metrics.py:62-65`) and a profile visit cannot be attributed.
+   4. **Read off the review count and average and tell us.** Third-party
+      readings disagree (4.1/15 vs 4.2/13) and forty-four ledger entries quote a
+      number nobody has looked at.
+   5. **Service area** — accuracy; a ranking action only if 3.2 says hidden. (T051)
+   6. **NEW — Performance → Calls, last 28 days, and profile impressions
+      (searches), Search vs Maps. Two numbers, same screen.** This is the
+      readable half of **T049**, which has been a candidate since the ledger was
+      seeded and has never been activated. **It is the only instrument in this
+      whole project that measures the owner's actual goal.** Right now the
+      system's entire knowledge of "does the phone ring" is `phone_leads: 0`
+      all-time, `ai_calls: 0` for 30 days and `call_taps: 0` for 24 — and every
+      one of those counts only calls that pass through the website or the AI
+      agent. **A homeowner who taps Call in the map pack is invisible to all
+      three.** If profile Calls is non-zero, `phone_leads_all_time: 0` has been
+      an artifact for forty-seven days and this project has been optimising
+      against a blind instrument. If it is zero, that is the first hard
+      confirmation that the phone genuinely is not ringing — which is worth
+      knowing too, and worse news honestly obtained.
+      *Also worth one line from Eric while he is in there:* **is the number on
+      the profile `(717) 578-0073`** — the only number on the site — or a
+      different one? If it is different, nothing in this system could ever have
+      seen a profile-driven call.
+   *Checked:* T016, T049 and T051 all `candidate`, `activated: null`; nothing in
+   `techniques.py` touches the profile. **Cannot be automated — no GBP write path,
+   and no read path either (see the code table).**
+
+4. **Eric — reviews, asked of every finished job. T007/T047, plus T033 (reply to
+   all) and T083 (photos).** Carried. Still the best available explanation for
+   seven weeks of ranking in Lititz and Akron and nowhere in York, and freshness
+   and reply rate now feed the pack directly. **Ask every customer** — Google's
+   policy prohibits soliciting a selected subset, and a suspension would cost more
+   than any of this earns.
+
+5. **Engine, after the deploy — filter the machine queries, then split the
+   survivors by device and page. Costs no Anthropic credit, which is the point.**
+   The Search Console API is free and unaffected by the billing stall, and
+   `gsc.py:130-143` already takes `dimensions`. Two parts, in order:
+   (a) exclude rows carrying a machine fingerprint — a search operator, `+`
+   delimiters, or membership in a same-template town cross-product — from
+   `avg_position` and from any impression figure reported as health;
+   (b) pull `["query","device"]` and `["query","page"]` for the nine
+   position-<10 rows. **My prediction, recorded so it can be wrong: after (a),
+   site `avg_position` improves materially — it is currently dragged down by rows
+   at positions 30–82 that were never human — and the surviving zero-click rows
+   are overwhelmingly desktop**, because a matrix runner queries desktop while
+   genuine local gutter searches skew mobile. If instead they come back mobile,
+   my finding of the day is wrong and I will say so on the date. *How you would
+   know:* the next snapshot names a device split and a filtered `avg_position`.
+   *I am not writing this today* — see item 11.
+
+6. **Divine — Dover placeholder. Ten seconds. Day six.**
+   ```
+   sed -i '/<p>paragraphs2_placeholder<\/p>/d' \
+     /var/www/nemo-seamless-gutter/areas/seamless-gutters-dover-pa.html
+   ```
+   *Checked:* `grep -c placeholder` → **1**, on a live tracked town page.
+
+7. **Divine — restore the watchdog's alert. One flag, one minute.** Append
+   `--email divinejdavis@gmail.com` to the 11:00 entry in
+   `/etc/cron.d/nemo-growth`. `cmd_watchdog` returns early when healthy
+   (`growth_daily.py:346`), so it sends **nothing** on a good morning. Five dead
+   mornings have now passed without it.
+
+8. **Divine — the half-round repair. Day twenty-seven. Two minutes.**
+   ```
+   python3 /root/nemo-repo/deploy/repair_letter_paragraphs.py --root /var/www/nemo-seamless-gutter
+   python3 /root/nemo-repo/deploy/repair_letter_paragraphs.py --root /var/www/nemo-seamless-gutter --apply
+   ```
+
+9. **Eric — the Schuylkill and York Springs service claims.** Day thirty and day
+   twelve. Whether NEMO drives there is Eric's call; what cannot stand is the site
+   making operational promises no human made.
+   ```
+   python3 /root/nemo-repo/deploy/retire_out_of_area.py --root /var/www/nemo-seamless-gutter
+   python3 /root/nemo-repo/deploy/retire_out_of_area.py --root /var/www/nemo-seamless-gutter --apply
+   ```
+
+10. **Eric — PA HIC number on the site, plus "licensed and insured" beside the
+    phone buttons. Day twenty-eight.** HICPA requires the number on advertising
+    distributed in PA, and a website is advertising. *Engine-actionable the moment
+    Eric supplies it* — it belongs in `templates.py`. I must not invent a number.
+
+11. **Engine — nothing new written today, deliberately, for the sixth day.** The
+    09-07 rule holds: no more undeployed code while the backlog is fifteen days
+    deep. Item 5 is a genuinely new idea and I am still not writing it, because a
+    sixteenth undeployed file makes the one command that matters no likelier to
+    be run.
+
+12. **Eric — decide on Local Services Ads (T011), or decide against.** The
+    6–8-weeks-before-peak-leaf-drop window has closed. A recorded "no" is progress.
+
+13. **Nobody — do not** re-propose click-to-call or a sticky call bar
+    (`styles.css:229`, 215 `tel:` links site-wide); re-propose call-tap
+    instrumentation (`analytics.js:32`); re-propose FAQPage or LocalBusiness
+    schema; re-propose schema `@type` specificity (`index.html` already emits
+    `RoofingContractor`); **re-raise the March 2026 core update against the area
+    pages** (measured 09-06: 6-gram containment median 0.14, max 0.27 — the site
+    is clear, and this is now the second time a search surfaced it); re-chase
+    scaled content abuse (measured and rejected 09-08); re-propose `&num=100` or
+    the GSC logging bug as the zero-click mechanism (both dated before our
+    window); propose fetching AI-Overview data via the API; action T082 (retired);
+    schedule T084; or re-suspect the Search Console property.
+
+14. **Carried, unwritten:** the `gsc_clicks` unit bug (`gsc.py:283`);
+    `internal_links` to guides (eighteen days of zero); `MIN_RECENT_MEDIAN` making
+    the retire branch unreachable; the topic-versus-query gap in
+    `money_pages._needs_its_own_page` (watch 2026-10-07); the `TOWN_QUEUE` /
+    `keywords.TOWNS` divergence; and the five bare "near me" queries in the
+    tracked universe (`techniques.py:1640`) that GSC averages across all
+    geographies and so can never be scored top-3 *for York County* — five of 217,
+    permanently unscoreable rows in the goal's denominator.
+
+### What I changed in this repo today
+
+**One file, documentation:** `growth/BUDGET.md` — records 09-12 as the fifth day
+of the current stall and the twelfth empty-balance morning, updates the duty
+cycle to 13 alive of the 32 days 08-12 → 09-12, and notes that the stall has
+equalled the longest productive run.
+
+**No engine code, no page copy, no keyword lists.** Runtime state untouched:
+`techniques.json`, `keywords.json`, `results.jsonl` and `state.json` are
+droplet-owned. I activated and retired nothing.
+
+**Corrections to my standing instructions.** *New today:* (jj) **The zero-click
+impressions are machine-authored, and the evidence is in the query strings, not
+in any delivery mechanism** — a `-filetype:pdf` operator, `+`-delimited query
+strings recorded separately from their spaced twins, and an eight-town
+cross-product of one identical template. Stop hunting for a mechanism; the
+authorship is settled and the operator's identity probably is not knowable from
+here. (kk) **`top3` is the *clean* metric** — the geo filter at
+`techniques.py:1613-1665` has kept every machine row out of the tracked
+universe, so contamination arguments apply to `avg_position` and site
+`impressions` but **not** to the goal number. (ll) **The March 2026 core update
+was already measured against our area pages and they are clear** (09-06, 6-gram
+containment median 0.14, max 0.27) — it will keep surfacing in searches; do not
+re-spend an afternoon on it. (mm) **GBP `CALL_CLICKS` survives in the Performance
+API and is readable by hand today** — the 2024-07-31 discontinuation killed call
+*history*, not the metric. (nn) **The engine cannot read GBP even in principle
+without new credentials** — `gsc.py` is a service account scoped
+`webmasters.readonly`; GBP Performance needs owner OAuth plus Google's gated API
+application, so "add a scope" is wrong.
+*Carried, unchanged:* `WebSearch` and `WebFetch` fail independently — say which
+half worked; the `/root/nemo-repo` clone has never been confirmed to exist; AI
+Overviews do not explain the zero-click rows on their own; an adoption on a
+no-output morning lowers `coverage_pct`; the watchdog mails nobody; the
+developer's report is Friday-only and Eric's daily copy omits the `BLOCKED`
+banner; `local_visitors` is a twelve-host bucket, not Maps; `code_version` is the
+single deploy test; never read `top10`, `ranked_known` or `matched` as progress
+without subtracting that morning's adoptions; the impression series is
+discontinuous across 09-01; the GSC Generative AI report is UI-only; the GSC
+property is verified correct in code; ranking outside the home city is easier
+than in it; Google's review policy requires asking all customers; T082 is
+impossible; T084 is a non-problem; never quote `avg_position` or site CTR as
+health; the site converts at ~2.3% — it is a volume problem; never compare a
+traffic window straddling 2026-08-14.
+
+### Reasoning and uncertainties
+
+Day forty-seven. `top3` **2 / 217**, unchanged since the day it was first
+measured. **Twenty dated recommendations, zero actioned, nine days running.**
+
+**What I would defend hardest today.** Going back to the raw query strings. This
+journal spent three weeks arguing about *mechanisms* for the zero-click
+impressions — `&num=100`, the logging bug, AI Overviews — and refuted all three,
+each time correctly and each time leaving the question open. The answer was
+sitting in the strings the whole time: a Google search operator, URL-encoded
+delimiters recorded alongside their own spaced twins, and eight towns sharing one
+template. Evidence of *who wrote the query* does not care which pipe delivered
+it, which is why it survives every refutation the mechanism arguments ran into.
+The lesson I want the next run to take is narrower than the finding: when three
+successive mechanisms fail, stop looking for a fourth mechanism and go look at
+the raw data one level below the aggregate.
+
+**What I nearly got wrong, twice.** First, I had "the March 2026 core update
+devalued templated geo pages, and `area_pages` is exactly that" half-drafted as a
+headline finding before I grepped my own journal and found it measured and closed
+on 09-06 with a number I could not have improved on. Second, and worse: I had
+written that adding GBP call metrics was "a scope edit away" from the existing
+Search Console credential. It is not — `gsc.py:39,91` is a *service account* on
+`webmasters.readonly`, and GBP Performance needs an owner OAuth grant plus
+Google's gated API application. That would have put a week of work behind a
+sentence reading "ten lines". Both were caught by Step 3b and both would have
+cost someone real time.
+
+**What I am least sure of.** Whether the machine rows are a large enough share of
+891 total rows to matter to `avg_position`, or just a conspicuous 40. The
+snapshot publishes `discovered_untracked` capped at 40 rows, so I can see
+1,212 of 6,936 impressions (17.5%) and cannot see the rest. The filter in item 5
+would answer it in one pull; until then, "avg_position is contaminated" is a
+claim about the part I can see, and I have not extrapolated it.
+
+**What I keep coming back to.** Five mornings the engine has produced nothing,
+and the reason is a billing setting. Fifteen days a committed fix has sat unrun,
+and this morning it re-stamped six false successes for the fifteenth time. Both
+are minutes of human work. And the thing I found today that I would most like
+someone to act on costs nothing at all: **two numbers on one Business Profile
+screen that would tell us whether the phone has been ringing this whole time.**
+Forty-seven days of this project have been spent optimising toward "more phone
+calls" using three instruments that are all structurally incapable of seeing a
+call placed from the map pack. Leaf-fall is roughly three weeks out.
+
+**What would change my mind, dated.**
+1. **A top-level `code_version` block in tomorrow's snapshot** — item 2 landed.
+2. **`does_not_work` becoming non-empty, or four of the six verdicts
+   withdrawing** — the same deploy, seen from the ledger side.
+3. **A morning with no `credit balance is too low` after a fortnight** — item 1.
+4. **An email on the next stalled morning** — item 7 landed.
+5. **`grep -c placeholder` on the Dover page returning 0** — item 6.
+6. **A non-zero GBP Calls figure** — item 3.6. This is the one I most want and
+   the cheapest to get. If it is non-zero, `phone_leads_all_time: 0` was an
+   artifact and several verdicts in this ledger need revisiting.
+7. **A device split on the nine zero-click rows.** My prediction is desktop. If
+   they are mobile, today's finding is wrong.
+8. **A filtered `avg_position`** — item 5(a). Prediction: it improves materially.
+9. **A `local_visitors` day after `?utm_source=gbp` is set** — item 3.3.
+10. **A review count read off the actual profile** — item 3.4.
+11. **2026-09-20 — coverage versus rank.** Pre-registered above as "no
+    relationship detected, weakened by the stall". Coverage 32.3% → 42.9%,
+    `top3` flat at 2 for twenty-four days.
+12. **2026-09-28 — the `improve_ctr` test.** Homepage clicks outside 8–13.
+13. **2026-10-07 — the two LeafFilter pages.**
+14. **Any `discovered_untracked` row naming a York County town.** Still zero
+    after seven weeks. Today's rows are the same eastern-PA matrix.
