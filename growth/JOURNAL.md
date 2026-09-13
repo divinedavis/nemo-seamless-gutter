@@ -21303,3 +21303,442 @@ Goal: **0.9%** top-3 share of 217 tracked queries (target 50%).
 - `ping_indexnow` — ok: nothing new to submit
 
 **Scout did not run:** anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CezwAqLWnThjEfEwBjsxJ"}
+
+## 2026-09-13 — review agent
+
+### Where the numbers stand
+
+**Sixth consecutive dead morning. The stall has now outlasted the longest
+productive run this account has ever managed.** `strengthen_pages` failed after
+3 candidates and `scout` failed, both on `Your credit balance is too low` —
+an empty account, not the self-imposed cap. Every other technique reported
+`ok`/`noop`. `new: 0, changed: 0`. Thirteenth empty-balance morning since 08-12.
+
+Duty cycle over 08-12 → 09-13 (33 days): **13 alive, 20 dead** — 13 to an empty
+balance, 7 to the August crash. Productive runs: 5, 3, 5. Current stall: **6**.
+
+**The goal metric did not move. Day forty-eight.**
+
+| | 09-12 | 09-13 |
+| --- | --- | --- |
+| `top3` / tracked | 2 / 217 | **2 / 217** |
+| `share_pct` | 0.9% | **0.9%** (target 50%) |
+| `top10` | 13 | **13** |
+| `ranked_known` | 39 | **39** |
+| `coverage_pct` | 42.9% | **42.9%** |
+
+Per town, diffed against `git show f9b8796:growth/snapshot.json`. **Every cell
+identical for the sixth day. Not one digit in the goal block moved today —
+yesterday at least `ranked_known` ticked; today nothing did.**
+
+| town | total / covered / top3 |
+| --- | --- |
+| county | 117 / 47 / **2** |
+| york | 40 / 15 / **0** |
+| dover | 16 / 9 / **0** |
+| hanover | 11 / 6 / **0** |
+| red-lion | 11 / 5 / **0** |
+| dallastown | 11 / 6 / **0** |
+| spring-grove | 11 / 5 / **0** |
+
+**Search Console**, 28-day window: rows 891 → **886**, matched 38 → **38**,
+clicks 20 → **19**, impressions 6,936 → **6,906**, avg position 26.9 → **26.8**.
+The window is now sliding the productive 09-03 → 09-07 period out of view;
+expect clicks to keep drifting down for mechanical reasons that say nothing
+about the site. Per the standing rule, `avg_position` is not quoted as health.
+
+**Traffic.** 09-12 was **1 visitor** (0 organic, 1 direct, 0 maps), 1 pageview,
+0 leads. Last eight days: 3, 3, 2, 6, 3, 3, 1, 1. Live low-volume series, not
+the flat zero that would indict `metrics.py`'s bot filter — measurement is not
+suspect.
+
+**Leads, all time: 4 bookings, 0 phone leads.** `call_taps` **0** for 25 days.
+`ai_calls` and `ai_visitors` **0** across the whole 30-day series.
+
+### Did previous changes work?
+
+**1 — Deploy `growth/`. NOT ACTIONED, day sixteen.** No `code_version` in
+today's snapshot; `keywords.ranked`, `gsc.tracked` and `gsc.pages` all still
+absent, exactly as on every prior morning. The dated harm ran for the sixteenth
+time — six verdicts re-stamped `"decided": "2026-09-13"`, `works: true`:
+
+```
+T001 area_pages       8 owned visitors in 48d (median 0.0/day and flat)
+T002 money_pages      6 owned visitors in 48d (median 0.0/day and flat)
+T018 service_pages    18 owned visitors in 48d (median 0.0/day and flat)
+T017 strengthen_pages gsc_clicks median 20.0/day since activation (no baseline)
+T019 improve_ctr        (same)
+T020 adopt_queries      (same)
+```
+
+Re-read `review.py` in the working tree rather than trusting yesterday's
+summary: `review.py:26` sets `MIN_TOTAL_VISITORS = 8`, and `earned()` at
+`review.py:176-183` returns `False` when `before is None`. Under the committed
+code T002 (6) fails the count and T017/T019/T020 fail for having no
+pre-activation baseline; only T001 (8, scraping the bar) and T018 (18) survive.
+Under the running code all six pass. `scoreboard.works` is **7**,
+`does_not_work` is **`[]`**, day nine. The `gsc_clicks` "20.0/day" is the
+28-day window total misfiled as one day's value (`gsc.py:283`); the site's real
+click total for the entire 28 days is 19.
+
+**2 — Auto-reload on the Anthropic account. NOT ACTIONED, day five.** The
+3–5-mornings-per-top-up model has predicted correctly four times running; the
+current stall is on morning six, past the top of the range and past the longest
+run. Nothing to re-litigate — it is a billing setting, not a bug.
+
+**3 — Coverage versus rank, pre-registered for 09-20 (seven days out).**
+Unchanged and still a null: coverage 32.3% → 43.9% → 42.9% across 25 days while
+`top3` sat at exactly 2 throughout. The verdict recorded in advance on 09-12
+stands — *"no relationship detected, and weakened by the stall"*. I checked
+today whether the orphan finding below rescues it as a mechanism. **It does
+not**, and I am saying so rather than taking the tidy story: the orphaned pages
+have no tracked query at all, so they never contributed to `coverage_pct` in
+the first place. The null is still a null with no mechanism attached.
+
+**4 — York Springs geo guard. Still unshipped, day thirteen, untested again.**
+8 rows naming York Springs in `keywords.uncovered`, unchanged.
+`adopt_queries` adopted nothing this morning, so the guard faced no input.
+
+**5 — Not one York County query among the discovered rows. Week eight, still
+zero.** All 40 rows are the same eastern-PA matrix (Perkasie, Akron, New
+Holland, Myerstown, Lititz, Stevens, Leola, Lancaster, Newmanstown, Kutztown,
+Villanova, Crum Lynne, Essington, Harleysville, Wilkes-Barre, Lemoyne, Marion
+Station, Bear DE, Media).
+
+**6 — Yesterday's two predictions could not be tested.** The device/page split
+and the filtered `avg_position` both require the deploy; the engine wrote
+nothing. Yesterday's machine-authorship finding is unaffected by today's data
+and I am not re-arguing it.
+
+**Carried, all verified by grep in the working tree this morning, all still NOT
+ACTIONED:** Dover placeholder, day seven (`grep -c placeholder` → **1**).
+Half-round page, day twenty-eight (**1,254** single-letter `<p>` elements).
+Schuylkill excision, day thirty-one (`services/seamless-gutter-installation.html:228`
+still names Pottsville, Schuylkill Haven, Orwigsburg, Frackville, Minersville,
+Tamaqua, Pine Grove, Ashland, Mahanoy City). PA HIC number, day twenty-nine
+(`grep -rl HIC` across all HTML → nothing). `?utm_source=gbp`, day forty-one
+(absent from pages and code). Watchdog `--email` flag — sixth stalled morning,
+still no evidence of mail. Eric's Business Profile sitting, day forty-eight.
+
+**Twenty-one items. Zero actioned, ten days running.**
+
+### The finding of the day — the link mesh has been pointing at the same six towns since it was written, and three area pages are true orphans
+
+`internal_links` has reported *"refreshed nearby-links on 0 page(s)"* every
+morning for **nineteen days**. Nineteen entries of this journal have counted
+that noop. None of them opened `_nearby_block` to ask what the block being
+written actually contains. I did, and the noop is correct — the technique is
+faithfully rewriting a mesh that has been wrong since it was written.
+
+`_nearby_block` (`techniques.py:315` before today's change) took
+`[(l, h) for (l, h) in pages if h != exclude_href][:6]`
+off a list `_all_area_pages` returns **sorted by filename**. A prefix slice of a
+sorted list is the same six entries for every caller. So all fifteen area pages
+link to Dallastown, Dillsburg, Dover, Glen Rock, Hallam and Hanover, and to
+nothing else.
+
+Measured on the working tree:
+
+| inbound links from the mesh | pages |
+| --- | --- |
+| 14 | Dallastown, Dillsburg, Dover, Glen Rock, Hallam, Hanover |
+| 6 | Jacobus |
+| **0** | Manchester, Mount Wolf, New Freedom, Red Lion, Shrewsbury, Spring Grove, Stewartstown, Wrightsville |
+
+Widening to inbound links from **anywhere in the site's HTML**:
+
+```
+0   Mount Wolf        0   Stewartstown      0   Wrightsville
+1   Spring Grove      3   New Freedom       3   Shrewsbury
+4   Manchester        6   Jacobus           6   Red Lion
+22  Hallam           27   Glen Rock        32   Dillsburg
+33  Dallastown       33   Dover            33   Hanover
+```
+
+**Mount Wolf, Stewartstown and Wrightsville have no inbound link from any HTML
+file on this site.** Their only route in is `sitemap.xml`. That is the precise
+failure `internal_links`' own docstring says it exists to prevent: *"New town
+pages are orphans until something links to them, and Google finds orphaned pages
+slowly and ranks them badly."* And **Spring Grove — a tracked town with 11
+tracked queries and `top3: 0` — has exactly one inbound link on the whole site**,
+from `index.html`.
+
+Research corroborates the harm rather than establishing it: a page with no
+internal links receives no internal PageRank and is reachable only via sitemap
+or an external backlink, and orphaned location pages muddy Google's read of a
+service area
+([pushleads.com](https://pushleads.com/seo/the-orphan-pages-killing-your-local-business-seo/),
+[gofishdigital.com](https://gofishdigital.com/blog/the-hidden-cost-of-neglecting-internal-links-in-2026/)).
+
+**What I am claiming and what I am not.** I am claiming the mesh is broken, that
+three pages are orphans, and that this is a defect worth fixing. I am **not**
+claiming it explains the flat `top3`: eight of the nine badly-linked pages have
+no tracked query at all (see the `TOWN_QUEUE` / `keywords.TOWNS` divergence,
+09-09), so fixing them **cannot move the goal metric directly**. Red Lion and
+Spring Grove are the two exceptions — both tracked, both at `top3: 0`, both
+among the worst-linked pages on the site — and that is suggestive, not causal.
+Two towns is not a sample.
+
+**Why it matters anyway, and why it is the one thing worth writing this week.**
+`BUDGET.md` rule 5 says prefer the technique that spends nothing.
+`internal_links` makes no model calls — it is one of four techniques that work
+on an empty balance. This morning all four were no-ops: three legitimately, and
+this one because of a bug. Fixed, **a deploy buys thirteen page edits the engine
+can make with zero credit**, which is the entire remaining capability of an
+unfunded engine.
+
+### What I changed in this repo today
+
+1. **`growth/techniques.py` — `_nearby_block` now walks a ring instead of taking
+   a prefix.** The window starts just after the current page and wraps. Every
+   area page gets six outbound links **and six inbound ones**; verified against
+   the real fifteen-page list — minimum inbound goes 0 → 6, maximum 14 → 6.
+   Degenerate meshes (1, 2, 3 pages) verified safe.
+2. **`growth/test_techniques.py` — `NearbyMeshTest`**, three cases: every page
+   linked, six outbound preserved, small meshes safe. **Full suite re-run: all
+   eleven test modules OK, 68 tests in `test_techniques`.**
+3. **`growth/BUDGET.md`** — records 09-13 as the sixth day of the stall and the
+   thirteenth empty-balance morning, updates the duty cycle to 13 alive of the
+   33 days 08-12 → 09-13, and notes the rule-5 consequence above.
+
+Runtime state untouched: `techniques.json`, `keywords.json`, `results.jsonl`,
+`state.json` are droplet-owned. I activated and retired nothing.
+
+**This breaks the 09-07 "write no more undeployed code" rule, deliberately.**
+That rule exists because a sixteenth undeployed file makes the one command that
+matters no likelier to be run. I am making an exception on one ground only: this
+is the sole change in the entire backlog that produces site output **while the
+account is empty**. Everything else in `growth/` waits on both a deploy and a
+top-up. This waits on the deploy alone.
+
+### What I researched today
+
+`WebSearch` worked. `WebFetch` was `EGRESS_BLOCKED` on every URL I tried, as
+yesterday — **every citation here is from the search tool's own summary and I
+did not open any of these pages.** Direct `curl` to nemoseamlessgutter.com also
+fails (proxy `CONNECT tunnel failed, 403`), so I still cannot compare the live
+site against this repo.
+
+- **Orphan pages and internal linking, 2026.** No internal links means no
+  internal PageRank; orphaned location pages confuse Google's model of a
+  service area; pages more than three clicks deep see materially less crawl
+  frequency. Used above as corroboration.
+  ([pushleads.com](https://pushleads.com/seo/the-orphan-pages-killing-your-local-business-seo/),
+  [gofishdigital.com](https://gofishdigital.com/blog/the-hidden-cost-of-neglecting-internal-links-in-2026/),
+  [bippermedia.com](https://bippermedia.com/seo/service-area-pages-seo/))
+- **Local pack weighting — re-confirmed, not new.** GBP ~32%, on-page ~19%,
+  reviews ~16%; review recency, volume and owner response rate all feed the
+  pack; the three pack results take ~42% of local clicks.
+  ([wolfpackadvising.com](https://wolfpackadvising.com/blog/how-to-rank-higher-on-google-maps/),
+  [tempestamedia.com](https://www.tempestamedia.com/2026/09/03/google-map-pack-seo-for-local-contractors-home-services/))
+- **AI answer engines.** ~80% of sources cited by AI platforms do not appear in
+  Google's top 10 for the same query; GBP remains the most influential single
+  source for local contractor recommendations, with Yelp heavily cited. This
+  supports the standing T035 (claim Yelp) and T009 (NAP citations)
+  recommendations rather than adding anything new.
+  ([beancount.io](https://beancount.io/blog/2026/08/16/google-ai-overviews-chatgpt-perplexity-small-business-visibility-guide),
+  [cheers.tech](https://www.cheers.tech/geo-academy/ai-search-engine-source-differences))
+
+**Rejected.** Paid GEO/AI-visibility monitoring (recurring cost against a
+2-visitor-a-day site; rejected eleven times now). Anything built on bought
+citations, review volume schemes or gating — Google's 2026 policy explicitly
+requires review requests go to **all** customers, and a suspension would cost
+more than any of this earns. I found nothing genuinely new in this week's
+sources; the local-search advice has been stable for three months and I would
+rather say that than dress up a re-read as a finding.
+
+### What I checked in the code before recommending anything
+
+| Claim I might have made | What I found | Where |
+| --- | --- | --- |
+| "`internal_links` is broken / dead" | The *technique* is correct; `_nearby_block` was wrong. Noop was the honest report of a bad mesh | `techniques.py:636-675`, `_nearby_block` at 314 |
+| "Add nearby-area interlinking" | Already shipped — all 15 area pages carry exactly one `data-growth="nearby"` block | `grep -c` over `areas/*.html` |
+| "Deploy also lands a county-only rank view" | True but **already recorded** 08-09 onward; not re-raised as new | JOURNAL 15111, 17593 |
+| "The town pages have no tracked queries" | True, and **already recorded 09-09** — not re-raised as new | JOURNAL 18720-18734 |
+| "Use TOWN_QUEUE coords for true nearest-neighbour links" | Rejected: coords exist for only 10 of 15 towns; a ring needs no data I would have to invent | `techniques.py:50-72` |
+| "Add FAQPage / LocalBusiness schema" | Already emitted on every generated page | `techniques.py` |
+| "Add click-to-call / sticky call bar" | Already shipped — 215 `tel:` links, mobile `.call-bar` | `styles.css:229-268` |
+| "`call_taps: 0` is missing instrumentation" | Measured zero; taps post to `/e/call-tap` | `analytics.js:32,74` |
+
+### Recommendations
+
+**Nothing in this commit is live.** The site and engine run from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout; `publish_state.sh`
+copies droplet → repo only. Repo code reaches the droplet when a human runs the
+deploy, and not before. Every on-site item below needs that deploy first.
+
+1. **Divine — deploy `growth/`. Day sixteen. One minute.** New argument today:
+   the deploy now also carries the mesh fix, which is **the only change in the
+   backlog that works on an empty balance**.
+   ```
+   [ -d /root/nemo-repo/.git ] \
+     || git clone https://github.com/divinedavis/nemo-seamless-gutter /root/nemo-repo
+   git -C /root/nemo-repo fetch origin main
+   git -C /root/nemo-repo reset --hard origin/main
+   bash /root/nemo-repo/deploy/deploy_growth.sh            # report only, writes nothing
+   bash /root/nemo-repo/deploy/deploy_growth.sh --apply
+   ```
+   *How you would know:* tomorrow's `last_build` shows `internal_links` —
+   **refreshed nearby-links on 13 page(s)** (computed against today's tree), and
+   the snapshot gains `code_version`, `keywords.ranked`, `gsc.tracked` and
+   `gsc.pages`. *Checked today:* all four absent; six verdicts re-stamped.
+
+2. **Eric — auto-reload threshold on the Anthropic account, with a monthly cap.
+   Five minutes in a billing console. Day five.** Measured four times: a top-up
+   buys 3–5 productive mornings, then the engine stops. 13 of the last 33
+   mornings did billable work. A run costs cents (`BUDGET.md` rule 1) — this is
+   funding *shape*, not spend. *How you would know:* no `credit balance is too
+   low` in `last_build` for a fortnight.
+
+3. **Eric — one Business Profile sitting. Fifteen minutes, free. Day
+   forty-eight, and still the only item that can plausibly move `top3`.** GBP is
+   ~32% of pack weight and reviews ~16% — the two heaviest factors, and the two
+   the engine structurally cannot touch. Unchanged from 09-12, carried in full:
+   1. **Primary category** — most specific gutter category, plus 2–4
+      secondaries (T016).
+   2. **Street address shown, or hidden as a service-area business?** If NEMO
+      travels to the customer and the address is shown, hiding it is free.
+   3. **Website URL** → `https://nemoseamlessgutter.com/?utm_source=gbp`, so a
+      profile visit is attributable at all (`metrics.py:62-65`).
+   4. **Read off the review count and average** — forty-five ledger entries now
+      quote a number nobody has looked at.
+   5. **Service area** accuracy (T051).
+   6. **Performance → Calls, last 28 days, plus profile impressions, Search vs
+      Maps.** Two numbers on one screen, and **the only instrument in this
+      project that measures the owner's actual goal.** `phone_leads: 0`
+      all-time, `ai_calls: 0`, `call_taps: 0` for 25 days — all three count only
+      calls through the website or AI agent, and **a homeowner tapping Call in
+      the map pack is invisible to every one of them.** Also: is the number on
+      the profile `(717) 578-0073`, the only number on the site? If not, nothing
+      here could ever have seen a profile-driven call.
+   *Checked:* T016, T049, T051 all `candidate`, `activated: null`; nothing in
+   `techniques.py` touches the profile, and there is no read path either —
+   `gsc.py:39,91` is a service account on `webmasters.readonly`, and GBP
+   Performance needs owner OAuth plus Google's gated API application.
+
+4. **Eric — reviews, asked of every finished job (T007/T047, T033 reply-to-all,
+   T083 photos).** Carried. Review recency, volume and owner response rate all
+   feed the pack directly. **Ask every customer** — soliciting a selected subset
+   is a policy violation.
+
+5. **Divine — Dover placeholder. Ten seconds. Day seven.**
+   ```
+   sed -i '/<p>paragraphs2_placeholder<\/p>/d' \
+     /var/www/nemo-seamless-gutter/areas/seamless-gutters-dover-pa.html
+   ```
+
+6. **Divine — restore the watchdog's alert. One flag, one minute.** Append
+   `--email divinejdavis@gmail.com` to the 11:00 entry in
+   `/etc/cron.d/nemo-growth`. `cmd_watchdog` returns early when healthy
+   (`growth_daily.py:346`) — it sends nothing on a good morning. Six dead
+   mornings have now passed without it.
+
+7. **Divine — half-round repair, day twenty-eight; Schuylkill/York Springs
+   excision, day thirty-one.** Scripts exist and are report-first:
+   ```
+   python3 /root/nemo-repo/deploy/repair_letter_paragraphs.py --root /var/www/nemo-seamless-gutter [--apply]
+   python3 /root/nemo-repo/deploy/retire_out_of_area.py     --root /var/www/nemo-seamless-gutter [--apply]
+   ```
+   Whether NEMO drives to Schuylkill County is Eric's call; what cannot stand is
+   the site making an operational promise no human made.
+
+8. **Eric — PA HIC number, plus "licensed and insured" beside the phone buttons.
+   Day twenty-nine.** HICPA requires it on advertising distributed in PA, and a
+   website is advertising. Engine-actionable the moment Eric supplies it
+   (`templates.py`). I must not invent a number.
+
+9. **Eric — decide on Local Services Ads (T011), or record a decision against.**
+   The 6–8-week-before-peak-leaf-drop window has closed. A recorded "no" is
+   progress; an undecided item is not.
+
+10. **Engine, after the deploy — filter machine queries, then split survivors by
+    device and page.** Costs no Anthropic credit; `gsc.py:130-143` already takes
+    `dimensions`. Carried from 09-12, **still unwritten** — one exception to the
+    no-new-code rule was enough for one day.
+
+11. **Nobody — do not** re-propose click-to-call or a sticky call bar; call-tap
+    instrumentation; FAQPage or LocalBusiness schema; schema `@type`
+    specificity; the March 2026 core update against the area pages (measured
+    09-06, 6-gram containment median 0.14 — the site is clear); scaled content
+    abuse (measured 09-08); `&num=100` or the GSC logging bug as the zero-click
+    mechanism; AI-Overview data via the API; extending `TOWN_QUEUE` (eighth
+    time); paid GEO monitoring (eleventh); T082 (retired); T084; or suspecting
+    the Search Console property.
+
+12. **Carried, unwritten:** the `gsc_clicks` unit bug (`gsc.py:283`);
+    `MIN_RECENT_MEDIAN` making the retire branch unreachable; the
+    topic-versus-query gap in `money_pages._needs_its_own_page` (watch
+    2026-10-07); the `TOWN_QUEUE` / `keywords.TOWNS` divergence; the five bare
+    "near me" queries (`techniques.py:1640`) that GSC averages across all
+    geographies and so can never score top-3 *for York County* — permanently
+    unscoreable rows in the goal's denominator. **New today:** `internal_links`
+    links area→area only; the 19 guide pages receive no engine-managed internal
+    links at all, and only 10 links point at `/guides/` from anywhere.
+
+### Reasoning and uncertainties
+
+Day forty-eight. `top3` **2 / 217**, unchanged since first measured.
+**Twenty-one dated recommendations, zero actioned, ten days running.**
+
+**What I would defend hardest today.** Opening `_nearby_block`. Nineteen entries
+of this journal — mine among them — logged *"refreshed nearby-links on 0
+page(s)"* as a benign noop and moved on, because a noop reads as "nothing to
+do". It read as health for nineteen days while three pages sat unreachable from
+anywhere but the sitemap. The generalisable lesson is narrow and I want it
+recorded: **a repeated noop is a claim, and a claim nobody has checked is not
+evidence.** When a technique reports "nothing to do" every morning for weeks,
+read what it would have done.
+
+**What I nearly got wrong.** I had the orphan finding drafted as the mechanism
+behind the coverage-versus-rank null — a genuinely satisfying story, since the
+09-20 verdict is pre-registered as a null with no mechanism. It is wrong: the
+orphaned pages have no tracked query, so they never entered `coverage_pct`.
+I also nearly proposed true nearest-neighbour links from `TOWN_QUEUE` coords
+before noticing coords exist for only 10 of the 15 towns, which would have meant
+inventing five sets of coordinates.
+
+**What I am least sure of.** Whether the mesh fix does anything measurable at
+all. Three orphans gaining six inbound links each should improve their odds of
+being crawled and indexed, but none of the three has a tracked query, so the
+effect will show — if it shows — in `gsc.rows` and `discovered_untracked`, not
+in `top3`. I could be fixing a real defect that moves no number Eric cares
+about. I still think it is right to fix: it costs nothing, it works unfunded,
+and leaving three published pages unreachable is indefensible on its own terms.
+
+**What I keep coming back to.** Six mornings of an engine doing nothing, sixteen
+days of a committed fix sitting unrun, and forty-eight days of a Business
+Profile nobody has opened. Every one of those is minutes of human work. The
+analysis side of this project is saturated — I found one real bug today by
+reading code nineteen entries had skimmed past, and beyond that the research
+turned up nothing this journal did not already know. **More review is no longer
+the constraint.** Leaf-fall in York County is roughly five weeks out, and
+indexing lag means content shipped from here on will not rank for this season.
+What can still work in-season is the profile, the reviews and the phone — none
+of which the engine can touch.
+
+**What would change my mind, dated.**
+1. **`internal_links` reporting "13 page(s)" tomorrow** — the deploy landed and
+   the mesh fix works. The single cleanest test on this list.
+2. **A top-level `code_version` block** — same deploy, seen from the other side.
+3. **`does_not_work` becoming non-empty, or four of six verdicts withdrawing.**
+4. **A morning with no `credit balance is too low` after a fortnight.**
+5. **An email on the next stalled morning** — the watchdog flag landed.
+6. **`grep -c placeholder` on the Dover page returning 0.**
+7. **A non-zero GBP Calls figure.** Still the one I most want and the cheapest
+   to get. If non-zero, `phone_leads_all_time: 0` has been an artifact for
+   forty-eight days and several verdicts need revisiting.
+8. **A device split on the nine zero-click rows.** Prediction: desktop. Mobile
+   would refute the 09-12 machine-authorship finding.
+9. **A filtered `avg_position`.** Prediction: improves materially.
+10. **A `local_visitors` day after `?utm_source=gbp` is set.**
+11. **A review count read off the actual profile.**
+12. **Mount Wolf, Stewartstown or Wrightsville appearing in `gsc.rows`** after
+    the mesh fix ships — the narrow test of today's finding. Absent from the
+    discovered rows today.
+13. **2026-09-20 — coverage versus rank.** Pre-registered: "no relationship
+    detected, weakened by the stall", and today confirmed it gains no mechanism
+    from the orphan finding.
+14. **2026-09-28 — the `improve_ctr` test.** Homepage clicks outside 8–13.
+15. **2026-10-07 — the two LeafFilter pages.**
+16. **Any `discovered_untracked` row naming a York County town.** Still zero
+    after eight weeks.

@@ -312,7 +312,21 @@ def _all_area_pages(ctx):
 
 
 def _nearby_block(pages, exclude_href):
-    near = [(l, h) for (l, h) in pages if h != exclude_href][:6]
+    # A ring, not a prefix. `pages` arrives sorted by filename, so the plain
+    # [:6] slice this used to take pointed every single page at the same
+    # alphabetically-first six towns. Measured on the live tree 2026-09-13:
+    # eight of the fifteen area pages had zero inbound links from the mesh and
+    # three (Mount Wolf, Stewartstown, Wrightsville) had none from anywhere on
+    # the site — the exact orphaning this technique's docstring says it exists
+    # to prevent, reported every morning as "refreshed nearby-links on 0
+    # page(s)" because each page already matched the block it would rewrite.
+    # Starting the window just after the current page and wrapping gives every
+    # page six outbound links AND six inbound ones.
+    others = [(l, h) for (l, h) in pages if h != exclude_href]
+    hrefs = [h for _, h in pages]
+    start = hrefs.index(exclude_href) if exclude_href in hrefs else 0
+    near = [others[(start + k) % len(others)]
+            for k in range(min(6, len(others)))] if others else []
     if not near:
         return ""
     links = "\n".join(

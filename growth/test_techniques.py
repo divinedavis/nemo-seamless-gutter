@@ -640,5 +640,45 @@ class UnfinishedText(unittest.TestCase):
         self.assertIn("Do you serve Dover?", T._faq_ld(faqs))
 
 
+class NearbyMeshTest(unittest.TestCase):
+    """The mesh has to link every town page, not only the first six.
+
+    Until 2026-09-13 `_nearby_block` took a plain [:6] off an alphabetically
+    sorted list, so all fifteen area pages linked the same six towns. Eight
+    pages had no inbound mesh link at all and three had none from anywhere on
+    the site. `internal_links` reported "0 page(s)" every morning throughout,
+    because each page already equalled the block it would have been given.
+    """
+
+    PAGES = [(f"Town{i:02d}", f"/areas/seamless-gutters-town{i:02d}-pa.html")
+             for i in range(15)]
+
+    def _inbound(self, pages):
+        counts = {h: 0 for _, h in pages}
+        for _, href in pages:
+            block = T._nearby_block(pages, href)
+            self.assertNotIn(href, block, "a page must not link to itself")
+            for _, other in pages:
+                if f'href="{other}"' in block:
+                    counts[other] += 1
+        return counts
+
+    def test_every_area_page_is_linked_by_the_mesh(self):
+        counts = self._inbound(self.PAGES)
+        self.assertEqual(min(counts.values()), 6)
+        self.assertEqual(max(counts.values()), 6)
+
+    def test_still_links_six_outbound(self):
+        block = T._nearby_block(self.PAGES, self.PAGES[0][1])
+        self.assertEqual(block.count('href="/areas/'), 6)
+
+    def test_small_meshes_do_not_blow_up(self):
+        for n in (1, 2, 3, 7):
+            pages = self.PAGES[:n]
+            counts = self._inbound(pages)
+            self.assertEqual(set(counts.values()), {min(6, n - 1)} if n > 1
+                             else {0})
+
+
 if __name__ == "__main__":
     unittest.main()
