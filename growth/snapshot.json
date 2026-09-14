@@ -1,25 +1,21 @@
 {
-  "generated": "2026-09-13T06:05:11+00:00",
-  "date": "2026-09-13",
+  "generated": "2026-09-14T06:05:13+00:00",
+  "date": "2026-09-14",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
     "target_pct": 50,
-    "share_pct": 0.9,
+    "share_pct": 0.5,
     "measured": true,
     "why_unmeasured": null,
-    "coverage_pct": 42.9,
-    "tracked_queries": 217,
-    "top3": 2,
+    "coverage_pct": 43.1,
+    "tracked_queries": 218,
+    "top3": 1,
     "top10": 13,
     "ranked_known": 39
   },
   "traffic": {
     "visitors": [
-      {
-        "date": "2026-07-30",
-        "value": 7
-      },
       {
         "date": "2026-07-31",
         "value": 5
@@ -195,13 +191,13 @@
       {
         "date": "2026-09-12",
         "value": 1
+      },
+      {
+        "date": "2026-09-13",
+        "value": 2
       }
     ],
     "pageviews": [
-      {
-        "date": "2026-07-30",
-        "value": 12
-      },
       {
         "date": "2026-07-31",
         "value": 13
@@ -377,14 +373,14 @@
       {
         "date": "2026-09-12",
         "value": 1
+      },
+      {
+        "date": "2026-09-13",
+        "value": 2
       }
     ],
     "organic_visitors": [
       {
-        "date": "2026-07-30",
-        "value": 3
-      },
-      {
         "date": "2026-07-31",
         "value": 1
       },
@@ -559,14 +555,14 @@
       {
         "date": "2026-09-12",
         "value": 0
+      },
+      {
+        "date": "2026-09-13",
+        "value": 1
       }
     ],
     "local_visitors": [
       {
-        "date": "2026-07-30",
-        "value": 0
-      },
-      {
         "date": "2026-07-31",
         "value": 0
       },
@@ -740,15 +736,15 @@
       },
       {
         "date": "2026-09-12",
+        "value": 0
+      },
+      {
+        "date": "2026-09-13",
         "value": 0
       }
     ],
     "ai_visitors": [
       {
-        "date": "2026-07-30",
-        "value": 0
-      },
-      {
         "date": "2026-07-31",
         "value": 0
       },
@@ -923,13 +919,13 @@
       {
         "date": "2026-09-12",
         "value": 0
+      },
+      {
+        "date": "2026-09-13",
+        "value": 0
       }
     ],
     "direct_visitors": [
-      {
-        "date": "2026-07-30",
-        "value": 3
-      },
       {
         "date": "2026-07-31",
         "value": 3
@@ -1105,13 +1101,13 @@
       {
         "date": "2026-09-12",
         "value": 1
+      },
+      {
+        "date": "2026-09-13",
+        "value": 1
       }
     ],
     "referral_visitors": [
-      {
-        "date": "2026-07-30",
-        "value": 0
-      },
       {
         "date": "2026-07-31",
         "value": 0
@@ -1286,15 +1282,15 @@
       },
       {
         "date": "2026-09-12",
+        "value": 0
+      },
+      {
+        "date": "2026-09-13",
         "value": 0
       }
     ],
     "campaign_visitors": [
       {
-        "date": "2026-07-30",
-        "value": 0
-      },
-      {
         "date": "2026-07-31",
         "value": 1
       },
@@ -1469,13 +1465,13 @@
       {
         "date": "2026-09-12",
         "value": 0
+      },
+      {
+        "date": "2026-09-13",
+        "value": 0
       }
     ],
     "bot_hits": [
-      {
-        "date": "2026-07-30",
-        "value": 1200
-      },
       {
         "date": "2026-07-31",
         "value": 3167
@@ -1651,13 +1647,13 @@
       {
         "date": "2026-09-12",
         "value": 2803
+      },
+      {
+        "date": "2026-09-13",
+        "value": 2499
       }
     ],
     "call_taps": [
-      {
-        "date": "2026-07-30",
-        "value": 0
-      },
       {
         "date": "2026-07-31",
         "value": 0
@@ -1832,15 +1828,15 @@
       },
       {
         "date": "2026-09-12",
+        "value": 0
+      },
+      {
+        "date": "2026-09-13",
         "value": 0
       }
     ],
     "ai_calls": [
       {
-        "date": "2026-07-30",
-        "value": 2
-      },
-      {
         "date": "2026-07-31",
         "value": 0
       },
@@ -2014,15 +2010,15 @@
       },
       {
         "date": "2026-09-12",
+        "value": 0
+      },
+      {
+        "date": "2026-09-13",
         "value": 0
       }
     ],
     "bookings": [
       {
-        "date": "2026-07-30",
-        "value": 1
-      },
-      {
         "date": "2026-07-31",
         "value": 0
       },
@@ -2196,15 +2192,15 @@
       },
       {
         "date": "2026-09-12",
+        "value": 0
+      },
+      {
+        "date": "2026-09-13",
         "value": 0
       }
     ],
     "phone_leads": [
       {
-        "date": "2026-07-30",
-        "value": 0
-      },
-      {
         "date": "2026-07-31",
         "value": 0
       },
@@ -2378,15 +2374,15 @@
       },
       {
         "date": "2026-09-12",
+        "value": 0
+      },
+      {
+        "date": "2026-09-13",
         "value": 0
       }
     ],
     "total_leads": [
       {
-        "date": "2026-07-30",
-        "value": 1
-      },
-      {
         "date": "2026-07-31",
         "value": 0
       },
@@ -2560,6 +2556,10 @@
       },
       {
         "date": "2026-09-12",
+        "value": 0
+      },
+      {
+        "date": "2026-09-13",
         "value": 0
       }
     ]
@@ -2574,7 +2574,7 @@
       "county": {
         "total": 117,
         "covered": 47,
-        "top3": 2
+        "top3": 1
       },
       "hanover": {
         "total": 11,
@@ -2597,8 +2597,8 @@
         "top3": 0
       },
       "spring-grove": {
-        "total": 11,
-        "covered": 5,
+        "total": 12,
+        "covered": 6,
         "top3": 0
       },
       "york": {
@@ -2609,8 +2609,8 @@
     },
     "by_intent": {
       "hire": {
-        "total": 136,
-        "covered": 74
+        "total": 137,
+        "covered": 75
       },
       "price": {
         "total": 51,
@@ -2759,14 +2759,14 @@
         "clicks": 0
       },
       {
-        "query": "gutters",
-        "position": 6.1,
-        "impressions": 88,
+        "query": "gutter replacement",
+        "position": 17.2,
+        "impressions": 79,
         "clicks": 0
       },
       {
-        "query": "gutter replacement",
-        "position": 17.4,
+        "query": "gutters",
+        "position": 6.4,
         "impressions": 79,
         "clicks": 0
       },
@@ -2784,19 +2784,25 @@
       },
       {
         "query": "gutter guards in akron pa",
-        "position": 16.1,
-        "impressions": 47,
+        "position": 15.8,
+        "impressions": 49,
         "clicks": 0
       },
       {
         "query": "gutter guards in new holland pa",
-        "position": 33.5,
-        "impressions": 46,
+        "position": 33.4,
+        "impressions": 47,
         "clicks": 0
       },
       {
         "query": "gutter repair",
         "position": 6.6,
+        "impressions": 43,
+        "clicks": 0
+      },
+      {
+        "query": "seamless gutter installation in myerstown pa",
+        "position": 44.1,
         "impressions": 43,
         "clicks": 0
       },
@@ -2807,39 +2813,39 @@
         "clicks": 0
       },
       {
-        "query": "seamless gutter installation in myerstown pa",
-        "position": 44.7,
-        "impressions": 40,
-        "clicks": 0
-      },
-      {
         "query": "gutter guards in lititz pa",
         "position": 28.1,
         "impressions": 37,
         "clicks": 0
       },
       {
-        "query": "gutter installation wilkes barre, pa",
-        "position": 54.4,
-        "impressions": 36,
+        "query": "seamless gutter installation in akron pa",
+        "position": 34.0,
+        "impressions": 37,
         "clicks": 0
       },
       {
-        "query": "seamless gutter installation in akron pa",
-        "position": 34.1,
+        "query": "gutter installation wilkes barre, pa",
+        "position": 54.0,
         "impressions": 34,
         "clicks": 0
       },
       {
         "query": "gutter replacement services",
-        "position": 9,
-        "impressions": 33,
+        "position": 9.2,
+        "impressions": 32,
         "clicks": 0
       },
       {
         "query": "gutter guards in myerstown pa",
-        "position": 75.4,
-        "impressions": 30,
+        "position": 76,
+        "impressions": 31,
+        "clicks": 0
+      },
+      {
+        "query": "gutter guards in stevens pa",
+        "position": 54.7,
+        "impressions": 31,
         "clicks": 0
       },
       {
@@ -2849,21 +2855,15 @@
         "clicks": 0
       },
       {
-        "query": "gutter guards in stevens pa",
-        "position": 54.9,
-        "impressions": 29,
-        "clicks": 0
-      },
-      {
         "query": "gutter guards in leola pa",
-        "position": 31.2,
-        "impressions": 25,
+        "position": 31.1,
+        "impressions": 29,
         "clicks": 0
       },
       {
         "query": "gutter guards in lancaster pa",
         "position": 42.5,
-        "impressions": 24,
+        "impressions": 26,
         "clicks": 0
       },
       {
@@ -2879,14 +2879,8 @@
         "clicks": 0
       },
       {
-        "query": "seamless gutters perkasie pa",
-        "position": 18.4,
-        "impressions": 19,
-        "clicks": 0
-      },
-      {
-        "query": "gutter screen perkasie pa",
-        "position": 30.1,
+        "query": "gutter",
+        "position": 4.5,
         "impressions": 18,
         "clicks": 0
       },
@@ -2897,20 +2891,8 @@
         "clicks": 0
       },
       {
-        "query": "gutter",
-        "position": 4.5,
-        "impressions": 17,
-        "clicks": 0
-      },
-      {
         "query": "nemo",
         "position": 7.2,
-        "impressions": 17,
-        "clicks": 0
-      },
-      {
-        "query": "seamless gutter company villanova pa",
-        "position": 20.6,
         "impressions": 17,
         "clicks": 0
       },
@@ -2921,21 +2903,15 @@
         "clicks": 0
       },
       {
+        "query": "seamless gutters perkasie pa",
+        "position": 18.2,
+        "impressions": 17,
+        "clicks": 0
+      },
+      {
         "query": "seamless gutter installation in stevens pa",
         "position": 40.1,
         "impressions": 16,
-        "clicks": 0
-      },
-      {
-        "query": "seamless gutters",
-        "position": 16.7,
-        "impressions": 16,
-        "clicks": 0
-      },
-      {
-        "query": "gutter leaf guard marion station pa",
-        "position": 38,
-        "impressions": 15,
         "clicks": 0
       },
       {
@@ -2945,26 +2921,20 @@
         "clicks": 0
       },
       {
-        "query": "seamless gutter repair villanova pa",
-        "position": 36.2,
+        "query": "seamless gutters",
+        "position": 17.6,
         "impressions": 15,
         "clicks": 0
       },
       {
-        "query": "seamless gutter services kutztown pa",
-        "position": 17.1,
-        "impressions": 15,
+        "query": "gutter guards in brownstown pa",
+        "position": 37.4,
+        "impressions": 14,
         "clicks": 0
       },
       {
         "query": "seamless gutter contractors essington pa",
         "position": 17.3,
-        "impressions": 14,
-        "clicks": 0
-      },
-      {
-        "query": "seamless gutter services villanova pa",
-        "position": 21.9,
         "impressions": 14,
         "clicks": 0
       },
@@ -2981,28 +2951,58 @@
         "clicks": 0
       },
       {
-        "query": "gutter guard harleysville pa",
-        "position": 46.5,
+        "query": "gutter leaf guard philadelphia pa",
+        "position": 50.4,
         "impressions": 13,
         "clicks": 0
       },
       {
-        "query": "gutter guards bear pa",
-        "position": 39.7,
+        "query": "gutter services",
+        "position": 9.8,
         "impressions": 13,
+        "clicks": 0
+      },
+      {
+        "query": "seamless gutter services kutztown pa",
+        "position": 17,
+        "impressions": 13,
+        "clicks": 0
+      },
+      {
+        "query": "clogged gutter cleaning wayne pa",
+        "position": 34.6,
+        "impressions": 12,
+        "clicks": 0
+      },
+      {
+        "query": "gutter cleaning contractors in lemoyne",
+        "position": 68.2,
+        "impressions": 11,
+        "clicks": 0
+      },
+      {
+        "query": "gutter guard installation harleysville pa",
+        "position": 42.5,
+        "impressions": 11,
+        "clicks": 0
+      },
+      {
+        "query": "new windows",
+        "position": 30.1,
+        "impressions": 11,
         "clicks": 0
       }
     ]
   },
   "gsc": {
-    "date": "2026-09-13",
+    "date": "2026-09-14",
     "ok": true,
     "connected": true,
-    "rows": 886,
+    "rows": 855,
     "matched": 38,
-    "clicks": 19,
-    "impressions": 6906,
-    "avg_position": 26.8
+    "clicks": 17,
+    "impressions": 5937,
+    "avg_position": 26.3
   },
   "techniques": [
     {
@@ -3023,21 +3023,17 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-13",
+        "decided": "2026-09-14",
         "works": true,
-        "why": "8 owned visitors in 48d (median 0.0/day and flat)",
+        "why": "8 owned visitors in 49d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 8,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 48
+          "days_measured": 49
         }
       },
       "owned_visitors": [
-        {
-          "date": "2026-07-30",
-          "value": 0
-        },
         {
           "date": "2026-07-31",
           "value": 0
@@ -3212,6 +3208,10 @@
         },
         {
           "date": "2026-09-12",
+          "value": 0
+        },
+        {
+          "date": "2026-09-13",
           "value": 0
         }
       ]
@@ -3234,21 +3234,17 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-13",
+        "decided": "2026-09-14",
         "works": true,
-        "why": "6 owned visitors in 48d (median 0.0/day and flat)",
+        "why": "6 owned visitors in 49d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 6,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 48
+          "days_measured": 49
         }
       },
       "owned_visitors": [
-        {
-          "date": "2026-07-30",
-          "value": 0
-        },
         {
           "date": "2026-07-31",
           "value": 0
@@ -3423,6 +3419,10 @@
         },
         {
           "date": "2026-09-12",
+          "value": 0
+        },
+        {
+          "date": "2026-09-13",
           "value": 0
         }
       ]
@@ -3700,14 +3700,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-13",
+        "decided": "2026-09-14",
         "works": true,
         "why": "gsc_clicks median 20.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 20.0,
           "median_before": null,
-          "days_measured": 48
+          "days_measured": 49
         }
       },
       "owned_visitors": null
@@ -3730,21 +3730,17 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-13",
+        "decided": "2026-09-14",
         "works": true,
-        "why": "18 owned visitors in 48d (median 0.0/day and flat)",
+        "why": "18 owned visitors in 49d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 18,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 48
+          "days_measured": 49
         }
       },
       "owned_visitors": [
-        {
-          "date": "2026-07-30",
-          "value": 0
-        },
         {
           "date": "2026-07-31",
           "value": 0
@@ -3920,6 +3916,10 @@
         {
           "date": "2026-09-12",
           "value": 0
+        },
+        {
+          "date": "2026-09-13",
+          "value": 0
         }
       ]
     },
@@ -3939,14 +3939,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-13",
+        "decided": "2026-09-14",
         "works": true,
         "why": "gsc_clicks median 20.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 20.0,
           "median_before": null,
-          "days_measured": 48
+          "days_measured": 49
         }
       },
       "owned_visitors": null
@@ -3967,14 +3967,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-09-13",
+        "decided": "2026-09-14",
         "works": true,
         "why": "gsc_clicks median 20.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 20.0,
           "median_before": null,
-          "days_measured": 48
+          "days_measured": 49
         }
       },
       "owned_visitors": null
@@ -5281,12 +5281,11 @@
     ]
   },
   "last_build": {
-    "date": "2026-09-13",
+    "date": "2026-09-14",
     "log": [
       {
         "ok": true,
-        "noop": true,
-        "detail": "no new in-area searches worth tracking",
+        "detail": "adopted 1 real search(es) into the tracked universe: gutters spring grove pa",
         "slug": "adopt_queries"
       },
       {
@@ -5303,7 +5302,7 @@
       },
       {
         "ok": false,
-        "detail": "3 candidate(s) failed, last: generation failed for 'gutter replacement dover pa': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CezwAny8ana36srVEZpkn\"}",
+        "detail": "3 candidate(s) failed, last: generation failed for 'gutter replacement dover pa': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011Cf2pysrpRvWGzmkMpehN6\"}",
         "slug": "strengthen_pages"
       },
       {
@@ -5353,9 +5352,9 @@
     "changed": 0
   },
   "last_scout": {
-    "date": "2026-09-13",
+    "date": "2026-09-14",
     "ok": false,
-    "detail": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CezwAqLWnThjEfEwBjsxJ\"}"
+    "detail": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011Cf2pyvChuCHf8MuKExhg2\"}"
   },
   "pages": {
     "areas": [
