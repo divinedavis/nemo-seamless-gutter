@@ -22251,3 +22251,545 @@ Goal: **0.5%** top-3 share of 218 tracked queries (target 50%).
 - `ping_indexnow` — ok: nothing new to submit
 
 **Scout did not run:** anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011Cf4ipQ9FkthxmVWpaHSQi"}
+
+## 2026-09-15 — review agent
+
+### Where the numbers stand
+
+**Eighth consecutive dead morning. `strengthen_pages` and `scout` both failed on
+`Your credit balance is too low` — an empty account, not the 08-01 spend cap,
+which expired six weeks ago.** Every other technique reported `ok`/`noop`.
+`new: 0, changed: 0`. **Fifteenth empty-balance morning since 08-12.**
+
+Duty cycle over 08-12 → 09-15 (35 days): **13 alive, 22 dead** — 15 to an empty
+balance, 7 to the August crash. Productive runs: 5, 3, 5. Current stall: **8**,
+now three mornings past the longest productive run this account has ever had.
+
+**Day fifty.**
+
+| | 09-14 | 09-15 |
+| --- | --- | --- |
+| `top3` / tracked | 1 / 218 | **1 / 218** |
+| `share_pct` | 0.5% | **0.5%** (target 50%) |
+| `top10` | 13 | **12** |
+| `ranked_known` | 39 | **40** |
+| `coverage_pct` | 43.1% | **43.1%** |
+
+Per town, diffed against `git show 1115f64:growth/snapshot.json`. **Every town
+cell is identical, including the county bucket that lost the top-3 row
+yesterday.** Every named town is at zero for the fiftieth day.
+
+| town | 09-14 | 09-15 |
+| --- | --- | --- |
+| county | 117 / 47 / **1** | 117 / 47 / **1** |
+| york | 40 / 15 / 0 | 40 / 15 / **0** |
+| dover | 16 / 9 / 0 | 16 / 9 / **0** |
+| hanover | 11 / 6 / 0 | 11 / 6 / **0** |
+| red-lion | 11 / 5 / 0 | 11 / 5 / **0** |
+| dallastown | 11 / 6 / 0 | 11 / 6 / **0** |
+| spring-grove | 12 / 6 / 0 | 12 / 6 / **0** |
+
+**`top10` 13 → 12 is the second real demotion in two days.** By the mechanism
+recorded on 09-14 (`keywords.py:343-351` — an absent query keeps its old
+position for ever), a rank *bucket* can only shrink when a tracked query was
+**present in this window and measured worse**. Nothing ages out. So both this
+week's downward moves are observed demotions, not window artefacts. Direction is
+the only thing I will claim from them; see the finding and the confounder below.
+
+**Search Console**, 28-day window: rows 855 → **865**, matched 38 → **39**,
+clicks 17 → **16**, impressions 5,937 → **6,319**, avg position 26.3 → **26.4**.
+Yesterday predicted clicks would keep drifting down mechanically as the
+productive 09-03 → 09-07 stretch slides out of the window: **half right.** Clicks
+did fall (17 → 16), but impressions rose 6.4% and rows rose 10, reversing the
+14%-in-one-window-day fall it had flagged. I am recording the miss rather than
+quietly dropping the prediction. Per the standing rule `avg_position` is not
+quoted as health.
+
+**Traffic.** 09-14 was **0 visitors**, 0 pageviews, 0 leads. Last eight days:
+6, 3, 3, 1, 1, 2, 0 across 09-08 → 09-14. Two zero-days in the last twenty-two
+(08-30, 09-14) inside an otherwise live low-volume series — this is small
+numbers, not the sustained flat zero that would indict `metrics.py`'s bot
+filter. Measurement is not suspect.
+
+**Leads, all time: 4 bookings, 0 phone leads.** `call_taps` **0** for 27 days —
+and see the second finding, which is the first time this journal has worked out
+what that zero is actually worth. `ai_calls` and `ai_visitors` **0** across the
+whole 30-day series.
+
+### Did previous changes work?
+
+**1 — Deploy `growth/`. NOT ACTIONED, day eighteen.** All four of yesterday's
+named tests came back negative, together:
+
+| yesterday's test | today |
+| --- | --- |
+| `discovered_untracked` > 40 rows (second slate) | **exactly 40**, nineteenth day running |
+| `internal_links` reports "13 page(s)" (mesh fix) | **"refreshed nearby-links on 0 page(s)"** |
+| top-level `code_version` | **absent** |
+| `keywords.ranked` / `gsc.tracked` / `gsc.pages` | **all absent** |
+
+The mesh fix (09-13) and the second discovery slate (08-23, twenty-three days
+old) are both in this repo and neither is running. **We still do not know
+whether either works.**
+
+The dated harm ran for the eighteenth time — six verdicts re-stamped
+`"decided": "2026-09-15"`, `works: true`, against a committed `review.py` that
+would withdraw four of them (`review.py:26` `MIN_TOTAL_VISITORS = 8` fails T002
+at 6; `review.py:176-183` returns `False` when `before is None`, failing
+T017/T019/T020 for having no pre-activation baseline). `scoreboard.works` is
+**7**, `does_not_work` is **`[]`**, day eleven. T017/T019/T020 still cite
+`gsc_clicks median 20.0/day`; the site's real click total for the **entire
+28 days** is **16** (`gsc.py:283` files a window total as one day's value).
+
+**2 — Auto-reload on the Anthropic account. NOT ACTIONED, day seven.** Eight
+dead mornings. It is a billing setting, not a bug, and there is nothing new to
+say about it except that today is the eighth day it cost the whole run.
+
+**3 — Expire stale positions (yesterday's recommendation 5). Not actioned, and
+today I am bounding it — see the finding.** Yesterday's framing ("expect `top3`
+to go down, possibly to 0") overstates what the fix can do. It can move `top3`
+by **at most one query**, and I can show that from the published series.
+
+**4 — Coverage versus rank, pre-registered for 09-20 (five days out).** Coverage
+flat at 43.1%, `top3` flat at 1, `top10` down one. Nothing here disturbs the
+verdict recorded in advance on 09-12: *"no relationship detected, and weakened by
+the stall."*
+
+**5 — York Springs geo guard. Still unshipped, day fifteen.** 8 rows naming York
+Springs in `keywords.uncovered`, unchanged. `adopt_queries` adopted nothing this
+morning ("no new in-area searches worth tracking"), so the guard faced no input
+and remains untested for the fifteenth day.
+
+**6 — The 09-14 retraction stands.** I re-checked the arithmetic behind it and
+did not attempt to rescue the York County discovery claim: `discovered_untracked`
+is still exactly 40 rows with an 11-impression admission floor, so the absence of
+York County rows is still a property of the filter, not of York County.
+
+**Carried, all verified by grep in the working tree this morning, all still NOT
+ACTIONED:** Dover placeholder, day nine (`grep -c placeholder` → **1**).
+Half-round page, day thirty (**1,021** `<p>[A-Za-z]</p>` elements in
+`services/half-round-gutters.html`, byte-identical to yesterday's count).
+Schuylkill excision, day thirty-three (`services/seamless-gutter-installation.html:228`
+still names Pottsville, Schuylkill Haven, Orwigsburg, Frackville, Minersville,
+Tamaqua, Pine Grove, Ashland, Mahanoy City). PA HIC number, day thirty-one
+(`grep -rl HIC` across all HTML → nothing). `?utm_source=gbp`, day forty-three
+(absent from pages and code). Watchdog `--email` flag — eighth stalled morning,
+still no evidence of mail. Eric's Business Profile sitting, day fifty.
+
+**Twenty-one items. Zero actioned, twelve days running.**
+
+### Finding of the day (1) — the stale-position ratchet is exactly one query wide, and has been for nineteen days
+
+Yesterday's finding (a) established a real defect: `keywords.apply_gsc`
+(`keywords.py:343-351`) skips a query Search Console did not return, so a
+position, once written, is never cleared. It concluded that `ranked_known` is
+"a high-water mark, not a current state" and that `top3` is "biased upward by
+stale carry-over". The defect is real. **The magnitude is not what that implies,
+and the magnitude is measurable from the snapshots already in this repo.**
+
+`matched` (`gsc.py:286`) is the return value of `apply_gsc` — the count of
+tracked queries Search Console returned **this window**. GSC positions are always
+≥ 1, so `round(pos,1) or None` at `keywords.py:347` never yields `None` for a
+matched query. Therefore every matched query is counted in `ranked_known`, and
+
+> **`ranked_known − matched` = the number of tracked queries holding a position
+> from an earlier window — the stale pool, exactly.**
+
+Extracted from every published snapshot (`git show <commit>:growth/snapshot.json`):
+
+| date | `ranked_known` | `matched` | **stale** | `top3` |
+| --- | --- | --- | --- | --- |
+| 08-20 | 25 | 25 | **0** | 2 |
+| 08-28 | 25 | 24 | **1** | 2 |
+| 08-31 | 26 | 25 | **1** | 2 |
+| 09-02 | 31 | 30 | **1** | 2 |
+| 09-05 | 35 | 34 | **1** | 2 |
+| 09-08 | 37 | 36 | **1** | 2 |
+| 09-10 | 38 | 37 | **1** | 2 |
+| 09-12 | 39 | 38 | **1** | 2 |
+| 09-14 | 39 | 38 | **1** | 1 |
+| **09-15** | **40** | **39** | **1** | **1** |
+
+**The stale pool has been exactly one query on every snapshot since 2026-08-28 —
+nineteen consecutive days — and zero before that.** It has never grown.
+
+The reason `ranked_known` never decreases is not that stale entries pile up. It
+is that **`matched` itself has fallen exactly once in the whole series** (25 → 24,
+between 08-20 and 08-28), and that single fall is the one query in the pool. On
+a 28-day window against a 218-query universe, a query that has ever ranked
+almost always reappears. `ranked_known` tracks `matched + 1` because the input
+is near-monotonic, not because the accumulator is broken.
+
+**What this changes.**
+
+- The code defect stands and should still be fixed. Its *effect* is bounded:
+  `top3` is overstated by **at most 1**. Today's `top3: 1` is either 1 or 0;
+  the `2` that stood for thirty-four days was at worst a 1.
+- Yesterday's recommendation 5 was sold with the warning "expect `top3` to go
+  down, possibly to 0, and whoever runs this should know before the headline
+  moves." That warning is now priced: the headline can move by one, from 1 to 0,
+  and only if the single stale query happens to be the top-3 one. That is worth
+  knowing, but it is no longer a reason to hesitate, and the fix should not be
+  sold as an explanation of anything.
+- The one thing that *would* settle it is `keywords.ranked` — one query name.
+  Nineteenth day of asking; it costs a deploy and no credit.
+
+**Why I am writing this against my predecessor rather than around it.** The
+09-14 entry is right about the code and right that the number is biased up. It
+reached for "high-water mark" on the strength of a monotonic series without
+checking the series it should have been compared against, which was sitting in
+the same JSON object. That is the same shape of error it spent its own entry
+retracting — reading a property of the data as a property of the world. One
+column of arithmetic bounds it. **A defect being real is not the same as a
+defect being large, and the gap between those two is where a metric gets
+quietly written off.**
+
+### Finding of the day (2) — `call_taps: 0` for 27 days is exactly what a working site does at this traffic level
+
+Twenty-seven consecutive zero-tap days has been carried in this journal as a
+standing worry, and 09-13 checked the client side (`analytics.js:32,74`) and
+confirmed the beacon fires. Nobody has asked what number we should have
+expected. I did the arithmetic today and the answer removes a worry.
+
+The two beacons share an identical nginx contract —
+`deploy/nginx-nemo-seamless-gutter.conf:27` (`/e/call-tap`) and `:37`
+(`/e/pv`), both `return 204`, both one log line, both read by the same parser
+(`metrics.py:231`, `:592`). **`/e/pv` is demonstrably producing counts every
+day, so the transport works; a zero in `call_taps` is a measured zero, not a
+dead pipe.**
+
+Measured over the 28 days 08-18 → 09-14: **62 visitors, 78 pageviews.** The 2026
+benchmark for home-service contractor sites is a **2–4% visit-to-call rate**
+([garretthandley.com](https://www.garretthandley.com/contractor-website-conversion-rate-in-2026-why-most-sites-convert-under-3-and-what-to-fix),
+[pipelineon.com](https://pipelineon.com/blog/contractor-conversion-rate-optimization/)).
+Applied to 62 visitors:
+
+| assumed rate | expected taps | P(observing zero) |
+| --- | --- | --- |
+| 2% | 1.2 | **29%** |
+| 3% | 1.9 | **16%** |
+| 4% | 2.5 | **8%** |
+
+**Zero taps in 27 days is unremarkable at this traffic volume.** It is not
+evidence of a conversion defect, a broken phone path, or a trust problem on the
+pages. There is nothing to diagnose here, and three ledger candidates aimed at
+it — **T023** (call-first mechanics), **T054** (price calculator), **T079**
+("we call you back in 60 seconds") — are optimising a percentage against a
+denominator of 2.2 visitors a day. At a *top-quartile* 6–12% rate this site
+would still produce roughly **4–7 calls a month**.
+
+**The consequence is the whole strategy, stated as arithmetic rather than as a
+hunch.** This site does not have a conversion problem. It has a volume problem,
+and the only two instruments that can fix a volume problem in-season are the
+Business Profile and the map pack — **neither of which routes through the
+website at all**, and both of which the engine structurally cannot touch. That
+is the fiftieth day of saying the Business Profile is the top item, and the
+first day it has been backed by a number instead of by a weighting statistic
+from a vendor blog.
+
+### The confounder I am obliged to name — an unconfirmed Google update on Sept 4 that reverted on Sept 13
+
+`top3` fell 2 → 1 on the 09-14 snapshot and `top10` fell 13 → 12 today. Before
+attributing either to the site, the dates:
+
+An unconfirmed Google ranking update rolled out **around 3–4 September 2026**,
+and for a number of tracked sites **the impact reversed on 13 September**
+([seroundtable.com](https://www.seroundtable.com/google-search-ranking-update-94-42079.html),
+[singlegrain.com](https://www.singlegrain.com/seo/unconfirmed-google-update-september-2026/)).
+No core or spam update has been confirmed for September; the most recent
+confirmed one is the August 2026 spam update
+([numinix.com](https://www.numinix.com/blog/september-2026-seo-algorithm-news-update/)).
+
+`gsc.py:44-45` sets `LAG_DAYS = 3`, `WINDOW_DAYS = 28`, so today's snapshot
+covers **2026-08-16 → 2026-09-12**. A Sept 4 event is inside that window. **A
+Sept 13 reversion is not in it yet** — it first enters on tomorrow's snapshot and
+is fully inside by 09-20.
+
+**Pre-registered, so it cannot be fitted after the fact:**
+
+- If `top3` returns to 2 and `top10` to 13 on the snapshots of **09-17 → 09-21**,
+  this week's two demotions were the Sept 4 update and its reversal, and say so.
+- If they are still 1 and 12 on **09-22**, they were not, and the drop belongs to
+  the site or to noise.
+- Either way the honest reading of a 1-of-218 metric on a property with 16 clicks
+  in 28 days is that it is noise around a number that has never exceeded 2 in
+  fifty days of measurement. **The target is 109.**
+
+I am naming this because it is the convenient explanation and therefore the one
+to be most careful with, not because I believe it.
+
+### What I researched today
+
+`WebSearch` worked. `WebFetch` is **still `EGRESS_BLOCKED`**, including on
+`nemoseamlessgutter.com` itself, which I tested directly today — so I still
+cannot compare the live site against this repo, and every citation below is from
+the search tool's own summaries. I opened no pages.
+
+- **Contractor site conversion benchmarks, 2026** — median 2–4% visit-to-call,
+  6%+ top quartile; phone leads convert ~46% vs form fills; response inside
+  60 seconds is the single largest lever on leads that do arrive
+  ([garretthandley.com](https://www.garretthandley.com/contractor-website-conversion-rate-in-2026-why-most-sites-convert-under-3-and-what-to-fix),
+  [pipelineon.com](https://pipelineon.com/blog/contractor-conversion-rate-optimization/),
+  [invoca.com](https://www.invoca.com/reports/the-invoca-home-services-lead-conversion-benchmarks-report-2026)).
+  Used above. The response-speed half supports **T013** and **T027**, which are
+  about answering a phone that rings — they are unaffected by the volume
+  argument, because a GBP call never touches the site.
+- **The unconfirmed early-September update and its 09-13 reversal.** Above.
+- **AI answer engines and local trades** — independent operators have close to
+  zero citation share in their own metro; aggregators (Yelp, Angi, Thumbtack)
+  collectively out-cite every national chain; GBP is the primary source ChatGPT
+  Search, Perplexity and AI Overviews draw on for local queries
+  ([5wpr.com](https://www.5wpr.com/research/local-services-ai-visibility-crisis-2026/),
+  [jweis.com](https://jweis.com/blog/ai-search-geo-contractors/),
+  [cheers.tech](https://www.cheers.tech/geo-academy/ai-search-engine-source-differences)).
+  **Adds nothing new to do.** It reinforces standing candidates T035 (Yelp),
+  T009 (citations) and T053, and I checked the one on-site prerequisite myself:
+  `robots.txt` explicitly allows GPTBot, OAI-SearchBot, ChatGPT-User,
+  PerplexityBot, ClaudeBot, anthropic-ai, Google-Extended, Applebot and
+  meta-externalagent. **The robots half of T046 is already satisfied in this
+  repo**; only live fetch-reachability is unverified, and I cannot test it from
+  here.
+- **GBP dynamic-activity signals** — vendor sources claim profiles that are
+  never touched are losing pack position to actively maintained ones, and that
+  the March 2026 core update drove suspensions for keyword-stuffed business
+  names ([theadfirm.net](https://www.theadfirm.net/dynamic-profiles-are-the-new-local-ranking-factor-heres-how-to-win/),
+  [exploredigital.com](https://www.exploredigital.com/blog/top-8-biggest-changes-to-google-business-profile-in-2026-so-far/)).
+  Recorded as **unverified vendor claim**. The name-stuffing note is worth one
+  line of Eric's attention during the sitting — it is a suspension risk and free
+  to check.
+
+**Rejected.** Paid GEO/AI-visibility monitoring — **thirteenth** rejection, a
+recurring cost against a 2.2-visitor-a-day site. Anything on bought citations,
+review-volume schemes or review gating: Google's policy requires review requests
+go to **all** customers, and a suspension would cost more than any of this
+earns. Unsolicited bulk email or SMS. **New rejection today:** the conversion
+research is full of CRO advice (sticky bars, calculators, exit intent) and I am
+rejecting all of it on the arithmetic above — at 62 visitors a month, CRO is
+rearranging a rounding error.
+
+### What I checked in the code before recommending anything
+
+| Claim I might have made | What I found | Where |
+| --- | --- | --- |
+| "`top3` is systematically inflated by stale positions" | Bounded at **exactly 1 query**, every snapshot since 08-28 | `keywords.py:343-351`, `gsc.py:286`, 20-snapshot series |
+| "`ranked_known` is a high-water mark" | It tracks `matched + 1`; `matched` has fallen once, ever | same series |
+| "`call_taps: 0` means the call path is broken" | Same nginx contract as `/e/pv`, which works; zero is expected at 62 visitors | `nginx-nemo-seamless-gutter.conf:27,37`, `metrics.py:231,592` |
+| "Add call-first mechanics / a calculator / a callback button" | **Rejected on volume**, not on novelty — T023/T054/T079 all still `candidate` | snapshot ledger |
+| "AI crawlers may be blocked" | **Already allowed** — 9 AI agents named `Allow: /` | `robots.txt` |
+| "Add FAQPage / LocalBusiness schema" | Already emitted on every generated page | `techniques.py` `_faq_ld` |
+| "Add click-to-call / a sticky call bar" | Already shipped — 215 `tel:` links, mobile `.call-bar` | `styles.css:229-268` |
+| "Nearby-area interlinking is missing" | Shipped; mesh fixed 09-13, **still undeployed** | `techniques.py:314` |
+| "Seed GBP Q&As" | Feature dead 2025-11-03; caught 08-17 | JOURNAL 8588 |
+| "The September drop is a confirmed core update" | **No confirmed September update**; unconfirmed 09-04, reverted 09-13 | research, above |
+
+### Recommendations
+
+**Nothing in this commit is live.** The site and engine run from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout; `publish_state.sh`
+copies droplet → repo only. Every on-site and engine item below needs a human to
+run the deploy first.
+
+1. **Eric — put credit on the Anthropic account and set an auto-reload threshold
+   with a monthly cap. Five minutes in a billing console. Day seven; eighth dead
+   morning.** I am promoting this above the deploy today for the first time. The
+   deploy has been the top item for eighteen days and has not been run; the
+   billing setting is the one that stops a **fifteenth** empty-balance morning
+   becoming a sixteenth, and 13 of the last 35 mornings did billable work. A run
+   costs cents (`BUDGET.md` rule 1) — this is funding *shape*, not spend.
+   *How you would know:* no `credit balance is too low` in `last_build` for a
+   fortnight.
+
+2. **Divine — deploy `growth/`. Day eighteen. One minute.** It carries three
+   things that need no Anthropic credit at all: the area-page **mesh fix**
+   (09-13), the **second discovery slate** (08-23), and `keywords.ranked`, which
+   is the only thing that can name the query behind this week's two demotions.
+   ```
+   [ -d /root/nemo-repo/.git ] \
+     || git clone https://github.com/divinedavis/nemo-seamless-gutter /root/nemo-repo
+   git -C /root/nemo-repo fetch origin main
+   git -C /root/nemo-repo reset --hard origin/main
+   bash /root/nemo-repo/deploy/deploy_growth.sh            # report only, writes nothing
+   bash /root/nemo-repo/deploy/deploy_growth.sh --apply
+   ```
+   *How you would know:* `discovered_untracked` holds **more than 40 rows**;
+   `internal_links` reports **13 page(s)**; the snapshot gains `code_version`,
+   `keywords.ranked`, `gsc.tracked`, `gsc.pages`. *Checked today:* 40 rows
+   exactly, 0 pages, all four keys absent, six verdicts re-stamped.
+
+3. **Eric — one Business Profile sitting. Fifteen minutes, free. Day fifty, and
+   today it is the only item with an argument from arithmetic behind it.** The
+   site produced 62 visitors in 28 days; at the industry median that is **one to
+   two calls a month even if every page converts perfectly**. The profile and
+   the map pack are the only in-season levers that do not route through the
+   site. Carried in full:
+   1. **Primary category** — most specific gutter category, plus 2–4
+      secondaries (T016's live half).
+   2. **Business name must be the plain legal name** — no "Best Gutters York PA"
+      suffix. Keyword-stuffed names were a leading suspension cause in 2026.
+      Free to check while you are in there.
+   3. ~~Seed owner Q&As~~ — **feature removed 2025-11-03.** Put those answers in
+      the **Services list and the business description**, which is where Ask Maps
+      now reads from (T022, T051).
+   4. **Street address shown, or hidden as a service-area business?** If NEMO
+      travels to the customer, hiding it is free.
+   5. **Website URL** → `https://nemoseamlessgutter.com/?utm_source=gbp`, so a
+      profile visit is attributable at all (`metrics.py:62-65`).
+   6. **Read off the review count and average** — forty-seven ledger entries now
+      quote a number nobody has looked at.
+   7. **Performance → Calls, last 28 days, plus profile impressions, Search vs
+      Maps.** Two numbers on one screen, and **the only instrument in this project
+      that measures the owner's actual goal.** Today's second finding makes this
+      sharper, not softer: `call_taps: 0` is now *explained* by low traffic, so it
+      tells us nothing about whether the phone rings. The GBP Calls figure is the
+      only thing that can. Also: is the number on the profile `(717) 578-0073`,
+      the only number on the site?
+   *Checked:* T016, T022, T049, T051 all `candidate`, `activated: null`; nothing
+   in `techniques.py` touches the profile, and there is no read path —
+   `gsc.py:39,91` is a service account on `webmasters.readonly`, and GBP
+   Performance needs owner OAuth plus Google's gated API application.
+
+4. **Eric — reviews, asked of every finished job (T007/T047, T033 reply-to-all,
+   T083 photos).** Carried. Recency, volume and owner response rate feed the pack
+   directly; Ask Maps and the AI engines read the review text; and review
+   quotes on-page are one of the few things the conversion research says moves a
+   visitor to call. **Ask every customer** — soliciting a selected subset is a
+   policy violation.
+
+5. **Engine, after the deploy — expire stale positions.** In
+   `keywords.apply_gsc`, record the window a position was measured in and have
+   `summary()` count only current-window positions. Costs no credit. **Revised
+   expectation, and this is the change from yesterday: the effect is bounded at
+   one query.** `top3` can go 1 → 0, and only if the single stale row is the
+   top-3 one. Do it because a metric that cannot fall is not a metric, not
+   because it will explain anything. *Checked:* `keywords.py:343-351`,
+   `keywords.py:360-361`; stale pool measured at 1 on all 19 snapshots since
+   08-28.
+
+6. **Divine — Dover placeholder. Ten seconds. Day nine.**
+   ```
+   sed -i '/<p>paragraphs2_placeholder<\/p>/d' \
+     /var/www/nemo-seamless-gutter/areas/seamless-gutters-dover-pa.html
+   ```
+
+7. **Divine — restore the watchdog's alert. One flag, one minute.** Append
+   `--email divinejdavis@gmail.com` to the 11:00 entry in
+   `/etc/cron.d/nemo-growth`. `cmd_watchdog` returns early when healthy
+   (`growth_daily.py:346`), so it sends nothing on a good morning. **Eight dead
+   mornings have now passed without it, which is the whole reason item 1 is
+   still open on day seven.**
+
+8. **Divine — half-round repair, day thirty; Schuylkill/York Springs excision,
+   day thirty-three.** Scripts exist and are report-first:
+   ```
+   python3 /root/nemo-repo/deploy/repair_letter_paragraphs.py --root /var/www/nemo-seamless-gutter [--apply]
+   python3 /root/nemo-repo/deploy/retire_out_of_area.py     --root /var/www/nemo-seamless-gutter [--apply]
+   ```
+   Whether NEMO drives to Schuylkill County is Eric's call; what cannot stand is
+   the site making an operational promise no human made.
+
+9. **Eric — PA HIC number, plus "licensed and insured" beside the phone buttons.
+   Day thirty-one.** HICPA requires it on advertising distributed in PA, and a
+   website is advertising. Engine-actionable the moment Eric supplies it
+   (`templates.py`). I must not invent a number.
+
+10. **Eric — decide on Local Services Ads (T011), or record a decision against.**
+    The 6–8-week-before-peak-leaf-drop window has closed. A recorded "no" is
+    progress; an undecided item is not.
+
+11. **Nobody — do not** propose site-side conversion work (T023, T054, T079, or
+    any sticky-bar / calculator / exit-intent variant) while traffic is ~2
+    visitors a day — **new standing rejection, on the arithmetic above**; GBP
+    Q&A seeding (feature dead 2025-11-03); click-to-call or a sticky call bar;
+    call-tap instrumentation; FAQPage or LocalBusiness schema; schema `@type`
+    specificity; AI-crawler robots access (**checked today, already allowed**);
+    the March 2026 core update against the area pages (measured 09-06, 6-gram
+    containment median 0.14); scaled content abuse (measured 09-08); `&num=100`
+    or the GSC logging bug as the zero-click mechanism; AI-Overview data via the
+    API; extending `TOWN_QUEUE` (tenth time); paid GEO monitoring (thirteenth);
+    T082 (retired); T084; or suspecting the Search Console property.
+
+12. **Carried, unwritten:** the `gsc_clicks` unit bug (`gsc.py:283` — now filing
+    "20.0/day" against a 28-day total of 16); `MIN_RECENT_MEDIAN` making the
+    retire branch unreachable; the topic-versus-query gap in
+    `money_pages._needs_its_own_page` (watch 2026-10-07); the `TOWN_QUEUE` /
+    `keywords.TOWNS` divergence; the five bare "near me" queries
+    (`techniques.py:1640`) that GSC averages across all geographies and so can
+    never score top-3 *for York County*; `internal_links` linking area→area only,
+    leaving the 19 guide pages with no engine-managed inbound links.
+
+### Reasoning and uncertainties
+
+Day fifty. `top3` **1 / 218**. **Twenty-one dated recommendations, zero actioned,
+twelve days running.** I wrote no code today: the mesh fix from 09-13 is still
+unrun on day eighteen, and a nineteenth undeployed file makes the one command
+that matters no likelier to be typed. The only files I touched are this journal
+and `BUDGET.md`.
+
+**What I would defend hardest today.** Bounding the stale-position ratchet at one
+query. It is a smaller claim than yesterday's and it is the correct size. A
+column of arithmetic that was already sitting in the published snapshots settles
+it, and nobody — me included, until this morning — had put `ranked_known` next to
+`matched`. The generalisable lesson belongs beside the last two: *a repeated noop
+is a claim nobody has checked* (09-13), *an absence in a truncated list is not an
+absence* (09-14), and now **a monotonic series is not evidence of accumulation
+until you have looked at what feeds it.** All three are the same failure — reading
+a property of the instrument as a property of the world — and this journal has
+now made it three days running, which is worth more attention than any single
+one of them.
+
+**What I nearly got wrong.** The early-September update is a clean, well-dated,
+externally-sourced explanation for a drop that happened on exactly the right
+week, and I had it drafted as the finding of the day. It is a confounder, not a
+finding: I cannot see per-query data, the effect reportedly reverted, and a
+1-of-218 metric on 16 clicks cannot distinguish an algorithm update from a coin
+flip. Pre-registering the 09-17 → 09-22 test is the honest version. I also nearly
+wrote that `call_taps: 0` was fine because the client code fires — which is what
+09-13 established and is only half the question. The half that mattered was what
+number to expect, and it took a benchmark and one Poisson calculation.
+
+**What I am least sure of.** Whether the conversion benchmark transfers. 2–4% is
+drawn from contractor sites with real traffic; a site at 2.2 visitors a day may
+draw a different mix of visitors entirely, and 62 visitors is a thin base for any
+rate. The argument survives that, though — the conclusion is that we cannot
+detect a conversion problem at this volume, which is true whatever the true rate
+is, and the recommendation it produces (stop optimising conversion, fix volume
+through the profile) is the same one that was already at the top of the list.
+
+**What I keep coming back to.** Eight mornings of an engine doing nothing because
+of a billing setting. Eighteen days of a committed fix sitting unrun. Fifty days
+of a Business Profile nobody has opened. **Leaf-fall in York County is roughly
+three weeks out**, and indexing lag means anything shipped from here will not
+rank for this season. Everything that can still work this autumn — the profile,
+the reviews, the phone — is minutes of human work that no amount of analysis
+substitutes for. This entry found one real correction and one number worth
+having, and neither of them makes the phone ring.
+
+**What would change my mind, dated.**
+1. **A morning with no `credit balance is too low`** — item 1 landed.
+2. **`discovered_untracked` with more than 40 rows** — the deploy landed and the
+   second slate is running. Reopens the York County question.
+3. **`internal_links` reporting "13 page(s)"** — same deploy, mesh fix works.
+4. **A top-level `code_version` block** — same deploy, third witness.
+5. **`keywords.ranked` appearing** — this week's two demotions get a name.
+6. **`ranked_known − matched` ever exceeding 1** — today's bound breaks and
+   yesterday's high-water-mark reading is the right one after all.
+7. **`does_not_work` becoming non-empty, or four of six verdicts withdrawing.**
+8. **An email on the next stalled morning** — the watchdog flag landed.
+9. **`grep -c placeholder` on the Dover page returning 0.**
+10. **A non-zero GBP Calls figure.** Still the one I most want and the cheapest to
+    get — and after today's second finding, the *only* instrument that can tell
+    us whether the phone rings.
+11. **A single `call_taps` day.** At 62 visitors / 28 days it would be one
+    ordinary event, not a signal — recording it so nobody over-reads it later.
+12. **A `local_visitors` day after `?utm_source=gbp` is set.**
+13. **A review count read off the actual profile.**
+14. **Mount Wolf, Stewartstown or Wrightsville appearing in `gsc.rows`** after
+    the mesh fix ships.
+15. **2026-09-17 → 09-21 — `top3` back to 2 and `top10` back to 13.** The Sept 4
+    update explains this week's demotions. Pre-registered above.
+16. **2026-09-22 — still 1 and 12.** It does not, and the drop is the site's or
+    it is noise.
+17. **2026-09-20 — coverage versus rank.** Pre-registered: "no relationship
+    detected, weakened by the stall."
+18. **2026-09-28 — the `improve_ctr` test.** Homepage clicks outside 8–13.
+19. **2026-10-07 — the two LeafFilter pages.**
