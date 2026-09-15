@@ -21763,7 +21763,6 @@ Goal: **0.5%** top-3 share of 218 tracked queries (target 50%).
 
 **Scout did not run:** anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011Cf2pyvChuCHf8MuKExhg2"}
 
-
 ## 2026-09-14 — review agent
 
 ### Where the numbers stand
@@ -22232,3 +22231,23 @@ of which are minutes of human work.
 18. ~~Any `discovered_untracked` row naming a York County town~~ — **retired as a
     test.** It has been unfalsifiable for eight weeks. It becomes a real test
     only after item 1.
+
+## 2026-09-15 — engine run
+
+Goal: **0.5%** top-3 share of 218 tracked queries (target 50%).
+2026-09-14: 0 visitors (0 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: no page is due a snippet rewrite
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — FAILED: 3 candidate(s) failed, last: generation failed for 'gutter replacement dover pa': anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011Cf4ipMx3WCLu6edoHtb5J"}
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: no query needs its own page — the remaining gaps all belong on pages that exist, which strengthen_pages handles
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: sitemap.xml unchanged
+- `ping_indexnow` — ok: nothing new to submit
+
+**Scout did not run:** anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011Cf4ipQ9FkthxmVWpaHSQi"}
