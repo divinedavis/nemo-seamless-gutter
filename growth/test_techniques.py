@@ -680,5 +680,50 @@ class NearbyMeshTest(unittest.TestCase):
                              else {0})
 
 
+class DateModifiedTest(unittest.TestCase):
+    """Freshness dates on the pages the engine actually edits.
+
+    Before 2026-09-16 only money_pages emitted a date, so all 15 area pages,
+    all 7 service pages and 4 guides carried no publish or modification date
+    at all — and every one of the eight sections strengthen_pages has ever
+    shipped landed on a page in that dateless set.
+    """
+
+    def test_faq_ld_carries_both_dates(self):
+        ld = json.loads(T._faq_ld([{"q": "Do you serve Dover?",
+                                    "a": "Yes, Dover PA is in our area."}])
+                        .replace("\\u003c", "<"))
+        today = T.ledger.today()
+        self.assertEqual(ld["datePublished"], today)
+        self.assertEqual(ld["dateModified"], today)
+        self.assertEqual(ld["@type"], "FAQPage")
+
+    def test_updates_an_existing_stale_date(self):
+        src = '<script>{\n  "@type": "Article",\n  "dateModified": "2026-07-28"\n}</script>'
+        out = T._touch_date_modified(src)
+        self.assertIn(f'"dateModified": "{T.ledger.today()}"', out)
+        self.assertNotIn("2026-07-28", out)
+
+    def test_inserts_into_a_dateless_faqpage(self):
+        src = ('<script>{\n  "@context": "https://schema.org",\n'
+               '  "@type": "FAQPage",\n  "mainEntity": []\n}</script>')
+        out = T._touch_date_modified(src)
+        self.assertIn(f'"dateModified": "{T.ledger.today()}"', out)
+        # Still one FAQPage node and still valid JSON.
+        self.assertEqual(out.count('"@type": "FAQPage"'), 1)
+        body = out[out.index("{"):out.rindex("}") + 1]
+        self.assertEqual(json.loads(body)["dateModified"], T.ledger.today())
+
+    def test_only_the_first_date_is_touched(self):
+        src = ('"dateModified": "2026-07-28" ... "dateModified": "2026-07-28"')
+        out = T._touch_date_modified(src)
+        self.assertEqual(out.count(T.ledger.today()), 1)
+        self.assertEqual(out.count("2026-07-28"), 1)
+
+    def test_page_with_neither_is_left_alone(self):
+        src = "<html><body><p>No structured data here.</p></body></html>"
+        self.assertEqual(T._touch_date_modified(src), src)
+
+
 if __name__ == "__main__":
     unittest.main()

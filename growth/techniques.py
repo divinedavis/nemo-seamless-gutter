@@ -274,11 +274,55 @@ def _render_faqs(faqs):
 
 
 def _faq_ld(faqs):
+    # datePublished/dateModified sit on the FAQPage node because FAQPage is a
+    # WebPage, and WebPage is a CreativeWork — the only node on an area or
+    # service page where a date is legal schema. The Service and
+    # RoofingContractor nodes are not CreativeWorks and must not carry one.
+    #
+    # Before 2026-09-16 only money_pages emitted a date at all (the Article
+    # block at _money_page's article_ld), so 26 of the site's 41 generated
+    # pages had no publish or modification date in their structured data, and
+    # the 15 that did had it frozen at creation — strengthen_pages and
+    # geo_answer_first_content_pass rewrite page bodies without touching it.
+    # Every section the engine has ever shipped landed on a page in the
+    # dateless 26. See _touch_date_modified for the other half of the fix.
+    today = ledger.today()
     return _ld({
         "@context": "https://schema.org", "@type": "FAQPage",
+        "datePublished": today, "dateModified": today,
         "mainEntity": [{"@type": "Question", "name": f.get("q", ""),
                         "acceptedAnswer": {"@type": "Answer", "text": f.get("a", "")}}
                        for f in _usable_faqs(faqs)]})
+
+
+_DATE_MODIFIED_RE = re.compile(r'("dateModified"\s*:\s*")(\d{4}-\d{2}-\d{2})(")')
+_FAQPAGE_TYPE_RE = re.compile(r'("@type"\s*:\s*"FAQPage"\s*,)')
+
+
+def _touch_date_modified(src):
+    """Stamp today's date on a page whose body this run actually rewrote.
+
+    Honest by construction: this is only ever called from the two techniques
+    that have just written new prose onto the page, so the date it records is
+    a real modification date. Nothing bumps a date on an unchanged page — a
+    freshness signal that fires without a change is the thing Google's own
+    guidance warns about, and it would also destroy the only record we have of
+    when a section was shipped.
+
+    Updates the value where one exists; inserts it into the FAQPage node where
+    one does not, which covers the 26 pages generated before the date was
+    emitted at all. A page with neither a date nor a FAQPage node is returned
+    untouched rather than guessed at.
+    """
+    today = ledger.today()
+    if _DATE_MODIFIED_RE.search(src):
+        return _DATE_MODIFIED_RE.sub(lambda m: m.group(1) + today + m.group(3),
+                                     src, count=1)
+    if _FAQPAGE_TYPE_RE.search(src):
+        return _FAQPAGE_TYPE_RE.sub(
+            lambda m: m.group(1) + f'\n  "dateModified": "{today}",',
+            src, count=1)
+    return src
 
 
 def _provider_ld():
@@ -1170,6 +1214,7 @@ def strengthen_pages(ctx):
         if idx < 0:
             idx = src.find('<div class="cta-band">')
         out = src[:idx] + block + "\n\n" + src[idx:]
+        out = _touch_date_modified(out)
 
         ctx.backup(host.lstrip("/"))
         ctx.write(host.lstrip("/"), out)
@@ -1861,6 +1906,8 @@ def geo_answer_first_content_pass(ctx):
                 if body_end >= 0:
                     out = out[:body_end] + "  " + ld + "\n" + out[body_end:]
                 added_faq = True
+
+        out = _touch_date_modified(out)
 
         ctx.backup(rel)
         ctx.write(rel, out)

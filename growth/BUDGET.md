@@ -14,7 +14,7 @@ This is not hypothetical. It has already happened twice:
 | 2026-08-12 → 08-13 | Balance $0 again | Same shape: `strengthen_pages` + `scout` failed, everything else `ok`, `new: 0, changed: 0` for two days |
 | 2026-08-19 → 08-20 | Balance $0 again | Same shape, two more days. On 08-20 `geo_answer_first_content_pass` failed too |
 | 2026-08-31 → 09-02 | Balance $0 again, three days after the 08-24 top-up was first drawn on | Same shape. `new: 0, changed: 0` |
-| 2026-09-08 → 09-15 | Balance $0 again, five days after the 09-03 top-up was first drawn on | Same shape — but now every other technique is a `noop` too (`area_pages`, `service_pages` and `money_pages` have exhausted their queues), so a no-credit morning produces **nothing at all**, not merely less. **Eight** consecutive mornings of `new: 0, changed: 0` with every step reporting `ok` or `noop` — the longest empty-balance stall this account has had, and now three mornings longer than the longest productive run |
+| 2026-09-08 → 09-16 | Balance $0 again, five days after the 09-03 top-up was first drawn on | Same shape — but now every other technique is a `noop` too (`area_pages`, `service_pages` and `money_pages` have exhausted their queues), so a no-credit morning produces **nothing at all**, not merely less. **Nine** consecutive mornings of `new: 0, changed: 0` with every step reporting `ok` or `noop` — the longest empty-balance stall this account has had, and now four mornings longer than the longest productive run |
 
 Every time, the engine kept reporting `[ok]` on most steps. **A cost failure
 here looks like a quiet, partial success**, which is exactly why it needs a rule
@@ -35,26 +35,41 @@ duty cycle rather than a guess:
 | 08-28 → 08-30 | 3 | **alive** — 3 page edits |
 | 08-31 → 09-02 | 3 | dead — no credit |
 | 09-03 → 09-07 | 5 | **alive** — 2 new pages, 7 page edits |
-| 09-08 → 09-15 | 8 | dead — no credit |
+| 09-08 → 09-16 | 9 | dead — no credit |
 
 **A top-up has bought 3–5 productive mornings, three times in a row.** The
 09-03 top-up lasted exactly five, the top of the predicted range, and then
 stopped dead — so this is now a measurement that predicts rather than a
-pattern that was noticed. Over the thirty-five days 08-12 → 09-15 the engine
-did billable work on **13 of 35**; an empty balance accounts for **15** of the
-22 lost days and the August crash for the other 7.
+pattern that was noticed. Over the thirty-six days 08-12 → 09-16 the engine
+did billable work on **13 of 36**; an empty balance accounts for **16** of the
+23 lost days and the August crash for the other 7.
 
-The current stall is on its **eighth** morning. Productive runs have been 5, 3
+The current stall is on its **ninth** morning. Productive runs have been 5, 3
 and 5 mornings, so the stall has now **outlasted the longest run this account
-has managed since 08-12** by three days — the engine is idle more often than it
+has managed since 08-12** by four days — the engine is idle more often than it
 works, and the ratio is getting worse, not better.
 
 As of 2026-09-15 the funding shape is the top recommendation in the journal,
 ahead of the `growth/` deploy that has held first place for eighteen days. The
 reasoning is in rule 1's arithmetic: a run costs cents, so nothing here is a
-spend problem. Fifteen of the last thirty-five mornings were lost to an account
+spend problem. Sixteen of the last thirty-six mornings were lost to an account
 at zero, which is a *threshold* problem, and an auto-reload with a monthly cap
 fixes it without touching rule 1.
+
+**What a funded morning is actually worth — measured 2026-09-16, and it is less
+than this file has implied.** Rule 2 caps every technique at one unit of work,
+and across the twenty-one published snapshots 08-20 → 09-16 `area_pages` and
+`service_pages` were a `noop` on **every single one** — their queues were
+already exhausted before the published record begins. `money_pages` and
+`improve_ctr` produced twice each; `geo_answer_first_content_pass` and
+`internal_links` never. So the engine's entire measurable output in that window
+is **twelve artifacts**, eight of them `strengthen_pages` sections, and a fully
+funded morning buys about **one page section**. That does not argue against the
+auto-reload — cents for one section a day is still the cheapest thing on the
+board — but it does mean funding is a *floor*, not a plan. Against a queue of
+125 uncovered queries, one section a morning reaches full coverage around
+mid-January, and coverage is the input the journal has pre-registered as having
+no detected relationship with rank.
 
 One consequence worth stating for the next run, because it changes what is
 worth asking for: rule 5 above ("prefer the technique that spends nothing") is
