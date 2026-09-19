@@ -14,7 +14,7 @@ This is not hypothetical. It has already happened twice:
 | 2026-08-12 → 08-13 | Balance $0 again | Same shape: `strengthen_pages` + `scout` failed, everything else `ok`, `new: 0, changed: 0` for two days |
 | 2026-08-19 → 08-20 | Balance $0 again | Same shape, two more days. On 08-20 `geo_answer_first_content_pass` failed too |
 | 2026-08-31 → 09-02 | Balance $0 again, three days after the 08-24 top-up was first drawn on | Same shape. `new: 0, changed: 0` |
-| 2026-09-08 → 09-18 | Balance $0 again, five days after the 09-03 top-up was first drawn on | Same shape — but now every other technique is a `noop` too (`area_pages`, `service_pages` and `money_pages` have exhausted their queues), so a no-credit morning produces **nothing at all**, not merely less. **Eleven** consecutive mornings of `new: 0, changed: 0` with every step reporting `ok` or `noop` — the longest empty-balance stall this account has had: eleven dead mornings against thirteen productive mornings in the whole of 08-12 → 09-18 |
+| 2026-09-08 → 09-19 | Balance $0 again, five days after the 09-03 top-up was first drawn on | Same shape — but now every other technique is a `noop` too (`area_pages`, `service_pages` and `money_pages` have exhausted their queues), so a no-credit morning produces **nothing at all**, not merely less. **Twelve** consecutive mornings of `new: 0, changed: 0` with every step reporting `ok` or `noop` — the longest empty-balance stall this account has had: twelve dead mornings against thirteen productive mornings in the whole of 08-12 → 09-19 |
 
 Every time, the engine kept reporting `[ok]` on most steps. **A cost failure
 here looks like a quiet, partial success**, which is exactly why it needs a rule
@@ -35,16 +35,16 @@ duty cycle rather than a guess:
 | 08-28 → 08-30 | 3 | **alive** — 3 page edits |
 | 08-31 → 09-02 | 3 | dead — no credit |
 | 09-03 → 09-07 | 5 | **alive** — 2 new pages, 7 page edits |
-| 09-08 → 09-18 | 11 | dead — no credit |
+| 09-08 → 09-19 | 12 | dead — no credit |
 
 **A top-up has bought 3–5 productive mornings, three times in a row.** The
 09-03 top-up lasted exactly five, the top of the predicted range, and then
 stopped dead — so this is now a measurement that predicts rather than a
-pattern that was noticed. Over the thirty-eight days 08-12 → 09-18 the engine
-did billable work on **13 of 38**; an empty balance accounts for **18** of the
-25 lost days and the August crash for the other 7.
+pattern that was noticed. Over the thirty-nine days 08-12 → 09-19 the engine
+did billable work on **13 of 39**; an empty balance accounts for **19** of the
+26 lost days and the August crash for the other 7.
 
-The current stall is on its **eleventh** morning. Productive runs have been 5, 3
+The current stall is on its **twelfth** morning. Productive runs have been 5, 3
 and 5 mornings — thirteen productive mornings in total since 08-12, so **this one
 stall has now cost almost as many mornings as the engine has ever worked**. The
 engine is idle more often than it works, and the ratio is getting worse.
