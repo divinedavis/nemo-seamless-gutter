@@ -25529,3 +25529,306 @@ Goal: **0.0%** top-3 share of 220 tracked queries (target 50%).
 - `ping_indexnow` — ok: nothing new to submit
 
 **Scout did not run:** anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CfG5ekdkq6ysATuimfDyT"}
+
+## 2026-09-21 — review agent
+
+### Where the numbers stand
+
+**The goal metric is zero for the second day.** `top3` **0 / 220**,
+`share_pct` **0.0%** against a target of 50%. `top10` **11** (fifth day),
+`coverage_pct` **42.7%** (fifth day), `ranked_known` **42**. Nothing in the
+goal block moved.
+
+**Fourteenth consecutive dead morning.** `strengthen_pages` and `scout` both
+failed on `Your credit balance is too low` — an empty account, same error text
+as the previous thirteen. Every other step `ok`/`noop`. `new: 0, changed: 0`.
+**Twenty-first empty-balance morning since 08-12.** Duty cycle over
+08-12 → 09-21 (41 days): **13 alive, 28 dead** — 21 to an empty balance, 7 to
+the August crash.
+
+**Day fifty-six.**
+
+| | 09-20 | 09-21 |
+| --- | --- | --- |
+| `top3` / tracked | 0 / 220 | **0 / 220** |
+| `share_pct` | 0.0% | **0.0%** |
+| `top10` | 11 | **11** |
+| `ranked_known` | 42 | **42** |
+| `coverage_pct` | 42.7% | **42.7%** |
+
+**`keywords.by_town`, diffed cell by cell against `git show
+2bec986:growth/snapshot.json`: not one cell moved.** county 117 / 47 / 0;
+york 40 / 15 / 0; dover 16 / 9 / 0; hanover 13 / 6 / 0; red-lion 11 / 5 / 0;
+dallastown 11 / 6 / 0; spring-grove 12 / 6 / 0. `by_intent` identical. Six
+named towns at zero for fifty-six days, the county bucket for two.
+
+**Search Console**, 28-day window: rows 872 → **880**, matched 41 → **42**,
+clicks 15 → **16**, impressions 6,505 → **6,537**, avg position **28.0**
+(unchanged; per the standing rule it is not quoted as health). 16 clicks on
+6,537 impressions is a **0.24% CTR**.
+
+**The untracked slate is frozen, twenty-fifth day.** Exactly 40 rows, **zero
+new, zero gone**, 1,076 → **1,083 impressions, 0 clicks** — eighth consecutive
+day at zero clicks. **Not one of the forty rows moved as much as a single
+position.** Forty is the ceiling of the undeployed `discover()`, so "frozen" here
+partly means "clipped".
+
+**Traffic.** 09-20: 2 visitors, 0 leads. Last twenty-one days: **54 visitors**
+(24 organic, 26 direct, **1 from maps**, 0 AI). `call_taps` **0 for
+twenty-two straight days**. `phone_leads` **0 all-time**. `bookings` 4
+all-time; last one **09-02, nineteen days ago**.
+
+### The one thing that did move: the stale-position pool closed
+
+`ranked_known` **42**, `matched` **42**. For twenty-four days these ran 42 and
+41 — one tracked query carried a stored position that had not been seen in the
+live 28-day window. Today they are equal.
+
+This is small and it cuts against the softest available reading of yesterday.
+`top3` is counted from stored positions (`keywords.py:361`). While a stale
+position sat in the pool, "top3 went to 0" could in principle have been an
+artifact of an old number ageing out. It cannot be that today: **every one of
+the 42 positions the zero is computed over was confirmed in the current
+window.** The zero is a live measurement, not a bookkeeping residue.
+
+What it does *not* do is tell me which query left — `keywords.ranked` is still
+in the undeployed queue, so the per-query positions behind that 42 are not
+published. Second day of judging a number I cannot decompose.
+
+### Did previous changes work?
+
+**1 — Test 19 (GSC `rows`, five-day mean 09-18 → 09-22 vs a 863.6 bar). Day
+four of five. NOT SCOREABLE.** Rows: 848, 871, 872, **880**. Running four-day
+mean **867.75**, above the bar by 4.15. **Due tomorrow, 09-22** — recording the
+running figure so that tomorrow's entry scores it on the fifth day and not on
+four days that happen to clear it.
+
+**2 — Test 20 (coverage vs rank). Scored yesterday: falsified.** Coverage rose
+32.3% → 42.7% while `top3` fell 2 → 0. Nothing today revisits it. Standing
+conclusion: coverage is not the variable, and coverage is the output of the
+three techniques that now `noop` every morning anyway.
+
+**3 — The funding-calendar finding (pre-registered yesterday).** Falsifier:
+*one funded week producing page sections, followed by no recovery in `top10`
+within twenty-one days.* **Cannot advance — there has been no funded morning.**
+`top10` held at 11 for the fifth day, which is consistent with the hypothesis
+and with nothing. Still suggestive, still not established.
+
+**4 — Auto-reload on the Anthropic account. NOT ACTIONED, day thirteen.**
+Fourteen dead mornings. Billing setting, not a bug. Position unchanged from
+yesterday: fund it as hygiene, not as the lever.
+
+**5 — Deploy `growth/`. NOT ACTIONED, day twenty-four.** All five named tests
+negative again: `discovered_untracked` **exactly 40** (25th day); `internal_links`
+reports **"0 page(s)"**; top-level `code_version` **absent**; `keywords.ranked` /
+`gsc.tracked` / `gsc.pages` **all absent**; `scoreboard.works` **still 7**
+(`does_not_work` still empty).
+
+The dated harm ran for the **twenty-fourth** time — six verdicts re-stamped
+`"decided": "2026-09-21"` with changed bodies. The three `gsc_clicks` verdicts
+moved from `median 19.5/day` to **`median 18.0/day`**, against a real 28-day
+click total of **16**. *I reconstructed the series to check the mechanism
+rather than repeat the accusation:* pulling `gsc.clicks` out of all 24
+published snapshots gives 18, 17, 17, 17, 17, 18, 18, 20, 21, 21, 21, 21, 21,
+20, 20, 19, 17, 16, 16, 16, 16, 14, 15, 16 — **median 17.5**, and the droplet's
+fuller series since 07-27 medians to 18.0. So the arithmetic is right and the
+unit is wrong: it is the median of a **28-day window total**, printed as a
+daily rate. A genuine 18 clicks/day would be 504 per 28 days; the real figure
+has never exceeded 21. The drift 19.5 → 18.0 is the median tracking the window
+totals down, which is the mechanism confirming itself.
+
+**6 — The Akron / Lancaster County paragraph. NOT ACTIONED, day two** (day
+fifty-four on the site). Verbatim at `services/gutter-guards.html:163`. The
+query it explains, `gutter guards in akron pa`, did not move today (9.9).
+
+**7 — Test 26, the Monday bursts.** `gutter installer` and `gutter contractor`
+still absent from `discovered_untracked`; the fortieth row carries 11
+impressions, so both remain under ~11. No change. Needs weeks.
+
+**8 — The York Springs geo guard / freshness dates.** `adopt_queries` noop'd
+again. `dateModified` present on **15 of 41** pages under `areas/ services/
+guides/` — unchanged for the sixth day. Two blockers deep: undeployed *and*
+needs credit.
+
+**Carried, re-verified by grep this morning, all still NOT ACTIONED:** Dover
+placeholder, day fifteen (`grep -c placeholder` → **1**, `areas/seamless-gutters-dover-pa.html`).
+Half-round page, day thirty-six. Schuylkill excision, day thirty-nine — still
+exactly one file, `services/seamless-gutter-installation.html`. PA HIC number,
+day thirty-seven (`grep -rl HIC` → nothing). `?utm_source=gbp`, day forty-nine
+(`grep -c` → **0** in `index.html`). Watchdog `--email`. Eric's Business
+Profile, day fifty-six.
+
+**Twenty-two items. Zero actioned, eighteen days running.**
+
+### The one repo change I made today
+
+`growth/review.py` — the `/day` suffix on site-wide verdicts is now
+metric-aware: `gsc_clicks` and `gsc_impressions` print **`/28d`**, everything
+else keeps `/day`. Twenty lines including the comment, plus two tests in
+`growth/test_review.py`. Full suite re-run: **11 modules, all OK.**
+
+I did this rather than write about it for a seventh time because of something I
+found while checking whether it was worth doing. **`scout.py:140` feeds the
+verdict `why` strings straight into the scout's prompt** as
+`"- {name}: WORKS — {why}"`. So the mislabelled unit is not confined to the
+ledger's display layer: on every funded morning, the model that proposes new
+techniques is told this site earns eighteen clicks a day. That is thirty times
+the truth, and it is upstream of every idea the scout has ever generated. The
+suffix is the whole fix — the arithmetic was never wrong.
+
+**A correction to my own 09-20 entry, which was too broad.** I wrote that
+`publish_state.sh` reverts any edit made in this repo. Re-reading the script:
+it copies `growth/snapshot.json`, `sitemap.xml`, `index.html`, merges
+`JOURNAL.md`, and rsyncs `areas/ guides/ services/`. **It does not touch
+`growth/*.py`.** So page edits here are indeed reverted at 06:00 — engine-code
+edits are not. Today's change will survive, and it still does nothing until
+`growth/` is deployed to the droplet.
+
+### What I researched today
+
+`WebSearch` only; citations are from the search tool's summaries.
+
+- **Operating hours are now a top-five local-pack signal — specifically being
+  open *at the moment of the search*, not merely having hours listed.** Rankings
+  are reported to drop the moment a business is marked closed, and Google
+  suppresses closed listings on time-sensitive queries
+  ([thekaleidoscope.com](https://thekaleidoscope.com/openness-ranking-factor-google-business-profile-hours-operation/),
+  [merchynt.com](https://www.merchynt.com/post/google-business-ranking-guide-2026)).
+  *Checked the ledger before writing this up:* **T042
+  `open_now_hours_and_saturday_estimate_window` already exists as a candidate.**
+  Nothing new to add. What is new is the evidence behind it — it is a free,
+  one-sitting, two-minute change that today's research puts in the top five of
+  ~187 factors, which makes it the cheapest item on the entire board.
+- **Eight of the top ten local-pack signals originate from the Business
+  Profile, not the website** (Whitespark, via
+  [thekaleidoscope.com](https://thekaleidoscope.com/openness-ranking-factor-google-business-profile-hours-operation/)).
+  Category accuracy ~18%, review signals ~17%, on-page website signals ~14%,
+  behavioural signals (clicks, calls) ~11% and rising
+  ([gbppromote.com](https://gbppromote.com/local-search-pack-ranking-factors/),
+  [brightlocal.com](https://www.brightlocal.com/learn/google-local-algorithm-and-ranking-factors/)).
+  Direct corroboration for recommendation 1, which is also what yesterday's
+  shingle measurement pointed at from the other direction.
+- **Still no confirmed September 2026 Google update.** Re-checked; the most
+  recent confirmed ranking event remains the August 2026 spam update
+  (08-18 → 08-21). Secondary reporting continues to describe unconfirmed
+  volatility. Nothing to hang the 09-14 → 09-20 slide on.
+
+**Rejected.**
+
+- **"The September update punished templated city-swap location pages, and this
+  site has fifteen of them"** ([optramarketing.com](https://optramarketing.com/blog/how-googles-algorithm-updates-affected-local-search/)).
+  Second rejection. The update is unconfirmed, *and* yesterday's shingle
+  measurement showed the premise is false for this site — zero of 105 area-page
+  pairs share ≥70% of the shorter page's 8-grams.
+- **AI call-answering / speed-to-lead systems.** Second rejection.
+  `call_taps` is 0 for twenty-two days and `phone_leads` is 0 all-time. There
+  are no calls to answer. Revisit the day `call_taps` goes positive.
+- **Lancaster County pages because the site ranks there.** Third rejection.
+- Paid GEO/AI-visibility monitoring — **nineteenth** rejection. Bought
+  citations, review-volume schemes, review gating, unsolicited bulk email or
+  SMS — standing rejections. Site-side CRO — standing rejection on volume.
+
+### What I checked in the code before recommending anything
+
+| Claim I might have made | What I found | Where |
+| --- | --- | --- |
+| **"Ten of the fifteen town pages have no tracked keywords, so their rank is invisible and `adopt_queries` cannot adopt for them"** | **Half false, and the half that is false would have been the recommendation.** `TOWNS` has 7 keys and `keywords.add()` hard-rejects any town outside it — but `adopt_queries` defaults `town="county"` for everything except the five named slugs, and `SERVICE_AREA_WORDS` lists **all fifteen towns** including Dillsburg, Manchester, Wrightsville, Hallam, Jacobus. Intake is not gated. The only real cost is reporting granularity: those ten towns are dissolved into the 117-query county bucket, so "which town is closest to ranking" is unanswerable — which is an argument for publishing `keywords.ranked`, not for a new technique | `keywords.py:40-48, 153`; `techniques.py:1499-1503, 1699-1706` |
+| "The ledger is fabricating a click rate" | **No — it is a unit error.** `gsc.py:283` records the 28-day window total daily; `review.py` medians it and printed "/day". Fixed today | `gsc.py:283`, `review.py:145` |
+| "The unit error is display-only" | **No** — `scout.py:140` puts the `why` strings in the scout's prompt | `scout.py:139-140` |
+| "Add an `open now` / hours technique" | **Already a candidate — T042** | ledger |
+| "Add GBP category / services / service-area / booking-link work" | **Already candidates** — T016, T022, T050, T051 | ledger |
+| "Add review-acquisition work" | **Already candidates** — T007, T033, T047, T076 | ledger |
+| "`improve_ctr`'s endless noop is a bug" | **Not a bug** — `underperformers()` excludes pages averaging worse than position 15, and the site averages 28.0 | `gsc.py:388, 402-405` |
+| "Auto-retire the techniques that do not work" | **Do not touch** — `MIN_RECENT_MEDIAN = 0` makes the retire branch unreachable; `test_review.py:136` documents it deliberately and says the constant is Eric's and Divine's call | `review.py:29`, `test_review.py:136-151` |
+| "Edit the live pages from this repo" | **Still no** for pages — but **yes for `growth/*.py`**, which `publish_state.sh` does not copy. Corrected above | `growth/publish_state.sh:45-73` |
+
+### Recommendations
+
+**Nothing in this commit is live.** The site and engine run from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout. Today's
+`review.py` change will persist in git but does nothing until `growth/` is
+deployed. **No new items. Twenty-two are carried and unactioned.**
+
+Yesterday I said that if the count was still twenty-two next week I would stop
+listing and pick one. I am starting that today rather than waiting for the
+deadline, because the list is not being read as a list — it is being read as a
+wall. **If exactly one thing happens this week, it should be item 1.**
+
+1. **Eric — one Business Profile sitting. Fifteen minutes, free. Day
+   fifty-six, and today's research made it cheaper, not just better-supported.**
+   Eight of the top ten local-pack signals come from the profile; the website
+   carries about 14% of the weight and has been measured good and invisible.
+   In this order, and the first one is new to the top of this list:
+   **hours** — set real hours and a Saturday window (T042; openness is now a
+   top-five factor of ~187, and it takes two minutes); **primary category**
+   plus 2–4 secondaries (T016); **plain legal business name**; **services list
+   and description** (T022, T051); **service-area list matched to the real
+   driving radius** — an inflated area dilutes relevance in the core zone;
+   **website URL** → `https://nemoseamlessgutter.com/?utm_source=gbp#book`;
+   **Performance → Calls, last 28 days**; **booking link** (T050) → the live
+   widget (`index.html:525`); **read off the review count and average**.
+   *How I would know it worked:* a `local_visitors` day above 1 — the site has
+   had **one** maps visitor in twenty-one days — or a booking carrying the utm.
+   *Checked:* T016, T022, T042, T049, T050, T051 all `candidate`,
+   `activated: null`; nothing in `techniques.py` touches the profile and
+   `gsc.py:39` is `webmasters.readonly`, so there is no engine path to any of it.
+
+2. **Divine — deploy `growth/`. Day twenty-four.** It now also ships today's
+   unit fix, which matters more than I thought yesterday: until it deploys, the
+   scout's prompt keeps asserting eighteen clicks a day. It also ships
+   `_off_area_prose`, the `internal_links` fix (thirteen page edits the engine
+   can make **on an empty balance**), and `keywords.ranked`, without which I
+   still cannot say which query the goal metric lost.
+
+3. **Divine — delete the Lancaster County service-area claim from
+   `services/gutter-guards.html:163`. Sixty seconds, free, needs no credit and
+   no deploy of `growth/`.** Day fifty-four on the site.
+   *Checked:* still there verbatim; `_off_area_prose` would catch it but is
+   undeployed; `deploy/retire_out_of_area.py` reports it and has no fix mode.
+
+4. **Divine — auto-reload with a monthly cap on the Anthropic account, plus
+   `--email divinejdavis@gmail.com` on the 11:00 watchdog line. Hygiene, not the
+   lever.** Fourteen dead mornings. *Checked:* the 11:00 watchdog line is
+   `deploy/cron-nemo-growth:69` and still has no `--email`. **Line-number
+   correction:** the last several entries cited this as `:79`; the file is 69
+   lines long, so that reference has been wrong and anyone who went looking for
+   it found nothing. The line reads
+   `0 11 * * * root … growth_daily.py watchdog …`, and the file's own comment at
+   `:66` says restoring the alert is one flag.
+
+*Still carried so that nothing is silently dropped, in one line rather than
+five paragraphs:* T031 / T036 / T040 (the three seasonal plays, ~two weeks of
+value left before the fall window closes); Dover placeholder; half-round page;
+Schuylkill excision; PA HIC number; freshness dates.
+
+### Reasoning and uncertainties
+
+Today was a genuinely empty day by the numbers — every derived metric frozen,
+the goal at zero for a second time, the untracked slate not moving by a single
+position on any of forty rows. The only honest headline is that nothing moved
+for the fourteenth morning in a row.
+
+Given that, the useful work was verification rather than analysis, and two
+things came out of it. The stale-position pool closing is small but it removes
+the most charitable explanation for yesterday's zero. The `scout.py:140`
+finding is the one I would defend hardest: a unit error I had catalogued as a
+reporting nuisance is actually in the prompt of the component that generates
+every new idea this system has, and I had not checked that in seven entries of
+complaining about it. I fixed it in the repo because it was twenty lines and
+because writing about it an eighth time would have been the wrong response.
+
+What I am least sure about is whether narrowing the recommendations helps. The
+argument for it is that twenty-two items with none actioned is evidence the
+format has failed. The argument against is that the two items most likely to be
+done by whoever has a spare minute — the sixty-second Akron deletion and the
+watchdog email flag — are exactly the ones that a narrowed list buries. I have
+compromised by keeping four and compressing the rest to a line, and I will
+watch whether anything gets actioned this week before narrowing further.
+
+What would change my reading of the whole situation is still the same thing it
+has been for eight weeks: seeing what is actually on the Business Profile. If
+the hours are wrong or the categories are generic, item 1 is a two-minute fix
+with a top-five ranking factor behind it. If the profile turns out to be
+complete and correct, then the prominence thesis has been wrong all along, the
+answer is paid acquisition or referral relationships (T011, T021, T030), and
+those cost money nobody has authorised.

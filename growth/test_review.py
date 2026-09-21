@@ -151,5 +151,24 @@ class RetireThresholdTest(unittest.TestCase):
         self.assertFalse(0.0 < R.MIN_RECENT_MEDIAN)
 
 
+class VerdictUnitTest(unittest.TestCase):
+    """The `why` string has to print the unit the series is actually in.
+
+    `gsc.py:283` records the Search Console 28-day window total once per day.
+    Every verdict built on it therefore reports a window total, and printing
+    "/day" beside it has been misread as a daily click rate — on 2026-09-21
+    three techniques carried `gsc_clicks median 18.0/day` while the site's real
+    28-day click total was 16.
+    """
+
+    def test_gsc_series_are_labelled_as_window_totals(self):
+        self.assertEqual(R._unit("gsc_clicks"), "/28d")
+        self.assertEqual(R._unit("gsc_impressions"), "/28d")
+
+    def test_genuinely_daily_series_keep_the_daily_label(self):
+        self.assertEqual(R._unit("organic_visitors"), "/day")
+        self.assertEqual(R._unit("owned_visitors"), "/day")
+
+
 if __name__ == "__main__":
     unittest.main()

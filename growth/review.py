@@ -34,6 +34,20 @@ REDUNDANCY_RATIO = 0.10  # <10% of an overlapping technique's traffic = redundan
 # flat would break every other technique, so these are never auto-retired.
 PROTECTED = {"rebuild_sitemap", "ping_indexnow", "internal_links"}
 
+# Not every recorded series is a daily value. `gsc.py:283` records the Search
+# Console 28-DAY WINDOW TOTAL once per day, so a median over that series is a
+# median of window totals — "gsc_clicks median 18.0" means the site's 28-day
+# click total is typically 18, not that it earns 18 clicks a day. Labelling it
+# "/day" has been misread in this repo repeatedly (see growth/JOURNAL.md,
+# 2026-08-31 onward): three techniques currently carry a verdict that reads as
+# a daily click rate roughly thirty times the real one. The suffix is the whole
+# fix — the arithmetic was never wrong, only the unit printed next to it.
+WINDOW_TOTAL_METRICS = {"gsc_clicks", "gsc_impressions"}
+
+
+def _unit(metric):
+    return "/28d" if metric in WINDOW_TOTAL_METRICS else "/day"
+
 
 # The date a running technique should be judged from.
 #
@@ -141,15 +155,16 @@ def evaluate(t):
     if len(after) < GRACE_DAYS // 2:
         res["why"] = f"only {len(after)} days of {metric} since activation"
         return res
+    unit = _unit(metric)
     if b_med is None:
-        res["why"] = f"{metric} median {a_med}/day since activation (no pre-activation baseline)"
+        res["why"] = f"{metric} median {a_med}{unit} since activation (no pre-activation baseline)"
         return res
     if a_med is not None and a_med <= b_med:
         res["action"] = "flag"
-        res["why"] = (f"{metric} median {a_med}/day vs {b_med}/day before activation — "
+        res["why"] = (f"{metric} median {a_med}{unit} vs {b_med}{unit} before activation — "
                       f"no measurable lift after {days}d")
         return res
-    res["why"] = f"{metric} median {a_med}/day vs {b_med}/day before activation"
+    res["why"] = f"{metric} median {a_med}{unit} vs {b_med}{unit} before activation"
     return res
 
 
