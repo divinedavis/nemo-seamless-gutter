@@ -25852,3 +25852,377 @@ Goal: **0.0%** top-3 share of 220 tracked queries (target 50%).
 - `ping_indexnow` — ok: nothing new to submit
 
 **Scout did not run:** anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CfHySzPTypL4nWNzwDusu"}
+
+## 2026-09-22 — review agent
+
+### Where the numbers stand
+
+**The goal metric is zero for the third day.** `top3` **0 / 220**, `share_pct`
+**0.0%** against a target of 50%. `ranked_known` **42**, `coverage_pct`
+**42.7%** (sixth day). **`top10` moved 11 → 12** — the first movement in the
+goal block in six days, and the only one.
+
+**Fifteenth consecutive dead morning.** `strengthen_pages` and `scout` both
+failed on `Your credit balance is too low` — an empty account, same error text
+as the previous fourteen. Every other step `ok`/`noop`. `new: 0, changed: 0`.
+**Twenty-second empty-balance morning since 08-12.** Duty cycle over
+08-12 → 09-22 (42 days): **13 alive, 29 dead**.
+
+**Day fifty-seven.**
+
+| | 09-21 | 09-22 |
+| --- | --- | --- |
+| `top3` / tracked | 0 / 220 | **0 / 220** |
+| `share_pct` | 0.0% | **0.0%** |
+| `top10` | 11 | **12** |
+| `ranked_known` | 42 | **42** |
+| `coverage_pct` | 42.7% | **42.7%** |
+
+**`keywords.by_town`, diffed cell by cell against `git show
+54d2a16:growth/snapshot.json`: not one cell moved.** county 117 / 47 / 0;
+york 40 / 15 / 0; dover 16 / 9 / 0; hanover 13 / 6 / 0; red-lion 11 / 5 / 0;
+dallastown 11 / 6 / 0; spring-grove 12 / 6 / 0. `by_intent` identical. Six named
+towns at zero for fifty-seven days, the county bucket for three. The `top10`
+rise is therefore inside the county bucket and invisible per-town, which is the
+same reporting gap `keywords.ranked` would close.
+
+**Search Console**, 28-day window: rows 880 → **888**, matched **42**
+(unchanged), clicks **16** (unchanged), impressions 6,537 → **6,571**,
+avg position 28.0 → **27.9**. 16 clicks on 6,571 impressions is a **0.24% CTR**,
+and the next section is about why that number does not mean what it looks like.
+
+**Traffic.** 09-21: 2 visitors, 0 leads. Last twenty-one days: **53 visitors**
+(25 organic, 25 direct, **1 from maps**, 0 AI, 1 referral), **1 booking**.
+`call_taps` **0 for twenty-three straight days**. `phone_leads` **0 all-time**.
+`bookings` 4 all-time; last one **09-02, twenty days ago**. The measurement is
+not suspect — 149 visitors across 45 days is small, not zero, and organic and
+direct both move.
+
+### Correction: the "frozen untracked slate" was never frozen
+
+The last several entries, mine included by inheritance, have described
+`discovered_untracked` as frozen, and yesterday's said it plainly: *"Not one of
+the forty rows moved as much as a single position."* **That is false.** I
+reconstructed the slate from all twenty-four published snapshots and counted
+day-over-day position changes on the rows common to each pair:
+
+| date | rows whose position moved | impressions changed | in / out |
+| --- | --- | --- | --- |
+| 09-17 | 18 / 37 | 18 | 3 / 3 |
+| 09-18 | 18 / 39 | 19 | 1 / 1 |
+| 09-19 | 13 / 39 | 20 | 1 / 1 |
+| 09-20 | 13 / 40 | 12 | 0 / 0 |
+| **09-21** | **11 / 40** | 16 | 0 / 0 |
+| 09-22 | 18 / 39 | 16 | 1 / 1 |
+
+Every day since 09-02 sits in the 11–20 band. The eleven rows that moved on
+09-21 were `gutter replacement` 18.5→18.6, `gutters` 7.4→7.7, `gutter guards in
+akron pa` 9.8→9.9, `factors that affect gutter cleaning cost` 37.9→37.7,
+`gutter cleaning` 8.3→8.1, `gutter guards in stevens pa` 55.0→55.2, `gutter
+repair` 7.1→7.0, `gutter guard installation harleysville pa` 42.2→42.5,
+`seamless gutter harleysville pa` 26.1→26.3, `gutter guards harleysville pa`
+45.4→45.3, `new windows` 31→31.9.
+
+Two things *are* constant, and conflating them with the slate is how the error
+got made. The **row count** is exactly 40 every single day, because 40 is
+`TOP_BY_IMPRESSIONS` (`gsc.py:299`) — a cap, not a measurement. And the **click
+total is 0 in every snapshot ever published**, twenty-four for twenty-four,
+across impression bases from 11,956 down to 1,064. "Frozen" should only ever
+have been said about those two.
+
+This matters beyond bookkeeping: "nothing moves" has been doing rhetorical work
+in this journal for a week. The site's positions on these queries move daily.
+What does not move is clicks.
+
+### Finding of the day — not one of the forty loudest queries is a York County search
+
+Classifying today's forty untracked rows with the engine's own
+`techniques._names_other_market`:
+
+| slice | rows | impressions | clicks |
+| --- | --- | --- | --- |
+| names a place outside the service area | 25 | **613 (57.6%)** | 0 |
+| names no place at all (geo-neutral head terms) | 15 | 451 (42.4%) | 0 |
+| **names a York County place** | **0** | **0** | **0** |
+
+The off-area rows are Lancaster County (New Holland, Akron, Lititz, Leola,
+Stevens, Brownstown), Lebanon (Myerstown, Newmanstown), Bucks (Perkasie),
+Montgomery (Harleysville), Delaware (Essington, Crum Lynne, Wayne), Luzerne
+(Wilkes-Barre) and Philadelphia. The geo-neutral ones are `gutter installation`
+at **2.1**, `gutter soffit and fascia replacement` at **1**, `seamless gutters`
+at 7.2, `gutter cleaning` at 8.0, `gutter repair` at 7.0 — good positions, zero
+clicks, which is the same shape as the retired `gutter installer` anomaly and
+should be read the same cautious way.
+
+**I checked whether the site caused this and it did not.** Grepping every HTML
+file for each of the seventeen off-area place names returns **two hits total**:
+`Akron` and `Lancaster`, both in `services/gutter-guards.html` — the paragraph
+this journal has been asking to have deleted for fifty-five days. New Holland,
+Lititz, Leola, Stevens, Myerstown, Newmanstown, Perkasie, Harleysville,
+Essington, Crum Lynne, Wayne, Wilkes-Barre, Philadelphia and Brownstown appear
+**nowhere on the site**. Google is matching thin-competition geo queries onto
+generic service pages on its own. So deleting the Akron paragraph is still
+right — it is the site telling York County searchers the business is in
+Lancaster County — but it will not reclaim the impression base, and nobody
+should expect it to.
+
+**What this does to the CTR number.** A 0.24% site-wide CTR computed over a
+base where the loudest 1,064 impressions contain zero York County searches is
+not a statement about this business's conversion. It is mostly a measurement of
+how often Google shows a York County contractor to someone in Lancaster or
+Delaware County, where the correct behaviour of that searcher is not to click.
+The honest CTR question needs the county-only base, which `tracked_totals`
+computes in the repo and which the deployed engine does not publish.
+
+### Did previous changes work?
+
+**1 — Test 19 (GSC `rows`, five-day mean 09-18 → 09-22 against the 863.6 bar
+set by 09-13 → 09-17). DUE TODAY. PASSES.**
+
+| | 09-18 | 09-19 | 09-20 | 09-21 | 09-22 | mean |
+| --- | --- | --- | --- | --- | --- | --- |
+| rows | 848 | 871 | 872 | 880 | **888** | **871.8** |
+
+871.8 against a bar of 863.6, clearing it by 8.2, with **four consecutive daily
+rises** and no day in the window below the bar's own worst day. **The rows
+slide that began 09-10 has stopped.** Impressions, which I dropped from this
+test on 09-19 and am reporting only as context, did the same thing: 6,438.4
+against a 6,317.2 baseline.
+
+**What the pass does and does not license.** It says the decline in the number
+of distinct queries the site appears for has ended; it does not say the site
+got better, and today's finding is the reason to be careful. `rows` counts
+query variety, and the variety this site has is majority out-of-county. A
+recovering `rows` count with `clicks` flat at 16 for three days, `top3` at
+zero, and zero in-area rows in the loudest forty is a base stabilising, not a
+business recovering. The correct reading is narrow: **whatever was removing
+this site from SERPs between 09-10 and 09-17 stopped removing it.** Given no
+confirmed September Google update (re-checked today, below), the most likely
+explanation remains the one traced on 09-19 — window composition, three Monday
+bursts rolling out — which would stop on its own schedule regardless of
+anything the engine did. **I am not claiming the engine caused this**, and it
+could not have: `new: 0, changed: 0` on every one of those mornings.
+
+**2 — Test 20 (coverage vs rank). Falsified 09-20, nothing today revisits it.**
+Standing conclusion unchanged: coverage is not the variable.
+
+**3 — The funding-calendar finding.** Falsifier is *one funded week producing
+page sections, followed by no recovery in `top10` within twenty-one days*.
+**Still cannot advance — there has been no funded morning.** `top10` rose 11 →
+12 today on a dead morning, which is weak evidence *against* the hypothesis
+that `top10` tracks funding, and I am recording it as such rather than ignoring
+it. One point, inside noise.
+
+**4 — Auto-reload on the Anthropic account. NOT ACTIONED, day fourteen.**
+Fifteen dead mornings. Billing setting, not a bug.
+
+**5 — Deploy `growth/`. NOT ACTIONED, day twenty-five.** All five named tests
+negative again: `discovered_untracked` **exactly 40**; `internal_links` reports
+**"0 page(s)"**; top-level `code_version` **absent**; `keywords.ranked` /
+`gsc.tracked` / `gsc.pages` **all absent**; `scoreboard.works` still 7.
+
+The dated harm ran for the **twenty-fifth** time — six verdicts re-stamped
+`"decided": "2026-09-22"` with changed bodies. The three `gsc_clicks` verdicts
+moved **18.0 → 16.5**, still suffixed `/day` against a real 28-day total of 16.
+Yesterday's `review.py` fix is in this repo and still not on the droplet, so
+`scout.py:140` will keep telling the scout this site earns 16.5 clicks a day on
+the next funded morning.
+
+**6 — The Akron / Lancaster paragraph. NOT ACTIONED, day three** (day
+fifty-five on the site). Verbatim at `services/gutter-guards.html:163`. Today's
+finding narrows the claim made for it: worth deleting because it misstates
+where the business is, **not** because it is causing the Lancaster impressions.
+
+**7 — Test 26, the Monday bursts.** `gutter installer` and `gutter contractor`
+still absent from `discovered_untracked`; today's fortieth row carries 11
+impressions, so both remain under ~11. No change.
+
+**8 — The York Springs geo guard / freshness dates.** `adopt_queries` noop'd
+again. `dateModified` present on **15 of 41** pages — unchanged for the seventh
+day. Two blockers deep: undeployed *and* needs credit.
+
+**Carried, re-verified by grep this morning, all still NOT ACTIONED:** Dover
+placeholder, day sixteen (`grep -c placeholder` → **1**). Half-round page, day
+thirty-seven. Schuylkill excision, day forty — still exactly one file,
+`services/seamless-gutter-installation.html`. PA HIC number, day thirty-eight
+(`grep -rl HIC` → nothing). `?utm_source=gbp`, day fifty (`grep -c` → **0** in
+`index.html`). Watchdog `--email` (`deploy/cron-nemo-growth:69`). Eric's
+Business Profile, day fifty-seven.
+
+**Twenty-two items. Zero actioned, nineteen days running.**
+
+### What I researched today
+
+`WebSearch` worked; `WebFetch` is still `EGRESS_BLOCKED` (tried
+`sterlingsky.ca` directly and was refused), so citations below are from the
+search tool's summaries and I did not open the pages.
+
+- **A correction to my own recommendation, which is the most useful thing the
+  research turned up.** Yesterday's item 1 told Eric to set the GBP
+  service-area list "matched to the real driving radius" because *"an inflated
+  area dilutes relevance in the core zone."* **That premise is not supported.**
+  For a service-area business, distance is computed from the hidden verified
+  address, not from the service areas listed; listing more areas neither
+  expands nor dilutes ranking, and adding a town to the field tells customers
+  where you work without moving you in that town's results
+  ([sterlingsky.ca](https://www.sterlingsky.ca/does-the-service-area-in-google-my-business-impact-ranking/),
+  [mapranks.com](https://www.mapranks.com/2026/06/29/google-maps-optimization-service-area-businesses/),
+  [shiftflow.app](https://www.shiftflow.app/playbook/do-service-areas-affect-google-maps-rankings)).
+  **Eric should still fill the service-area list in, for customer clarity — he
+  should not shrink it expecting a ranking gain, and should not spend more than
+  a minute on it.** T051's hypothesis needs the same edit when someone next
+  touches the ledger.
+- **The profile-versus-website weighting holds up.** Whitespark's 2026 survey
+  puts Google Business Profile signals at **32%**, the heaviest single
+  category, with profile and reviews together roughly half of local rank;
+  primary category is the top single factor
+  ([thevalleymarketinggroup.com](https://thevalleymarketinggroup.com/blog/google-business-profile-ranking-factors-2026/),
+  [wolfpackadvising.com](https://wolfpackadvising.com/blog/how-to-rank-higher-on-google-maps/)).
+  Corroborates recommendation 1; nothing new to add to the ledger.
+- **AI Overviews mostly do not sit on the queries this business needs, and
+  where AI does answer, it cites other people's pages.** AI Overviews appear on
+  ~38% of local service queries, but `near me` and `[city] + service` queries
+  trigger the Local Pack instead, with only **4–8% overlap**; and **~60% of AI
+  citations go to third-party publishers** — Reddit, Yelp, Thumbtack,
+  HomeGuide, Angi
+  ([whitespark.ca](https://whitespark.ca/blog/case-study-the-prevalence-of-ai-overviews-in-local-search/),
+  [tarasaka.com](https://tarasaka.com/google-ai-overview-seo-local-businesses/)).
+  *Checked the ledger before writing this up:* this is corroboration for
+  **T035** (Yelp), **T056** (third-party "best of" lists), **T048**
+  (Foursquare), **T053** (BuildZoom), **T086** (Thumbtack) and **T044**
+  (Reddit) — all already candidates. **No new technique.** What it changes is
+  the ordering argument: the site-side GEO work (T025, T046, T073) is aimed at
+  the 40% of citations that go to first-party pages on the queries least likely
+  to be asked here.
+- **Still no confirmed September 2026 Google update.** Re-checked: the two
+  confirmed 2026 core updates remain March and May, the most recent confirmed
+  ranking event is the **August 2026 spam update (from 08-18)**, and trackers
+  saw unconfirmed volatility around **09-02 → 09-08**
+  ([searchengineland.com](https://searchengineland.com/library/platforms/google/google-algorithm-updates),
+  [seroundtable.com](https://www.seroundtable.com/category/google-updates)).
+  Note the dates: the 09-10 → 09-17 slide sits *after* that volatility window,
+  not inside it. Nothing to hang it on, for the fourth consecutive entry.
+
+**Rejected.** Shrinking the GBP service area as a ranking tactic — **new
+rejection, and it retracts my own previous advice**. Templated-city-page
+penalty — third rejection (premise measured false on 09-20). AI
+call-answering / speed-to-lead — third rejection; `call_taps` 0 for
+twenty-three days, there are no calls to answer. Lancaster County pages because
+the site ranks there — fourth rejection, and today's finding sharpens it: those
+613 impressions are not a market, they are Google guessing. Paid
+GEO/AI-visibility monitoring — **twentieth** rejection. Bought citations,
+review-volume schemes, review gating, unsolicited bulk email or SMS — standing
+rejections.
+
+### What I checked in the code before recommending anything
+
+| Claim I might have made | What I found | Where |
+| --- | --- | --- |
+| **"The snapshot should report an in-area / out-of-area impression split"** | **Half already shipped.** `tracked_totals()` is the in-area side and is in the repo, undeployed. The off-area side did not exist, so site-wide-minus-tracked was one lump holding two unlike things. I added it rather than propose it | `gsc.py:204-239`; added at `gsc.py:242-281` |
+| "Write a new off-area classifier for GSC rows" | **No** — `techniques._names_other_market` already does exactly this and already governs what enters the goal's denominator. Reused it; a second opinion would let the measurement and the intake filter disagree | `techniques.py:1564-1594` |
+| "The 40-row untracked cap is a bug" | **Not a bug, and already fixed in the repo** — `_select_discoveries` takes a second slate by position precisely so a flood cannot evict a well-ranked row. Undeployed | `gsc.py:349-388` |
+| "The off-area impressions are caused by off-area copy on the site" | **False** — 17 place names grepped across all HTML, 2 hits, both in one file | `services/gutter-guards.html:163` |
+| "Traffic measurement is broken — `visitors` looks like zero" | **No.** 149 visitors over 45 days, organic and direct both non-zero and both moving. Small, not suspect | `snapshot.json:traffic` |
+| "Add directory / Yelp / Reddit / third-party-listicle work for AI citations" | **Already candidates** — T009, T035, T044, T048, T053, T056, T086 | ledger |
+| "Add GBP hours / category / services / booking-link / service-area work" | **Already candidates** — T016, T022, T042, T050, T051 | ledger |
+| "Auto-retire techniques that do not work" | **Do not touch** — `MIN_RECENT_MEDIAN = 0` makes the branch unreachable and `test_review.py:136` documents that as Eric's and Divine's call | `review.py:29`, `test_review.py:136-151` |
+| "Fix the Akron paragraph from this repo" | **No** — `publish_state.sh` rsyncs `areas/ guides/ services/` droplet → repo at 06:00, so a page edit here is reverted. `growth/*.py` is not copied and does survive | `growth/publish_state.sh:45-73` |
+
+### The one repo change I made today
+
+`growth/gsc.py` — added `off_area_totals(rows)`, forty lines with the
+docstring, wired into `sync()` beside the existing `tracked` block. Five tests
+in `growth/test_gsc.py`, including one asserting the three slices add up. Full
+suite re-run: **11 modules, all OK.**
+
+It exists so that the count I did by hand this morning happens every morning.
+Right now the only way to know that none of the site's loudest forty queries is
+a York County search is to write a script against the published snapshot, which
+means it gets noticed once and forgotten. **It does nothing until `growth/` is
+deployed**, the same as yesterday's unit fix — and I want to be plain that this
+is now two consecutive days of the review agent writing engine code that cannot
+run. That is not a substitute for the deploy; it is what is left when the
+deploy does not happen.
+
+### Recommendations
+
+**Nothing in this commit is live.** The site and engine run from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout. **No new items.
+Twenty-two carried, none actioned.**
+
+1. **Eric — one Business Profile sitting. Fifteen minutes, free. Day
+   fifty-seven.** Eight of the top ten local-pack signals originate from the
+   profile; profile plus reviews are roughly half of local rank. In this order:
+   **hours**, real ones plus a Saturday window (T042 — being open at the moment
+   of the search is a top-five factor); **primary category** plus 2–4
+   secondaries (T016 — the single heaviest factor); **plain legal business
+   name**; **services list and description** (T022, T051); **website URL** →
+   `https://nemoseamlessgutter.com/?utm_source=gbp#book`; **Performance →
+   Calls, last 28 days**; **booking link** (T050) → the live widget
+   (`index.html:525`); **read off the review count and average**. **Changed
+   from yesterday:** fill the service-area list for customer clarity, one
+   minute, and do *not* shrink it — I had that backwards and the research says
+   the field does not move rankings either way.
+   *How I would know it worked:* a `local_visitors` day above 1 — the site has
+   had **one** maps visitor in twenty-one days — or a booking carrying the utm.
+   *Checked:* T016, T022, T042, T049, T050, T051 all `candidate`,
+   `activated: null`; nothing in `techniques.py` touches the profile and
+   `gsc.py:39` is `webmasters.readonly`, so there is no engine path to any of
+   it.
+
+2. **Divine — deploy `growth/`. Day twenty-five.** It now ships three things
+   the droplet does not have: `keywords.ranked` (without which I cannot say
+   which query the goal metric lost, or which of the 42 ranked queries moved
+   into the top 10 today), yesterday's `/28d` unit fix (without which the
+   scout's prompt keeps asserting 16.5 clicks a day, thirty times the truth),
+   and today's `gsc.off_area` split. Plus `_off_area_prose` and the
+   `internal_links` fix — thirteen page edits the engine can make **on an empty
+   balance**.
+
+3. **Divine — delete the Lancaster County service-area claim from
+   `services/gutter-guards.html:163`. Sixty seconds, free, needs no credit and
+   no deploy.** Day fifty-five. *Narrowed today:* do it because the site's
+   gutter-guard page tells York County searchers the business is in Lancaster
+   County, not because it is generating the Lancaster impressions — it is not.
+
+4. **Divine — auto-reload with a monthly cap on the Anthropic account, plus
+   `--email divinejdavis@gmail.com` on the 11:00 watchdog line
+   (`deploy/cron-nemo-growth:69`). Hygiene, not the lever.** Fifteen dead
+   mornings.
+
+*Still carried, in one line rather than five paragraphs:* T031 / T036 / T040
+(the three seasonal plays — **this is the last week they are worth starting**,
+leaf-fall in York County runs out from mid-October); Dover placeholder;
+half-round page; Schuylkill excision; PA HIC number; freshness dates.
+
+### Reasoning and uncertainties
+
+Today had two real results and I want them kept apart, because one is good news
+and the other is the reason not to celebrate it. Test 19 passed on its due date
+by a pre-registered rule I did not write and could not bend: rows 871.8 against
+863.6, four consecutive rises. The slide stopped. And the composition of what
+stopped sliding is a base in which **zero of the forty loudest queries is a
+York County search** — so the thing that recovered is variety in markets this
+business cannot serve. Both are true. A review that reported only the first
+would be the "slower way of wasting Eric's summer" this prompt warns about.
+
+The correction to the frozen-slate claim is the part I would most want checked.
+I found it by not trusting an inherited sentence, and the reconstruction is
+reproducible from git history in about twenty lines. I do not think it changes
+any decision — but a journal whose job is to show what was believed at the time
+is worth less if a false observation gets repeated for six entries because it
+sounded like the rest of the story.
+
+What I am least sure about is whether the `top10` 11 → 12 means anything. It is
+one query on a dead morning, in a bucket of 42 ranked queries, and I cannot see
+which one because `keywords.ranked` is undeployed. I have recorded it as weak
+evidence against the funding-calendar hypothesis rather than for anything.
+
+What would change my reading is unchanged for eight weeks and is not an
+analysis: seeing the Business Profile. Every measurement available to me now
+says the same thing from three directions — the website ranks, in the wrong
+counties, and never gets called; the profile carries roughly half of local rank
+and has never been audited; `call_taps` has been zero for twenty-three days.
+The correction I had to publish today, retracting my own service-area advice
+from a guess, is a small example of the larger problem: I have been reasoning
+about that profile for eight weeks without anyone having looked at it.

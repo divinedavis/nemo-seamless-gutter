@@ -103,6 +103,56 @@ class TrackedTotalsTest(unittest.TestCase):
         self.assertLess(t["avg_position"], 10)
 
 
+class OffAreaTotalsTest(unittest.TestCase):
+    """The third slice, added 2026-09-22.
+
+    Site-wide minus tracked used to be one lump holding two unlike things:
+    searches from counties this business does not serve, and geo-neutral
+    searches like "gutter installation" that are real in-area demand naming no
+    town. They need opposite readings, so they are measured apart.
+    """
+
+    def test_a_named_other_county_is_off_area(self):
+        rows = [_row("gutter guards in akron pa", 9.6, 51),
+                _row("seamless gutters perkasie pa", 19.4, 21)]
+        t = G.off_area_totals(rows)
+        self.assertEqual(t["rows"], 2)
+        self.assertEqual(t["impressions"], 72)
+
+    def test_geo_neutral_demand_is_not_counted_as_off_area(self):
+        # The whole point of the split. "gutter installation" names no place,
+        # so it is not somebody else's market — it is the remainder.
+        rows = [_row("gutter installation", 2.1, 51),
+                _row("seamless gutters", 7.2, 12),
+                _row("gutter cleaning", 8.0, 45)]
+        self.assertEqual(G.off_area_totals(rows)["rows"], 0)
+        self.assertEqual(G.off_area_totals(rows)["impressions"], 0)
+
+    def test_in_area_towns_are_not_off_area(self):
+        rows = [_row("gutter installation york pa", 8.0, 400, 3),
+                _row("seamless gutters hanover pa", 12.0, 30)]
+        self.assertEqual(G.off_area_totals(rows)["rows"], 0)
+
+    def test_position_is_weighted_by_impressions(self):
+        rows = [_row("gutter guards in myerstown pa", 76.5, 1),
+                _row("gutter guards in akron pa", 9.6, 99)]
+        self.assertLess(G.off_area_totals(rows)["avg_position"], 12)
+
+    def test_the_three_slices_add_up(self):
+        # site-wide == tracked + off-area + geo-neutral remainder, which is the
+        # property that makes the number worth publishing.
+        rows = [_row("gutter installation york pa", 8.0, 400, 3),
+                _row("gutter guards in akron pa", 9.6, 51),
+                _row("gutter installation", 2.1, 51)]
+        site = sum(r["impressions"] for r in rows)
+        tracked = G.tracked_totals(rows, TRACKED)["impressions"]
+        off = G.off_area_totals(rows)["impressions"]
+        self.assertEqual(site, 502)
+        self.assertEqual(tracked, 400)
+        self.assertEqual(off, 51)
+        self.assertEqual(site - tracked - off, 51)
+
+
 class SelectDiscoveriesTest(unittest.TestCase):
     """The second slate, added 2026-08-05.
 

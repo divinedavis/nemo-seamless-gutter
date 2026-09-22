@@ -239,6 +239,48 @@ def tracked_totals(rows, tracked):
             "avg_position": round(weighted / seen, 1) if seen else None}
 
 
+def off_area_totals(rows):
+    """The same three numbers over searches that name somebody else's market.
+
+    `tracked_totals` says how much of the window is York County, and its own
+    docstring names the reason that is only a floor: a geo-neutral search like
+    "gutter installation" is not in the tracked universe, so real in-area
+    demand that happens to name no town is excluded from it. That leaves the
+    residual — everything site-wide minus the tracked rows — carrying two
+    unlike things at once, and every entry in the journal that has had to say
+    "site-wide impressions are the wrong instrument" has been saying it about
+    that lump.
+
+    This splits the lump. Site-wide, minus tracked, minus off-area, is the
+    geo-neutral remainder, and the three add up.
+
+    Measured by hand on 2026-09-22, over the forty loudest untracked rows in
+    that morning's snapshot: 613 of 1,064 impressions (57.6%) named a place
+    outside the service area — New Holland, Akron, Lititz and Leola in
+    Lancaster County, Myerstown and Newmanstown in Lebanon, Harleysville,
+    Perkasie, Essington, Crum Lynne, Wilkes-Barre, Philadelphia. **Not one of
+    the forty named a York County place.** All forty had zero clicks, as they
+    have had in every snapshot ever published. A site-wide CTR computed over
+    that base is not a statement about this business.
+
+    The classifier is `techniques._names_other_market`, unchanged and
+    deliberately reused: the engine already decides with it what may enter the
+    goal's denominator, and a second opinion about what counts as off-area
+    would be a way for the measurement and the intake filter to disagree.
+    Imported inside the call because `techniques` imports this module.
+    """
+    from .techniques import _names_other_market
+    hits = [r for r in rows if _names_other_market(r.get("query") or "")]
+    impressions = sum(int(r.get("impressions") or 0) for r in hits)
+    clicks = sum(int(r.get("clicks") or 0) for r in hits)
+    weighted = sum(float(r.get("position") or 0) * int(r.get("impressions") or 0)
+                   for r in hits if r.get("position"))
+    seen = sum(int(r.get("impressions") or 0)
+               for r in hits if r.get("position"))
+    return {"rows": len(hits), "clicks": clicks, "impressions": impressions,
+            "avg_position": round(weighted / seen, 1) if seen else None}
+
+
 def sync(quiet=False):
     """Pull rank data and fold it into the tracked keyword universe.
 
@@ -287,7 +329,11 @@ def sync(quiet=False):
            "clicks": t["clicks"], "impressions": t["impressions"],
            "avg_position": round(t["position"], 1) if t.get("position") else None,
            # The county-only view of the same window. See tracked_totals().
-           "tracked": tracked_totals(rows, {k["query"] for k in keywords.load()})}
+           "tracked": tracked_totals(rows, {k["query"] for k in keywords.load()}),
+           # Somebody else's market, so that site-wide minus these two is the
+           # geo-neutral remainder rather than an unreadable lump. See
+           # off_area_totals().
+           "off_area": off_area_totals(rows)}
     ledger.set_state("gsc_last", {"date": ledger.today(), **out})
     if not quiet:
         print(f"  gsc: {len(rows)} queries in the last {WINDOW_DAYS}d, "
