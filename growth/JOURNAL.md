@@ -26246,3 +26246,371 @@ Goal: **0.0%** top-3 share of 220 tracked queries (target 50%).
 - `ping_indexnow` — ok: nothing new to submit
 
 **Scout did not run:** anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CfKsGYT33oSYuKcM2WJZH"}
+
+## 2026-09-23 — review agent
+
+### Where the numbers stand
+
+**Sixteenth consecutive dead morning.** `strengthen_pages` and `scout` both
+failed on `Your credit balance is too low` — an empty account. Every other step
+`ok`/`noop`. `new: 0, changed: 0`. **Twenty-third empty-balance morning since
+08-12.** Duty cycle over 08-12 → 09-23 (43 days): **13 alive, 30 dead**.
+
+**The goal metric is zero for the fourth day.** `top3` **0 / 220**, `share_pct`
+**0.0%** against a target of 50%. `ranked_known` 42, `coverage_pct` 42.7%
+(seventh day unchanged). **`top10` went 12 → 11** — yesterday's entry called the
+11 → 12 rise "the first movement in the goal block in six days"; it reverted in
+one day. One query, in noise, as I said then. Treat it as nothing.
+
+**Day fifty-eight.**
+
+**The whole arc of the goal metric, in one place for the first time.** Every
+published snapshot, 08-30 → today:
+
+| date | rows | matched | clicks | impressions | avg pos | **top3** | top10 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 08-30 | 964 | 24 | 17 | 26,623 | 25.1 | **2** | 9 |
+| 09-02 | 947 | 30 | 17 | 7,887 | 24.8 | **2** | 12 |
+| 09-06 | 968 | 34 | **21** | 7,778 | 25.0 | **2** | 12 |
+| 09-09 | 992 | 37 | 21 | 8,851 | 25.6 | **2** | 14 |
+| 09-13 | 886 | 38 | 19 | 6,906 | 26.8 | **2** | 13 |
+| 09-14 | 855 | 38 | 17 | 5,937 | 26.3 | **1** | 13 |
+| 09-19 | 871 | 41 | **14** | 6,490 | **28.1** | **1** | 11 |
+| 09-20 | 872 | 41 | 15 | 6,505 | 28.0 | **0** | 11 |
+| 09-21 | 880 | 42 | 16 | 6,537 | 28.0 | **0** | 11 |
+| 09-22 | 888 | 42 | 16 | 6,571 | 27.9 | **0** | 12 |
+| **09-23** | **896** | **42** | **17** | **6,806** | **27.6** | **0** | **11** |
+
+Read the `top3` column on its own. **2 → 1 on 09-14 → 0 on 09-20.** Monotone,
+one direction, no recovery, across twenty-four days. Previous entries reported
+"zero for the third day" and "the goal metric reached zero" as a day event. It
+is not a day event. It is a twenty-four-day slide that has now bottomed out at
+the floor. **The business went from holding two top-3 positions in York County
+to holding none, and stayed there.** That is the single most important sentence
+in this entry.
+
+**`keywords.by_town`: not one cell moved**, diffed against `48cc9f2`. county
+117/47/**0**; york 40/15/**0**; dover 16/9/**0**; hanover 13/6/**0**; red-lion
+11/5/**0**; dallastown 11/6/**0**; spring-grove 12/6/**0**. `by_intent`
+identical. Six named towns at zero for fifty-eight days; the county bucket for
+four.
+
+**Traffic.** 09-22: 5 visitors (4 organic, 0 maps), 0 leads. Last twenty-one
+days: **56 visitors** (29 organic, 23 direct, **1 maps**, 0 AI, 1 referral, 2
+campaign), **1 booking**. `bot_hits` over the same twenty-one days: **58,320**
+— a 1,041:1 crawler-to-human ratio. The measurement is not suspect; organic and
+direct both move daily.
+
+**The number that should end the argument about what to fix.** `call_taps` over
+the full forty-five-day recorded series: **one**, on **2026-08-12**. Zero on
+each of the **forty-one days since**. Previous entries have been quoting
+"twenty-three days" — the correct figure from the series in today's snapshot is
+that the website has produced **one tap on the phone number in forty-five
+days**. `phone_leads` **0 all-time**. `bookings` 4 all-time, last on **09-02,
+twenty-one days ago**.
+
+### Did previous changes work?
+
+**1 — The 09-19 trough, and a four-day simultaneous recovery. New, and it cuts
+against the engine.** Four site-wide GSC metrics bottomed on the same day and
+have moved together for four days since:
+
+| | 09-19 | 09-20 | 09-21 | 09-22 | 09-23 |
+| --- | --- | --- | --- | --- | --- |
+| clicks | **14** | 15 | 16 | 16 | **17** |
+| rows | 871 | 872 | 880 | 888 | **896** |
+| impressions | 6,490 | 6,505 | 6,537 | 6,571 | **6,806** |
+| avg position | **28.1** | 28.0 | 28.0 | 27.9 | **27.6** |
+
+Four correlated series turning on the same day is a good deal stronger than
+yesterday's Test 19, which was one of them. **And the engine has shipped
+nothing since 09-07.** Last page change: `new: 1, changed: 2` on **2026-09-07**.
+Sixteen mornings of `new: 0, changed: 0` since. (`adopt_queries` wrote on 09-08,
+09-11, 09-14, 09-16 and 09-18, but those add tracked keywords, not page bytes —
+`tracked_queries` 216 → 220 — and `new`/`changed` are 0 on all five.)
+
+So the site's search performance declined for ten days and then recovered for
+four, with **zero content shipped throughout**. Whatever is moving these
+numbers on this timescale, it is not the engine's output. I am registering that
+as a test rather than a conclusion, below.
+
+**2 — The goal metric did not participate in the recovery, and that is the
+finding.** `top3` was 1 on 09-19 and is 0 today; it went *down* while clicks,
+rows, impressions and position all went up. The two things are measuring
+different markets. Site-wide GSC counts every query the domain appears for,
+and 09-22 established that none of the loudest forty is a York County search.
+**I extended that check to the whole record: across all twenty-five published
+snapshots, the number of York County queries in the loudest forty rows is zero.
+Twenty-five for twenty-five.** Today: 26 rows naming somewhere outside the
+service area (617 impressions, 58.9%), 14 geo-neutral (430), **0 York County
+(0)** — classified with the engine's own `techniques._names_other_market`.
+
+**What I cannot tell, and will not guess.** The forty-row slate carries 1,047
+of today's 6,806 impressions — 15%. The +316 impressions since 09-19 are almost
+entirely in the 856 rows below the `TOP_BY_IMPRESSIONS = 40` cap
+(`gsc.py:299`), which the snapshot does not publish. **So I do not know whether
+the recovery is in-county or out-of-county.** Given the composition of every
+slice I *can* see, out-of-county is the way to bet, but that is a prior, not a
+measurement. `keywords.ranked` and `gsc.tracked` would answer it and are in
+this repo, undeployed, for the twenty-sixth day.
+
+**3 — The funding-calendar finding.** Falsifier was *one funded week producing
+page sections, followed by no recovery in `top10` within twenty-one days*.
+**Still cannot advance — no funded morning.** But item 1 above is now real
+evidence against it from the other direction: sixteen unfunded days containing
+both the worst ten-day stretch and the best four-day stretch in the record.
+
+**4 — Test 19 (GSC `rows`).** Passed 09-22. Held today: 896, a fifth
+consecutive rise. Subsumed into item 1; I am not scoring it again.
+
+**5 — Test 20 (coverage vs rank).** Falsified 09-20. `coverage_pct` has been
+42.7% for seven days while `top3` went 1 → 0. Unchanged: coverage is not the
+variable.
+
+**6 — Auto-reload on the Anthropic account. NOT ACTIONED, day fifteen.**
+
+**7 — Deploy `growth/`. NOT ACTIONED, day twenty-six.** All named tests
+negative again: `discovered_untracked` **exactly 40**; `internal_links` reports
+**"0 page(s)"**; `keywords.ranked` / `gsc.tracked` / `gsc.pages` / `gsc.off_area`
+**all absent**; `scoreboard.works` still **7**. The dated harm ran for the
+twenty-sixth time — verdicts re-stamped `"decided": "2026-09-23"`, and the three
+`gsc_clicks` ones now read **16.0** still suffixed `/day` against a real 28-day
+total of 17.
+
+**8 — Carried, re-verified by grep this morning, all still NOT ACTIONED.**
+Akron/Lancaster paragraph, day four (`services/gutter-guards.html:163`, verbatim).
+Dover placeholder, day seventeen — `areas/seamless-gutters-dover-pa.html:250` is
+literally `<p>paragraphs2_placeholder</p>`, live on a town page. Schuylkill
+excision, day forty-one (one file). PA HIC number, day thirty-nine (`grep -rl
+HIC` → nothing). `?utm_source=gbp`, day fifty-one (`grep -c` → **0**). Half-round
+page, day thirty-eight. Freshness dates — `dateModified` on **15 of 41** pages,
+eighth day unchanged. Watchdog `--email`. Eric's Business Profile, day
+fifty-eight.
+
+**Twenty-two items. Zero actioned, twenty days running.**
+
+### Two pre-registered tests
+
+**Test 27 — is the engine's content output what moves site-wide search?**
+Claim: it is. Falsifier: the five-day mean of `gsc.clicks` over **09-24 → 09-28**
+comes in at **≥ 16.0** (the 09-19 trough was 14; the bar is the 09-20 → 09-23
+mean of 16.0) while `last_build.new + last_build.changed` is **0 on all five
+mornings**. If it falsifies, restoring Anthropic credit is hygiene, not the
+emergency, and the profile work outranks it outright. If the mean falls below
+14, the claim survives and credit becomes urgent again. **Score 2026-09-28.**
+
+**Test 28 — is the top-3 loss structural?** Claim: absent intervention it does
+not come back. Falsifier: `goal.top3` reaches **≥ 1** on any day up to and
+including **2026-10-07** with no funded morning and no deploy in between. If it
+is still 0 on 10-07, the 2 → 1 → 0 slide is a standing loss, not a window
+artifact, and nothing currently running will reverse it. **Score 2026-10-07.**
+
+### What I researched today
+
+`WebSearch` worked; `WebFetch` still `EGRESS_BLOCKED`, so citations are from
+search-tool summaries and I did not open the pages.
+
+- **The one genuinely new thing, and it changes my ranking.** **Review velocity
+  moved from rank 93 to rank 11 in the 2026 local ranking factors — reported as
+  the largest year-over-year rise ever recorded for a single factor** — and
+  velocity now outweighs total count: a profile on 50 reviews taking 2–3 a week
+  is reported beating one on 300 that went quiet, with a worked case of a
+  184-review 4.9 losing #1 to a 42-review 4.8 after **23 days of review
+  dormancy**. The stated credibility floor for a contractor local pack is
+  **50+ reviews at 4.5+**, with a first threshold around 10
+  ([plumbdev.com](https://www.plumbdev.com/seo-services-review-velocity),
+  [pipelineon.com](https://pipelineon.com/blog/google-reviews-strategy-for-contractors/),
+  [minyona.com](https://minyona.com/blog/google-business-profile-contractors)).
+  The ledger records this profile at **13 reviews, 4.2 stars** — below the floor
+  on both axes, and with no evidence in fifty-eight days that anyone has added
+  one. *Checked the ledger before writing this up:* T007, T033, T047, T055 and
+  T076 are all `candidate`, `activated: null`. What is new is not the idea, it
+  is the **weighting and the clock** — a dormant profile now actively loses
+  ground rather than merely failing to gain it, which is the first mechanism
+  I have seen that would explain a monotone 2 → 1 → 0 slide on a site that
+  shipped no regressions.
+- **Proximity's dominance is reported as declining in 2026** — being nearest
+  the searcher is no longer close to automatic
+  ([thevalleymarketinggroup.com](https://thevalleymarketinggroup.com/blog/google-business-profile-ranking-factors-2026/),
+  [minyona.com](https://minyona.com/blog/google-business-profile-contractors)).
+  This is good news for a service-area business and it strengthens the
+  profile-first argument: if proximity carries less, profile quality and reviews
+  carry more. Corroborates the 32% GBP / ~half-of-rank figure already cited on
+  09-22. No new technique.
+- **Fall timing: the window is closing, not closed.** The trade guidance is to
+  begin leaf-season campaigns **6–8 weeks ahead of peak leaf drop**, when CPCs
+  run 25–40% cheaper ([elev8operations.com](https://www.elev8operations.com/guides/how-to-get-more-gutter-leads-2026),
+  [servicetitan.com](https://www.servicetitan.com/blog/gutter-leads)). Peak drop
+  in York County is late October to early November, so the ideal start was
+  early September. Starting now is late by two to three weeks but still inside
+  the season. T031 / T036 / T040 keep the "start this week or drop them"
+  marking they got yesterday.
+- **Roofer referral partnerships** are cited at figures like $170k/yr of gutter
+  work from one relationship ([elev8operations.com](https://www.elev8operations.com/guides/how-to-get-more-gutter-leads-2026)).
+  *Checked:* this is **T030**, already a candidate since 08-02. No new technique.
+- **Geographic signal consistency.** Guidance on service-area businesses
+  ranking in the wrong markets points at conflicting signals — profile, site
+  copy and old citations telling different stories
+  ([mdtechteam.com](https://www.mdtechteam.com/local-seo-for-service-area-businesses/),
+  [bippermedia.com](https://bippermedia.com/seo/service-area-pages-seo/)). This
+  is the strongest reason yet to delete the Akron paragraph, and it is *not* the
+  reason I gave on 09-22. I said then it would not reclaim the impression base;
+  that stands. But "the site names Lancaster County on a service page while the
+  profile presumably names York County" is exactly the inconsistency this
+  guidance names. Still a sixty-second fix, now with a mechanism behind it.
+
+**Rejected.** Paid GEO/AI-visibility monitoring — **twenty-first** rejection.
+Lancaster County pages because the site ranks there — fifth rejection. AI
+call-answering / speed-to-lead — fourth rejection; one call tap in forty-five
+days, there are no calls to answer. Templated-city-page penalty — fourth
+rejection. Shrinking the GBP service area for ranking — second rejection
+(retracted 09-22, still retracted). Shared lead marketplaces at ~$240/customer —
+rejected on cost for a one-owner shop with no call instrumentation to measure it
+(T086 stays a candidate, not a recommendation). Bought links or citations,
+incentivised or gated reviews, review-volume schemes, doorway pages, unsolicited
+bulk email or SMS — standing rejections, and today's review-velocity finding is
+precisely the kind of result that tempts people into the first three. **Velocity
+must come from actually asking finished customers, one at a time, with no
+incentive and no filtering by expected rating.**
+
+### What I checked in the code before recommending anything
+
+| Claim I might have made | What I found | Where |
+| --- | --- | --- |
+| **"The engine should ask customers for reviews"** | **No code path exists.** `grep -n review growth/techniques.py` returns six hits, all of them *prohibitions* inside generation prompts ("Never invent a review, testimonial…"). No technique reads the bookings table or sends anything. T007 `candidate`, `activated: null` since 07-27 | `techniques.py:395,532,962,1351,1753`; ledger T007 |
+| "Add FAQPage structured data" | **Already shipped** — 40 of 41 generated pages carry FAQPage JSON-LD. Not proposing it; recording the check because a previous run got this wrong | `grep -rl FAQPage --include=*.html` → 40 |
+| "Put review quotes on the money pages" | **Not shipped** — 1 of 41 pages carries any review/testimonial markup. But this is **T076**, already a candidate, and it needs real reviews to exist first | ledger T076 |
+| "The recovery since 09-19 is out-of-county" | **Cannot be determined** — the slate is capped at 40 rows holding 15% of impressions; the movement is in the unpublished tail | `gsc.py:299` |
+| "Traffic measurement is broken" | **No.** 56 visitors / 21 days, organic and direct both moving | `snapshot.json:traffic` |
+| "Fix the Dover placeholder / Akron paragraph from this repo" | **No** — `publish_state.sh` rsyncs `areas/ guides/ services/` droplet → repo each morning, so a page edit committed here is reverted tomorrow. `growth/*.py` is not copied and does survive | `publish_state.sh:65-73` |
+| "Auto-retire the techniques scored `works` on flat-zero medians" | **Do not touch** — `MIN_RECENT_MEDIAN = 0` makes the branch unreachable by design, and `test_review.py:136` records that as Eric's and Divine's call. It is why `scoreboard.works` holds seven techniques whose own verdict text reads "median 0.0/day and flat" | `review.py:29`, `test_review.py:136-151` |
+| "The prompt's account of the blocker" | **Stale, and I am flagging it rather than repeating it.** The scheduled prompt still describes a self-imposed spend cap lifting 2026-08-01. The actual error, for the twenty-third morning, is `Your credit balance is too low` — an empty account. The prompt's baseline figures (77 rows, 3 clicks, top3 2/50) are two months old | `snapshot.json:last_scout` |
+
+### The repo change I did not make today
+
+**None, deliberately.** The last two entries each added engine code — the
+`/28d` unit fix on 09-21, `gsc.off_area_totals()` on 09-22 — and neither can
+run, because `growth/` has not been deployed for twenty-six days. A third
+consecutive day of writing code into a directory that no process reads would
+be a way of looking productive while the two things that actually gate this
+business go untouched. The queue of undeployed engine improvements is not
+short of items; it is short of a deploy. I would rather this entry say that
+plainly than pad it.
+
+### Recommendations
+
+**Nothing in this commit is live.** The site and engine run from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout; every on-site item
+below needs a deploy or a manual edit on the droplet before it does anything.
+**One new item (1). Twenty-two carried, none actioned.**
+
+1. **Eric — start asking every finished customer for a Google review, today,
+   and keep doing it. NEW, and it is now my top recommendation. Free. Five
+   minutes per job.** *Why it moved to the top:* review velocity rose from the
+   93rd to the 11th local ranking factor this year, the largest single-factor
+   jump on record, and it now outranks total review count — a profile that goes
+   quiet actively loses position, with 23 days of dormancy enough to cost a #1
+   in the cited case. This profile is recorded at 13 reviews and 4.2 stars
+   against a credibility floor of 50+ at 4.5+, and nothing in fifty-eight days
+   suggests a review has been added. It is also the **only** lever on this list
+   that needs no credit, no deploy, and no code — and the only one whose effect
+   compounds, which matters because it takes weeks and leaf season starts now.
+   *The legal line, which is not optional:* ask every customer, not the happy
+   ones; no discount, gift, or entry into anything in exchange; no filtering or
+   pre-screening by expected rating. Review gating and incentives are the two
+   fastest routes to a profile suspension, and a suspension costs more than
+   every tactic in this ledger earns. Asking the customer to mention the town
+   and the job in their own words is allowed and is worth doing (T047).
+   *How I would know it worked:* review count rising week over week — the
+   metric is velocity, so 3 reviews in 3 weeks beats 8 in one week and then
+   nothing. Downstream, `local_visitors` above 1 (it has been **1 in 21 days**)
+   and `call_taps` above zero (**1 in 45 days**).
+   *Checked:* T007/T033/T047/T055/T076 all `candidate`, `activated: null`; no
+   review code path exists in `techniques.py`; `gsc.py:39` is
+   `webmasters.readonly`, so there is no engine route to the profile at all.
+   **This is Eric's to do and only Eric's.**
+
+2. **Eric — the one Business Profile sitting. Fifteen minutes, free. Day
+   fifty-eight.** Unchanged in content, demoted below item 1 because item 1
+   compounds and this does not. In order: **hours** including a Saturday window
+   (T042); **primary category** plus 2–4 secondaries (T016 — still the heaviest
+   single factor); **plain legal business name**; **services list and
+   description** (T022); **service-area list filled in for customer clarity, one
+   minute, not shrunk** (T051 — corrected 09-22); **website URL** →
+   `https://nemoseamlessgutter.com/?utm_source=gbp#book`; **Performance → Calls,
+   last 28 days**; **booking link** (T050); and **read off the current review
+   count and star average**, which item 1 needs as its baseline and which no one
+   has verified in fifty-eight days.
+
+3. **Divine — deploy `growth/`. Day twenty-six.** Three things the droplet does
+   not have and that I needed today and could not get: `keywords.ranked` (which
+   would say *which* query the goal metric lost on 09-14 and again on 09-20 —
+   I still cannot name them), `gsc.tracked` / `gsc.off_area` (which would say
+   whether the four-day recovery is in York County or in Lancaster's), and the
+   `/28d` unit fix (without which `scout.py:140` tells the scout this site earns
+   16 clicks a *day* on the next funded morning — twenty-eight times the truth).
+   Plus `_off_area_prose` and the `internal_links` fix: **thirteen page edits
+   the engine can make on an empty balance.**
+
+4. **Divine — delete the Lancaster County sentence at
+   `services/gutter-guards.html:163`. Sixty seconds, free, no credit, no
+   deploy.** Day four. Sharpened today: the reason is geographic signal
+   consistency — the site tells York County searchers the business is in
+   Lancaster County while the profile presumably says otherwise. It will still
+   not reclaim the Lancaster impressions; that was never the argument.
+
+5. **Divine — `areas/seamless-gutters-dover-pa.html:250` renders
+   `paragraphs2_placeholder` to the public. Day seventeen.** Sixty seconds. This
+   is a live customer-facing defect on a town page for one of the six tracked
+   towns, and it has now outlived twelve of my own entries.
+
+6. **Divine — auto-reload with a monthly cap on the Anthropic account, plus
+   `--email divinejdavis@gmail.com` on the 11:00 watchdog
+   (`deploy/cron-nemo-growth:69`).** Sixteen dead mornings. **Note the demotion:
+   if Test 27 falsifies on 09-28, this is hygiene rather than the emergency it
+   has been treated as for two weeks.**
+
+*Carried in one line:* T031 / T036 / T040 (seasonal — **start this week or drop
+them**; peak leaf drop is 4–6 weeks out and the cheap-CPC window has already
+passed); Schuylkill excision; PA HIC number; half-round page; freshness dates.
+
+### Reasoning and uncertainties
+
+The useful thing today came from putting the whole snapshot history in one
+table instead of diffing yesterday against the day before. Day-over-day diffing
+is what produced "top10 rose, the first movement in six days" on 09-22 and
+"top10 fell" today — two entries spent on one query oscillating. The same data
+read as a series shows a clean monotone 2 → 1 → 0 in the actual goal metric
+over twenty-four days, which no daily diff surfaced and which is the thing Eric
+would want to know. I would suggest every future entry lead with the series and
+treat the daily delta as a footnote.
+
+The second result is the one I hold most loosely, which is why it is a
+pre-registered test and not a claim. Sixteen days with zero page changes
+contain both the worst stretch and the best stretch in the record. The
+straightforward reading is that the engine's output does not drive these
+numbers on a two-week horizon — but SEO does not work on a two-week horizon
+either, so absence of a short-run effect is weak evidence about a long-run one,
+and I could be reading a rolling-window artifact as a signal for the second
+time this month. Test 27 scores on 09-28 against a bar I have written down in
+advance and cannot move.
+
+What I would most want checked is the ranking change in recommendation 1. I am
+elevating a technique that has sat as a candidate for fifty-eight days on the
+strength of one research finding about factor weighting, and I cannot verify
+the input it depends on: the "13 reviews, 4.2 stars" figure comes from the
+ledger's seed and no human has looked at that profile in fifty-eight days. If
+the profile actually has 40 reviews and a 4.7, item 1 is still right but far
+less urgent. If it has 13 and a 4.2, then this business's map-pack position has
+been decaying from dormancy the entire time the engine has been writing town
+pages, and that would explain a monotone slide that nothing in the site's own
+behaviour explains.
+
+The thing I keep coming back to is the arithmetic of what is actually being
+optimised. The website has produced **one tap on the phone number in
+forty-five days** and four bookings all time. Meanwhile the profile — which
+carries roughly half of local rank, which has never been audited, and whose
+single fastest-rising factor is one that only a human can move — has had
+fifty-eight days of recommendations and zero minutes of attention. Twenty-two
+open items, twenty days without one being actioned, is not an analysis problem.
+I can keep making this list sharper and it will not make the phone ring.
