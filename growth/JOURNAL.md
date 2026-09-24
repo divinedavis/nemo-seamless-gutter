@@ -26634,3 +26634,444 @@ Goal: **0.0%** top-3 share of 220 tracked queries (target 50%).
 - `ping_indexnow` — ok: nothing new to submit
 
 **Scout did not run:** anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CfMm4ttpuPv8wmLJKJC4T"}
+
+## 2026-09-24 — review agent
+
+### Where the numbers stand
+
+**Seventeenth consecutive dead morning.** `strengthen_pages` and `scout` both
+failed on `Your credit balance is too low` — an empty account, not a spend cap.
+Every other step `ok`/`noop`. `new: 0, changed: 0`. **Twenty-fourth
+empty-balance morning since 08-12.** Duty cycle over 08-12 → 09-24 (44 days):
+**13 alive, 31 dead.**
+
+**The goal metric is zero for the fifth day.** `top3` **0 / 220**, `share_pct`
+**0.0%** against a target of 50%. `ranked_known` 42, `top10` **11**
+(unchanged), `coverage_pct` **42.7%** (eighth day unchanged).
+
+**Day fifty-nine.**
+
+Continuing yesterday's series table, which is the right way to read this:
+
+| date | rows | matched | clicks | impressions | avg pos | **top3** | top10 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 09-19 | 871 | 41 | **14** | 6,490 | **28.1** | **1** | 11 |
+| 09-20 | 872 | 41 | 15 | 6,505 | 28.0 | **0** | 11 |
+| 09-21 | 880 | 42 | 16 | 6,537 | 28.0 | **0** | 11 |
+| 09-22 | 888 | 42 | 16 | 6,571 | 27.9 | **0** | 12 |
+| 09-23 | 896 | 42 | 17 | 6,806 | 27.6 | **0** | 11 |
+| **09-24** | **892** | **42** | **16** | **6,883** | **27.6** | **0** | **11** |
+
+The four-day co-movement I inherited from yesterday **broke today**: rows fell
+896 → 892 and clicks 17 → 16, while impressions rose 6,806 → 6,883 and position
+held at 27.6. That is what four thin series decoupling looks like, and it is the
+expected behaviour of noise. I am not calling the recovery over; I am recording
+that its first falsifiable property — everything moving together — did not hold
+for a fifth day.
+
+**`keywords.by_town`: not one cell moved**, diffed against `154a946`. county
+117/47/**0**; york 40/15/**0**; dover 16/9/**0**; hanover 13/6/**0**; red-lion
+11/5/**0**; dallastown 11/6/**0**; spring-grove 12/6/**0**. `by_intent`
+identical (hire 139/75, price 51/10, diy 8/1, check 22/8). **Six named towns at
+zero for fifty-nine days; the county bucket for five.**
+
+**Traffic.** 09-23: 5 visitors — 2 organic, 1 direct, **2 AI**, 0 maps — and 0
+leads. Last twenty-one days (09-03 → 09-23): **54 visitors** (29 organic, 1
+maps, 2 AI), **0 bookings**, **0 phone leads**. `bot_hits` over the same
+window: **57,880** — a **1,072:1** crawler-to-human ratio. Measurement is not
+suspect; organic and direct both move daily.
+
+**The conversion numbers, unchanged and still the point.** `call_taps`: **one
+tap in forty-six recorded days**, on 2026-08-12 — **forty-two consecutive zeros
+since**. `phone_leads` **0 all-time**. `bookings` **4 all-time**, last on
+**09-02, twenty-two days ago**.
+
+### Did previous changes work?
+
+**1 — Test 27, day 1 of 5.** Claim under test: the engine's content output is
+what moves site-wide search. Falsifier: 5-day mean of `gsc.clicks` over 09-24 →
+09-28 **≥ 16.0** with `new + changed = 0` on all five mornings. **Today: clicks
+16, `new + changed` 0.** Running mean 16.0, exactly on the bar. Four days left.
+The bar was written down on 09-23 and I am not moving it.
+
+**2 — Test 28 (is the top-3 loss structural?), running.** `goal.top3` **0**
+today, day 5 of the zero run. Scores 2026-10-07.
+
+**3 — The first AI-referral visitors in the record. New, and I am deliberately
+not calling it a result.** `traffic.ai_visitors` is **2 on 2026-09-23** and
+**0 on all forty-four other recorded days** (08-10 → 09-22). It is the only
+non-zero the series has ever held. Two visitors is noise by every standard this
+journal applies to traffic — I have called 2 → 4 noise repeatedly and this is
+smaller. But it is a *category* first rather than a magnitude change, it lands
+on a site where `geo_answer_first_content_pass` reports "every ranking page
+already opens with a direct answer", and today's research says the inputs to
+Google's Ask Maps answers are profile data, reviews, photos **and website
+content**. So it is worth a pre-registered test rather than a shrug. **Test 29
+below.**
+
+**4 — Where this site's clicks actually come from. New, and it retires the
+published slate as an instrument.** Across the forty loudest rows in today's
+snapshot: **1,050 impressions, 0 clicks.** Site-wide: 6,883 impressions, 16
+clicks. So the slate holds **15.3%** of impressions and **0%** of clicks, and
+**all sixteen clicks come from the 852 rows the snapshot does not publish**
+(`gsc.py:299`, `TOP_BY_IMPRESSIONS = 40`).
+
+That is worse than "the slate is unrepresentative". Look at the positions on
+the rows that earn nothing:
+
+| query | avg position | impressions | clicks |
+| --- | --- | --- | --- |
+| gutter soffit and fascia replacement | **1.0** | 13 | **0** |
+| gutter installation | **1.8** | 50 | **0** |
+| gutter | 4.2 | 12 | **0** |
+| seamless gutters | 5.8 | 11 | **0** |
+| gutters | 7.4 | 57 | **0** |
+| gutter repair | 7.3 | 31 | **0** |
+
+A position-1.8 listing taking 0 of 50 impressions is not a CTR problem that
+`improve_ctr` can write its way out of. Either those impressions are being
+served on surfaces that do not produce a classic click, or they are being served
+to people ninety miles away for whom a York County contractor is the wrong
+answer — and every other slice I can see says the second. **Every one of these
+rows is geo-neutral**, so a national or Philadelphia-metro searcher is exactly
+who would see them.
+
+Two consequences. First, `improve_ctr` is scored `works: true` on the strength
+of `gsc_clicks`, and the clicks it is credited with are in rows nobody can see.
+Second, I have been reading a site-wide CTR of 0.23% as a statement about this
+business; it is mostly a statement about somebody else's SERP.
+
+**5 — The off-area composition, 26 snapshots for 26.** Re-run today with the
+engine's own classifier (`techniques._names_other_market`): of the forty loudest
+rows, **26 name somewhere outside the service area** (618 impressions, **58.9%**)
+— Lancaster County (New Holland, Akron, Lititz, Leola, Stevens, Brownstown),
+Lebanon (Myerstown, Newmanstown), Harleysville, Perkasie, Essington, Crum Lynne,
+Wilkes-Barre, Philadelphia — **14 are geo-neutral** (432), and **not one names a
+York County place**. That is now true of **every snapshot ever published**.
+
+**6 — The funding-calendar finding.** Still cannot advance — no funded morning.
+
+**7 — Auto-reload on the Anthropic account. NOT ACTIONED, day sixteen.**
+
+**8 — Deploy `growth/`. NOT ACTIONED, day twenty-seven.** All named tests
+negative again: `discovered_untracked` **exactly 40**; `internal_links` reports
+**"0 page(s)"**; `keywords.ranked` / `gsc.tracked` / `gsc.off_area` / `gsc.pages`
+**all absent** (`gsc` publishes exactly `date, ok, connected, rows, matched,
+clicks, impressions, avg_position`); `scoreboard.works` still **7**. The dated
+harm ran for the twenty-seventh time — verdicts re-stamped
+`"decided": "2026-09-24"`, and the three `gsc_clicks` ones read **16.0**
+suffixed `/day` against a real 28-day total of 16.
+
+**9 — Carried, all re-verified by grep this morning, all still NOT ACTIONED.**
+Akron/Lancaster paragraph, day five (`services/gutter-guards.html:163`, verbatim).
+Dover placeholder, day eighteen (`areas/seamless-gutters-dover-pa.html:250` is
+literally `<p>paragraphs2_placeholder</p>`). Schuylkill excision, day forty-two
+(`services/seamless-gutter-installation.html`). PA HIC number, day forty
+(`grep -rl HIC --include=*.html` → nothing). `?utm_source=gbp`, day fifty-two
+(`grep -c` → **0**). Half-round page, day thirty-nine. Freshness dates —
+`dateModified` on **15 of 44** pages, ninth day unchanged. Watchdog `--email`.
+Eric's Business Profile, day fifty-nine.
+
+**Twenty-two items. Zero actioned, twenty-one days running.**
+
+### The thing I found that reframes the whole backlog
+
+I went looking in `deploy/` before writing another recommendation, and the
+backlog is not what twenty-one entries have described it as. **Three of the
+carried items are not decisions awaiting judgement. They are finished,
+documented, report-only-by-default scripts sitting in this repository, and I can
+prove from the mirrored pages that not one of them has ever been run:**
+
+| script | what it fixes | evidence it has not run |
+| --- | --- | --- |
+| `deploy/repair_letter_paragraphs.py` | the 2026-08-16 iterate-a-string bug that shredded one paragraph into single-character `<p>` elements | **`services/half-round-gutters.html` still holds 1,021 `<p>x</p>` elements** this morning |
+| `deploy/retire_out_of_area.py` | the Adams County page `money_pages` published on 09-03, plus its keyword rows | **`guides/5-inch-gutter-service-york-springs-pa.html` is still present** |
+| `deploy/deploy_growth.sh` | hashes droplet vs repo `growth/*.py` and copies the stale ones | snapshot still has no `keywords.ranked` / `gsc.tracked` |
+
+Each takes `--apply` and does nothing without it. Each backs up every file it
+touches and deletes nothing. Each is safe to re-run. `deploy_growth.sh` only
+ever copies `*.py` and explicitly refuses to touch `techniques.json`,
+`keywords.json`, `results.jsonl` or `state.json`. The report halves are
+read-only and answer "is my fix live?" — the question I have been unable to
+answer for twenty-seven days.
+
+So "deploy `growth/`" is not a project. It is one ssh session and three
+commands, all written, all documented, all already reviewed. That is a
+materially different ask from what recommendation 3 has looked like for four
+weeks, and I should have gone and checked `deploy/` before repeating it.
+
+### The repo change I made today
+
+**`deploy/repair_placeholder_paragraphs.py`** — the one known live page defect
+with no executable behind it. `areas/seamless-gutters-dover-pa.html:250` renders
+the literal string `paragraphs2_placeholder` to the public, between two good
+paragraphs, on a town page for one of the six tracked towns; it has done so for
+eighteen days. Commit `797b723` fixed the generator, but that stops the next
+occurrence and only once `growth/` is deployed — it does not repair a page
+already on disk, and a repair committed to this repo is rsynced away the next
+morning (`publish_state.sh:65-73`).
+
+Same shape and same conventions as the two scripts beside it: report-only
+without `--apply`, `.placeholder-bak` before any write, atomic replace, never
+deletes a file, idempotent. The match is deliberately narrow — the element's
+whole text must contain no whitespace **and** either contain "placeholder" or be
+a bare snake_case identifier — so a legitimate one-word paragraph is left alone.
+It removes the element rather than inventing copy, because a `*_placeholder`
+token means the model returned nothing for that field and the paragraphs either
+side already read as continuous prose without it.
+
+Tested against all 44 mirrored pages: **one match, zero false positives**, and a
+second run reports nothing to do. It is the fourth command in that same ssh
+session, and after it the site has no known rendering defects left.
+
+I wrote this rather than more engine code on purpose. Yesterday's entry declined
+to add a third undeployed module to `growth/`, and that reasoning still holds —
+but `deploy/` scripts are the opposite case: they run against the docroot, import
+nothing from the growth package, and work *whether or not* `growth/` is ever
+deployed.
+
+### What I researched today
+
+`WebSearch` worked. I did not open the pages, so these are search-tool summaries.
+
+- **Google Business Profile Q&A no longer exists, and this makes one of my own
+  ledger items partly obsolete.** The Q&A API was discontinued 2025-11-03 and
+  the public Q&A section was deprecated from profiles beginning 2025-12-03; the
+  replacement is **Ask Maps**, a Gemini-powered "Ask about this place" that
+  synthesises an answer on the spot. Crucially, **it does not read anything the
+  owner wrote** — its inputs are profile data, reviews, photos and **website
+  content** ([northcountydigital.com](https://www.northcountydigital.com/marketing-blog/google-business-profile-qa-discontinued),
+  [mayansstudio.com](https://mayansstudio.com/blog/google-removed-qa-from-business-profiles-where-your-answers-go-now/),
+  [almcorp.com](https://almcorp.com/blog/google-maps-ask-maps/)).
+  *Checked the ledger:* **T014 `gbp_category_and_qna_audit`** is a `candidate`
+  whose name is half a dead feature. The category half is more important than
+  ever; the Q&A half cannot be done and should be struck. That is a correction
+  to a ledger item, not a new technique — and it is the first mechanism I have
+  seen that ties this site's own copy directly to what a maps user is told.
+- **Sterling Sky settles the service-area question, in the direction of the
+  09-22 retraction.** Service areas "do not have any impact on rankings"; they
+  are a visual indicator for users, and removing them "had absolutely no impact
+  on rankings whatsoever" — ranking is driven by the **verified address**
+  ([sterlingsky.ca](https://www.sterlingsky.ca/does-the-service-area-in-google-my-business-impact-ranking/),
+  [sterlingsky.ca](https://www.sterlingsky.ca/the-state-of-local-seo-in-2026/)).
+  The 09-22 retraction stands, now on the best source in the field. **Filling the
+  service-area list in is for customer clarity only and should never be sold as
+  a ranking action. T051 keeps that framing. Nobody should re-open this.**
+- **The primary category is the highest-*variance* field on the profile, which
+  my recommendation 2 has never said.** Sterling Sky documents an HVAC business
+  dropping **from position 1 to position 31 on a single category change**
+  ([sterlingsky.ca](https://www.sterlingsky.ca/the-state-of-local-seo-in-2026/),
+  [localmighty.com](https://www.localmighty.com/blog/google-business-profile-ranking-factors/)).
+  I have been listing "primary category" as the heaviest single factor for weeks
+  without saying that editing it is the riskiest single keystroke available.
+  Corrected below.
+- **Hours are now roughly the #5 factor and a profile showing "closed" ranks
+  substantially worse** ([sterlingsky.ca](https://www.sterlingsky.ca/the-state-of-local-seo-in-2026/)).
+  Sharpens T042 from housekeeping to a ranking item.
+- **Reviews ≈20% of pack weight, recency beats volume, and reviews *with text*
+  outrank reviews without** — from a study of 8,186 businesses across 200 cities
+  ([sterlingsky.ca](https://www.sterlingsky.ca/the-state-of-local-seo-in-2026/)).
+  Independently corroborates yesterday's review-velocity finding from weaker
+  sources, and adds one concrete instruction: ask for a sentence, not a star.
+- **Freshness is now a direct local-pack signal** — weekly photos, posts and
+  review replies; the profile is graded on "how alive it looks"
+  ([scatterbranchmarketing.com](https://www.scatterbranchmarketing.com/blog/is-your-google-business-profile-ready-for-2026-what-changed-and-what-to-do-now),
+  [digitalapplied.com](https://www.digitalapplied.com/blog/google-business-profile-guide-every-feature-2026)).
+  This is the mechanism yesterday's entry wanted for a monotone 2 → 1 → 0 slide
+  on a site that shipped no regressions: a dormant profile now actively decays.
+- **Zero-click context for the finding in item 4.** ~60% of searches end without
+  a click, rising to ~83% when an AI Overview appears
+  ([digitalapplied.com](https://www.digitalapplied.com/blog/60-percent-searches-zero-click-crisis-2026-seo-strategy)).
+  And Sterling Sky reports **AI local packs surface only 32% as many unique
+  businesses as traditional map packs**
+  ([numerounoweb.com](https://www.numerounoweb.com/local-seo/local-rankings-steady-but-calls-dropping-heres-what-actually-changed/59522/)).
+  Read against `top3 = 0`: the set of businesses that get shown at all is
+  shrinking, so being outside the three costs more each month than it did last
+  month. It does not change what to do; it changes how much the delay costs.
+
+**Rejected.** Paid GEO/AI-visibility monitoring — **twenty-second** rejection;
+two AI visitors in forty-five days is not a base to monitor. Lancaster County
+pages because the site ranks there — sixth rejection, and item 4 strengthens it:
+those rows produce zero clicks at *any* position. AI call-answering /
+speed-to-lead — fifth rejection; one call tap in forty-six days. Shrinking the
+GBP service area — third rejection, now settled by Sterling Sky. Chasing the
+geo-neutral head terms ("gutters", "gutter installation") — **new rejection**:
+the site already sits at positions 1.8–7.4 on them and earns nothing, so there
+is no gain left there to take. Bought links or citations, incentivised or gated
+reviews, review-volume schemes, doorway pages, unsolicited bulk email or SMS —
+standing rejections.
+
+### What I checked in the code before recommending anything
+
+| Claim I might have made | What I found | Where |
+| --- | --- | --- |
+| "Write the Dover placeholder fix into this repo" | **No** — `publish_state.sh` rsyncs `areas/ guides/ services/` docroot → repo each morning, so the edit is reverted tomorrow. A `deploy/` script is the only shape that survives | `publish_state.sh:65-73` |
+| "There is no tooling for the carried page defects" | **False, and this was my mistake to make** — `repair_letter_paragraphs.py` and `retire_out_of_area.py` have been in `deploy/` for weeks. Only the placeholder had none | `deploy/` |
+| "Seed answers into GBP Q&A" (T014) | **Impossible** — the feature was removed; Ask Maps does not read owner-written answers | research above; ledger T014 |
+| "Add FAQPage structured data" | **Already shipped** — 40 of 41 generated pages carry it. Recording the check because a previous run got this wrong | `grep -rl FAQPage` → 40 |
+| "`improve_ctr` should rewrite the snippets on the loud queries" | **Would not help** — those rows return 0 clicks at average positions 1.0 and 1.8; a snippet rewrite cannot fix an audience ninety miles away | `snapshot.json:keywords.discovered_untracked` |
+| "Auto-retire the techniques scored `works` on flat-zero medians" | **Do not touch** — `MIN_RECENT_MEDIAN = 0` makes the branch unreachable by design, recorded as Eric's and Divine's call | `review.py:29`, `test_review.py:136-151` |
+| "Traffic measurement is broken" | **No** — 54 visitors / 21 days, organic and direct both moving daily | `snapshot.json:traffic` |
+| "The prompt's account of the blocker" | **Stale for the twenty-fourth morning, flagging rather than repeating.** The prompt describes a self-imposed spend cap lifting **2026-08-01**; the actual error is `Your credit balance is too low` — an empty account. Its baseline figures (77 rows, 3 clicks, 429 impressions, top3 2 of 50, `by_town` county bucket of 50) are two months old; today is 892 rows, 16 clicks, 6,883 impressions, **top3 0 of 220**, county bucket **117**. The prompt should be updated to stop re-litigating a cap that lifted seven weeks ago | `snapshot.json:last_scout`, `snapshot.json:gsc` |
+
+### Three pre-registered tests
+
+**Test 27 — carried, day 1 of 5.** Scores 2026-09-28, bar unchanged at a 5-day
+`gsc.clicks` mean of 16.0 with `new + changed = 0` throughout.
+
+**Test 28 — carried.** Scores 2026-10-07.
+
+**Test 29 — was 09-23's AI visit the start of anything? NEW.** Claim: it was a
+one-off, and `ai_visitors` returns to its 44-day baseline of zero. Falsifier:
+`traffic.ai_visitors` is **non-zero on three or more days** in the window
+**09-24 → 10-08** (fifteen days). If it falsifies, AI answer engines have
+started sending this site people and the answer-first content pass is earning
+something the click data cannot see — which would raise T045
+(`ai_crawler_access_audit`) and T057 (`foursquare_places_claim_for_ai_answers`)
+above most of the on-site queue. If it holds, two visitors was noise and I say
+so. **Score 2026-10-08.**
+
+### Recommendations
+
+**Nothing in this commit is live.** The site and engine run from
+`/var/www/nemo-seamless-gutter`, which is not a git checkout; every on-site item
+below needs a deploy or a manual edit on the droplet before it does anything.
+**Item 1 is restructured from four separate recommendations into one session.
+One new item (5). Twenty-one carried.**
+
+1. **Divine — one ssh session, four commands, all four scripts already written
+   and already in this repo. Day twenty-seven, and it is no longer a project.**
+   Report halves first; nothing writes without `--apply`.
+   ```
+   git -C /root/nemo-repo fetch origin main && git -C /root/nemo-repo reset --hard origin/main
+   cd /var/www/nemo-seamless-gutter
+   bash    /root/nemo-repo/deploy/deploy_growth.sh                       # report
+   python3 /root/nemo-repo/deploy/repair_letter_paragraphs.py            # report
+   python3 /root/nemo-repo/deploy/repair_placeholder_paragraphs.py       # report
+   python3 /root/nemo-repo/deploy/retire_out_of_area.py                  # report
+   ```
+   then re-run each with `--apply`, except `retire_out_of_area.py`, which is a
+   judgement call for Eric (see item 4). *What it buys:* `keywords.ranked` and
+   `gsc.tracked` / `gsc.off_area`, which would finally name **which** queries the
+   goal metric lost on 09-14 and 09-20 and settle whether the impression base is
+   in York County — the two things I have been unable to answer all month; the
+   `/28d` unit fix, without which `scout.py:140` tells the scout this site earns
+   16 clicks a **day**; `_off_area_prose` and the `internal_links` fix, which
+   are **thirteen page edits the engine can make on an empty balance**; 1,021
+   single-character paragraphs off a live service page; and the Dover
+   placeholder off a live town page. *How I would know it worked:* tomorrow's
+   snapshot carries `keywords.ranked` and `gsc.tracked`, and
+   `discovered_untracked` stops being exactly 40. *Effort:* minutes, free, no
+   API credit needed for any of it.
+
+2. **Eric — start asking every finished customer for a Google review, and ask
+   them to write a sentence. Carried from 09-23 as top priority for Eric, now
+   on a better source and with one instruction added.** Sterling Sky's study of
+   8,186 businesses finds reviews ≈20% of pack weight, **recency beating raw
+   volume**, and **reviews with text outranking reviews without** — so "could
+   you leave us a review" should become "could you leave a review and say what
+   we did and where". The ledger records this profile at 13 reviews / 4.2 stars
+   against a reported credibility floor of 50+ at 4.5+. *The legal line, not
+   optional:* ask every customer, not the happy ones; no discount, gift or entry
+   into anything; no filtering by expected rating. Review gating and incentives
+   are the fastest routes to a suspension, and a suspension costs more than
+   every tactic in this ledger earns. *How I would know:* review count rising
+   week over week; downstream, `local_visitors` above 1 (it has been **1 in 21
+   days**) and `call_taps` above zero (**1 in 46 days**). *Checked:*
+   T007/T033/T047/T055/T076 all `candidate`, `activated: null`; no review code
+   path exists in `techniques.py` — its six `review` hits are all prohibitions
+   inside generation prompts; `gsc.py:39` is `webmasters.readonly`, so the
+   engine has no route to the profile at all. **Eric's, and only Eric's.**
+
+3. **Eric — the one Business Profile sitting. Fifteen minutes, free. Day
+   fifty-nine. Re-ordered today, and with a warning it has never carried.**
+   Do the zero-risk fields first and the high-variance one last, deliberately:
+   **(a) hours**, including a Saturday window — hours are now ~#5 and a profile
+   reading "closed" ranks substantially worse (T042); **(b) services list and
+   description** — the services field does move rankings (T022); **(c) plain
+   legal business name**; **(d) website URL** →
+   `https://nemoseamlessgutter.com/?utm_source=gbp#book`; **(e) service-area
+   list filled in — for customer clarity only, never shrunk, and it will not
+   change rank** (T051, now settled by Sterling Sky); **(f) booking link**
+   (T050); **(g) weekly photo from a finished job**, since freshness is now a
+   direct signal (T021); **(h) read off the current review count and star
+   average** — item 2 needs it as a baseline and nobody has verified it in
+   fifty-nine days; **(i) Performance → Calls, last 28 days** — the only
+   independent check on `call_taps`. **Then, and separately: the primary
+   category (T016).** It is the heaviest single field *and* the highest-variance
+   one — Sterling Sky documents a business going from position 1 to position 31
+   on one category change. Write down what it is set to now before touching it,
+   change one thing, and be ready to put it back. I have listed this as "the
+   heaviest single factor" for weeks without saying that; it was an incomplete
+   recommendation.
+
+4. **Eric — a one-question decision that has been sitting inside a carried item
+   for three weeks: will you drive York Springs?** It is ~25 minutes from York
+   city. If yes, keep `guides/5-inch-gutter-service-york-springs-pa.html`, add
+   York Springs to the profile's service area, and drop it from `OUT_OF_AREA` in
+   `growth/techniques.py`. If no, run `retire_out_of_area.py --apply`. Either
+   answer is fine; what cannot stand is today's state, where an unreviewed page
+   claims Adams County and the breadcrumb says York County. *Nobody but Eric can
+   answer this, and item 1 is blocked on it for that one script only.*
+
+5. **Divine — `services/gutter-guards.html:163` and the Schuylkill paragraph in
+   `services/seamless-gutter-installation.html`. NEW framing, sixty seconds
+   each, and now with a mechanism.** These are the two pages whose copy tells a
+   York County searcher the business is in Lancaster County and the coal region.
+   `retire_out_of_area.py` finds them and **deliberately refuses to touch them**
+   — it retires a page whose *slug* names an out-of-area town, and reports a
+   page that merely mentions one, because deleting a real service page over one
+   bad sentence would be wrong. So its report half will name both; the rewrite
+   is a human edit on the docroot. It is worth doing now for the reason today's
+   Ask Maps finding gives: **website content is a direct input to the answer a
+   maps user is handed about this business.**
+
+6. **Divine — auto-reload with a monthly cap on the Anthropic account, plus
+   `--email divinejdavis@gmail.com` on the 11:00 watchdog
+   (`deploy/cron-nemo-growth:69`).** Seventeen dead mornings. **Demotion
+   standing:** if Test 27 falsifies on 09-28, this is hygiene, not the
+   emergency.
+
+*Carried in one line:* T031 / T036 / T040 (seasonal — peak leaf drop is 4–6
+weeks out and the cheap-CPC window has passed; **start this week or drop them**);
+PA HIC number; freshness dates (`dateModified` on 15 of 44); half-round page
+(now covered by item 1).
+
+### Reasoning and uncertainties
+
+The most useful thing I did today was open a directory I had never opened. For
+twenty-one entries this journal has described a backlog of twenty-two
+"recommendations", which framed the problem as one of judgement and made zero
+action look like deliberation. Three of those items already had finished,
+documented, backed-up, report-only-by-default scripts sitting in `deploy/`, and
+I can show from the pages themselves that none has been run — 1,021 shredded
+paragraphs still live, the Adams County page still live. That is not a backlog
+of decisions. It is four commands that nobody has typed. If one thing from this
+entry survives, it should be that recommendation 1 is now a copy-pasteable block
+and not a project, and that I should have checked before repeating it four times.
+
+The finding I hold most confidently is item 4, and it is uncomfortable. This
+site holds average position 1.0 on "gutter soffit and fascia replacement" and
+1.8 on "gutter installation" and takes zero clicks from either. Whatever else is
+true, the engine's on-site work is not failing for lack of ranking on those
+terms — it is ranking for people who are not in York County, and there is no
+snippet, schema or content fix for that. The corollary I like least is that
+`improve_ctr`, `strengthen_pages` and `adopt_queries` are all scored
+`works: true` on a `gsc_clicks` series whose clicks are entirely in rows the
+snapshot does not publish. I cannot audit that until item 1 happens.
+
+What I hold most loosely is Test 29. Two AI visitors after forty-four zeros is
+exactly the kind of thing I have correctly called noise all month, and I would
+be embarrassed to have made anything of it. I wrote it as a test with a bar
+because the honest position is that a first non-zero in a categorical series is
+slightly more interesting than a small change in a continuous one, and because
+writing the falsifier down in advance is the only way to stop myself telling a
+story about it in two weeks.
+
+The arithmetic has not changed and is still the only thing that matters. The
+website has produced **one tap on the phone number in forty-six days** and four
+bookings all time, the last twenty-two days ago. The profile — which carries
+roughly a third of pack weight, whose review signal is ~20% and rewards recency,
+whose freshness is now graded directly, and which has never been audited — has
+had fifty-nine days of recommendations and zero minutes of attention. I can keep
+sharpening this list. It will not make the phone ring.
