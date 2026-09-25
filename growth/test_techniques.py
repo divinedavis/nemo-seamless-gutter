@@ -11,6 +11,7 @@ build log said "ok":
 
 Run: python3 -m growth.test_techniques   (from the repo root)
 """
+import inspect
 import json
 import os
 import re
@@ -507,6 +508,36 @@ class StatewideQueryTest(unittest.TestCase):
         for q in ("gutter installer", "gutter guys near me",
                   "seamless vs sectional gutters", "are gutter guards worth it"):
             self.assertFalse(T._names_other_market(q), msg=q)
+
+    def test_a_rank_trackers_query_string_is_not_demand(self):
+        # A rank tracker checking a keyword set across geo-coordinates makes
+        # Search Console log an impression every time it looks at a SERP, so
+        # its strings reach `gsc.discover()` looking like demand. Both of these
+        # shapes are in the 2026-09-25 slate; both are rejected there only
+        # incidentally, and `keywords.py` has no removal path, so assert the
+        # York-named versions — the ones the old intake would have taken.
+        for q in ("seamless+gutters+york+pa",
+                  "gutter+cleaning+york+pa",
+                  "gutter cleaning york pa -filetype:pdf",
+                  "site:nemoseamlessgutter.com gutter york",
+                  "gutters york pa -lancaster",
+                  "intitle:gutter installation york pa"):
+            self.assertTrue(T._machine_shaped(q), msg=q)
+        # Assert it is wired into the intake, not merely available: the harm is
+        # a permanent denominator row, and only adopt_queries can cause it.
+        self.assertIn("_machine_shaped(q)",
+                      inspect.getsource(T.adopt_queries))
+
+    def test_a_homeowners_query_is_not_machine_shaped(self):
+        # The rule costs one row out of a 221-row denominator when it is wrong,
+        # so it must not read hyphenated trade words, inch marks or ordinary
+        # dashes — which this trade's vocabulary is full of — as tooling.
+        for q in ("gutter cleaning east york", "5 vs 6 inch gutters york pa",
+                  "half-round copper gutters york pa", "gutter guys near me",
+                  "how much do seamless gutters cost per foot",
+                  "k-style vs half-round gutters", '6" gutters york pa',
+                  '5" vs 6" k-style york pa', "gutter repair - york pa"):
+            self.assertFalse(T._machine_shaped(q), msg=q)
 
     def test_an_unknown_word_fails_towards_rejection(self):
         # The documented failure mode, asserted so it stays deliberate: a trade

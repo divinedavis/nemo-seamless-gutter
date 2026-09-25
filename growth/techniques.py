@@ -1595,6 +1595,51 @@ def _names_other_market(query):
     return False
 
 
+# Google search operators, and the shape a URL query-string has before anything
+# decodes it. Nothing a homeowner types on a phone.
+SEARCH_OPERATORS = ("site:", "filetype:", "inurl:", "intitle:", "intext:",
+                    "cache:", "related:", "allintitle:", "allinurl:")
+
+
+def _machine_shaped(query):
+    """True if this "search" was typed by a tool rather than a person.
+
+    `_names_other_market` asks *where* a query comes from. This asks *who* —
+    and the answer matters because a rank tracker checking a keyword set across
+    geo-coordinates makes Search Console log a real impression every time it
+    looks at a SERP, so those strings arrive through `gsc.discover()` looking
+    exactly like demand.
+
+    Two of them are in today's published slate: `seamless+gutters+perkasie+pa`
+    at 31 impressions — sitting beside its own human-spelled twin `seamless
+    gutters perkasie pa` at 23, which is what one phrase queried by both a tool
+    and a person looks like — and `factors that affect gutter cleaning cost
+    -filetype:pdf` at 55. Both are rejected today, but incidentally: the first
+    for naming Perkasie, the second for naming none of our towns. Swap the town
+    for York and `adopt_queries` takes them, and `keywords.py` has no removal
+    path, so the goal's denominator carries a tool's query string for good.
+
+    Fails towards rejection for the same reason STATEWIDE_WORDS does. A wrongly
+    rejected query costs one row out of a 221-row denominator; a wrongly
+    accepted one is permanent, and can never be won, because no human will type
+    it.
+
+    There is deliberately no rule for a quoted phrase. `6" gutters york pa` and
+    `5" vs 6" k-style` are things homeowners in this trade really type, and no
+    quote test separates an inch mark from a phrase search well enough to be
+    worth the false positives — a tool doing a quoted check almost always also
+    carries an operator or arrives plus-delimited.
+    """
+    q = (query or "").lower()
+    if any(op in q for op in SEARCH_OPERATORS):
+        return True
+    if re.search(r"\w\+\w", q):       # plus-delimited, i.e. a raw query-string
+        return True
+    if re.search(r"\s-\w", q):        # an exclusion term
+        return True
+    return False
+
+
 # A "<Name> County" that is not ours. Matched against generated prose rather
 # than a search query, so it is case-sensitive on purpose: the model writes
 # place names capitalised, and lowering the whole string first would make
@@ -1690,6 +1735,8 @@ def adopt_queries(ctx):
     added = []
     for d in found:
         q = d["query"].lower()
+        if _machine_shaped(q):
+            continue
         if any(bad in q for bad in OUT_OF_AREA):
             continue
         if not any(w in q for w in TRADE_WORDS):
