@@ -47,4 +47,4 @@ myaccount.google.com/apppasswords.
 
 **Gotcha:** `node -e "require('./config')"` reports `smtp: (none)` because it
 does not load `.env`. That is a false alarm. The authoritative checks are the
-pm2 startup line `smtp: on`, or a real booking returning `"emailed":true`.
+`journalctl -u nemo-seamless-gutter` startup line `smtp: on`, or a real booking returning `"emailed":true`.

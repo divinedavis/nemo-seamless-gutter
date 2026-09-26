@@ -202,8 +202,17 @@ applies on top of this table — treat LLM06 as the entry point to it.
 ## Deployment
 
 Static files live at `/var/www/nemo-seamless-gutter` on the droplet, served by the
-nginx site `nemo-seamless-gutter`. The booking API runs under **pm2** on
-`127.0.0.1:3009`, reverse-proxied by nginx at `/api/`.
+nginx site `nemo-seamless-gutter`. The booking API runs as the nologin system
+user **`nemo`** under the systemd unit **`nemo-seamless-gutter.service`** (moved off
+root's pm2 on 2026-09-26) on `127.0.0.1:3009`, reverse-proxied by nginx at `/api/`.
+
+Ownership the deploy must preserve: code root-owned and read-only to the app;
+`server/` is `root:nemo 1770` (sticky, so the app can create sqlite `-wal`/`-shm`
+files but not replace code); `bookings.sqlite*` belong to `nemo`; `server/.env` is
+`root:nemo 0640`. `rsync -a` copies this Mac's uid 501 and resets `server/`'s mode,
+so the api step below re-applies it. The app can no longer rewrite `.env`, so
+before sending a `setup.html?t=` link run `chown nemo server/.env`, and put it back
+to `root:nemo 0640` afterwards. The booking crons run as `nemo` too.
 
 ```bash
 # static
@@ -215,7 +224,10 @@ rsync -avz guides/   root@104.236.120.144:/var/www/nemo-seamless-gutter/guides/
 # api
 rsync -avz --exclude node_modules --exclude .env --exclude '*.sqlite*' --exclude data \
   server/ root@104.236.120.144:/var/www/nemo-seamless-gutter/server/
-ssh root@104.236.120.144 'cd /var/www/nemo-seamless-gutter/server && npm install --omit=dev && pm2 restart nemo-seamless-gutter'
+ssh root@104.236.120.144 'cd /var/www/nemo-seamless-gutter/server && npm install --omit=dev && \
+  chown -R root:root . && chmod -R go-w . && chown root:nemo . && chmod 1770 . && \
+  chown nemo:nemo bookings.sqlite* && chown root:nemo .env && chmod 0640 .env && \
+  systemctl restart nemo-seamless-gutter'
 ```
 
 nginx proxies `/api/`, `/booking/` and `/owner/` to the Node app; the config is
