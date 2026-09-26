@@ -11,7 +11,9 @@ import datetime
 
 WEB_ROOT = os.environ.get("WEB_ROOT", "/var/www/nemo-seamless-gutter")
 BASE = "https://nemoseamlessgutter.com"
-SKIP_DIRS = {"server", "node_modules", ".git", "assets", "seo"}
+SKIP_DIRS = {"server", "node_modules", ".git", "assets", "seo",
+             # internal, and denied by nginx: never list them
+             "reports", "growth", "agent", "deploy", "__pycache__"}
 SKIP_FILES = {"setup.html", "404.html"}          # owner-only / error page: keep out of index
 TOP_PRIORITY = {"index.html": "1.0"}
 

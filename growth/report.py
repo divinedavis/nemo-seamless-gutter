@@ -31,7 +31,7 @@ WAITING_PAGE = "reports/waiting-on-you.html"
 
 
 def write_waiting_page(items):
-    """Write the full 'waiting on you' list into the docroot, return its URL.
+    """Write the full 'waiting on you' list into the docroot (not web-served).
 
     noindex, and seo/gen_sitemap.py never sees it, so it stays out of search.
     Returns None when the docroot isn't there (a laptop run), in which case
@@ -70,7 +70,11 @@ def write_waiting_page(items):
     with open(tmp, "w", encoding="utf-8") as f:
         f.write(page)
     os.replace(tmp, path)
-    return f"{SITE}/{WAITING_PAGE}"
+    # nginx now denies /reports/ (it was public and listed in sitemap.xml —
+    # internal notes on the open web), so a link to it would 404. Return None
+    # and the email builders inline the full list instead. The file is still
+    # written for growth_daily.py's staleness check and for reading on the box.
+    return None
 
 BAR = "=" * 58
 
