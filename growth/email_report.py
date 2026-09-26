@@ -400,12 +400,60 @@ def _new_pages_card(run_log):
 # Candidates the owner can actually act on. The rest of the ledger's blocked
 # items are engineering chores (API keys, service accounts) and would be noise
 # in his inbox.
+#
+# This is an allowlist of slugs, and that is a trap it already fell into once.
+# It was written when the ledger ended at T016, so it covered the owner-side
+# work that existed then. Every owner-side technique the scout has proposed
+# SINCE — all of T022, T033, T042, T049, T050, T051 — was silently excluded,
+# because a slug the scout invents can never be in a set written before it.
+# For sixty days the review journal ranked "sit down with the Business Profile
+# and fill in hours, services, service area and the booking link" as the single
+# highest-value action available, and for sixty days none of those rows appeared
+# in the only inbox that could act on them. Anything added below must be an
+# owner action — something he does with his phone or his hands, needing no
+# deploy and no API key.
 OWNER_ACTIONABLE = {"review_engine", "gbp_posts", "citations",
                     "google_local_services_ads",
                     "nextdoor_business_page_recommendations",
                     "speed_to_lead_callback_discipline",
                     "just_finished_job_neighbor_flyer",
-                    "gbp_category_and_qna_audit"}
+                    "gbp_category_and_qna_audit",
+                    # Business Profile fields — the owner opens the app and
+                    # types. No deploy, no credit, and per Sterling Sky's 2026
+                    # testing a services-list edit moves pack position inside
+                    # 24-72 hours, which is the only lever here with no
+                    # indexing lag at all.
+                    "open_now_hours_and_saturday_estimate_window",
+                    "gbp_services_list_and_job_photo_cadence",
+                    "gbp_service_area_geography_pass",
+                    "gbp_appointment_link_free_measurement",
+                    "call_instrumentation_baseline",
+                    "review_response_sweep_and_recovery"}
+
+# Order the card by risk, not by ledger id. The profile's primary category is
+# the heaviest single field AND the highest-variance one — the March 2026 core
+# update made careless business-name and category edits a leading cause of
+# contractor profile suspensions — so it goes last, after the fields that
+# cannot hurt. Reading order is the only safety rail an email has. Slugs not
+# named here keep their ledger order and follow these.
+OWNER_ACTION_ORDER = ("open_now_hours_and_saturday_estimate_window",
+                      "gbp_services_list_and_job_photo_cadence",
+                      "gbp_service_area_geography_pass",
+                      "gbp_appointment_link_free_measurement",
+                      "call_instrumentation_baseline",
+                      "review_engine",
+                      "review_response_sweep_and_recovery",
+                      "gbp_posts",
+                      "gbp_category_and_qna_audit")
+
+
+def _owner_sort_key(t):
+    """Safe-and-fast first, high-variance last; unranked slugs in between."""
+    slug = t.get("slug")
+    try:
+        return (0, OWNER_ACTION_ORDER.index(slug))
+    except ValueError:
+        return (1, 0)
 
 
 def _owner_actions_card():
@@ -415,6 +463,7 @@ def _owner_actions_card():
              and t.get("slug") in OWNER_ACTIONABLE and t.get("notes")]
     if not cands:
         return ""
+    cands.sort(key=_owner_sort_key)
     rows = []
     for t in cands:
         first = (t.get("notes") or "").strip().split("\n")[0]
