@@ -107,6 +107,30 @@ class OwnerActionsCard(unittest.TestCase):
         html = self.render([_tech("citations", "T009", notes="")])
         self.assertEqual(html, "")
 
+    def test_the_card_stops_at_three_rows_and_says_what_is_behind_them(self):
+        # The 09-26 widening made fourteen rows reachable. A fourteen-item card
+        # is a card that moves nothing; the cap is what keeps row one readable.
+        techs = [_tech(s, f"T{i:03}") for i, s in
+                 enumerate(email_report.OWNER_ACTION_ORDER, start=1)]
+        html = self.render(techs)
+        shown = [s for s in email_report.OWNER_ACTION_ORDER
+                 if s.replace("_", " ") in html]
+        self.assertEqual(shown, list(email_report.OWNER_ACTION_ORDER[:3]))
+        self.assertIn(f"{len(techs) - 3} more ideas behind these", html)
+
+    def test_no_tail_line_when_nothing_is_held_back(self):
+        html = self.render([_tech("open_now_hours_and_saturday_estimate_window", "T042")])
+        self.assertNotIn("behind these", html)
+
+    def test_the_two_measured_profile_edits_survive_the_cap(self):
+        # Hours and the services list are the only rows with no indexing lag.
+        # Whatever else the cap drops, it must never drop these two.
+        techs = [_tech(s, f"T{i:03}") for i, s in
+                 enumerate(sorted(email_report.OWNER_ACTIONABLE), start=1)]
+        html = self.render(techs)
+        self.assertIn("open now hours", html)
+        self.assertIn("gbp services list", html)
+
     def test_the_card_addresses_the_owner_not_the_developer(self):
         html = self.render([_tech("citations", "T009",
                                   notes="first step: confirm with Eric that Eric has the login.")])

@@ -456,6 +456,25 @@ def _owner_sort_key(t):
         return (1, 0)
 
 
+# How many rows the owner's card is allowed to show.
+#
+# Widening OWNER_ACTIONABLE on 2026-09-26 fixed the right bug — the profile
+# fields were reaching nobody — and then took the card from 8 rows to 14, which
+# is the failure the same entry had just described about its own recommendation
+# list: "a twenty-two-item list where everything is carried is not a record of
+# diligence, it is a list nobody can act on." A fourteen-row card buries hours
+# and the services list, the two edits measured moving pack position inside
+# 24-72 hours, under twelve others — among them a Local Services Ads item that
+# costs money and a Posts item whose own first step is OAuth for the engine
+# rather than anything the owner can do.
+#
+# Three is the number a person reads standing next to a truck. The tail line
+# below says how many are behind them, so nothing is hidden and the ranking
+# stays the thing that decides what he sees first. Raising this is not a
+# neutral edit: every row added past three is a row taken off row one.
+OWNER_CARD_MAX = 3
+
+
 def _owner_actions_card():
     """Only the things the owner himself can move, addressed to him."""
     cands = [t for t in ledger.load_techniques()
@@ -464,8 +483,9 @@ def _owner_actions_card():
     if not cands:
         return ""
     cands.sort(key=_owner_sort_key)
+    held_back = max(0, len(cands) - OWNER_CARD_MAX)
     rows = []
-    for t in cands:
+    for t in cands[:OWNER_CARD_MAX]:
         first = (t.get("notes") or "").strip().split("\n")[0]
         first = first.replace("first step:", "").strip()
         # written for a developer; make it address the owner
@@ -477,6 +497,13 @@ def _owner_actions_card():
             f'<div style="font:600 17px {FONT};color:{INK}">{_e(t["name"])}</div>'
             f'<div style="font:400 16px {FONT};color:{MUTED};margin-top:3px;'
             f'line-height:1.5">{_e(first)[:260]}</div></div>')
+    if held_back:
+        rows.append(
+            f'<div style="padding:10px 0 0 0;border-top:1px solid {LINE};'
+            f'font:400 15px {FONT};color:{MUTED};line-height:1.5">'
+            f'{held_back} more idea{"s" if held_back > 1 else ""} '
+            f'behind these, in order. They wait until these are done — '
+            f'reply to this email if you want the rest of the list.</div>')
     return _card(_h("Worth your time", ORANGE) + "".join(rows))
 
 
