@@ -22,69 +22,58 @@
     "image":"https://nemoseamlessgutter.com/assets/og.png","mainEntityOfPage":"https://nemoseamlessgutter.com/guides/5-vs-6-inch-gutters-right-size-for-york-county-homes.html"}
   </script>
   <!-- Google tag (gtag.js) -->
+  <!-- Google Consent Mode v2: EEA/UK/CH default-denied. MUST come before the gtag.js loader and any gtag('config'). -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', {
+      ad_storage: 'denied', analytics_storage: 'denied',
+      ad_user_data: 'denied', ad_personalization: 'denied',
+      region: ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH'],
+      wait_for_update: 500
+    });
+    (function () {
+      var KEY = 'consent.v1', saved = null;
+      try { saved = localStorage.getItem(KEY); } catch (e) {}
+      function grant(v) {
+        gtag('consent', 'update', {
+          ad_storage: v, analytics_storage: v, ad_user_data: v, ad_personalization: v
+        });
+      }
+      if (saved === 'granted' || saved === 'denied') { grant(saved); return; }
+      // Only visitors whose clock is set to a European zone see the banner; Consent Mode's
+      // region list above is the real gate, this just decides who gets asked.
+      var tz = '';
+      try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+      if (!/^(Europe\/|Atlantic\/(Reykjavik|Canary|Madeira|Azores|Faroe))/.test(tz)) return;
+      function show() {
+        var b = document.createElement('div');
+        b.setAttribute('role', 'dialog');
+        b.setAttribute('aria-label', 'Cookie choice');
+        b.style.cssText = 'position:fixed;left:16px;right:16px;bottom:16px;z-index:2147483647;max-width:560px;margin:0 auto;padding:14px 16px;border-radius:12px;background:#111;color:#fff;font:14px/1.4 system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.3);display:flex;flex-wrap:wrap;gap:10px;align-items:center';
+        b.innerHTML = '<span style="flex:1 1 260px">We use Google Analytics cookies to see how the site is used. <a href="/privacy.html" style="color:#9cf">Privacy</a></span>' +
+          '<button type="button" data-v="denied" style="padding:8px 14px;border-radius:8px;border:1px solid #666;background:transparent;color:#fff;cursor:pointer">Decline</button>' +
+          '<button type="button" data-v="granted" style="padding:8px 14px;border-radius:8px;border:0;background:#fff;color:#111;cursor:pointer">Accept</button>';
+        b.addEventListener('click', function (ev) {
+          var v = ev.target && ev.target.getAttribute && ev.target.getAttribute('data-v');
+          if (!v) return;
+          try { localStorage.setItem(KEY, v); } catch (e) {}
+          grant(v);
+          b.remove();
+        });
+        document.body.appendChild(b);
+      }
+      if (document.body) show(); else document.addEventListener('DOMContentLoaded', show);
+    })();
+  </script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-JWSK5E1ZRZ"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
-    gtag(js, new Date());
-    gtag(config, G-JWSK5E1ZRZ);
+    gtag('js', new Date());
+    gtag('config', 'G-JWSK5E1ZRZ');
   </script>
   <script src="/analytics.js?v=2" defer></script>
-
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Seamless vs. Sectional Gutters: Which Is Better? | NEMO Seamless Gutter</title>
-  <meta name="description" content="Seamless vs. sectional gutters for York, PA homeowners: how they differ on leaks, cost, appearance and lifespan — and which is the better choice for your home." />
-  <meta name="keywords" content="seamless vs sectional gutters, seamless gutters York PA, gutter comparison" />
-  <meta name="theme-color" content="#243C94" />
-  <link rel="canonical" href="https://nemoseamlessgutter.com/guides/seamless-vs-sectional-gutters.html" />
-
-  <meta name="geo.region" content="US-PA" />
-  <meta name="geo.placename" content="York, Pennsylvania" />
-  <meta name="geo.position" content="39.9626;-76.7277" />
-  <meta name="ICBM" content="39.9626, -76.7277" />
-
-  <meta property="og:site_name" content="NEMO Seamless Gutter" />
-  <meta property="og:title" content="Seamless vs. Sectional Gutters: Which Is Better?" />
-  <meta property="og:description" content="Seamless vs. sectional gutters for York, PA homeowners: how they differ on leaks, cost, appearance and lifespan — and which is the better choice for your home." />
-  <meta property="og:type" content="article" />
-  <meta property="og:url" content="https://nemoseamlessgutter.com/guides/seamless-vs-sectional-gutters.html" />
-  <meta property="og:image" content="https://nemoseamlessgutter.com/assets/og.png" />
-  <meta property="og:locale" content="en_US" />
-
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Seamless vs. Sectional Gutters: Which Is Better?" />
-  <meta name="twitter:description" content="Seamless vs. sectional gutters for York, PA homeowners: how they differ on leaks, cost, appearance and lifespan — and which is the better choice for your home." />
-  <meta name="twitter:image" content="https://nemoseamlessgutter.com/assets/og.png" />
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": "Seamless vs. Sectional Gutters: Which Is Better?",
-    "description": "Seamless vs. sectional gutters for York, PA homeowners: how they differ on leaks, cost, appearance and lifespan — and which is the better choice for your home.",
-    "author": { "@type": "Organization", "name": "NEMO Seamless Gutter" },
-    "publisher": {
-      "@type": "Organization",
-      "name": "NEMO Seamless Gutter",
-      "logo": { "@type": "ImageObject", "url": "https://nemoseamlessgutter.com/assets/logo-4k.png" }
-    },
-    "image": "https://nemoseamlessgutter.com/assets/og.png",
-    "mainEntityOfPage": "https://nemoseamlessgutter.com/guides/seamless-vs-sectional-gutters.html",
-    "datePublished": "2026-06-23"
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://nemoseamlessgutter.com/" },
-      { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://nemoseamlessgutter.com/" },
-      { "@type": "ListItem", "position": 3, "name": "Seamless vs. Sectional Gutters: Which Is Better?", "item": "https://nemoseamlessgutter.com/guides/seamless-vs-sectional-gutters.html" }
-    ]
-  }
-  </script>
 
   <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
   <link rel="icon" href="/assets/favicon-96.png" type="image/png" sizes="96x96" />

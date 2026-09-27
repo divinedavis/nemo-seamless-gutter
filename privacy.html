@@ -8,6 +8,50 @@
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://nemoseamlessgutter.com/privacy.html" />
   <!-- Google tag (gtag.js) -->
+  <!-- Google Consent Mode v2: EEA/UK/CH default-denied. MUST come before the gtag.js loader and any gtag('config'). -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', {
+      ad_storage: 'denied', analytics_storage: 'denied',
+      ad_user_data: 'denied', ad_personalization: 'denied',
+      region: ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH'],
+      wait_for_update: 500
+    });
+    (function () {
+      var KEY = 'consent.v1', saved = null;
+      try { saved = localStorage.getItem(KEY); } catch (e) {}
+      function grant(v) {
+        gtag('consent', 'update', {
+          ad_storage: v, analytics_storage: v, ad_user_data: v, ad_personalization: v
+        });
+      }
+      if (saved === 'granted' || saved === 'denied') { grant(saved); return; }
+      // Only visitors whose clock is set to a European zone see the banner; Consent Mode's
+      // region list above is the real gate, this just decides who gets asked.
+      var tz = '';
+      try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+      if (!/^(Europe\/|Atlantic\/(Reykjavik|Canary|Madeira|Azores|Faroe))/.test(tz)) return;
+      function show() {
+        var b = document.createElement('div');
+        b.setAttribute('role', 'dialog');
+        b.setAttribute('aria-label', 'Cookie choice');
+        b.style.cssText = 'position:fixed;left:16px;right:16px;bottom:16px;z-index:2147483647;max-width:560px;margin:0 auto;padding:14px 16px;border-radius:12px;background:#111;color:#fff;font:14px/1.4 system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.3);display:flex;flex-wrap:wrap;gap:10px;align-items:center';
+        b.innerHTML = '<span style="flex:1 1 260px">We use Google Analytics cookies to see how the site is used. <a href="/privacy.html" style="color:#9cf">Privacy</a></span>' +
+          '<button type="button" data-v="denied" style="padding:8px 14px;border-radius:8px;border:1px solid #666;background:transparent;color:#fff;cursor:pointer">Decline</button>' +
+          '<button type="button" data-v="granted" style="padding:8px 14px;border-radius:8px;border:0;background:#fff;color:#111;cursor:pointer">Accept</button>';
+        b.addEventListener('click', function (ev) {
+          var v = ev.target && ev.target.getAttribute && ev.target.getAttribute('data-v');
+          if (!v) return;
+          try { localStorage.setItem(KEY, v); } catch (e) {}
+          grant(v);
+          b.remove();
+        });
+        document.body.appendChild(b);
+      }
+      if (document.body) show(); else document.addEventListener('DOMContentLoaded', show);
+    })();
+  </script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-JWSK5E1ZRZ"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -16,61 +60,6 @@
     gtag('config', 'G-JWSK5E1ZRZ');
   </script>
   <script src="/analytics.js?v=2" defer></script>
-
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Seamless vs. Sectional Gutters: Which Is Better? | NEMO Seamless Gutter</title>
-  <meta name="description" content="Seamless vs. sectional gutters for York, PA homeowners: how they differ on leaks, cost, appearance and lifespan — and which is the better choice for your home." />
-  <meta name="keywords" content="seamless vs sectional gutters, seamless gutters York PA, gutter comparison" />
-  <meta name="theme-color" content="#243C94" />
-  <link rel="canonical" href="https://nemoseamlessgutter.com/guides/seamless-vs-sectional-gutters.html" />
-
-  <meta name="geo.region" content="US-PA" />
-  <meta name="geo.placename" content="York, Pennsylvania" />
-  <meta name="geo.position" content="39.9626;-76.7277" />
-  <meta name="ICBM" content="39.9626, -76.7277" />
-
-  <meta property="og:site_name" content="NEMO Seamless Gutter" />
-  <meta property="og:title" content="Seamless vs. Sectional Gutters: Which Is Better?" />
-  <meta property="og:description" content="Seamless vs. sectional gutters for York, PA homeowners: how they differ on leaks, cost, appearance and lifespan — and which is the better choice for your home." />
-  <meta property="og:type" content="article" />
-  <meta property="og:url" content="https://nemoseamlessgutter.com/guides/seamless-vs-sectional-gutters.html" />
-  <meta property="og:image" content="https://nemoseamlessgutter.com/assets/og.png" />
-  <meta property="og:locale" content="en_US" />
-
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Seamless vs. Sectional Gutters: Which Is Better?" />
-  <meta name="twitter:description" content="Seamless vs. sectional gutters for York, PA homeowners: how they differ on leaks, cost, appearance and lifespan — and which is the better choice for your home." />
-  <meta name="twitter:image" content="https://nemoseamlessgutter.com/assets/og.png" />
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": "Seamless vs. Sectional Gutters: Which Is Better?",
-    "description": "Seamless vs. sectional gutters for York, PA homeowners: how they differ on leaks, cost, appearance and lifespan — and which is the better choice for your home.",
-    "author": { "@type": "Organization", "name": "NEMO Seamless Gutter" },
-    "publisher": {
-      "@type": "Organization",
-      "name": "NEMO Seamless Gutter",
-      "logo": { "@type": "ImageObject", "url": "https://nemoseamlessgutter.com/assets/logo-4k.png" }
-    },
-    "image": "https://nemoseamlessgutter.com/assets/og.png",
-    "mainEntityOfPage": "https://nemoseamlessgutter.com/guides/seamless-vs-sectional-gutters.html",
-    "datePublished": "2026-06-23"
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://nemoseamlessgutter.com/" },
-      { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://nemoseamlessgutter.com/" },
-      { "@type": "ListItem", "position": 3, "name": "Seamless vs. Sectional Gutters: Which Is Better?", "item": "https://nemoseamlessgutter.com/guides/seamless-vs-sectional-gutters.html" }
-    ]
-  }
-  </script>
 
   <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
   <link rel="icon" href="/assets/favicon-96.png" type="image/png" sizes="96x96" />
@@ -118,66 +107,109 @@
       <h1>Privacy Policy</h1>
       <p class="lede">Plain English: we collect what we need to quote and schedule your gutter
       work, we measure how people find the site, and we don't sell your information.</p>
+      <p class="muted">Last updated: September 27, 2026</p>
       <h2>Who we are</h2>
       <p>NEMO Seamless Gutter installs and services seamless gutters in York County, Pennsylvania.
       This policy explains what we collect through <a href="https://nemoseamlessgutter.com">nemoseamlessgutter.com</a>,
-      why, and what you can do about it. Questions go to
+      why, who else handles it, and what you can do about it. Questions go to
       <a href="mailto:eric@nemoseamlessgutter.com">eric@nemoseamlessgutter.com</a> or (717) 578-0073.</p>
       <h2>Information you give us</h2>
-      <p>When you book an appointment or submit the contact form, we collect your
-      <strong>name, phone number, email address, and the job address</strong> for the property
-      you want serviced, plus any notes you add. We ask for the job address because we
-      cannot quote or schedule gutter work without knowing where the house is.</p>
-      <p>We use this only to schedule and perform the work you asked for, and to contact you
-      about that job. We do not sell it, rent it, or share it for anyone else's marketing.</p>
+      <p><strong>Online booking.</strong> When you book a time, we collect your <strong>name,
+      phone number, email address, the job address</strong> (not needed for a phone
+      consultation) and any notes you add, plus the service and time you picked. This is
+      stored in our booking database on our own server.</p>
+      <p><strong>Estimate request form.</strong> The &ldquo;Request Free Estimate&rdquo; form
+      (name, phone, email, message) is delivered by
+      <a href="https://formsubmit.co/" rel="nofollow noopener" target="_blank">FormSubmit</a>
+      (formsubmit.co), a third-party form-to-email service: your entries go to FormSubmit, which
+      emails them to us. That form is not stored on our server.</p>
+      <p>We use this information only to quote, schedule and do the work you asked for and to
+      contact you about that job. We do not sell it, rent it, or share it for anyone else's
+      marketing.</p>
+      <h2>Email and calendar</h2>
+      <p>Booking confirmations, reminders, weather reschedules and alerts to our crew are sent
+      from our Google Workspace email (enemo@nemoseamlessgutter.com) through Google's mail servers. Each booking
+      is emailed to you and to us as a calendar invitation (.ics) containing your name, phone,
+      email, job address and notes, and we add it to our own calendar, which may be Google
+      Calendar or Apple iCloud Calendar.</p>
+      <p>Our booking system can also write appointments straight into Apple iCloud Calendar
+      and read busy times from our calendars to avoid double-booking. Those direct calendar
+      connections are currently switched off; if we turn them on, the same booking details
+      will be stored in Apple iCloud.</p>
       <h2>Information collected automatically</h2>
-      <p>Like most websites, our server records standard request logs (IP address, browser
-      type, pages requested, timestamps) for security and troubleshooting.</p>
-      <p>We also use <strong>Google Analytics</strong> to understand which pages people find
-      useful and which searches bring them here. Google Analytics sets cookies and collects
-      usage data. Google Analytics 4 anonymizes visitor IP addresses by default and does not
-      make them available to us. We use this to improve the site, not to identify individual
-      visitors.</p>
-      <p>If you arrived from a Google ad, <strong>Google Ads</strong> may set a cookie so we
-      can tell which ads lead to real enquiries. We see totals, not who you are.</p>
+      <p><strong>Server logs.</strong> Our web server records standard request logs (IP
+      address, browser type, pages requested, referring page, timestamps). They are used for
+      security, troubleshooting and counting visits, and are deleted after 14 days.</p>
+      <p><strong>Visit counter.</strong> To count visitors without relying on Google, our
+      server sets a first-party cookie called <code>nemo_vid</code> containing a random ID
+      (or, if cookies are blocked, stores one in your browser's local storage). Each page view
+      and each tap on a &ldquo;call&rdquo; link sends that ID, the page and the referring page
+      back to our own server. It is not shared with anyone and cannot identify you by name.</p>
+      <p><strong>Google Analytics.</strong> We use Google Analytics 4 (measurement ID
+      G-JWSK5E1ZRZ) to see which pages people use and which searches bring them here, including
+      when someone taps to call or text us or completes a booking. Google Analytics sets cookies
+      and Google receives your IP address and browsing data from our pages. We do not run
+      Google Ads or any advertising or remarketing tags.</p>
+      <p><strong>Fonts.</strong> Our pages load fonts from Google Fonts, so your browser
+      contacts Google's servers and shares your IP address when a page loads.</p>
       <h2>Cookies and how to refuse them</h2>
-      <p>Cookies are small files a site stores in your browser. Ours fall into two groups:</p>
       <ul>
-        <li><strong>Necessary</strong> &mdash; needed for the booking form to work correctly.</li>
-        <li><strong>Analytics and advertising</strong> &mdash; set by Google as described above.</li>
+        <li><strong>Necessary / first-party</strong> &mdash; <code>nemo_vid</code> (visit
+            counting, described above) and a <code>consent.v1</code> entry in local storage that
+            remembers your cookie choice.</li>
+        <li><strong>Analytics</strong> &mdash; Google Analytics cookies (names starting with
+            <code>_ga</code>).</li>
       </ul>
-      <p>Every major browser lets you block or delete cookies in its settings. Blocking the
-      analytics and advertising cookies will not stop you from booking an appointment. You can
-      also install Google's
+      <p>If you are in the European Economic Area, the UK or Switzerland, Google Analytics
+      cookies are off by default (Google Consent Mode) and we ask before turning them on.
+      Anyone can block or delete cookies in their browser settings, or install Google's
       <a href="https://tools.google.com/dlpage/gaoptout" rel="nofollow noopener" target="_blank">opt-out
-      browser add-on</a> to prevent Google Analytics from measuring your visits to any site.</p>
-      <h2>Who else can see your information</h2>
-      <p>We share information only with services that make the site and our scheduling work:</p>
+      browser add-on</a>. Blocking cookies will not stop you from booking.</p>
+      <h2>Who else handles your information</h2>
       <ul>
-        <li><strong>Google</strong> &mdash; analytics, advertising measurement, and the email
-            and calendar we use to run the business.</li>
-        <li><strong>Our web host</strong> &mdash; stores the site and its logs.</li>
+        <li><strong>Google</strong> &mdash; Google Analytics, Google Fonts, and the Google
+            Workspace email we send and receive booking messages with.</li>
+        <li><strong>FormSubmit</strong> &mdash; delivers the estimate request form to our
+            inbox.</li>
+        <li><strong>Apple</strong> &mdash; iCloud Calendar, if we keep your appointment there
+            (see &ldquo;Email and calendar&rdquo;).</li>
+        <li><strong>DigitalOcean</strong> &mdash; hosts our website, booking database and
+            server logs.</li>
+        <li><strong>U.S. National Weather Service</strong> &mdash; we check the public forecast
+            for York County to schedule outdoor work; no personal information is sent.</li>
       </ul>
-      <p>We may also disclose information if the law requires it. Otherwise, your details stay
-      with us and the crew doing your job.</p>
+      <p>We may also disclose information if the law requires it. We do not sell personal
+      information and do not share it for cross-context behavioral advertising.</p>
       <h2>How long we keep it</h2>
       <p>We keep booking and customer records as long as needed to service the job, honor any
-      warranty, and meet tax and accounting obligations. Server logs are kept for a short
-      period for security purposes. Analytics data is retained under Google's own schedule.</p>
-      <h2>Your choices</h2>
-      <p>Ask us to see, correct, or delete the information we hold about you by emailing
-      <a href="mailto:eric@nemoseamlessgutter.com">eric@nemoseamlessgutter.com</a>. We will respond within a reasonable
-      time. If you booked an appointment and want the record removed, say so and we will delete
-      it once the job and any warranty period are complete.</p>
-      <p>Depending on where you live, you may have additional rights over your personal
-      information. Contact us and we will honor them.</p>
+      warranty, and meet tax and accounting obligations. Server logs are deleted after 14 days.
+      Google Analytics data is kept under the retention setting in our Google Analytics account
+      and Google's own schedule. Estimate-form emails stay in our mailbox until we delete
+      them.</p>
+      <h2>Your rights</h2>
+      <p><strong>Everyone:</strong> email <a href="mailto:eric@nemoseamlessgutter.com">eric@nemoseamlessgutter.com</a>
+      to see, correct or delete the information we hold about you. We will respond within 30
+      days. If you booked an appointment and want the record removed, we will delete it, except
+      what we must keep for an open job, a warranty, or tax records.</p>
+      <p><strong>California residents (CCPA/CPRA):</strong> you have the right to know what
+      personal information we collect and how we use it, to access it, to have it corrected or
+      deleted, and to opt out of its sale or sharing &mdash; we do neither. We will not treat you
+      differently for using these rights. We verify requests by confirming the email or phone
+      number on the booking; an authorized agent may ask on your behalf.</p>
+      <p><strong>EEA, UK and Swiss residents (GDPR / UK GDPR):</strong> you have the right to
+      access, correct, delete, restrict or object to our use of your information, to receive
+      it in a portable format, and to withdraw consent at any time (for analytics cookies, clear
+      this site's storage and choose again when asked). We rely on your request for a quote or
+      booking (contract), your consent (analytics cookies), and our legitimate interest in
+      securing and improving the site. You may complain to your local data protection
+      authority.</p>
       <h2>Children</h2>
       <p>This site is meant for homeowners and is not directed at children under 13. We do not
       knowingly collect information from children.</p>
       <h2>Changes</h2>
-      <p>If we change how we handle your information we will update this page and move the
-      effective date below. Material changes will be noted clearly.</p>
-      <p class="muted">Effective July 20, 2026.</p>
+      <p>If we change how we handle your information we will update this page and the date
+      below. Material changes will be noted clearly.</p>
+      <p class="muted">Last updated: September 27, 2026.</p>
     </div>
   </article>
   <footer class="site-footer">
@@ -209,11 +241,59 @@
 
   <a href="tel:+17175780073" class="call-bar"
      aria-label="Call NEMO Seamless Gutter at (717) 578-0073">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18"/><path d="M5 7v8a4 4 0 0 0 4 4h6a4 4 0 0 0 4-4V7"/><path d="M3 7l2-3h14l2 3"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
     <span>Call (717) 578-0073</span>
     <span class="call-bar-sub">Free estimate</span>
   </a>
 
   <script src="../script.js?v=1"></script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Are seamless gutters worth the extra cost over sectional?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "For most York County homes, yes. Fewer joints means fewer places for sealant to fail, so you spend less time resealing seams and dealing with drips down the fascia. We measure your rooflines and give you a free written on-site estimate so you can compare both options."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much do seamless gutters cost?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Price depends on total footage, the number of corners and downspouts, gutter size, how many stories, and whether old gutters and rotted fascia need attention. We look at all of that in person and hand you a written estimate at no charge. Call (717) 578-0073 to set it up."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can seamless gutters be installed on an older house?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Usually. The machine forms the gutter to whatever length your roofline needs, so odd angles and long runs are not a problem. What we check first is the fascia board \u2014 if it is soft or rotted behind the old gutter, that gets repaired before anything is hung."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do seamless gutters ever leak?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "They can, but at the corners, end caps and downspout outlets rather than along the run. Those few points are sealed and can be resealed if needed. Sectional gutters have a joint every 10 feet, which multiplies the number of spots that can open up over time."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What material and color choices are there?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Most residential seamless gutter here is aluminum, which is light, does not rust, and comes in a range of baked-on colors so it can match trim or roof. We bring color samples to the estimate and can show you how the K-style profile looks against your siding."
+      }
+    }
+  ]
+}
+</script>
 </body>
 </html>

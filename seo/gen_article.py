@@ -61,9 +61,15 @@ def read_chrome():
     html = open(CHROME_PAGE).read()
     header = re.search(r"(<header class=\"site-header\".*?</header>)", html, re.S).group(1)
     footer_float = re.search(r"(<footer class=\"site-footer\".*?</body>)", html, re.S).group(1)
-    # Start at the Google tag, not the icon links -- otherwise generated
-    # pages ship without analytics and silently under-report traffic.
-    head_links = re.search(r"(<!-- Google tag.*?</head>)", html, re.S).group(1)
+    # Start at the Google tag (and the consent snippet inside it), not the icon
+    # links -- otherwise generated pages ship without analytics. But take only the
+    # tag block and the icon/font/stylesheet links: the chrome page's own <title>,
+    # canonical, OG tags and JSON-LD sit between them, and copying the whole span
+    # gave generated guides a second <title> and a canonical pointing at the chrome
+    # guide (found 2026-09-27 on the 5-vs-6-inch guide).
+    tag = re.search(r"(<!-- Google tag.*?analytics\.js[^>]*></script>)", html, re.S).group(1)
+    links = re.search(r"(<link rel=\"icon\".*?</head>)", html, re.S).group(1)
+    head_links = tag + "\n\n  " + links
     return head_links, header, footer_float
 
 
