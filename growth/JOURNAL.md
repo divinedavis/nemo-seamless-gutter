@@ -28077,3 +28077,23 @@ bookings all time, the last twenty-four days ago. Fifty-two visitors in three
 weeks, against 56,371 crawler hits.** Nineteen dead mornings, alarming nobody by
 design. And the profile that has been recommendation 1 since July has never
 appeared in the inbox of the only person who can open it.
+
+## 2026-09-27 — engine run
+
+Goal: **0.0%** top-3 share of 221 tracked queries (target 50%).
+2026-09-26: 2 visitors (2 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — FAILED: generation failed for areas/seamless-gutters-dover-pa.html: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CfTSUk3Vm2EqQoEhqg9Du"}
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — FAILED: 3 candidate(s) failed, last: generation failed for 'gutter replacement dover pa': anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CfTSUpFzfz5vJWcSt5Vak"}
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: no query needs its own page — the remaining gaps all belong on pages that exist, which strengthen_pages handles
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: sitemap.xml unchanged
+- `ping_indexnow` — ok: nothing new to submit
+
+**Scout did not run:** anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CfTSUr7sQp1jGK7hNiQGG"}
