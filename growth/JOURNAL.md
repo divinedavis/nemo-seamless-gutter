@@ -28576,3 +28576,541 @@ Goal: **0.0%** top-3 share of 222 tracked queries (target 50%).
 - `ping_indexnow` — ok: nothing new to submit
 
 **Scout did not run:** anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CfVLJMrHhsug3WniJ6b5Z"}
+
+## 2026-09-28 — review agent
+
+### Where the numbers stand
+
+**Twenty-first consecutive dead morning, and the lead is not the outage.** The
+lead is that **Divine deployed on 2026-09-27** — the journal has said "nothing
+deployed, zero recommendations actioned" for a month and that framing is now
+partly wrong. Details in item 2 below.
+
+`improve_ctr` and `strengthen_pages` failed and the scout failed, all three on
+`Your credit balance is too low` — an **empty account**, not the spend cap.
+(The task prompt still describes the 2026-07-28 state and says to expect the
+self-imposed usage cap "until 2026-08-01". The snapshot says otherwise: today's
+three errors are all `invalid_request_error` / credit balance. The data wins;
+the prompt needs correcting.) Every other step `ok`/`noop`. `new: 0,
+changed: 0`.
+
+**The goal metric is zero for the ninth day.** `top3` **0 / 222**, `share_pct`
+**0.0%** against a target of 50%. Read as the README reads it —
+`top3 / ranked_known` — **0 of 46**.
+
+**Day sixty-three.**
+
+| date | rows | matched | clicks | impressions | avg pos | **top3** | top10 | ranked_known |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 09-24 | 892 | 42 | 16 | 6,883 | 27.6 | **0** | 11 | 42 |
+| 09-25 | 903 | 43 | 14 | 7,037 | 27.5 | **0** | 13 | 43 |
+| 09-26 | 905 | 44 | 15 | 6,984 | 27.4 | **0** | 13 | 44 |
+| 09-27 | 898 | 45 | 15 | 6,920 | 27.6 | **0** | 13 | 45 |
+| **09-28** | **871** | **44** | **15** | **6,649** | **27.8** | **0** | **14** | **46** |
+
+Mostly the wrong way. `rows` **898 → 871**, a second straight fall and the
+largest single-day drop in the window. `impressions` **6,920 → 6,649**, a third
+straight fall, now 388 below the 09-25 peak. `avg_position` **27.6 → 27.8**.
+`matched` **45 → 44**, the first fall after three rises. `clicks` flat at 15 for
+a third day — and that is a 28-day rolling total (`gsc.py:45`,
+`WINDOW_DAYS = 28`), 0.54 clicks a day. The one gain: `top10` **13 → 14** and
+`ranked_known` 45 → 46.
+
+**`keywords.by_town`: not one `top3` cell moved.** county 118/45/**0**, york
+40/15/**0**, dover 16/9/**0**, hanover 13/6/**0**, red-lion 11/5/**0**,
+dallastown 12/6/**0**, spring-grove 12/6/**0**. Six named towns at zero for
+sixty-three days; the county bucket for nine.
+
+**`covered` fell for the first time in this window: 94 → 92**, `coverage_pct`
+**42.5% → 41.4%**, while `tracked_queries` rose 221 → 222 (`adopt_queries` took
+`gutter protection system dallastown pa`). `by_intent`: hire 141/75, **price
+51/10**, diy 8/1, **check 22/6** — down from 22/8. **That drop is good news and
+item 3 explains why.**
+
+**Leads and calls, unchanged and honest:** 09-27 was a **0-visitor day** (0
+organic, 0 maps, 0 AI). Median 2/day over the last 21 days; 2,338 bot hits
+yesterday. `call_taps` **0** for the forty-sixth measurable day, `bookings` 0,
+`phone_leads` 0. All-time: 4 bookings, 0 phone leads.
+
+### Did previous changes work?
+
+**1 — Test 27 scores today. It does not falsify. It also does not survive. The
+result is *no verdict*, and yesterday's entry predicted the wrong thing.**
+
+The bar, pre-registered 2026-09-23: falsify if the five-day mean of
+`gsc.clicks` over 09-24 → 09-28 comes in **≥ 16.0** with
+`last_build.new + last_build.changed` **0 on all five mornings**; the claim
+**survives** if the mean **falls below 14**.
+
+Clicks, each read from that morning's own published snapshot: 09-24 **16**,
+09-25 **14**, 09-26 **15**, 09-27 **15**, 09-28 **15**. Total **75**, mean
+**15.0**. `new + changed` **0 on all five**.
+
+15.0 is below 16.0, so the falsifier was **not** met. 15.0 is above 14, so the
+claim does **not** survive either. The spec has a middle region and the test
+landed squarely in it. Yesterday's entry wrote "it is going to falsify" and
+"the claim falsifies, and restoring Anthropic credit is **hygiene rather than
+the emergency**" — and in the same paragraph computed that reaching the bar
+needed 20 clicks on 09-28. Both cannot be true: failing to reach the
+falsification bar is the opposite of falsifying. **Test 27 returns nothing.
+Credit is neither exonerated nor indicted, and yesterday's conclusion must not
+be carried forward as if it were a finding.** That matters concretely: it was
+the stated reason for keeping the BLOCKED banner out of Eric's email and for
+demoting credit. Both of those now rest on nothing.
+
+What the five days *do* establish, weakly: five consecutive mornings of zero
+publishing coincided with clicks flat in the 14–17 band that has held since
+09-14. The confound Test 27 was written to break — a 28-day window rolling past
+August's thirteen alive mornings — is still unbroken. I am not re-registering
+this test in the same shape; a rolling 28-day total cannot resolve a 21-day
+outage inside it, which is the design flaw, not the data's fault.
+
+**2 — Divine deployed on 2026-09-27. The "nothing has been deployed" premise is
+now wrong in part, and the recommendation has to be re-aimed rather than
+repeated louder.**
+
+`ce84002`, authored by Divine Davis at 2026-09-27 14:02 −0400: the privacy
+policy rewritten to name every real processor, Google Consent Mode v2
+(EEA/UK/CH default-denied) on **all 43 GA pages** and in
+`growth/templates.py`, and two genuine bug fixes — `gen_privacy.py` and
+`gen_article.py` were copying a source page's whole head block, which shipped
+duplicate `<title>` and `<link rel=canonical>` tags; and **four guides had
+`gtag('js')` / `gtag('config')` with their quotes stripped, a ReferenceError
+that meant GA never configured on those pages at all.** The commit says the
+pages were patched in place on the docroot with an idempotent script and copied
+back to the repo.
+
+I verified the deploy independently rather than taking the message's word:
+every one of the 43 `lastmod` values in `sitemap.xml` is now `2026-09-27`
+(yesterday they spanned 2026-08-14 → 2026-09-07), which is what an in-place
+patch of every file does to mtimes; no duplicate `<title>` or duplicate
+canonical survives anywhere on the site (checked all 44 files); and today's
+publish commit did **not** revert the repo's HTML, which it would have if the
+docroot still held the old pages.
+
+So Eric's man is not absent. **He is working a different queue — legal and
+analytics correctness — from the one this journal has ranked first for thirty
+days.** Both of the bugs he fixed were real and neither was on my list; the
+GA-quote bug in particular was breaking measurement on four pages while this
+journal was writing about measurement every morning and never found it. Nine
+days ago the ledger's undeployed `review.earned()` was called the important
+thing. It was not the important thing.
+
+**3 — `covered` 94 → 92 is not a regression. It is the goal metric getting
+honest, and I can name the two queries and the line of code.**
+
+Newly uncovered: **`5 inch vs 6 inch gutters which do i need`** and **`5 inch
+vs 6 inch gutters which is better`** (plus the newly adopted dallastown query,
+which arrived uncovered — 3 added to `uncovered`, 2 of them flips).
+
+Cause, traced end to end. `guides/5-vs-6-inch-gutters-right-size-for-york-county-homes.html`
+shipped with **two `<title>` elements**: its own, and a leaked
+`Seamless vs. Sectional Gutters: Which Is Better? | NEMO Seamless Gutter`
+copied in by `gen_article.py`. `keywords.check_coverage()` collected *every*
+title on the page with `re.findall`, so the tokens `which` and `better` — which
+appear nowhere in this page's own title, h1 or h2 — credited it coverage from a
+heading belonging to a different page. Diffed `ce84002~1` against `ce84002` to
+confirm: two titles before, one after. Both queries had been **falsely
+`covered`**, and Divine's fix made the number correct. `check` intent 8 → 6 is
+exactly these two.
+
+This is the second time false coverage has come in through borrowed headings —
+`_headline_index`'s own docstring records the 2026-08-17 h2 incident, 43 of 128
+queries flipped. Fixed below, in code.
+
+**4 — The deploy queue: still not deployed. Day thirty-one; the mesh fix day
+fifteen.** Divine's deploy was of his own work, not this one. Re-measured
+this morning against the docroot mirror:
+
+| town | inbound mesh links |
+| --- | --- |
+| dallastown, dillsburg, dover, glen-rock, hallam, hanover | 14 each |
+| jacobus | 6 |
+| **manchester, mount-wolf, new-freedom, red-lion, shrewsbury, spring-grove, stewartstown, wrightsville** | **0** |
+
+**Eight of fifteen area pages still carry zero inbound internal links**, two of
+them (**red-lion**, **spring-grove**) tracked towns at `top3` 0. `internal_links`
+reported 0 pages again, correctly, because the droplet runs the pre-fix
+`_nearby_block`. The other markers, all re-run: PA HIC number on **0** pages;
+`?utm_source=gbp` on **0**; `dateModified` on **15 of 44**;
+`services/half-round-gutters.html` still holds **1,021** single-letter `<p>`
+elements; the Akron/Lancaster paragraph still at
+`services/gutter-guards.html`; the Schuylkill County section still on
+`services/seamless-gutter-installation.html`; and
+`<p>paragraphs2_placeholder</p>` still live on the Dover town page — now at
+**line 294**, not 250. That 44-line move is what led me to `ce84002`.
+
+**5 — Test 28** (is the top-3 loss structural?): `goal.top3` **0**, day **9**
+of the zero run, no funded morning in the window. Scores **2026-10-07**.
+**Test 29** (was 09-23's AI visit the start of anything?): `ai_visitors`
+**0 on 09-24, 09-25, 09-26 and 09-27**. Non-zero days needed to falsify: 3.
+Count: **0**. Scores **2026-10-08**.
+
+**6 — I audited the call-tap instrumentation instead of speculating about it,
+and it is sound. The 0 is real.** `analytics.js:32` fires
+`navigator.sendBeacon('/e/call-tap?p=…')` on any click reaching
+`a[href^="tel:"], a[href^="sms:"]` (`analytics.js:74`); the script is present
+on **all 43 public pages** (`setup.html` is the only omission and is
+owner-only, correctly excluded); `metrics.py:538` counts unique tappers from
+the nginx line behind the same bot/owner gates. It is independent of GA, so
+the `gtag` bug Divine fixed never touched it. `call_taps = 0` across 46 days is
+therefore a genuine floor on a denominator of roughly **90 visitors** — and at
+n≈90 you cannot distinguish a 0% tap rate from 3%. The measurement is fine;
+the sample is the problem. T049's GBP-Calls read is still the only independent
+check, and it is still not done.
+
+**7 — Recommendations actioned by Eric: still zero.** Business Profile sitting,
+**day sixty-three**. Anthropic auto-reload, day twenty. What changed today is
+only that the *developer* column is no longer empty.
+
+### What I researched today
+
+`WebSearch` worked. Four searches: 2026 local-pack ranking factors for
+contractors, AI-answer-engine recommendation for local services, contractor
+site→call conversion, and what actually changed in Google Business Profile in
+the last six months.
+
+**Two genuinely new things, both of which change something in the ledger:**
+
+- **Google discontinued the Business Profile Q&A feature (late 2025); it is
+  dead in 2026 and replaced by "Ask Maps", an AI feature that answers
+  questions live from profile and review data.** ([Explore Digital](https://www.exploredigital.com/blog/top-8-biggest-changes-to-google-business-profile-in-2026-so-far/),
+  [Elfsight](https://elfsight.com/blog/google-business-profile-whats-new/))
+  **This makes half of ledger entry T016 (`gbp_category_and_qna_audit`)
+  obsolete.** The category half is still the heaviest single field in the pack;
+  the "Owner Q&A audit" half is work on a feature that no longer exists. This
+  journal has recommended T016 by name repeatedly, most recently yesterday, and
+  would have sent Eric to seed Q&A entries he cannot create. The ledger lives
+  in droplet-side `techniques.json`, which I must not touch, so this has to be
+  a note here and an instruction in the recommendation.
+- **The Performance tab was overhauled again in 2026 and now exposes discovery
+  share, AI-surface attribution, and message/booking conversion alongside
+  calls and directions.** ([Explore Digital](https://www.exploredigital.com/blog/top-8-biggest-changes-to-google-business-profile-in-2026-so-far/),
+  [Digital Applied](https://www.digitalapplied.com/blog/google-business-profile-guide-every-feature-2026))
+  That upgrades T049 from "read the call count" to "read the call count, the
+  discovery share and whether AI surfaces are citing this business at all" —
+  the first independent read on the `ai_visitors` series, which has sat at 0
+  for every day but 09-23, and it is free.
+
+**Reinforcing, not new:** GBP signals are reported at ~32% of local-pack weight
+(the largest single category, ahead of on-page at ~19%), reviews up to ~20%
+from 16% in 2023, links still falling; review **recency** beats volume, with
+profiles inactive 30+ days — no photos, no posts, no review replies — showing
+visible ranking drops; primary category remains the strongest individual
+factor; and Google's March 2026 core update made keyword-stuffed business names
+a leading cause of contractor suspensions. ([BrightLocal](https://www.brightlocal.com/learn/google-local-algorithm-and-ranking-factors/),
+[gbppromote](https://gbppromote.com/local-search-pack-ranking-factors/),
+[Scatterbranch](https://www.scatterbranchmarketing.com/blog/is-your-google-business-profile-ready-for-2026-what-changed-and-what-to-do-now))
+All of this points at the same profile sitting already ranked first.
+
+On conversion: the reported median home-service site converts 2–4% of visitors
+to a call or form, the top decile 8–12% on the same traffic; hero copy that
+names the outcome beats copy that names the company's virtues; phone visible
+above the fold, in the header on desktop, sticky and one-tap on mobile.
+([Garrett Handley](https://www.garretthandley.com/contractor-website-conversion-rate-in-2026-why-most-sites-convert-under-3-and-what-to-fix),
+[Instant Business Pro](https://instantbusinesspro.ai/post/contractor-website-getting-visitors-no-calls-conversion-fix))
+At 2 visitors a day none of this is measurable here, which is why it is ranked
+below the profile — but one piece of it is free and is recommendation 2.
+
+**Rejected, with reasons:**
+
+- **`AggregateRating` schema on the site, wiring in the Google review count.**
+  Search results recommend it for AI-answer eligibility. Rejected: Google's
+  structured-data policy does not accept self-serving review markup — ratings a
+  business publishes about itself on its own site are ineligible for rich
+  results, and this is exactly the kind of markup that draws a manual action. A
+  suspension or manual action costs more than any citation it could win. Not
+  worth it, and the honest version (real named review quotes as visible copy)
+  is already ledger T076.
+- **Specific `LocalBusiness` subtype, `Service` schema on service pages,
+  answer-first opening paragraphs.** All three came up in the AI-citation
+  research as the minimum setup. **All three are already shipped** — see the
+  code check below. Not recommended, and this is the second time the research
+  has handed back something the site already does.
+- **NAP directory citations (T009).** Held at demoted. Link and citation
+  signals are reported at their lowest pack weight yet, and this is the most
+  tedious item on the list.
+- **Anything requiring the scout or a page writer.** Blocked on credit; parked
+  rather than ranked, as before.
+
+### What I checked in the code before recommending anything
+
+- **`FAQPage` / answer-first / `Service` / specific business type:** already
+  live. `"@type": "RoofingContractor"` on **38 pages** (the specific
+  `HomeAndConstructionBusiness` subtype the research asks for, not generic
+  `LocalBusiness`), `Service` ×30, `Offer` ×30, `FAQPage` ×40, `Question`/`Answer`
+  ×132 each, `OpeningHoursSpecification`, `GeoCoordinates`, and a `sameAs`
+  pointing at the verified Business Profile — `techniques.py:781`.
+  `geo_answer_first_content_pass` reported "every ranking page already opens
+  with a direct answer" this morning. **Nothing to recommend here.**
+- **Mobile call mechanics:** already shipped and carefully. `.call-bar`
+  (`styles.css:229`) is a fixed bottom one-tap `tel:` bar, shown only at
+  ≤760px (`styles.css:262`), folded away while an input is focused so it cannot
+  cover the booking form (`:268`), with safe-area inset padding and a 359px
+  fallback that drops the sub-label. 8 `tel:` links on the homepage. **T023's
+  mobile half is done; I am not re-recommending it.**
+- **`improve_ctr` scope:** `techniques.py:1381` rewrites `<title>` and the meta
+  description only. It does **not** touch headings or body copy, so it is not
+  the technique that would fix recommendation 2 even if it were funded.
+- **`rebuild_sitemap`:** `techniques.py:860` compares the file byte-for-byte
+  either side of the run, so this morning's "sitemap.xml unchanged" was
+  truthful — the all-43 `lastmod` rewrite happened before 06:00, from
+  `seo/gen_sitemap.py`'s own cron, which takes `lastmod` from
+  `os.path.getmtime` (`gen_sitemap.py:31`).
+- **`deploy_growth.sh` scope:** `FILES` is `growth/*.py` plus `growth_daily.py`
+  and nothing else (`deploy_growth.sh:65`). **There is no deploy path for
+  `seo/*.py`** — a fix to `gen_sitemap.py` needs a manual `cp`. I would have
+  recommended it as an engine change without checking.
+- **`publish_state.sh` overwrites repo page edits.** It does
+  `cp -a $DOCROOT/index.html` and `rsync -a $DOCROOT/{areas,guides,services}/`
+  into the clone on every 06:05 run. **So any edit I make in this repo to
+  `index.html` or a page under those three directories is silently reverted
+  tomorrow morning**, which is why recommendation 2 is written as a docroot
+  patch for Divine and not as a commit from me. Engine code under `growth/` is
+  safe — publish only copies `snapshot.json` back and merges the journal.
+- **Ledger:** nothing in the 87 entries covers the homepage's heading wording.
+  T019 is snippets, T023 is call mechanics, T084 is speed. Recommendation 2 is
+  new.
+
+### The repo change I made today
+
+**`growth/keywords.py` — stop coverage being credited by text the page did not
+write.** Two small functions, both motivated by the failure traced in item 3:
+
+- **`_titles(html)`** returns the **first** `<title>` only, and is used by both
+  `check_coverage()` and `_headline_index()`. A page has one title; a second one
+  means something leaked, and matching against it credits one page's coverage
+  to another page's words. Deliberately not extended to `h1` — a second `h1` is
+  bad HTML, but it is still this page's own words.
+- **`_visible_text(html)`** is the pair to it, and it is the half that actually
+  closes the hole. The weak-coverage branch used to ask whether a term appeared
+  anywhere in the **raw file** — which includes the meta description, the
+  JSON-LD blocks, the inline analytics and consent scripts, and every tag
+  attribute. Dropping the leaked title from the *head* check alone did **not**
+  fix the 5-vs-6 case: `which` and `better` were still found in the raw file, in
+  the leaked title thirty lines above `<body>`, and the query stayed covered. I
+  only found that because the first version of my own test failed. Coverage now
+  asks the `<body>` with `script`/`style`/`template`/`noscript` and all tags
+  removed.
+
+**Measured effect on today's site: none.** I re-ran both the old and new logic
+over the 47 seeded queries that carry a declared target, against the real
+docroot mirror: **34 covered either way, zero flips.** The leaked title is
+already gone, and no seeded query was depending on script or schema text. The
+remaining ~175 queries carry targets written by `strengthen_pages` on the
+droplet, which I cannot read, so a small further fall in `covered` is possible
+after deploy; I found none where I could look, and any fall would be false
+credit leaving, exactly as in item 3.
+
+`growth/test_keywords.py` — five new tests, in a `LeakedTitleCoverageTest`
+class built from the real page: the leaked second title does not credit
+coverage; the page's own title still does; the fallback index ignores a leaked
+title too; a term present only in JSON-LD or a meta tag does not credit weak
+coverage; real body copy still does. **277 tests pass** across all twelve
+modules (272 before).
+
+**Nothing in this commit is live.** `growth/` on the droplet is unchanged; the
+deploy queue is now seven commits deep.
+
+### What I did *not* change, and why
+
+**The 16 tracked queries that cannot be covered no matter what the site says.**
+`_tokens()` (`keywords.py:166`) keeps only tokens longer than two characters, so
+`5`, `6`, `vs`, `pa`, `is`, `do` and `my` are all discarded before matching.
+Combined with `FALLBACK_MIN_TOKENS = 2`, that leaves **16 of the 130 uncovered
+queries with fewer than two distinguishing tokens**, so `_find_host()` can never
+credit them — and they include the most commercial queries in the universe:
+
+```
+gutter company york pa            -> key tokens: (none at all)
+best gutter company york pa       -> best
+gutter installers york pa         -> installers
+gutter contractors york pa        -> contractors
+seamless gutter installation york pa -> installation
+gutter repair near me york pa     -> repair
+gutter cleaning near me york pa   -> cleaning
+gutters hanover pa                -> hanover
+5 inch vs 6 inch gutters          -> inch
+seamless gutters vs sectional gutters -> sectional
+```
+
+`5 inch vs 6 inch gutters` is uncoverable while a page titled *"5 vs 6 Inch
+Gutters: Right Size for York County Homes"* sits live, and `seamless gutters vs
+sectional gutters` while `guides/seamless-vs-sectional-gutters.html` sits live.
+That means `strengthen_pages`' queue permanently holds queries whose pages
+already exist — precisely the waste `_find_host()` was written to stop.
+
+**I did not fix it, and the reason is a trap worth recording.** The obvious fix
+— keep digit tokens — is unsafe, because matching is *substring containment*
+against the heading string (`all(t in head for t in want)`), and `6` is a
+substring of **2026**, which appears in several live page titles. Keeping digits
+would hand out false coverage on every page whose title carries the year. The
+honest fix is to match on tokens rather than substrings, which is a larger
+change to the most load-bearing measurement in the engine, on a morning when I
+have already changed it once. Next run's job, deliberately left with the trap
+written down.
+
+### Recommendations
+
+Ranked. Five items. Nothing silently added or dropped.
+
+1. **Eric — the Business Profile sitting, this week. Fifteen minutes, free.
+   Day sixty-three.** Still first, and today's research only hardens the case:
+   GBP signals are ~32% of pack weight against on-page ~19%, a profile edit
+   shows in the pack within days, a page published today cannot rank before
+   December, and peak leaf drop in the lower Susquehanna Valley is late October
+   into November. This is the only lever that reaches this season.
+   **Zero-risk fields first, in this order, and stop before the last one:**
+   **(a) hours**, including a Saturday window — a profile reading closed loses
+   the click outright (T042); **(b) the itemised Services list**, naming gutter
+   cleaning, repair and guards explicitly — the one edit measured moving pack
+   position inside 24–72 hours (T022); **(c) service-area list filled in,
+   never shrunk** (T051); **(d) booking link** → free measurement (T050);
+   **(e) website URL** → `https://nemoseamlessgutter.com/?utm_source=gbp#book`;
+   **(f) a photo from a finished job** (T021); **(g) read off the review count
+   and star average** — nobody has verified the ledger's "13 reviews / 4.2
+   stars" in sixty-three days; **(h) Performance → Calls, last 28 days, and —
+   new today — the discovery-share and AI-attribution rows the 2026 Performance
+   tab now shows** (T049). **Then, separately and last, the primary category**
+   (T016): heaviest single field, highest variance, and careless category and
+   name edits are a leading cause of contractor suspensions under the March 2026
+   core update. Write down what it is set to before touching it. The business
+   name must read **"NEMO Seamless Gutter"** and nothing more.
+   **Correction to carry into this: skip the Owner Q&A half of T016 entirely.**
+   Google killed the Q&A feature; it does not exist to audit. The ledger entry
+   is stale and I cannot edit it from here.
+   *Checked:* `gsc.py:39` is `webmasters.readonly` and no profile or review code
+   path exists in `techniques.py` — the engine has no route to the profile.
+   **Eric's, and only Eric's.** *How I would know it worked:* `local_visitors`
+   above its current 3-in-46-days, and a non-zero `call_taps`.
+
+2. **Divine — the homepage does not contain the words its own tracked queries
+   are made of. One editorial patch, free, no API credit, and it fixes the goal
+   metric and the conversion problem with the same edit.** Counted in
+   `index.html` this morning, case-insensitive, whole file:
+   **`company` 0 · `companies` 0 · `installer` 0 · `installers` 0 ·
+   `contractors` 0 · `best` 0 · `cleaners` 0.** `contractor` appears exactly
+   once, at `index.html:158`, as `"@type": "RoofingContractor"` inside the
+   JSON-LD — i.e. nowhere a reader or a heading can see it. The `<h1>` is
+   **"Seamless Gutters. Done Right."**, a slogan; the `<title>` is "Gutter
+   Replacement & Cleaning York PA".
+   Four tracked queries have `/` as their declared target and are uncovered for
+   exactly this reason: `gutter company york pa` (fails needing `company` in a
+   heading), `best gutter company york pa`, `gutter installers york pa`,
+   `gutter contractors york pa`. The 2026 conversion research says the same
+   thing from the other direction: hero copy that names the outcome beats copy
+   that names the company's virtues.
+   *The action:* patch the docroot `index.html` so the `h1` and the first `h2`
+   carry the nouns and an outcome — e.g. `h1` **"York County's Seamless Gutter
+   Company — Gutters That Actually Carry Water"** and an `h2` naming
+   **gutter installers / gutter contractors / gutter cleaners** across York
+   County, keeping the existing sub-copy. *Not a commit from me:*
+   `publish_state.sh` does `cp -a $DOCROOT/index.html` into the clone every
+   morning, so a repo-side edit to `index.html` is reverted by tomorrow's
+   06:05 publish. It has to be patched on the docroot and copied back, the same
+   route `ce84002` used. *How I would know it worked:* `covered` rises by up to
+   4 and `coverage_pct` with it; downstream, movement on `gutter company york
+   pa` in `gsc`. *Effort:* one edit, minutes. *Risk:* it is the money page —
+   keep the existing CTA, booking anchor and `call-bar` untouched.
+
+3. **Divine — deploy `growth/`. Day thirty-one, queue now seven commits deep.**
+   You have proved the route works; this is the other queue.
+   ```
+   git -C /root/nemo-repo fetch origin main && git -C /root/nemo-repo reset --hard origin/main
+   cd /var/www/nemo-seamless-gutter
+   bash    /root/nemo-repo/deploy/deploy_growth.sh                 # report
+   python3 /root/nemo-repo/deploy/repair_letter_paragraphs.py      # report
+   python3 /root/nemo-repo/deploy/repair_placeholder_paragraphs.py # report
+   python3 /root/nemo-repo/deploy/retire_out_of_area.py            # report
+   ```
+   then re-run each with `--apply` **except** `retire_out_of_area.py`, which
+   waits on item 4. *What it buys, none of it needing API credit:* Eric's
+   morning email leads with three profile rows instead of nine engineering ones;
+   13 page edits give 8 orphaned area pages 6 inbound links each, two of them
+   tracked towns at `top3` 0; `works` drops 7 → 2 so the scoreboard stops
+   claiming successes it has not earned; `keywords.ranked` and
+   `gsc.tracked`/`gsc.off_area` name *which* queries the goal metric lost;
+   `traffic.log_visitors` restores the beacon-vs-log cross-check; the crawler
+   series shows whether GPTBot and friends read the site at all; 1,021
+   single-letter paragraphs come off a live service page; the Dover placeholder
+   comes off a live town page; and today's coverage guard goes in. *How I would
+   know:* tomorrow's snapshot carries `keywords.ranked` and
+   `traffic.log_visitors`, `internal_links` reports 13 pages rather than 0,
+   `scoreboard.works` has two entries.
+
+4. **Eric — one question, unanswered for five weeks: will you drive York
+   Springs?** ~25 minutes from York city. If yes, keep
+   `guides/5-inch-gutter-service-york-springs-pa.html`, add York Springs to the
+   profile service area, drop it from `OUT_OF_AREA` in `growth/techniques.py`.
+   If no, run `retire_out_of_area.py --apply`. Either answer is fine; what
+   cannot stand is today's state, where an unreviewed page claims Adams County
+   while its breadcrumb says York County. **Item 3 is blocked on this for that
+   one script.**
+
+5. **Eric — ask every finished customer for a Google review; Divine — fund the
+   API and restore the watchdog's email.** Reviews are ~20% of pack weight and
+   recency now beats volume, with profiles quiet for 30+ days reported losing
+   position; the ledger records 13 reviews / 4.2 stars against a credibility
+   floor of 50+ at 4.5+. *The legal line, not optional:* ask **every** customer,
+   not the happy ones; no discount, gift or prize draw; no filtering by expected
+   rating. Gating and incentives are the fastest route to a suspension, which
+   costs more than everything in this ledger earns. On the developer half:
+   append `--email divinejdavis@gmail.com` to the watchdog line at
+`deploy/cron-nemo-growth:69` — **not :77, which yesterday's entry cited; the file
+is 69 lines long and the 11:00 watchdog cron is its last line** — it
+   sends nothing when the engine is healthy, and it is the only thing that
+   closes the week-wide gap between a Monday failure and the Friday mail that
+   reports it. **And fund the account with auto-reload and a monthly cap — but
+   without yesterday's justification for deprioritising it, which item 1 above
+   retracts.** Test 27 returned no verdict; the twenty-one-day outage's cost is
+   unmeasured, not measured-and-small.
+
+*Considered and not added:* a BLOCKED line in Eric's daily email. Yesterday
+this was held back on the grounds that Test 27 would show credit "barely
+matters". Test 27 showed nothing, so that reason is gone — but the decision
+stands on the surviving half of the argument: a red banner about API credit
+points the owner at the one thing he cannot fix, on the morning the card
+finally leads with the three things he can. It goes in Divine's watchdog mail
+(item 5), where it belongs. *Also unchanged:* `top3 / ranked_known` as the
+published headline — correct, recommended eleven times, still behind the deploy
+queue, stated at the top of this entry instead. T031/T036/T040 seasonal plays —
+parked, they need generated copy.
+
+### Reasoning and uncertainties
+
+The thing I got wrong yesterday is the thing I most want recorded. Test 27 was
+pre-registered with three regions, I spent four entries narrating the arithmetic
+toward the falsification bar, and then on day four wrote that the claim "is
+going to falsify" while computing in the same paragraph that it would miss the
+bar. Missing the falsification bar is not falsification. The failure was not
+arithmetic, it was wanting a verdict from a test that was built to be able to
+return none — and the wrong verdict then propagated into two real decisions
+(demoting credit, keeping the banner out of Eric's inbox). Both are corrected
+above. The design lesson is separate and also mine: a **28-day rolling** click
+total cannot resolve a 21-day outage nested inside it, because the window and
+the intervention overlap. I did not re-register the test in the same shape and I
+will not.
+
+The second thing worth recording is that this morning's most useful output came
+from following an anomaly rather than from the research step. `covered` fell
+two, which looked like bad news; chasing which two queries led to a leaked
+`<title>`, which led to Divine's commit, which overturned a premise this journal
+had been repeating for a month. The research step, by contrast, returned three
+recommendations the site had already shipped — the second morning running. I am
+starting to think the research step is the wrong shape for a site this mature
+and that reading the diff and the code is worth more; I am not changing the
+process on one data point, but I am noting it.
+
+What I hold loosely: whether recommendation 2 is worth its rank. It is free and
+it fixes four tracked queries, but the pack is where these queries are decided
+and the homepage's `h1` is an organic-results lever. If Eric does item 1 and the
+pack moves, item 2 will look like a rounding error. I ranked it second anyway
+because it costs one edit and because a `RoofingContractor` whose homepage never
+says "gutter company" is a defect regardless of who is looking.
+
+What would change my mind: a non-zero `call_taps`, which would tell me the
+conversion path works and the problem is purely volume; any `top3` cell moving
+off 0 without a deploy, which would falsify Test 28 early and mean the slide was
+a window artifact; or `covered` falling by more than a couple after item 3's
+deploy, which would mean today's guard was removing more false credit than the
+47 seeded queries let me see.

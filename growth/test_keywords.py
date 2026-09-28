@@ -202,5 +202,93 @@ class UnassignedTargetCoverageTest(unittest.TestCase):
         self.assertEqual(spy.call_count, 1)
 
 
+class LeakedTitleCoverageTest(unittest.TestCase):
+    """A title that belongs to another page must not credit coverage.
+
+    Added 2026-09-28 after the real thing. `seo/gen_article.py` copied a source
+    guide's whole head block — its <title> included — into every article it
+    generated, so /guides/5-vs-6-inch-gutters-right-size-for-york-county-homes.html
+    shipped carrying "Seamless vs. Sectional Gutters: Which Is Better?" as a
+    second title. `check_coverage` matched against every title on the page and
+    credited two "5 inch vs 6 inch gutters which ..." queries to it on the
+    strength of the word "which", which appears only in the borrowed heading.
+    Both sat `covered` until the leak was stripped on 2026-09-27 (ce84002).
+    """
+
+    def setUp(self):
+        self.root = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.root)
+        os.makedirs(os.path.join(self.root, "guides"))
+
+    def _write(self, rel, head_html, h1):
+        with open(os.path.join(self.root, rel), "w") as f:
+            f.write(f"<html><head>{head_html}</head>"
+                    f"<body><h1>{h1}</h1><p>Free estimates in York County.</p>"
+                    f"</body></html>")
+
+    def _check(self, kws):
+        with mock.patch.object(K, "load", return_value=kws), \
+             mock.patch.object(K, "save"), \
+             mock.patch.object(K.ledger, "today", return_value="2026-09-28"):
+            return K.check_coverage(self.root)[0]
+
+    # The page as it shipped: its own title, plus the one gen_article.py leaked.
+    LEAKED = ("<title>5 vs 6 Inch Gutters: Right Size for York County Homes"
+              " | NEMO Seamless Gutter</title>"
+              "<title>Seamless vs. Sectional Gutters: Which Is Better?"
+              " | NEMO Seamless Gutter</title>")
+    CLEAN = ("<title>5 vs 6 Inch Gutters: Right Size for York County Homes"
+             " | NEMO Seamless Gutter</title>")
+    H1 = "5 vs 6 Inch Gutters: Right Size for York County Homes"
+    REL = "guides/5-vs-6-inch-gutters-right-size-for-york-county-homes.html"
+
+    def test_a_leaked_second_title_does_not_credit_coverage(self):
+        self._write(self.REL, self.LEAKED, self.H1)
+        got = self._check([_kw("5 inch vs 6 inch gutters which is better",
+                               covered=False, target=f"/{self.REL}")])[0]
+        self.assertFalse(got["covered"])
+
+    def test_the_pages_own_title_still_counts(self):
+        self._write(self.REL, self.CLEAN, self.H1)
+        got = self._check([_kw("6 inch gutters right size york",
+                               covered=False, target=f"/{self.REL}")])[0]
+        self.assertTrue(got["covered"])
+
+    def test_the_fallback_index_ignores_a_leaked_title_too(self):
+        # Unassigned target, so coverage goes through _find_host(): the
+        # borrowed heading must not make this page the host either.
+        self._write(self.REL, self.LEAKED, self.H1)
+        index = K._headline_index(self.root)
+        self.assertNotIn("sectional", index[f"/{self.REL}"])
+        self.assertIn("inch", index[f"/{self.REL}"])
+
+    def test_a_term_only_in_json_ld_does_not_credit_weak_coverage(self):
+        # The old check asked whether the term was anywhere in the file, so a
+        # word appearing only inside a schema blob or an inline script counted
+        # as body copy. It is not something a reader can read.
+        self._write(self.REL,
+                    self.CLEAN + '<meta name="description" content="sectional">'
+                    '<script type="application/ld+json">'
+                    '{"name": "which is better sectional"}</script>',
+                    self.H1)
+        got = self._check([_kw("5 inch vs 6 inch gutters which is better",
+                               covered=False, target=f"/{self.REL}")])[0]
+        self.assertFalse(got["covered"])
+
+    def test_real_body_copy_still_counts_as_weak_coverage(self):
+        self._write(self.REL, self.CLEAN, self.H1)
+        path = os.path.join(self.root, self.REL)
+        html = open(path).read().replace(
+            "<p>Free estimates in York County.</p>",
+            "<p>Which is better for a York County roof? Usually 6 inch.</p>")
+        open(path, "w").write(html)
+        got = self._check([_kw("5 inch vs 6 inch gutters which is better",
+                               covered=False, target=f"/{self.REL}")])[0]
+        self.assertTrue(got["covered"])
+        self.assertIn("weak", got["coverage_detail"])
+
+
+
+
 if __name__ == "__main__":
     unittest.main()

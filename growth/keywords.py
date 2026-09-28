@@ -202,6 +202,57 @@ def _page_text(docroot, target):
 FALLBACK_MIN_TOKENS = 2
 
 
+def _titles(html):
+    """The page's own <title>, and only the first one.
+
+    A page has exactly one title. Two means something leaked, and on
+    2026-09-27 that cost the goal metric two queries' worth of honesty:
+    `seo/gen_article.py` copied everything from a source guide's Google tag
+    to `</head>` when it generated a new article, which carried that guide's
+    *title* along with the tag block. `5-vs-6-inch-gutters-...html` therefore
+    shipped with a second title reading "Seamless vs. Sectional Gutters:
+    Which Is Better?", and `check_coverage` — matching against every title it
+    found — credited "5 inch vs 6 inch gutters which do i need" and
+    "...which is better" to that page on the strength of a heading belonging
+    to a different page. Both read `covered` for weeks. Divine fixed the
+    generator and stripped the leaked block on 2026-09-27 (ce84002) and
+    `covered` fell 94 -> 92 the next morning: the drop was the metric getting
+    more honest, not the site getting worse.
+
+    The generator bug is fixed. This is the guard that stops the next one
+    being invisible: coverage is a claim about what a page is *about*, and a
+    borrowed title is not that. Deliberately not extended to h1 — a second h1
+    is bad HTML but it is still this page's own words.
+    """
+    m = re.search(r"<title[^>]*>(.*?)</title>", html, re.S)
+    return [m.group(1)] if m else []
+
+
+def _visible_text(html):
+    """What the page actually says to a reader, with the machinery removed.
+
+    The weak-coverage branch of check_coverage() used to ask whether a term
+    appeared anywhere in the raw file, which is not the same question. A raw
+    file also contains the meta description, the JSON-LD blocks, the inline
+    analytics and consent scripts, every tag attribute, and — until
+    2026-09-27 — a whole leaked <title> belonging to another page. On that
+    file, "5 inch vs 6 inch gutters which is better" was credited weak
+    coverage because "which" and "better" appeared in the borrowed title,
+    thirty lines above the <body>. Dropping the leaked title from the head
+    check alone did not fix it: the raw-file check let it back in.
+
+    So this is the pair to _titles(). Coverage means the page says the thing.
+    Body text, scripts and templates removed, tags removed with their
+    attributes — a term surviving in here is a term a reader could have read.
+    """
+    m = re.search(r"<body[^>]*>(.*)</body>", html, re.S)
+    body = m.group(1) if m else html
+    body = re.sub(r"<(script|style|template|noscript)\b[^>]*>.*?</\1>",
+                  " ", body, flags=re.S)
+    body = re.sub(r"<[^>]+>", " ", body)
+    return re.sub(r"\s+", " ", body)
+
+
 def _headline_index(docroot):
     """{relative path: title + h1 text} for every page on the site.
 
@@ -228,7 +279,7 @@ def _headline_index(docroot):
             html = _page_text(docroot, rel)
             if html is None:
                 continue
-            heads = re.findall(r"<title[^>]*>(.*?)</title>", html, re.S)
+            heads = _titles(html)
             heads += re.findall(r"<h1[^>]*>(.*?)</h1>", html, re.S)
             index[rel] = re.sub(r"<[^>]+>", " ", " ".join(heads))
     return index
@@ -298,7 +349,7 @@ def check_coverage(docroot):
                 covered = True
                 detail = f"targeted by title/h1 of {host} (unassigned target)"
         if html is not None:
-            heads = re.findall(r"<title[^>]*>(.*?)</title>", html, re.S)
+            heads = _titles(html)
             heads += re.findall(r"<h1[^>]*>(.*?)</h1>", html, re.S)
             heads += re.findall(r"<h2[^>]*>(.*?)</h2>", html, re.S)
             head = re.sub(r"<[^>]+>", " ", " ".join(heads))
@@ -307,7 +358,8 @@ def check_coverage(docroot):
             # query from every other gutter query on the site.
             key_toks = [t for t in toks if t not in GENERIC]
             miss_head = [t for t in key_toks if t not in head]
-            miss_body = [t for t in key_toks if t not in html]
+            visible = _visible_text(html)
+            miss_body = [t for t in key_toks if t not in visible]
             if not key_toks:
                 # A purely generic query ("seamless gutters york pa") — the
                 # homepage genuinely is the answer, so require the generic
