@@ -163,19 +163,57 @@ def add(query, town, intent, target="", source="scout", note=""):
 
 
 def _tokens(s):
-    return [t for t in re.split(r"[^a-z0-9]+", (s or "").lower()) if len(t) > 2]
+    """Every alphanumeric token, however short.
+
+    This used to drop anything of two characters or fewer, which was a cheap
+    way of throwing out "the", "in" and "pa" — and it threw out "5", "6" and
+    "vs" with them. Measured on 2026-09-29 against the live tracked universe,
+    that cutoff left 16 of the 131 uncovered queries with fewer than
+    FALLBACK_MIN_TOKENS distinguishing tokens, so _find_host() could never
+    credit them no matter what the site said. Two of those queries had pages
+    live and titled for them:
+
+        5 inch vs 6 inch gutters        -> guides/5-vs-6-inch-gutters-…
+        seamless gutters vs sectional   -> guides/seamless-vs-sectional-gutters
+
+    strengthen_pages therefore kept both in its build queue, which is exactly
+    the waste _find_host() exists to stop. Short words that really are noise
+    are now named in STOP and GENERIC, where the reason for dropping them is
+    written down, instead of being silently removed by a length.
+    """
+    return [t for t in re.split(r"[^a-z0-9]+", (s or "").lower()) if t]
 
 
 STOP = {"the", "and", "for", "how", "what", "out", "much", "can", "you", "your",
         "are", "that", "does", "should", "need", "near", "not", "with", "when",
-        "why", "have", "will", "per"}
+        "why", "have", "will", "per",
+        # Two characters and under. These were removed by the old length cutoff
+        # in _tokens(); they are listed explicitly so that lifting the cutoff
+        # does not re-admit them. "vs" is deliberately absent — it is the whole
+        # distinguishing content of a comparison query.
+        "a", "an", "as", "at", "be", "by", "do", "i", "if", "in", "is", "it",
+        "my", "me", "no", "of", "on", "or", "so", "to", "up", "us", "we"}
 
 # Words that appear in the header, footer, title or nav of every page on this
 # site. They carry no targeting signal: if "gutter" and "york" were enough to
 # call a query covered, the homepage would "cover" all 47 of them and the gap
 # list — which is the build queue — would always come back empty.
+#
+# Membership is a claim about this site, and it has to be checked against it.
+# "company" sat here until 2026-09-29 and was never true: counted over all 44
+# live pages, it appears in exactly one title or h1 —
+# /guides/best-gutter-company-york-county-pa.html, which money_pages published
+# on 2026-07-28 for precisely that query. Calling it generic discarded the one
+# token that told the two apart, left "best gutter company york pa" with a
+# single distinguishing token, and so kept a query in strengthen_pages' build
+# queue for two months while the page written for it sat live.
 GENERIC = {"gutter", "gutters", "york", "pennsylvania", "seamless", "nemo",
-           "service", "services", "home", "house", "company"}
+           "service", "services", "home", "house",
+           # The state abbreviations. Every page on this site is in
+           # Pennsylvania, so "pa" distinguishes nothing — it was removed by
+           # _tokens()' old length cutoff and belongs here now that short
+           # tokens survive.
+           "pa", "penna"}
 
 
 def _page_text(docroot, target):
@@ -195,6 +233,43 @@ def _page_text(docroot, target):
             return f.read(300_000).lower()
     except Exception:
         return None
+
+
+def _word_set(text):
+    """The tokens of a heading or a body, for matching query tokens against."""
+    return {t for t in re.split(r"[^a-z0-9]+", (text or "").lower()) if t}
+
+
+# A short token has to match a whole word; a longer one may match the start of
+# one, so "installer" still matches "installers" and "clean" still matches
+# "cleaning". Four is where that stops being a plural rule and starts being a
+# coincidence.
+PREFIX_MIN = 4
+
+
+def _has(words, token):
+    """Does this set of words carry this query token, on word boundaries?
+
+    Matching used to be raw substring containment against the joined heading
+    string, which was safe only because _tokens() threw away everything of two
+    characters or fewer. Now that "5", "6" and "vs" survive, substring matching
+    is a bug waiting to fire: "6" is a substring of "2026", which appears in
+    several live page titles, so every page carrying the year would hand out
+    coverage for every 6-inch query on the site. That is the same false-credit
+    failure as the leaked <title> fixed on 2026-09-28, arriving by a different
+    door. Match words, not characters.
+    """
+    if token in words:
+        return True
+    if len(token) >= PREFIX_MIN:
+        return any(w.startswith(token) for w in words)
+    return False
+
+
+def _missing(text, tokens):
+    """The query tokens this text does not carry."""
+    words = _word_set(text)
+    return [t for t in tokens if not _has(words, t)]
 
 
 # How many distinguishing tokens a query must share with a page's title/h1
@@ -317,7 +392,7 @@ def _find_host(key_toks, index):
     if len(want) < FALLBACK_MIN_TOKENS:
         return None
     for rel, head in sorted(index.items()):
-        if all(t in head for t in want):
+        if not _missing(head, want):
             return rel
     return None
 
@@ -357,14 +432,14 @@ def check_coverage(docroot):
             # What actually decides coverage: the terms that distinguish this
             # query from every other gutter query on the site.
             key_toks = [t for t in toks if t not in GENERIC]
-            miss_head = [t for t in key_toks if t not in head]
+            miss_head = _missing(head, key_toks)
             visible = _visible_text(html)
-            miss_body = [t for t in key_toks if t not in visible]
+            miss_body = _missing(visible, key_toks)
             if not key_toks:
                 # A purely generic query ("seamless gutters york pa") — the
                 # homepage genuinely is the answer, so require the generic
                 # terms in a heading and leave it at that.
-                covered = all(t in head for t in toks)
+                covered = not _missing(head, toks)
                 detail = ("targeted by title/heading" if covered
                           else "generic query, no heading carries it")
             elif not miss_head:

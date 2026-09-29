@@ -289,6 +289,107 @@ class LeakedTitleCoverageTest(unittest.TestCase):
 
 
 
+class WordBoundaryMatchingTest(unittest.TestCase):
+    """Short tokens survive tokenisation, so matching must respect words.
+
+    Added 2026-09-29. `_tokens()` used to discard every token of two characters
+    or fewer, which quietly made "5 inch vs 6 inch gutters" and "seamless
+    gutters vs sectional gutters" permanently uncoverable — both had pages live
+    and titled for them, and both stayed in `strengthen_pages`' build queue.
+    Lifting the cutoff on its own would have been worse than the bug: matching
+    was raw substring containment, and "6" is a substring of "2026", so every
+    page whose title carries the year would have handed out coverage for every
+    6-inch query on the site. The cutoff is gone and matching is on words.
+    """
+
+    def setUp(self):
+        self.root = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.root)
+        os.makedirs(os.path.join(self.root, "guides"))
+
+    def _write(self, rel, title, h1, body="Free estimates in York County."):
+        with open(os.path.join(self.root, rel), "w") as f:
+            f.write(f"<html><head><title>{title}</title></head>"
+                    f"<body><h1>{h1}</h1><p>{body}</p></body></html>")
+
+    def _check(self, kws):
+        with mock.patch.object(K, "load", return_value=kws), \
+             mock.patch.object(K, "save"), \
+             mock.patch.object(K.ledger, "today", return_value="2026-09-29"):
+            return K.check_coverage(self.root)[0]
+
+    SIZE = "5 vs 6 Inch Gutters: Right Size for York County Homes"
+    SIZE_REL = "guides/5-vs-6-inch-gutters-right-size-for-york-county-homes.html"
+
+    def test_a_digit_token_survives_tokenisation(self):
+        self.assertIn("5", K._tokens("5 inch vs 6 inch gutters"))
+        self.assertIn("6", K._tokens("5 inch vs 6 inch gutters"))
+
+    def test_vs_is_kept_because_it_is_the_whole_comparison(self):
+        self.assertNotIn("vs", K.STOP)
+        self.assertIn("vs", K._tokens("seamless gutters vs sectional gutters"))
+
+    def test_the_state_abbreviation_distinguishes_nothing(self):
+        self.assertIn("pa", K.GENERIC)
+
+    def test_a_digit_does_not_match_inside_a_year(self):
+        self.assertFalse(K._has({"2026", "gutters"}, "6"))
+        self.assertFalse(K._has({"2025", "prices"}, "5"))
+
+    def test_a_digit_matches_the_same_digit_as_a_word(self):
+        self.assertTrue(K._has({"6", "inch", "gutters"}, "6"))
+
+    def test_a_longer_token_still_matches_a_plural(self):
+        self.assertTrue(K._has({"installers"}, "installer"))
+        self.assertTrue(K._has({"cleaning"}, "clean"))
+
+    def test_a_short_token_must_match_a_whole_word(self):
+        self.assertFalse(K._has({"versus"}, "vs"))
+        self.assertTrue(K._has({"vs", "sectional"}, "vs"))
+
+    def test_the_size_page_now_hosts_its_own_query(self):
+        self._write(self.SIZE_REL, self.SIZE, self.SIZE)
+        index = K._headline_index(self.root)
+        host = K._find_host(["5", "inch", "vs", "6"], index)
+        self.assertEqual(host, f"/{self.SIZE_REL}")
+
+    def test_a_page_titled_for_the_year_does_not_host_a_6_inch_query(self):
+        self._write("guides/gutter-cost-2026.html",
+                    "Gutter Cost in York County 2026",
+                    "Gutter Cost in York County 2026")
+        index = K._headline_index(self.root)
+        self.assertIsNone(K._find_host(["6", "inch"], index))
+
+    def test_company_is_not_generic_and_hosts_the_page_written_for_it(self):
+        """money_pages published the page on 2026-07-28; the query stayed in
+        the build queue until 2026-09-29 because "company" sat in GENERIC."""
+        self.assertNotIn("company", K.GENERIC)
+        self._write("guides/best-gutter-company-york-county-pa.html",
+                    "Best Gutter Company in York County PA | NEMO Seamless",
+                    "The Best Gutter Company in York County, PA")
+        index = K._headline_index(self.root)
+        self.assertEqual(
+            K._find_host(["best", "company"], index),
+            "/guides/best-gutter-company-york-county-pa.html")
+
+    def test_company_alone_still_cannot_host_a_query(self):
+        self._write("guides/best-gutter-company-york-county-pa.html",
+                    "Best Gutter Company in York County PA",
+                    "The Best Gutter Company in York County, PA")
+        index = K._headline_index(self.root)
+        self.assertIsNone(K._find_host(["company"], index))
+
+    def test_coverage_of_an_assigned_page_uses_words_not_characters(self):
+        self._write("guides/gutter-cost-2026.html",
+                    "Gutter Cost in York County 2026",
+                    "Gutter Cost in York County 2026",
+                    body="Prices held steady through 2026.")
+        got = self._check([_kw("6 inch gutter cost york pa", covered=False,
+                               target="/guides/gutter-cost-2026.html")])[0]
+        self.assertFalse(got["covered"])
+
+
+
 
 if __name__ == "__main__":
     unittest.main()
