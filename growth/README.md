@@ -116,6 +116,36 @@ guides, and a stray `git reset` or `git clean` in there would be destructive.
 Pushing uses a write-scoped deploy key (`/root/.ssh/nemo_deploy`, SSH host alias
 `github-nemo`).
 
+## The bridge only runs one way
+
+`publish_state.sh` copies **droplet → repo**, and only these paths:
+`growth/snapshot.json`, `growth/JOURNAL.md`, `sitemap.xml`, `index.html`, and
+`areas/ guides/ services/`. Nothing copies the other way, ever. Two consequences
+that have each cost weeks, so they are written down here rather than rediscovered:
+
+* **Engine code committed here is not running.** The docroot is not a git
+  checkout, so a fix to `growth/*.py` or `growth_daily.py` sits in the
+  repository doing nothing until a human copies it across. Surviving the 06:00
+  publish is not the same as being live. Check, and then close the gap:
+
+      git -C /root/nemo-repo fetch origin main
+      git -C /root/nemo-repo reset --hard origin/main
+      bash /root/nemo-repo/deploy/deploy_growth.sh           # read-only report
+      bash /root/nemo-repo/deploy/deploy_growth.sh --apply   # copy the stale ones
+
+  The report hashes each file and prints `ok` / `STALE` / `MISSING`. It is safe
+  to run at any time and is the answer to "is my fix live?".
+
+* **Page edits committed here are reverted.** `index.html`, `sitemap.xml` and
+  anything under `areas/ guides/ services/` are overwritten from the docroot at
+  the next 06:05 publish. To change live page copy, edit it in the docroot; a
+  repo-side edit looks like a fix for one day and then silently disappears.
+
+**The self-check:** a current `snapshot.py` emits a top-level `code_version`
+fingerprint block. If the published `snapshot.json` has no `code_version`, the
+droplet is running stale engine code and the deploy above has not been run —
+which is also why that diagnostic cannot report its own absence.
+
 ## Running it by hand
 
 Every command takes `--dry-run`, which makes the whole thing read-only:
