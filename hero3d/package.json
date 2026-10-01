@@ -1,0 +1,12 @@
+{
+  "name": "nemo-hero3d",
+  "private": true,
+  "description": "Source for the homepage's 3D gutter hero. Build: npm run build -> ../assets/hero3d.js",
+  "scripts": {
+    "build": "esbuild hero3d.src.js --bundle --minify --format=esm --target=es2019 --legal-comments=none --outfile=../assets/hero3d.js"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "three": "0.169.0"
+  }
+}

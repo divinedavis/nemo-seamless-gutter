@@ -242,3 +242,12 @@ it with:
 ssh root@104.236.120.144 'cd /var/www/nemo-seamless-gutter/server && node jobs/confirm_run.js --dry-run'
 tail -f /var/log/nemo-confirm.log
 ```
+
+## Homepage 3D hero
+
+The hero's looping gutter scene (tear off → measure → form → hang → protect → flow)
+is `hero3d/hero3d.src.js`, bundled with three.js into `assets/hero3d.js` — self-hosted
+because the CSP is `script-src 'self'`. Rebuild with `cd hero3d && npm install && npm run build`,
+then scp `assets/hero3d.js` up and bump its `?v=` in `index.html`. No WebGL keeps the CSS
+gradient; reduced motion gets one still frame. `/?hero3d=<seconds>` freezes the loop at that
+time for screenshots.
