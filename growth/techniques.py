@@ -808,6 +808,19 @@ def local_schema(ctx):
         # answers, so a Saturday search that finds the business open reaches
         # someone. Still unconfirmed against the Business Profile — see the
         # hours item in the growth backlog.
+        #
+        # WARNING, before anyone acts on that backlog item (T042,
+        # open_now_hours_and_saturday_estimate_window): its own note proposes
+        # "Mon-Fri 7am-8pm, Sat 8am-1pm", which is NOT what this block
+        # publishes. Setting the profile to T042's numbers would leave the
+        # Business Profile and the only openingHoursSpecification on the site
+        # disagreeing on both the weekday close and the Saturday close. As of
+        # 2026-09-23 Google auto-applies a user-suggested profile edit after
+        # four days when "other publicly available information, such as your
+        # business website" corroborates it, so this block is not a passive
+        # copy of the hours — it is evidence Google reads back. Whichever set
+        # is true, make all three agree (profile, this block, T042's note) and
+        # change them in one pass; do not edit one alone.
         "openingHoursSpecification": [
             {"@type": "OpeningHoursSpecification",
              "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
