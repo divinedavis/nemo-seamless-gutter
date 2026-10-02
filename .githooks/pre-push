@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Runs before every `git push` from this checkout (installed by
+# scripts/install_hooks.sh). Two gates, a few seconds total:
+#   1. gitleaks over exactly the commits being pushed — no credential leaves
+#      the Mac (the repo is PUBLIC; server/.env, seo/.env and the growth keys
+#      live next to the code on the droplet);
+#   2. scripts/test.sh (growth engine + site checks + booking API).
+# Emergency bypass: git push --no-verify (say why in the next commit). CI
+# (.github/workflows/ci.yml) runs both again on every push regardless.
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+ZERO=0000000000000000000000000000000000000000
+GITLEAKS=$(command -v gitleaks || echo /opt/homebrew/bin/gitleaks)
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ "$local_sha" = "$ZERO" ] && continue            # deleting a branch
+  if [ "$remote_sha" = "$ZERO" ]; then range="$local_sha --not --remotes"; else range="$remote_sha..$local_sha"; fi
+  if [ -x "$GITLEAKS" ]; then
+    "$GITLEAKS" git --no-banner --redact --log-opts="$range" >/dev/null 2>&1 || {
+      echo "pre-push: gitleaks found a secret in $range — run: gitleaks git --log-opts=\"$range\" -v" >&2; exit 1; }
+  else
+    echo "pre-push: gitleaks not installed (brew install gitleaks) — secrets scan skipped" >&2
+  fi
+done
+scripts/test.sh >/dev/null 2>&1 || { echo "pre-push: tests failed — run: scripts/test.sh" >&2; exit 1; }
+echo "pre-push: secrets scan + tests passed"

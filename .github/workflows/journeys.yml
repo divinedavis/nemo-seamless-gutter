@@ -1,0 +1,42 @@
+# The booking-widget browser journey (tests/booking_journey.py) — desktop
+# Chromium and iPhone WebKit — whenever the widget, the page it lives on, or
+# the API behind it changes. The page is this commit's index.html served
+# locally; the API is server/server.js on a temp SQLite file with email,
+# calendars and weather forced off, and the browser aborts any POST to
+# /api/book. It never books anything, never emails anyone, and uses no secrets.
+name: journeys
+on:
+  push:
+    paths:
+      - 'index.html'
+      - 'booking.js'
+      - 'booking.css'
+      - 'styles.css'
+      - 'script.js'
+      - 'server/**'
+      - 'tests/booking_journey.py'
+      - '.github/workflows/journeys.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: journeys-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  booking:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - run: npm ci --prefix server --no-audit --no-fund
+      - run: pip install -q playwright==1.62.0
+      - run: python -m playwright install --with-deps chromium webkit
+      - run: python tests/booking_journey.py
