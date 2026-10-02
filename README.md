@@ -210,25 +210,24 @@ Ownership the deploy must preserve: code root-owned and read-only to the app;
 `server/` is `root:nemo 1770` (sticky, so the app can create sqlite `-wal`/`-shm`
 files but not replace code); `bookings.sqlite*` belong to `nemo`; `server/.env` is
 `root:nemo 0640`. `rsync -a` copies this Mac's uid 501 and resets `server/`'s mode,
-so the api step below re-applies it. The app can no longer rewrite `.env`, so
+so `scripts/deploy_api.sh` re-applies it (without ever chowning the live sqlite files). The app can no longer rewrite `.env`, so
 before sending a `setup.html?t=` link run `chown nemo server/.env`, and put it back
 to `root:nemo 0640` afterwards. The booking crons run as `nemo` too.
 
 ```bash
-# static
-rsync -avz index.html styles.css script.js booking.css booking.js setup.html \
-  robots.txt sitemap.xml site.webmanifest assets/ \
-  root@104.236.120.144:/var/www/nemo-seamless-gutter/
-rsync -avz services/ root@104.236.120.144:/var/www/nemo-seamless-gutter/services/
-rsync -avz guides/   root@104.236.120.144:/var/www/nemo-seamless-gutter/guides/
-# api
-rsync -avz --exclude node_modules --exclude .env --exclude '*.sqlite*' --exclude data \
-  server/ root@104.236.120.144:/var/www/nemo-seamless-gutter/server/
-ssh root@104.236.120.144 'cd /var/www/nemo-seamless-gutter/server && npm install --omit=dev && \
-  chown -R root:root . && chmod -R go-w . && chown root:nemo . && chmod 1770 . && \
-  chown nemo:nemo bookings.sqlite* && chown root:nemo .env && chmod 0640 .env && \
-  systemctl restart nemo-seamless-gutter'
+scripts/deploy_web.sh     # pages, CSS/JS, assets  (--dry-run prints the plan)
+scripts/deploy_api.sh     # server/*.js + jobs, npm ci only if the lockfile changed
+scripts/rollback.sh web   # list snapshots; scripts/rollback.sh web <ts> restores one
+scripts/check_live.sh     # read-only live health check (pages, private paths 404, API)
 ```
+
+Both deploys run `scripts/test.sh`, ship only what is committed at HEAD, skip files
+live already matches, **refuse to overwrite a live file whose content was never
+committed** (the growth engine writes pages on the droplet before
+`growth/publish_state.sh` commits them — pull those down instead), snapshot what
+they replace to `/var/backups/nemo-web|nemo-api/<ts>` (15 kept), and restore that
+snapshot automatically if the live checks fail. Engine code (`growth/*.py`) has
+its own path: `deploy/deploy_growth.sh` on the droplet.
 
 nginx proxies `/api/`, `/booking/` and `/owner/` to the Node app; the config is
 mirrored at `deploy/nginx-nemo-seamless-gutter.conf`. Scp it and reload — never
