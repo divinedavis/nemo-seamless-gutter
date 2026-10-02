@@ -30573,3 +30573,23 @@ credit card and two shell commands.** I have kept the list at four rather than
 growing it, because a four-item list someone finishes beats a twenty-two-item
 list nobody starts — but I note that the same argument was made yesterday and
 the list still was not started.
+
+## 2026-10-02 — engine run
+
+Goal: **0.0%** top-3 share of 223 tracked queries (target 50%).
+2026-10-01: 2 visitors (1 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — FAILED: generation failed for areas/seamless-gutters-dover-pa.html: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CfcuYFUZtuLVwiFKoAeVp"}
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — FAILED: 3 candidate(s) failed, last: generation failed for 'gutter replacement dover pa': anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CfcuYKPxQq9ui9r4neog5"}
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: no query needs its own page — the remaining gaps all belong on pages that exist, which strengthen_pages handles
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: sitemap.xml unchanged
+- `ping_indexnow` — ok: nothing new to submit
+
+**Scout did not run:** anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CfcuYNpaty2cjT3R3AGfD"}
