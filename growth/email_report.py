@@ -417,6 +417,21 @@ OWNER_ACTIONABLE = {"review_engine", "gbp_posts", "citations",
                     "nextdoor_business_page_recommendations",
                     "speed_to_lead_callback_discipline",
                     "just_finished_job_neighbor_flyer",
+                    # WARNING, 2026-10-02: half of this row is now obsolete and
+                    # the card must not be read as written. Google has
+                    # discontinued Business Profile Q&A (the API was shut off
+                    # 2025-11-03 and the panel is now gone from listings),
+                    # replacing it with "Ask Maps" — a Gemini answer generated
+                    # on the fly from the profile, the reviews, the photos and
+                    # THE BUSINESS WEBSITE. There is no owner answer box left to
+                    # seed, so the "Owner Q&A" half of T016 cannot be done at
+                    # all; sending Eric to look for a panel that no longer
+                    # exists costs him trust in every other row on this card.
+                    # The primary/secondary CATEGORY half is untouched and is
+                    # still the heaviest single pack field, which is why this
+                    # slug stays here and stays last. The work the Q&A half used
+                    # to do — putting the owner's own answers where Google reads
+                    # them — now lands on the site's own FAQ copy instead.
                     "gbp_category_and_qna_audit",
                     # Business Profile fields — the owner opens the app and
                     # types. No deploy, no credit, and per Sterling Sky's 2026
