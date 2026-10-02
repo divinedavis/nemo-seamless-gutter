@@ -27,9 +27,10 @@ if [ ! -d server/node_modules ]; then
   echo "server/node_modules missing — run: npm ci --prefix server" >&2
   exit 1
 fi
-if ! out=$(node --test server/test/*.test.js 2>&1); then
+# --test-reporter=spec: node 20 (the droplet, CI) defaults to TAP off a TTY.
+if ! out=$(node --test --test-reporter=spec server/test/*.test.js 2>&1); then
   echo "$out" | grep -vE '^\s*(at |ℹ (suites|cancelled|skipped|todo|duration))' >&2
   echo "node tests failed" >&2; exit 1
 fi
-echo "$out" | grep -E '^ℹ (tests|pass|fail) '
+echo "$out" | grep -E '^ℹ (tests|pass|fail) ' || true
 echo "== all tests passed"

@@ -126,10 +126,26 @@ def next_weekday(days=3):
     return d.isoformat()
 
 
+def settle(page):
+    """Wait until the page stops scrolling (scrollY steady across 3 frames).
+
+    WebKit with iPhone emulation scrolls the focused field after a fill, and
+    a tap whose point was computed before that scroll lands on <body>.
+    """
+    page.evaluate("""() => new Promise(done => {
+        let last = -1, same = 0, frames = 0;
+        (function tick() {
+            same = (scrollY === last) ? same + 1 : 0; last = scrollY;
+            if (same >= 3 || ++frames > 120) return done();
+            requestAnimationFrame(tick);
+        })();
+    })""")
+
+
 def journey(browser, device, base):
     ctx = browser.new_context(**device)
     page = ctx.new_page()
-    book_posts, dialogs, errors = [], [], []
+    book_posts, errors = [], []
 
     def route(r):
         url = r.request.url
@@ -142,12 +158,18 @@ def journey(browser, device, base):
 
     page.route("**/*", route)
     page.on("pageerror", lambda e: errors.append(str(e)))
+    # Record alert() calls in the page instead of driving native dialogs:
+    # emulated-iPhone WebKit drops an alert raised shortly after the previous
+    # one was dismissed, which made the lane flaky (CI and locally). The test
+    # is about what the widget tells the customer, not about the dialog chrome.
+    page.add_init_script("window.__alerts = []; window.alert = function (m) { window.__alerts.push(String(m)); };")
+    # styles.css sets html{scroll-behavior:smooth}, so the scroll Playwright
+    # does before each action animates and a tap computed mid-animation lands
+    # on <body> (seen in WebKit after filling the phone field). Real fingers
+    # tap a page at rest; make the test's page rest too.
+    page.add_init_script("document.addEventListener('DOMContentLoaded', function () {"
+                         " document.documentElement.style.scrollBehavior = 'auto'; });")
 
-    def on_dialog(d):
-        dialogs.append(d.message)
-        d.dismiss()
-
-    page.on("dialog", on_dialog)
     page.goto(base + "/index.html#book", wait_until="domcontentloaded")
 
     # 1. renders: three services, a date picker, a disabled confirm button.
@@ -164,16 +186,15 @@ def journey(browser, device, base):
     assert not page.locator("#bk-submit").is_disabled(), "confirm still disabled with a slot chosen"
     assert page.locator("#bk-addr-field").is_visible(), "estimate must ask for the job address"
 
-    # 3. validates: each missing field is named, nothing is posted. Wait for
-    # each alert before the next click — WebKit delivers them asynchronously.
+    # 3. validates: each missing field is named, nothing is posted.
     def submit_expecting(msg):
-        n = len(dialogs)
-        page.click("#bk-submit")
-        deadline = time.time() + 5
-        while len(dialogs) == n and time.time() < deadline:
-            page.wait_for_timeout(50)
-        assert dialogs[n:] == [msg], f"expected alert {msg!r}, got {dialogs[n:]!r}"
-        page.wait_for_timeout(250)  # let WebKit finish closing the alert
+        n = page.evaluate("window.__alerts.length")
+        btn = page.locator("#bk-submit")
+        btn.scroll_into_view_if_needed()
+        settle(page)
+        btn.click()
+        got = page.evaluate("window.__alerts").__getitem__(slice(n, None))
+        assert got == [msg], f"expected alert {msg!r}, got {got!r}"
 
     submit_expecting("Please enter your name.")
     page.fill("#bk-name", "Journey Test")
