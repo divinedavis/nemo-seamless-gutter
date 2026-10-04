@@ -390,6 +390,42 @@ class WordBoundaryMatchingTest(unittest.TestCase):
 
 
 
+class TownCoverage(unittest.TestCase):
+    """Every town the engine publishes a page for must be scoreable.
+
+    Added 2026-10-04. `techniques.TOWN_QUEUE` had published all ten of its
+    towns -- Dillsburg through Jacobus -- and none of them were in
+    `keywords.TOWNS`, so `add()` silently refused any query for them (the
+    `town not in TOWNS` guard) and `summary()["by_town"]` had no bucket to put
+    them in. Ten of the fifteen live area pages were therefore invisible to
+    the one metric the whole engine is pointed at: `top3`. The engine could
+    publish a page and never be told whether it worked.
+    """
+
+    def test_every_queued_town_has_a_bucket(self):
+        from . import techniques
+        missing = sorted({t[0] for t in techniques.TOWN_QUEUE} - set(K.TOWNS))
+        self.assertEqual(missing, [], f"TOWN_QUEUE towns absent from TOWNS: {missing}")
+
+    def test_every_queued_town_has_at_least_one_seed_query(self):
+        from . import techniques
+        seeded = {town for town, _q, _i, _t in K.SEED}
+        missing = sorted({t[0] for t in techniques.TOWN_QUEUE} - seeded)
+        self.assertEqual(missing, [], f"queued towns with no tracked query: {missing}")
+
+    def test_a_seed_query_points_at_the_page_that_exists_for_it(self):
+        """A town seed aimed at /areas/ must name that town's own page.
+
+        A copy-paste that left the previous town's filename in place would
+        credit coverage to the wrong page and send strengthen_pages after a
+        gap that is not there.
+        """
+        for town, query, _intent, target in K.SEED:
+            if not target.startswith("/areas/"):
+                continue
+            self.assertEqual(target, f"/areas/seamless-gutters-{town}-pa.html",
+                             f"{query!r} targets {target}")
+
 
 if __name__ == "__main__":
     unittest.main()

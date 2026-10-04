@@ -44,6 +44,23 @@ TOWNS = {
     "red-lion": "Red Lion",
     "dallastown": "Dallastown",
     "spring-grove": "Spring Grove",
+    # The ten towns `techniques.TOWN_QUEUE` has published an area page for.
+    # They were absent here until 2026-10-04, which meant ten of the fifteen
+    # live area pages had no tracked query at all: `by_town` could not show
+    # them, `top3` could not count them, and nothing in the goal metric could
+    # say whether any of those pages ranked for the town it was written for.
+    # A page the engine publishes has to be measurable, or publishing it is
+    # unfalsifiable. See `test_keywords.TownCoverage`.
+    "dillsburg": "Dillsburg",
+    "shrewsbury": "Shrewsbury",
+    "stewartstown": "Stewartstown",
+    "new-freedom": "New Freedom",
+    "glen-rock": "Glen Rock",
+    "manchester": "Manchester",
+    "mount-wolf": "Mount Wolf",
+    "wrightsville": "Wrightsville",
+    "hallam": "Hallam",
+    "jacobus": "Jacobus",
     "county": "York County",     # county-wide / no town modifier
 }
 
@@ -86,6 +103,27 @@ SEED = [
     ("dallastown", "gutter installation dallastown pa", "hire", "/areas/seamless-gutters-dallastown-pa.html"),
     ("spring-grove", "seamless gutters spring grove pa", "hire", "/areas/seamless-gutters-spring-grove-pa.html"),
     ("spring-grove", "gutter installation spring grove pa", "hire", "/areas/seamless-gutters-spring-grove-pa.html"),
+    # ---- the ten area pages TOWN_QUEUE published, so they can be scored ----
+    ("dillsburg", "seamless gutters dillsburg pa", "hire", "/areas/seamless-gutters-dillsburg-pa.html"),
+    ("dillsburg", "gutter installation dillsburg pa", "hire", "/areas/seamless-gutters-dillsburg-pa.html"),
+    ("shrewsbury", "seamless gutters shrewsbury pa", "hire", "/areas/seamless-gutters-shrewsbury-pa.html"),
+    ("shrewsbury", "gutter installation shrewsbury pa", "hire", "/areas/seamless-gutters-shrewsbury-pa.html"),
+    ("stewartstown", "seamless gutters stewartstown pa", "hire", "/areas/seamless-gutters-stewartstown-pa.html"),
+    ("stewartstown", "gutter installation stewartstown pa", "hire", "/areas/seamless-gutters-stewartstown-pa.html"),
+    ("new-freedom", "seamless gutters new freedom pa", "hire", "/areas/seamless-gutters-new-freedom-pa.html"),
+    ("new-freedom", "gutter installation new freedom pa", "hire", "/areas/seamless-gutters-new-freedom-pa.html"),
+    ("glen-rock", "seamless gutters glen rock pa", "hire", "/areas/seamless-gutters-glen-rock-pa.html"),
+    ("glen-rock", "gutter installation glen rock pa", "hire", "/areas/seamless-gutters-glen-rock-pa.html"),
+    ("manchester", "seamless gutters manchester pa", "hire", "/areas/seamless-gutters-manchester-pa.html"),
+    ("manchester", "gutter installation manchester pa", "hire", "/areas/seamless-gutters-manchester-pa.html"),
+    ("mount-wolf", "seamless gutters mount wolf pa", "hire", "/areas/seamless-gutters-mount-wolf-pa.html"),
+    ("mount-wolf", "gutter installation mount wolf pa", "hire", "/areas/seamless-gutters-mount-wolf-pa.html"),
+    ("wrightsville", "seamless gutters wrightsville pa", "hire", "/areas/seamless-gutters-wrightsville-pa.html"),
+    ("wrightsville", "gutter installation wrightsville pa", "hire", "/areas/seamless-gutters-wrightsville-pa.html"),
+    ("hallam", "seamless gutters hallam pa", "hire", "/areas/seamless-gutters-hallam-pa.html"),
+    ("hallam", "gutter installation hallam pa", "hire", "/areas/seamless-gutters-hallam-pa.html"),
+    ("jacobus", "seamless gutters jacobus pa", "hire", "/areas/seamless-gutters-jacobus-pa.html"),
+    ("jacobus", "gutter installation jacobus pa", "hire", "/areas/seamless-gutters-jacobus-pa.html"),
     # ---- price intent: high-converting, and nobody local has good pages ------
     ("county", "gutter installation cost york pa", "price", "/guides/gutter-cleaning-cost-york-pa.html"),
     ("county", "how much do seamless gutters cost", "price", ""),

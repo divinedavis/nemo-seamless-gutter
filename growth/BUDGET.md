@@ -35,7 +35,24 @@ duty cycle rather than a guess:
 | 08-28 → 08-30 | 3 | **alive** — 3 page edits |
 | 08-31 → 09-02 | 3 | dead — no credit |
 | 09-03 → 09-07 | 5 | **alive** — 2 new pages, 7 page edits |
-| 09-08 → 09-20 | 13 | dead — no credit |
+| 09-08 → 10-03 | 26 | dead — no credit |
+| 10-04 → ? | 1+ | **alive** — credit restored; 2 page edits on day 1 |
+
+**Recorded 2026-10-04 by the review agent.** The 09-08 stall did not end on
+09-20 where the table above stopped; it ran **26 mornings**, to 10-03
+inclusive, and is the longest in this account's history by a factor of two. It
+ended on 10-04: `last_build` reported `changed: 2` and `last_scout.ok` was
+true for the first time since 09-07. That makes the duty cycle since 08-12
+**14 productive mornings out of 54** — worse than the 13-of-40 above, because
+the stall grew and the restart bought two page edits.
+
+The prediction this file's own measurement forces: **a top-up has bought 3–5
+productive mornings, three times in a row, so expect the balance to be empty
+again between 10-07 and 10-09** unless auto-reload was set at the same time as
+the top-up. If the engine is still writing on 10-10, auto-reload is on and
+this row can be closed out; if `last_build` reads `new: 0, changed: 0` with a
+credit error that week, the top-up was a fourth manual one and the threshold
+problem is untouched.
 
 **A top-up has bought 3–5 productive mornings, three times in a row.** The
 09-03 top-up lasted exactly five, the top of the predicted range, and then
