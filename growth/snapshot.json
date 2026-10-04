@@ -1,6 +1,6 @@
 {
-  "generated": "2026-10-03T06:05:28+00:00",
-  "date": "2026-10-03",
+  "generated": "2026-10-04T06:08:58+00:00",
+  "date": "2026-10-04",
   "site": "nemoseamlessgutter.com",
   "goal": {
     "statement": "more than 50% of tracked York County gutter queries holding a top-3 position",
@@ -8,18 +8,14 @@
     "share_pct": 0.0,
     "measured": true,
     "why_unmeasured": null,
-    "coverage_pct": 40.9,
-    "tracked_queries": 225,
+    "coverage_pct": 40.8,
+    "tracked_queries": 228,
     "top3": 0,
-    "top10": 17,
-    "ranked_known": 49
+    "top10": 18,
+    "ranked_known": 51
   },
   "traffic": {
     "visitors": [
-      {
-        "date": "2026-08-19",
-        "value": 3
-      },
       {
         "date": "2026-08-20",
         "value": 1
@@ -195,13 +191,13 @@
       {
         "date": "2026-10-02",
         "value": 6
+      },
+      {
+        "date": "2026-10-03",
+        "value": 3
       }
     ],
     "pageviews": [
-      {
-        "date": "2026-08-19",
-        "value": 6
-      },
       {
         "date": "2026-08-20",
         "value": 2
@@ -377,14 +373,14 @@
       {
         "date": "2026-10-02",
         "value": 11
+      },
+      {
+        "date": "2026-10-03",
+        "value": 3
       }
     ],
     "organic_visitors": [
       {
-        "date": "2026-08-19",
-        "value": 2
-      },
-      {
         "date": "2026-08-20",
         "value": 0
       },
@@ -559,14 +555,14 @@
       {
         "date": "2026-10-02",
         "value": 4
+      },
+      {
+        "date": "2026-10-03",
+        "value": 1
       }
     ],
     "local_visitors": [
       {
-        "date": "2026-08-19",
-        "value": 0
-      },
-      {
         "date": "2026-08-20",
         "value": 0
       },
@@ -740,15 +736,15 @@
       },
       {
         "date": "2026-10-02",
+        "value": 0
+      },
+      {
+        "date": "2026-10-03",
         "value": 0
       }
     ],
     "ai_visitors": [
       {
-        "date": "2026-08-19",
-        "value": 0
-      },
-      {
         "date": "2026-08-20",
         "value": 0
       },
@@ -923,13 +919,13 @@
       {
         "date": "2026-10-02",
         "value": 0
+      },
+      {
+        "date": "2026-10-03",
+        "value": 0
       }
     ],
     "direct_visitors": [
-      {
-        "date": "2026-08-19",
-        "value": 1
-      },
       {
         "date": "2026-08-20",
         "value": 0
@@ -1105,13 +1101,13 @@
       {
         "date": "2026-10-02",
         "value": 2
+      },
+      {
+        "date": "2026-10-03",
+        "value": 2
       }
     ],
     "referral_visitors": [
-      {
-        "date": "2026-08-19",
-        "value": 0
-      },
       {
         "date": "2026-08-20",
         "value": 0
@@ -1286,15 +1282,15 @@
       },
       {
         "date": "2026-10-02",
+        "value": 0
+      },
+      {
+        "date": "2026-10-03",
         "value": 0
       }
     ],
     "campaign_visitors": [
       {
-        "date": "2026-08-19",
-        "value": 0
-      },
-      {
         "date": "2026-08-20",
         "value": 1
       },
@@ -1469,13 +1465,13 @@
       {
         "date": "2026-10-02",
         "value": 0
+      },
+      {
+        "date": "2026-10-03",
+        "value": 0
       }
     ],
     "bot_hits": [
-      {
-        "date": "2026-08-19",
-        "value": 2844
-      },
       {
         "date": "2026-08-20",
         "value": 3667
@@ -1651,13 +1647,13 @@
       {
         "date": "2026-10-02",
         "value": 3236
+      },
+      {
+        "date": "2026-10-03",
+        "value": 2954
       }
     ],
     "call_taps": [
-      {
-        "date": "2026-08-19",
-        "value": 0
-      },
       {
         "date": "2026-08-20",
         "value": 0
@@ -1832,15 +1828,15 @@
       },
       {
         "date": "2026-10-02",
+        "value": 0
+      },
+      {
+        "date": "2026-10-03",
         "value": 0
       }
     ],
     "ai_calls": [
       {
-        "date": "2026-08-19",
-        "value": 0
-      },
-      {
         "date": "2026-08-20",
         "value": 0
       },
@@ -2014,15 +2010,15 @@
       },
       {
         "date": "2026-10-02",
+        "value": 0
+      },
+      {
+        "date": "2026-10-03",
         "value": 0
       }
     ],
     "bookings": [
       {
-        "date": "2026-08-19",
-        "value": 0
-      },
-      {
         "date": "2026-08-20",
         "value": 0
       },
@@ -2196,15 +2192,15 @@
       },
       {
         "date": "2026-10-02",
+        "value": 0
+      },
+      {
+        "date": "2026-10-03",
         "value": 0
       }
     ],
     "phone_leads": [
       {
-        "date": "2026-08-19",
-        "value": 0
-      },
-      {
         "date": "2026-08-20",
         "value": 0
       },
@@ -2379,13 +2375,13 @@
       {
         "date": "2026-10-02",
         "value": 0
+      },
+      {
+        "date": "2026-10-03",
+        "value": 0
       }
     ],
     "total_leads": [
-      {
-        "date": "2026-08-19",
-        "value": 0
-      },
       {
         "date": "2026-08-20",
         "value": 0
@@ -2560,6 +2556,10 @@
       },
       {
         "date": "2026-10-02",
+        "value": 0
+      },
+      {
+        "date": "2026-10-03",
         "value": 0
       }
     ]
@@ -2572,7 +2572,7 @@
   "keywords": {
     "by_town": {
       "county": {
-        "total": 118,
+        "total": 119,
         "covered": 45,
         "top3": 0
       },
@@ -2587,7 +2587,7 @@
         "top3": 0
       },
       "red-lion": {
-        "total": 11,
+        "total": 12,
         "covered": 5,
         "top3": 0
       },
@@ -2602,18 +2602,18 @@
         "top3": 0
       },
       "york": {
-        "total": 40,
-        "covered": 15,
+        "total": 41,
+        "covered": 16,
         "top3": 0
       }
     },
     "by_intent": {
       "hire": {
-        "total": 144,
-        "covered": 75
+        "total": 146,
+        "covered": 76
       },
       "price": {
-        "total": 51,
+        "total": 52,
         "covered": 10
       },
       "diy": {
@@ -2669,12 +2669,12 @@
       "gutter leaf guard york springs pa",
       "gutter overflowing in heavy rain who to call",
       "gutter protection system dallastown pa",
-      "gutter repair near me york pa",
       "gutter replacement after new roof york pa",
       "gutter replacement dallastown pa",
       "gutter replacement dover pa",
       "gutter replacement hanover",
       "gutter replacement hanover pa",
+      "gutter replacement red lion pa",
       "gutter replacement york springs pa",
       "gutters hanover pa",
       "gutters overflowing during rain who to call",
@@ -2684,6 +2684,7 @@
       "half round gutters historic home pa",
       "ice dam damage gutter replacement york county pa",
       "ice dam damaged gutters repair pa",
+      "ice dam removal york pa",
       "rotted fascia board repair york pa",
       "rotted fascia board replacement york pa",
       "seamless gutter installation hanover pa",
@@ -2740,6 +2741,7 @@
       "how much does a gutter guard cost per foot",
       "how much does it cost to replace gutters on a house in pa",
       "how much does it cost to replace gutters on a ranch house",
+      "how much to clean gutters on a two story house",
       "how much to replace gutters on a 1500 sq ft house",
       "how much to replace gutters on a house",
       "how often should gutters be cleaned in pa",
@@ -2763,8 +2765,8 @@
     "discovered_untracked": [
       {
         "query": "gutter replacement",
-        "position": 18.2,
-        "impressions": 63,
+        "position": 18.5,
+        "impressions": 61,
         "clicks": 0
       },
       {
@@ -2775,8 +2777,8 @@
       },
       {
         "query": "gutters",
-        "position": 10.9,
-        "impressions": 38,
+        "position": 11.1,
+        "impressions": 35,
         "clicks": 0
       },
       {
@@ -2794,79 +2796,73 @@
       {
         "query": "gutter guards in akron pa",
         "position": 8.5,
-        "impressions": 26,
+        "impressions": 25,
         "clicks": 0
       },
       {
         "query": "gutter guards in leola pa",
         "position": 30.7,
-        "impressions": 22,
-        "clicks": 0
-      },
-      {
-        "query": "gutter guards in new holland pa",
-        "position": 32.4,
-        "impressions": 22,
-        "clicks": 0
-      },
-      {
-        "query": "gutter replacement services",
-        "position": 11.5,
-        "impressions": 22,
+        "impressions": 21,
         "clicks": 0
       },
       {
         "query": "gutter guards in lititz pa",
-        "position": 29.3,
-        "impressions": 21,
+        "position": 29.2,
+        "impressions": 20,
         "clicks": 0
       },
       {
         "query": "gutter guards in stevens pa",
-        "position": 54.8,
-        "impressions": 21,
+        "position": 55.1,
+        "impressions": 20,
         "clicks": 0
       },
       {
         "query": "gutter installation wilkes barre, pa",
         "position": 52.6,
-        "impressions": 21,
+        "impressions": 20,
+        "clicks": 0
+      },
+      {
+        "query": "gutter replacement services",
+        "position": 11.9,
+        "impressions": 20,
+        "clicks": 0
+      },
+      {
+        "query": "gutter guards in new holland pa",
+        "position": 32.2,
+        "impressions": 19,
         "clicks": 0
       },
       {
         "query": "seamless gutter installation in akron pa",
-        "position": 33.5,
-        "impressions": 21,
+        "position": 34.2,
+        "impressions": 19,
         "clicks": 0
       },
       {
         "query": "seamless gutter installation in myerstown pa",
-        "position": 38.0,
-        "impressions": 20,
+        "position": 37.8,
+        "impressions": 19,
         "clicks": 0
       },
       {
         "query": "seamless gutters perkasie pa",
-        "position": 21.8,
-        "impressions": 20,
+        "position": 22.1,
+        "impressions": 19,
         "clicks": 0
       },
       {
         "query": "gutter guards in lancaster pa",
         "position": 43.4,
-        "impressions": 18,
+        "impressions": 17,
         "clicks": 0
       },
       {
         "query": "gutter guard installation harleysville pa",
         "position": 42.4,
-        "impressions": 15,
-        "clicks": 0
-      },
-      {
-        "query": "lemoyne seamless spouting system installers",
-        "position": 27.6,
-        "impressions": 13,
+        "impressions": 14,
         "clicks": 0
       },
       {
@@ -2876,8 +2872,8 @@
         "clicks": 0
       },
       {
-        "query": "gutter guards in myerstown pa",
-        "position": 90.4,
+        "query": "lemoyne seamless spouting system installers",
+        "position": 28.2,
         "impressions": 12,
         "clicks": 0
       },
@@ -2894,8 +2890,8 @@
         "clicks": 0
       },
       {
-        "query": "gutter guards harleysville pa",
-        "position": 46.2,
+        "query": "gutter guards in myerstown pa",
+        "position": 89.9,
         "impressions": 11,
         "clicks": 0
       },
@@ -2942,12 +2938,6 @@
         "clicks": 0
       },
       {
-        "query": "gutter services",
-        "position": 9.9,
-        "impressions": 10,
-        "clicks": 0
-      },
-      {
         "query": "seamless gutter contractor wayne pa",
         "position": 27.1,
         "impressions": 10,
@@ -2978,6 +2968,12 @@
         "clicks": 0
       },
       {
+        "query": "gutter guards harleysville pa",
+        "position": 46.6,
+        "impressions": 9,
+        "clicks": 0
+      },
+      {
         "query": "gutter guards wayne pa",
         "position": 42.7,
         "impressions": 9,
@@ -2990,28 +2986,34 @@
         "clicks": 0
       },
       {
-        "query": "gutter replacement red lion pa",
-        "position": 8,
+        "query": "gutter soffit and fascia replacement",
+        "position": 1,
         "impressions": 9,
         "clicks": 0
       },
       {
-        "query": "gutter soffit and fascia replacement",
-        "position": 1,
+        "query": "seamless gutter repair plymouth meeting pa",
+        "position": 21.4,
+        "impressions": 9,
+        "clicks": 0
+      },
+      {
+        "query": "seamless gutter services blue bell pa",
+        "position": 26.8,
         "impressions": 9,
         "clicks": 0
       }
     ]
   },
   "gsc": {
-    "date": "2026-10-03",
+    "date": "2026-10-04",
     "ok": true,
     "connected": true,
-    "rows": 833,
-    "matched": 46,
-    "clicks": 14,
-    "impressions": 5981,
-    "avg_position": 27.6
+    "rows": 828,
+    "matched": 48,
+    "clicks": 11,
+    "impressions": 5853,
+    "avg_position": 27.7
   },
   "techniques": [
     {
@@ -3032,21 +3034,17 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-10-03",
+        "decided": "2026-10-04",
         "works": true,
-        "why": "11 owned visitors in 68d (median 0.0/day and flat)",
+        "why": "11 owned visitors in 69d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 11,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 68
+          "days_measured": 69
         }
       },
       "owned_visitors": [
-        {
-          "date": "2026-08-19",
-          "value": 0
-        },
         {
           "date": "2026-08-20",
           "value": 0
@@ -3221,6 +3219,10 @@
         },
         {
           "date": "2026-10-02",
+          "value": 0
+        },
+        {
+          "date": "2026-10-03",
           "value": 0
         }
       ]
@@ -3243,21 +3245,17 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-10-03",
+        "decided": "2026-10-04",
         "works": true,
-        "why": "6 owned visitors in 68d (median 0.0/day and flat)",
+        "why": "6 owned visitors in 69d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 6,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 68
+          "days_measured": 69
         }
       },
       "owned_visitors": [
-        {
-          "date": "2026-08-19",
-          "value": 0
-        },
         {
           "date": "2026-08-20",
           "value": 0
@@ -3432,6 +3430,10 @@
         },
         {
           "date": "2026-10-02",
+          "value": 0
+        },
+        {
+          "date": "2026-10-03",
           "value": 0
         }
       ]
@@ -3709,14 +3711,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-10-03",
+        "decided": "2026-10-04",
         "works": true,
         "why": "gsc_clicks median 16.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 16.0,
           "median_before": null,
-          "days_measured": 68
+          "days_measured": 69
         }
       },
       "owned_visitors": null
@@ -3739,21 +3741,17 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-10-03",
+        "decided": "2026-10-04",
         "works": true,
-        "why": "24 owned visitors in 68d (median 0.0/day and flat)",
+        "why": "24 owned visitors in 69d (median 0.0/day and flat)",
         "measured": {
           "total_owned_visitors": 24,
           "recent_median": 0.0,
           "prior_median": 0.0,
-          "days_measured": 68
+          "days_measured": 69
         }
       },
       "owned_visitors": [
-        {
-          "date": "2026-08-19",
-          "value": 0
-        },
         {
           "date": "2026-08-20",
           "value": 0
@@ -3929,6 +3927,10 @@
         {
           "date": "2026-10-02",
           "value": 1
+        },
+        {
+          "date": "2026-10-03",
+          "value": 0
         }
       ]
     },
@@ -3948,14 +3950,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-10-03",
+        "decided": "2026-10-04",
         "works": true,
         "why": "gsc_clicks median 16.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 16.0,
           "median_before": null,
-          "days_measured": 68
+          "days_measured": 69
         }
       },
       "owned_visitors": null
@@ -3976,14 +3978,14 @@
       "retired": null,
       "notes": "",
       "verdict": {
-        "decided": "2026-10-03",
+        "decided": "2026-10-04",
         "works": true,
         "why": "gsc_clicks median 16.0/day since activation (no pre-activation baseline)",
         "measured": {
           "metric": "gsc_clicks",
           "median_after": 16.0,
           "median_before": null,
-          "days_measured": 68
+          "days_measured": 69
         }
       },
       "owned_visitors": null
@@ -5193,6 +5195,60 @@
       "notes": "first step: Send one short email today to the York Daily Record newsroom (home/living or local news desk) offering a free on-record local angle for leaf season: what 40-year-old spouting on a York City rowhome actually fails at, the two things a homeowner can check from the ground, and an offer of photos from the brake on the truck \u2014 no ad pitch, just availability, with cell number and PA HIC number.\neffort: hours\ncost: free\nexpected: Six pitches sent in September, 1-2 published mentions by December, each carrying a link or at minimum a named citation of NEMO Seamless Gutter, York PA. Success = 1 earned local-media link by 31 Dec and NEMO named in at least one AI answer to 'gutter company york pa' by the following quarter's audit.",
       "verdict": null,
       "owned_visitors": null
+    },
+    {
+      "id": "T088",
+      "slug": "truck_door_lettering_phone_first",
+      "name": "Phone-number-first truck lettering",
+      "kind": "distribution",
+      "status": "candidate",
+      "hypothesis": "Eric's truck sits in a York County driveway for 4-8 hours every working day with the brake running on the tailgate \u2014 the single most credible gutter advertisement in the county, and it is currently anonymous. Neighbours who watch a crew form aluminium on their street are the warmest gutter prospects that exist, and right now they have no number to dial. Unlike yard signs and door hangers (already in the ledger), lettering works on every drive to the supply house, every stop at Rutter's, and every minute parked in Dallastown \u2014 and it is the only channel here that costs nothing per month after the first week.",
+      "evidence": "Vehicle graphics are repeatedly costed at $0.15\u2013$0.48 CPM versus per-lead ad pricing; a 2026 benchmark of $6.72M of LSA spend across 888 contractors put blended cost per lead at $53. The design detail matters more than the budget: a plumber who stripped a wrap down from eight services and a tagline to just a phone number and the trade word reported 'saw your truck' calls rising from 2-3/month to 11-14/month. https://pipelineon.com/blog/truck-wrap-and-fleet-branding-contractors/ \u2014 cut-vinyl door lettering is quoted from roughly $59\u2013$500 depending on shop https://thetrucklettering.com/",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-10-04",
+      "added": "2026-10-04",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Measure both truck doors and the tailgate, then order cut vinyl in one size: business phone number at the largest size that fits, trade words above it, URL below. No logo, no service list, no tagline.\neffort: hours\ncost: under $100/mo\nexpected: Three lines only \u2014 SEAMLESS GUTTERS / phone in the biggest legible type / nemoseamlessgutter.com \u2014 on both doors and the tailgate. Target 3-6 inbound 'saw your truck' calls a month by the second month of leaf season, tracked by Eric asking every caller 'how did you find me' and writing the answer down. One $2,000 install pays for the lettering several times over.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T089",
+      "slug": "ycaaa_senior_services_listing",
+      "name": "Get on York County's senior-services referral lists",
+      "kind": "distribution",
+      "status": "candidate",
+      "hypothesis": "The person who physically cannot clean their own gutters is a 72-year-old in a 1950s rancher in Springettsbury or West York \u2014 and they do not search Google, they phone the York County Area Agency on Aging, their senior centre, or their church and ask who to call. That referral arrives as a warm phone call from someone with a real, dated need, which is exactly the number that is broken here (0 phone-agent leads). Leaf-fall is when their downspouts back up. This is free, legal, and reaches buyers 30 days out, and it is distinct from the paid 55+ newsletter ad already in the ledger: this is the county's own information-and-referral desk, not bought space.",
+      "evidence": "York County Area Agency on Aging runs a staffed Information & Referral desk Monday\u2013Friday 8am\u20134:30pm on [redacted phone number], with a Spanish intake line, describing itself as a one-stop service using extensive resource files https://yorkcountypa.gov/202/Information-Referral \u2014 and the county's senior-services entry states the referrals it makes explicitly include minor home repair and yard work https://search.ne211.org/search/f43a9dc1-7713-5326-af5b-57018a11b4b0",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-10-04",
+      "added": "2026-10-04",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Call [redacted phone number] during business hours, ask what they need from a licensed, insured contractor to be included in the Information & Referral resource file for gutter cleaning and minor repair, and send the PA HIC number, insurance certificate and a written flat senior price the same day.\neffort: hours\ncost: free\nexpected: Listed in the I&R resource file plus 3-5 York County senior centres' vendor sheets or newsletters within 60 days; 2-4 inbound cleaning or repair calls a month from October to December, each one a candidate for a guard or replacement quote later.",
+      "verdict": null,
+      "owned_visitors": null
+    },
+    {
+      "id": "T090",
+      "slug": "winter_ice_dam_call_lane",
+      "name": "Winter ice-dam lane \u2014 rebuild the existing ice-dams guide into a call-first service page",
+      "kind": "conversion",
+      "status": "candidate",
+      "hypothesis": "Every other play in this ledger is pointed at August\u2013November. December to February is the hole, and it is the one time of year a York County homeowner has a gutter problem they will pay to fix the same week: ice backing up under shingles, a downspout frozen solid, water inside a bedroom ceiling. ice-dams-gutters-pennsylvania already exists but reads as a weather explainer \u2014 it describes the problem and never offers to come and fix it, has no price, no 'call today', and no York framing. Content needs 8-12 weeks to rank, so the page has to be rebuilt in October to earn January's calls.",
+      "evidence": "Contractor site benchmarks put median conversion at 2-4% of visitors versus 8-12% for sites with proper conversion architecture, and phone leads convert at around 46% versus web forms \u2014 every page decision should point at a call rather than a form https://www.garretthandley.com/contractor-website-conversion-rate-in-2026-why-most-sites-convert-under-3-and-what-to-fix ; specific outcome-based CTAs are reported to outperform generic ones substantially https://www.bullseyemarketingconsultants.com/marketing/high-converting-contractor-websites-the-2026-lead-generation-checklist/",
+      "prefixes": [],
+      "metric": "organic_visitors",
+      "source": "scout:2026-10-04",
+      "added": "2026-10-04",
+      "activated": null,
+      "retired": null,
+      "notes": "first step: Open ice-dams-gutters-pennsylvania, move a tap-to-call line with a real starting price to directly under the H1, and rewrite the first 80 words so they answer 'who do I call in York about this, today' instead of explaining the physics of snowmelt.\neffort: days\ncost: free\nexpected: Rebuilt page carries: what an ice dam is doing to the fascia, what Eric actually does about it, a real starting price for frozen-downspout and ice-damage repair, and a tap-to-call CTA above the fold. Success = the page holds top-3 for 'ice dam' queries by January and produces 3-8 calls across Jan-Feb, a window that currently produces none.",
+      "verdict": null,
+      "owned_visitors": null
     }
   ],
   "scoreboard": {
@@ -5286,20 +5342,23 @@
       "T084",
       "T085",
       "T086",
-      "T087"
+      "T087",
+      "T088",
+      "T089",
+      "T090"
     ]
   },
   "last_build": {
-    "date": "2026-10-03",
+    "date": "2026-10-04",
     "log": [
       {
         "ok": true,
-        "detail": "adopted 2 real search(es) into the tracked universe: gutter replacement dallastown pa, gutter replacement hanover pa",
+        "detail": "adopted 1 real search(es) into the tracked universe: gutter replacement red lion pa",
         "slug": "adopt_queries"
       },
       {
-        "ok": false,
-        "detail": "generation failed for index.html: anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfeoNG7JHiyigve9XNCtZ\"}",
+        "ok": true,
+        "detail": "rewrote title/description on /index.html (360 impressions, 7 clicks, pos 5.9) \u2014 Led the title with the two highest-volume service searches (gutter repair and gutter installation) plus York P",
         "slug": "improve_ctr"
       },
       {
@@ -5309,8 +5368,8 @@
         "slug": "geo_answer_first_content_pass"
       },
       {
-        "ok": false,
-        "detail": "3 candidate(s) failed, last: generation failed for 'gutter replacement dover pa': anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfeoNKxjJjn3erhCbVRhg\"}",
+        "ok": true,
+        "detail": "added \"Looking for Gutter Repair Near You in York, PA? Here's How t\" to /services/gutter-cleaning-repair.html for 'gutter repair near me york pa'",
         "slug": "strengthen_pages"
       },
       {
@@ -5345,24 +5404,32 @@
       },
       {
         "ok": true,
-        "noop": true,
-        "detail": "sitemap.xml unchanged",
+        "noop": false,
+        "detail": "[gen_sitemap] wrote 43 URLs to sitemap.xml",
         "slug": "rebuild_sitemap"
       },
       {
         "ok": true,
-        "noop": true,
-        "detail": "nothing new to submit",
+        "detail": "submitted 2 URL(s), HTTP 200",
         "slug": "ping_indexnow"
       }
     ],
     "new": 0,
-    "changed": 0
+    "changed": 2
   },
   "last_scout": {
-    "date": "2026-10-03",
-    "ok": false,
-    "detail": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfeoNNDAafQKCSxMStT7k\"}"
+    "date": "2026-10-04",
+    "ok": true,
+    "techniques_added": [
+      "truck_door_lettering_phone_first",
+      "ycaaa_senior_services_listing",
+      "winter_ice_dam_call_lane"
+    ],
+    "keywords_added": [
+      "ice dam removal york pa",
+      "how much to clean gutters on a two story house"
+    ],
+    "notes": "Reality check on the numbers first: 3 visitors yesterday means no amount of on-page conversion work can produce a call this month \u2014 at a top-decile 10% conversion rate, 3 visitors is 0.3 calls. The binding constraints are (1) 13 reviews against competitors with hundreds, which caps map-pack rank, and (2) nothing physical in York County carrying the phone number. That is why two of today's three ideas are offline distribution rather than more pages. The ~300 monthly GBP views are the only real audience this business currently has; everything that improves what that profile offers beats everything that adds a 36th page.\n\nIdeas considered and rejected: swapping a call-tracking number onto the Business Profile (breaks NAP consistency, which the ledger's citation work depends on \u2014 use GBP's own call-click metric plus a 'how did you find me' question instead); adding a second GBP listing or a virtual office to fake proximity to Hanover or Shrewsbury (direct guideline violation, suspension risk, and a suspension costs more than any of this earns); partnering with chimney sweeps and leaf-removal crews (real, but it is the same mechanism as the trade-partner referral loop already in the ledger \u2014 fold it in there rather than opening a new line); Nextdoor and Marketplace paid placement (free versions already candidates, and paid social is three candidates deep already); Craigslist services posting (dead channel for this trade in 2026).\n\nOn the winter idea: this strengthens the existing ice-dams-gutters-pennsylvania guide, it does not create a page. That guide currently covers the subject badly \u2014 it explains the weather and never asks for the call, has no price, and does not say Eric will come out. It is also distinct from the active 'strengthen pages that should already rank' work, which is driven by Search Console headings; this is a seasonal offer and CTA rebuild timed so it is ranked before January.\n\nOn truck lettering: the single most common way contractors waste this is putting eight services and a logo on the door. Keep it to the phone number at maximum legible size. Also make sure the number lettered on the truck is the exact number on the Business Profile \u2014 a different number on the truck splits the signal and confuses the AI agent's lead attribution.\n\nOn the senior channel: never imply an endorsement by the county or by any agency. Being on a referral resource list is not an endorsement and must not be presented as one on the site. If a senior rate is offered, publish it and honour it \u2014 a discount that evaporates at the kitchen table destroys exactly the trust this channel exists to borrow.\n\nOnly 7 queries added today, deliberately. At one page per day against 133 uncovered, anything weaker than these would sit in the queue until spring and enlarge the goal denominator for nothing."
   },
   "pages": {
     "areas": [
@@ -5419,11 +5486,19 @@
     ]
   },
   "redactions": {
-    "count": 1,
+    "count": 3,
     "items": [
       {
         "kind": "street address",
         "sample": "123 Maple St"
+      },
+      {
+        "kind": "phone number",
+        "sample": "717-771-9610"
+      },
+      {
+        "kind": "phone number",
+        "sample": "717-771-9610"
       }
     ],
     "note": "Anything shaped like a phone number, email or street address is removed before publishing. A non-zero count is usually an example quoted in scout research, not customer data \u2014 but a hit in a field fed by the bookings database would be a real bug worth chasing."
