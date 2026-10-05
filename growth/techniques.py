@@ -34,6 +34,17 @@ SITE = "https://nemoseamlessgutter.com"
 PHONE = "(717) 578-0073"
 PHONE_E164 = "+1-717-578-0073"
 BRAND = "NEMO Seamless Gutter"
+# Shortened brand for a title that cannot afford the full twenty characters.
+# Dropping the name entirely costs the branded searches — CTR_SYSTEM says why —
+# so this is what gets appended when " | NEMO Seamless Gutter" will not fit.
+BRAND_SHORT = "NEMO"
+# Google truncates a title past roughly this width. improve_ctr has refused a
+# model snippet over this length since 2026-07-27 ("a title that gets cut
+# mid-word reads as careless in the one place every searcher sees it"), but the
+# two page generators appended " | {BRAND}" to a model title with no limit at
+# all, so every guide and service page shipped between 65 and 80 characters
+# while the technique next door rejected exactly that. One number, both paths.
+TITLE_MAX = 65
 GA_ID = "G-JWSK5E1ZRZ"
 
 # A step that generates per item moves to the next candidate when one fails,
@@ -144,6 +155,45 @@ def _esc(s):
 def _attr(s):
     """Escape for an attribute value — meta descriptions, titles, alt text."""
     return html.escape(str(s or ""), quote=True)
+
+
+# A brand suffix the model wrote itself. The page prompts ask for a title and
+# the code appends the brand, but CTR_SYSTEM — the sibling prompt for the same
+# model — tells it to append " | NEMO Seamless Gutter" by hand, so it sometimes
+# does that here too. Three live pages shipped with the name twice:
+# "Best Gutter Company in York County PA | NEMO Seamless | NEMO Seamless Gutter".
+_TRAILING_BRAND = re.compile(
+    r"\s*[|–—-]\s*NEMO(?:\s+Seamless(?:\s+Gutter)?)?\s*$", re.I)
+
+
+def _page_title(raw, fallback=""):
+    """The <title> for a generated page: the model's phrase, then the brand.
+
+    Deterministic, because the model cannot be trusted to count. It strips a
+    brand the model already appended (otherwise the name lands twice), then
+    fits the suffix to what is left: the full name, else "| NEMO", else no
+    suffix at all. Leading with the search phrase is the rule CTR_SYSTEM gives
+    and the brand is the part Google truncates first, so the phrase wins when
+    only one of them fits.
+    """
+    def _strip(text):
+        out = _TRAILING_BRAND.sub("", str(text or "").strip())
+        out = out.strip(" |-–—")
+        # _TRAILING_BRAND needs a separator in front of the name, so a title
+        # that is nothing but the brand survives it untouched and would take
+        # the suffix on top of itself.
+        return "" if out.upper() in (BRAND.upper(), BRAND_SHORT.upper()) else out
+
+    head = _strip(raw) or _strip(fallback)
+    for suffix in (f" | {BRAND}", f" | {BRAND_SHORT}", ""):
+        if len(head) + len(suffix) <= TITLE_MAX:
+            return head + suffix
+    # The phrase alone is already over. Cut on a word boundary rather than
+    # mid-word, which is the thing the limit exists to prevent.
+    cut = head[:TITLE_MAX]
+    if " " in cut:
+        cut = cut[:cut.rindex(" ")]
+    return cut.rstrip(" ,:;-–—")
 
 
 def _ld(obj):
@@ -656,7 +706,7 @@ def money_pages(ctx):
 
     page = templates.HEAD.format(
         ga=GA_ID,
-        title=_esc(f"{data.get('title') or h1} | {BRAND}"),
+        title=_esc(_page_title(data.get("title"), h1)),
         meta_desc=_attr((data.get("meta_desc") or "")[:158]),
         canonical=canonical, geo="",
         og_title=_attr(f"{h1} — {BRAND}"), og_type="article",
@@ -1326,7 +1376,7 @@ def service_pages(ctx):
         body += "\n" + faqs
 
     page = templates.HEAD.format(
-        ga=GA_ID, title=_esc(f"{data.get('title') or h1} | {BRAND}"),
+        ga=GA_ID, title=_esc(_page_title(data.get("title"), h1)),
         meta_desc=_attr((data.get("meta_desc") or "")[:158]),
         canonical=canonical, geo="",
         og_title=_attr(f"{h1} — {BRAND}"), og_type="website",
@@ -1463,7 +1513,7 @@ def improve_ctr(ctx):
             return {"ok": False, "detail": f"model returned no snippet for {rel}"}
         # Google truncates past these; a title that gets cut mid-word reads as
         # careless in the one place every searcher sees it.
-        if len(title) > 65 or len(desc) > 165:
+        if len(title) > TITLE_MAX or len(desc) > 165:
             return {"ok": False,
                     "detail": f"rejected over-long snippet for {rel} "
                               f"(title {len(title)}, desc {len(desc)})"}

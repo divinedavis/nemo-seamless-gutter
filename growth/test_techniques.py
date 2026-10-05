@@ -418,6 +418,94 @@ class WholePageGeoGuardTest(unittest.TestCase):
             "and the surrounding Lancaster and York County area."]}]}
         self.assertEqual(T._off_area_prose(T._generated_prose(data)), "akron")
 
+class PageTitleTest(unittest.TestCase):
+    """The two page generators appended " | NEMO Seamless Gutter" to a model
+    title with no length check, while improve_ctr next door refused any model
+    title over 65 characters as "careless in the one place every searcher
+    sees it". On 2026-10-05, 23 of the site's 43 live titles were over that
+    limit — every one of them from these two generators, none of them from
+    area_pages, which uses a fixed string short enough to be safe. Three
+    carried the brand twice, because CTR_SYSTEM tells the same model to append
+    the name itself and it sometimes obeys on this path too.
+    """
+
+    # The three that shipped with the name twice.
+    DOUBLED = (
+        "Best Gutter Company in York County PA | NEMO Seamless",
+        "Gutter Installer Near You in York County, PA | NEMO",
+        "Commercial Gutter Installation York PA | NEMO Seamless",
+    )
+
+    def test_every_title_that_shipped_now_fits(self):
+        # The model titles behind the four longest live pages, reconstructed by
+        # stripping the suffix the generator appended.
+        for raw in ("Gutter Services in York County PA: Costs & What to Expect",
+                    "Gutter Falling Off the House? Who to Call, What It Costs",
+                    "Commercial Gutter Installation York PA | NEMO Seamless",
+                    "Copper Gutters for Historic Homes | York PA Cost Guide"):
+            out = T._page_title(raw)
+            self.assertLessEqual(len(out), T.TITLE_MAX, msg=repr(out))
+
+    def test_the_brand_never_lands_twice(self):
+        for raw in self.DOUBLED:
+            out = T._page_title(raw)
+            self.assertEqual(out.upper().count("NEMO"), 1, msg=repr(out))
+
+    def test_a_short_title_still_gets_the_full_brand(self):
+        # Dropping the name costs the branded searches, so it is only dropped
+        # when it genuinely will not fit.
+        self.assertEqual(T._page_title("Gutter Cleaning Cost in York, PA"),
+                         "Gutter Cleaning Cost in York, PA | NEMO Seamless Gutter")
+
+    def test_a_medium_title_keeps_the_short_brand(self):
+        out = T._page_title("Ice Dam Removal in York, PA: Costs and What Works")
+        self.assertTrue(out.endswith(" | NEMO"), msg=repr(out))
+        self.assertLessEqual(len(out), T.TITLE_MAX)
+
+    def test_the_search_phrase_survives_when_only_one_can(self):
+        # The phrase is what earns the click and the brand is what Google
+        # truncates first, so the brand is the part that goes.
+        raw = "Seamless Gutter Installation and Repair Cost in York County, PA"
+        out = T._page_title(raw)
+        self.assertEqual(out, raw)
+        self.assertNotIn("NEMO", out)
+
+    def test_an_over_long_phrase_is_cut_on_a_word_boundary(self):
+        raw = ("Signs Your Gutters Need Replacing in York County Pennsylvania "
+               "and What Replacement Costs")
+        out = T._page_title(raw)
+        self.assertLessEqual(len(out), T.TITLE_MAX)
+        self.assertTrue(raw.startswith(out), msg=repr(out))
+        self.assertFalse(out.endswith(" "), msg=repr(out))
+        # Whole words only — the limit exists to stop a mid-word cut.
+        self.assertIn(out.split()[-1], raw.split())
+
+    def test_an_empty_model_title_falls_back_to_the_h1(self):
+        self.assertEqual(T._page_title("", "Gutter Guards in York, PA"),
+                         "Gutter Guards in York, PA | NEMO Seamless Gutter")
+        self.assertEqual(T._page_title(None, "Gutter Guards in York, PA"),
+                         "Gutter Guards in York, PA | NEMO Seamless Gutter")
+
+    def test_a_bare_brand_title_does_not_leave_an_empty_title(self):
+        out = T._page_title("NEMO Seamless Gutter", "Half-Round Gutters York PA")
+        self.assertTrue(out.startswith("Half-Round Gutters York PA"), msg=repr(out))
+
+    def test_both_generators_compose_their_title_through_the_helper(self):
+        """Unit tests cannot run these paths — they need a live model call — so
+        the wiring is asserted in the source, the way the _ld indent test is."""
+        with open(os.path.join(os.path.dirname(__file__), "techniques.py")) as fh:
+            src = fh.read()
+        self.assertEqual(src.count("title=_esc(_page_title("), 2, msg=src.count(
+            "title=_esc(_page_title("))
+        self.assertNotIn("""{data.get('title') or h1} | {BRAND}""", src)
+
+    def test_improve_ctr_rejects_against_the_same_limit(self):
+        # One number for both paths: a generator must not ship what the
+        # rewriter would refuse.
+        body = inspect.getsource(T.improve_ctr)
+        self.assertIn("len(title) > TITLE_MAX", body)
+
+
 class StatewideQueryTest(unittest.TestCase):
     """"Names Pennsylvania, names none of our towns" was not out of area.
 
