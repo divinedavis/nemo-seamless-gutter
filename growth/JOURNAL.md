@@ -31992,3 +31992,26 @@ this entire journal has been measuring the wrong funnel for sixty-nine days and
 the website is a side issue. If it is zero, then the 300-ish monthly profile
 views are the only audience this business has and everything in item 3 is the
 whole plan.
+
+## 2026-10-05 — engine run
+
+Goal: **0.0%** top-3 share of 229 tracked queries (target 50%).
+2026-10-04: 2 visitors (1 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: no new in-area searches worth tracking
+- `improve_ctr` — ok: rewrote title/description on /areas/seamless-gutters-dover-pa.html (112 impressions, 0 clicks, pos 12.6) — Led the title with the exact high-volume phrase homeowners type ("gutter installation Dover PA") instead of th
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — ok: added "Copper Gutter Installation in York, PA" to /services/half-round-gutters.html for 'copper gutter installation york pa'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: published 'ice dam removal york pa' → /guides/ice-dam-removal-york-pa.html
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 44 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 3 URL(s), HTTP 200
+
+**Scout proposed (as candidates, not running):**
+- T091 Make Eric's outbound number answerable (CNAM + spam-flag check) — Every call play already in the ledger — the 5-minute human callback, missed-call text-back, the 60-second callback button, the five-touch quote cadence, the leaf-season callback to past customers — en
+- T092 Fix the six pages fighting each other for 'gutters york pa' — Zero of 228 tracked queries in the top 3 while the site already has 42 pages is not a coverage problem, it is a signal-splitting problem. Six published guides — gutter-guys-near-me, gutter-installer-n
+- T093 Read the Business Profile's own search-terms report monthly — The ledger's query universe comes entirely from Search Console, which cannot see Maps. The map pack is where 'gutter installer near me' money lands, and the profile gets ~300 views a month with nobody
