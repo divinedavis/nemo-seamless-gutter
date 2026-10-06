@@ -582,6 +582,12 @@ factors that move them. Never state a single price as if it were this company's 
 - Never invent a review, testimonial, customer, job count, award, or certification.
 - No exclamation marks. Plain, competent voice.
 - Be explicit that the free on-site estimate is how you get a real number.
+- On insurance: in Pennsylvania, adjusting or negotiating a claim for a homeowner \
+requires a public adjuster licence, which this business does not hold. You may say what \
+we document — photographs and a written, itemised estimate an adjuster can review — and \
+that the insurer decides. Never say damage is or will be covered, never offer to handle, \
+file or negotiate a claim, and never offer to waive, absorb, discount or rebate a \
+deductible.
 
 Return ONLY valid JSON:
 {
@@ -1004,6 +1010,16 @@ SERVICE_HINTS = [
     # "gutter soffit and fascia replacement" onto the installation page —
     # away from the dedicated page the site already ranks 1.8 for.
     (("soffit", "fascia"), "/services/gutter-soffit-fascia-replacement.html"),
+    # Storm words, ahead of the repair line for the same reason soffit is:
+    # "gutter repair after storm" would otherwise land on the cleaning page
+    # instead of the storm page the site already has. Added 2026-10-06, after
+    # the morning's scout adopted "gutter blown off house by wind" and the
+    # routing simulation showed it falling through to /index.html — which
+    # money_pages reads as "write it a guide", against an emergency-repair
+    # service page and a "gutter falling off house" guide that both already
+    # answer it. Eight words, one query moved out of 178 checked.
+    (("storm", "wind", "blown", "blew", "hail", "torn", "ripped", "emergency"),
+     "/services/emergency-gutter-repair.html"),
     (("clean", "repair", "downspout", "overflow", "clog", "sagging"),
      "/services/gutter-cleaning-repair.html"),
     (("install", "replace", "new gutters", "seamless"),

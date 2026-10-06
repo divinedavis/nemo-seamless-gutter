@@ -231,6 +231,25 @@ class PauseTurnTest(unittest.TestCase):
                 llm.call_json("sys", "prompt")
         self.assertIn("stop_reason=max_tokens", str(cm.exception))
 
+    def test_an_empty_reply_names_the_stop_reason_too(self):
+        """2026-10-06: improve_ctr died on "no text in reply" and the four words
+        did not say whether the budget, a refusal or an unfinished research turn
+        ate the answer. The sibling branch above has printed it since 09-18."""
+        for reason in ("max_tokens", "refusal", "pause_turn"):
+            with mock.patch.object(llm, "call_blocks", return_value=[]), \
+                 mock.patch.object(llm, "LAST_STOP_REASON", reason):
+                with self.assertRaises(ValueError) as cm:
+                    llm.call_json("sys", "prompt")
+            self.assertIn(f"stop_reason={reason}", str(cm.exception), msg=reason)
+
+    def test_an_empty_reply_with_no_stop_reason_still_reads_cleanly(self):
+        """An unset reason must not print "stop_reason=None"."""
+        with mock.patch.object(llm, "call_blocks", return_value=[]), \
+             mock.patch.object(llm, "LAST_STOP_REASON", None):
+            with self.assertRaises(ValueError) as cm:
+                llm.call_json("sys", "prompt")
+        self.assertEqual(str(cm.exception), "no text in reply")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

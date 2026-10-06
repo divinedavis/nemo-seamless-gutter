@@ -339,7 +339,17 @@ def call_json(system, prompt, **kw):
     """
     blocks = call_blocks(system, prompt, **kw)
     if not blocks:
-        raise ValueError("no text in reply")
+        # A reply with no text block at all is not the same failure as a reply
+        # whose text would not parse, and the two were reported as if they
+        # were: the parse branch below prints the stop reason, this one printed
+        # four words. improve_ctr died on exactly this on 2026-10-06 and left
+        # nothing to tell "the model spent the whole budget thinking"
+        # (max_tokens) apart from "the model declined" (refusal) or "it is
+        # still mid-research" (pause_turn with MAX_CONTINUATIONS spent). Same
+        # information the sibling branch already prints, so the next one is
+        # free to read.
+        why = f" [stop_reason={LAST_STOP_REASON}]" if LAST_STOP_REASON else ""
+        raise ValueError(f"no text in reply{why}")
     candidates = list(reversed(blocks))
     joined = "".join(blocks)
     if joined not in candidates:

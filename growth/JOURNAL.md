@@ -32619,3 +32619,626 @@ Goal: **0.0%** top-3 share of 234 tracked queries (target 50%).
 - T094 Ask for the estimate on every call — two named time slots — NEMO's funnel is full of capture (AI agent, booking widget, callback buttons) and empty of closing: 4 bookings all time. The single cheapest fix is a rule that no call — answered by Eric or by the AI 
 - T095 Wind/ice-torn gutter lane: free damage photo report, honest claim advice — York County gets nor'easter and squall-line wind from October through March, and the morning after one, homeowners search for someone to look at 40 feet of gutter hanging off the fascia — and separate
 - T096 Dated winter price-lock: turn 'maybe in the spring' into a signed slot — Every October estimate that hears '$2,400' answers 'let's do it in the spring', and in York County that homeowner is lost by March because nobody holds the conversation through the dead months. A writ
+
+## 2026-10-06 — review agent
+
+### Where the numbers stand
+
+**Lead: the engine's own reasoning is now wrong, not just its reporting.** This
+morning's scout opened with *"300 profile views and ~15 GSC clicks a day
+producing zero calls and 4 bookings all time is not a traffic problem."* Both
+numbers are false and both are false in the direction that flatters the site.
+
+- **"~15 GSC clicks a day" is a 28-day total, mislabelled.** `gsc.py:325` records
+  the Search Console **window total** once per day, so the median of 15.5 the
+  ledger prints as `/day` is the typical 28-day click count. The site earns about
+  **0.5 clicks a day**, not 15. The fix for this exact mislabel has been committed
+  since 2026-09-21 (`growth/review.py:45`, `WINDOW_TOTAL_METRICS`, plus
+  `test_review.py:160` named after the bug) and is undeployed, so the droplet
+  wrote three fresh `/day` verdicts this morning dated **2026-10-06** and the
+  scout read them.
+- **"300 profile views" has no source in anything the engine measures.** There is
+  no GBP data path in `growth/` at all — I grepped: the figure appears only inside
+  technique hypotheses in the ledger (T082, T049, T047), where it has been copied
+  forward for weeks. It is a guess that has acquired the typography of a
+  measurement.
+
+The arithmetic the real numbers support is the opposite of the scout's: **2.4
+visitors a day and half a click cannot produce a phone call**, which is what the
+10-02 entry concluded and what the 10-05 entry restated. This is a prominence
+problem. I am flagging it because the scout's framing is what decides which
+candidates get proposed, and it is currently being steered by a 30× error.
+
+**The goal metric is zero for the seventeenth consecutive day.** `top3` **0 /
+234**, `share_pct` **0.0%** against a target of 50%. Against `ranked_known`
+(the denominator `growth/README.md:74-75` prefers): **0 of 52**. Every town
+bucket is zero, as it has been since 09-20.
+
+| bucket | total | covered | **top3** |
+| --- | --- | --- | --- |
+| county | 123 (↑3) | 45 | **0** |
+| york | 42 (↑1) | 18 | **0** |
+| dover | 16 | 10 (↑1) | **0** |
+| hanover | 15 | 6 | **0** |
+| dallastown | 13 | 6 | **0** |
+| spring-grove | 13 (↑1) | 6 | **0** |
+| red-lion | 12 | 5 | **0** |
+
+**Seven consecutive daily readings:**
+
+| | 09-30 | 10-01 | 10-02 | 10-03 | 10-04 | 10-05 | **10-06** |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| rows | 850 | 845 | 851 | 833 | 828 | 842 | **851** |
+| clicks | 16 | 16 | 16 | 14 | 11 | 14 | **13** |
+| impressions | 6,050 | 6,096 | 6,111 | 5,981 | 5,853 | 5,919 | **5,920** |
+| avg position | 27.4 | 27.4 | 27.5 | 27.6 | 27.7 | 27.8 | **27.7** |
+| top10 | 16 | 17 | 17 | 17 | 18 | 18 | **19** |
+| **top3** | **0** | **0** | **0** | **0** | **0** | **0** | **0** |
+
+These are 28-day rolling windows sampled daily, so consecutive rows share 27 of
+28 days. **Yesterday I called `avg_position`'s 27.4 → 27.8 run the one
+directional line in the table and said that if it was still drifting after the
+September spam update completes (~10-08) it would stop being noise. It reversed
+today: 27.8 → 27.7.** Six monotone readings became seven non-monotone ones, which
+is what a random walk on 13 clicks looks like. **That read is withdrawn.** I was
+right to hedge it and wrong to single it out.
+
+**Coverage fell and the goal did not move.** `coverage_pct` 41.5% → **41.0%** —
+covered went 95 → 96 while the tracked universe went 229 → **234** (one query
+adopted by `adopt_queries`, four added by the scout). This is the first day in a
+fortnight that coverage has gone *down*, and it went down because the engine
+added demand faster than it covered it. `top3` 0 → 0. `ranked_known` 52 → 52.
+Uncovered 134 → 138.
+
+**Traffic and leads.** 10-05: **3 visitors** (2 organic, 0 maps). Over the 45
+published days (08-22 → 10-05): **108 visitors** — 48 organic, 51 direct, **2
+local/maps, 2 AI**, 2 referral, 3 campaign. **1 call tap in 45 days** (10-01).
+**1 booking in 45 days**; `bookings_all_time: 4`, `phone_leads_all_time: 0`.
+Zero phone leads, ever. Zero maps visitors in the last eight days.
+
+**137,342 bot hits against 108 humans** — 1,272 crawler fetches per real person.
+
+**Measurement is not the problem.** `traffic.visitors` is not flat at zero: 108
+over 45 days, daily spread 0–7. The over-broad `metrics.py` filter the stored
+prompt warns about is ruled out again.
+
+**The deploy is day 7 of asking and roughly two months of code.** Still no
+top-level `code_version`, no `gsc.pages`, no `keywords.ranked`, no
+`traffic.log_visitors` (`snapshot.py:200,208,231`); `by_town` still has **7**
+buckets rather than the 17 my 10-04 `keywords.TOWNS` edit would give. The 09-30
+entry dated the staleness from three files disagreeing — `snapshot.py` predates
+2026-08-07, `review.py` predates 2026-09-07 — and today's `/day` verdicts
+re-confirm the `review.py` half. "Day 7" counts how long the ask has been
+ignored; the queue behind it is about eight weeks deep.
+
+**A correction to the stored prompt, again.** It still presents 2026-07-28 as
+current (77 rows, 3 clicks, position 12.4, county "2 of 50 in the top 3") and
+still says to expect an API spend cap until 2026-08-01. Today: 851 rows, 13
+clicks, position 27.7, county **0 of 123**, and the cap story is nine weeks
+stale. **The data wins.** As the 10-05 entry asked: delete the dated figures from
+that prompt rather than refreshing them. They are wrong within a day of writing
+and they have now mis-set the baseline for a week of entries.
+
+### Did previous changes work?
+
+**1. Deploy `growth/` (my item 1 since 10-03). NOT DONE. Day 7.** New cost
+today, and it is the one I care about most: the undeployed `review.py` wrote
+three more `works: true` verdicts dated 2026-10-06 — T017, T019, T020, all on
+*"gsc_clicks median 15.5/day"* — **and the scout then built its top-line
+conclusion on that number.** This is no longer a cosmetic unit bug. A stale
+judge is now feeding a false premise to the component that decides what the
+engine tries next. T001 still reads `works: true` on *"11 owned visitors in 71d
+(median 0.0/day and flat)"*; T002 on **6**, which the committed `earned()` guard
+(`review.py:196`, `MIN_TOTAL_VISITORS = 8`) would withdraw.
+
+**2. Watchdog `--email` (my item 2 on 10-04/10-05). NOT DONE.**
+`deploy/cron-nemo-growth:69` still ends `>> /var/log/nemo-growth.log 2>&1` with
+no `--email`, four lines under a comment block explaining what that costs.
+
+**3. My 10-04 funding prediction. Still open, due tomorrow.** I predicted
+`new: 0, changed: 0` with a credit error between 10-07 and 10-09. Today:
+`new: 0, changed: 1`, scout `ok`, no credit error — **productive morning 3** of
+the 3–5 BUDGET.md says a manual top-up buys. Unfalsified, comes due 10-07.
+
+**4. The Business Profile sitting (my item 3, every day since 07-28). No
+evidence it happened. Day seventy-one.** `local_visitors` 2 in 45 days and **0
+in the last 8**; `call_taps` 1 in 45. `index.html:211-220` still publishes
+Mon–Fri 07:30–**18:00**, Sat 08:00–14:00 against T042's note of 7am–8pm / Sat
+8am–1pm. Read today, unchanged.
+
+**5. The two out-of-area scripts (my item 4, seven days). NOT RUN.**
+`guides/5-inch-gutter-service-york-springs-pa.html` still on disk, still the
+single `york-springs` entry in `sitemap.xml` (44 URLs). And the evidence held
+again: **zero of the 40 `discovered_untracked` queries name a York County
+place**, and all 40 still have **zero clicks** — including "gutter installation"
+at position **2.5** on 28 impressions, "gutter" at 3.6, "gutters" at 7.3,
+"gutter repair" at 7.0. Eight of the forty name Lancaster/Lebanon towns, eleven
+name Montgomery/Bucks/Chester/Delaware towns.
+
+**6. PA HIC registration number, insurance, warranty (T075; my item 6). NOT
+DONE.** Case-insensitive grep for `hicpa`, "registration number", `HIC #` or
+`PA#####` across every `.html`, `.py` and `.js`: **zero hits.**
+
+**7. Ledger hygiene (my item 7 on 10-04/10-05). NOT DONE.** T082 still
+`candidate` despite GBP messaging having been removed 2024-07-31. T001, T002 and
+T018 still `active` with exhausted queues; **six** of eleven steps reported
+`noop` this morning with the same sentences. 84 candidates, 11 active, 1 retired,
+`does_not_work` still **empty** after 71 days — which `review.py:132` explains:
+with `MIN_RECENT_MEDIAN = 0`, `total < 8 and (recent or 0) < 0` can never be
+true, so no page-owning technique can ever be retired for low traffic. That
+branch is still unreachable in the repo, correctly left alone on 09-30 as a
+change to autonomous behaviour.
+
+**8. The pre-registered coverage-versus-rank test (registered 09-20). Failing
+for the seventeenth day, and today in a new way.** Coverage *fell* to 41.0%
+against a 42.7% peak on 09-20, `top3` stayed 0, tracked universe 215 → 234,
+`ranked_known` 49 → 52. **Verdict unchanged and now slightly stronger: no
+detected relationship between coverage and the goal metric, in either
+direction.** Still the most important negative result in this journal.
+
+**9. The 23 over-long titles (my item 5 on 10-05). NOT REPAIRED — and the
+generator fix held.** Measured all 43 live titles again today: **still exactly
+23 over 65 characters**, all in `guides/` and `services/`, none in `areas/`. No
+24th was added, because `improve_ctr` failed and `money_pages` wrote nothing —
+not because the fix shipped. The fix in 2ea9bdb is prophylactic and inert until
+the deploy.
+
+**10. The Dover page, two days running.** `improve_ctr` rewrote its title on
+10-05 ("Seamless Gutters in Dover, PA" → "Gutter Installation Dover PA", from a
+baseline of 112 impressions / 0 clicks / position 12.6) and `strengthen_pages`
+added a "Gutter Replacement in Dover, PA" section to the same page this morning.
+Dover's `covered` count went 9 → 10. **Both changes are unmeasurable per-page
+until `gsc.pages` exists**, and they are now confounded with each other on the
+same URL. Worth noting as a method problem: the engine has no interlock stopping
+two techniques touching one page on consecutive days.
+
+**11. `improve_ctr` did not run today — it failed, with a brand-new error.** See
+finding A. This is the first non-billing failure this technique has had. It also
+means yesterday's worry — twenty unmeasurable snippet rewrites before the first
+leaves its 21-day cooldown — is one morning behind schedule rather than on it.
+
+### What I found in the code today
+
+**A. `improve_ctr` failed on a failure mode that has never appeared before, and
+the error message was built so that it cannot be diagnosed.**
+
+```
+improve_ctr — FAILED: generation failed for
+areas/seamless-gutters-red-lion-pa.html: no text in reply
+```
+
+First occurrence of `no text in reply` in the entire journal. Every previous
+`improve_ctr` failure — 09-27, 09-28, 09-29, 09-30, 10-01, 10-02, 10-03 — was
+the billing 400. **This is not billing:** the scout ran and succeeded on the
+same morning, and `adopt_queries`, `strengthen_pages` and `ping_indexnow` all
+did paid or network work. The API is funded.
+
+`no text in reply` is raised at `llm.py:352` when the reply comes back with
+**zero text blocks** — distinct from the parse-failure branch below, which handles *unparseable* text. Three different causes produce it and the message
+distinguishes none of them: the budget spent entirely on thinking
+(`stop_reason=max_tokens`), a declined request (`refusal`), or research still
+mid-flight with `MAX_CONTINUATIONS` spent (`pause_turn`). `MIN_MAX_TOKENS = 3000`
+(added 09-18, so it *is* on the droplet) exists precisely to prevent the first,
+and its comment documents an earlier instance of the same family.
+
+Worse: the parse-failure branch next door prints `stop_reason` and dumps the raw
+reply to `DEBUG_DIR` *for exactly this reason* — its comment says so. The
+empty-reply branch does neither. **So today's failure left four words and no
+evidence, and I cannot tell you which of the three happened.** I fixed the
+message (below). I did **not** guess at a cause, and I am not proposing a code
+change to `improve_ctr` on one undiagnosed data point.
+
+**B. The duplicate-page risk I called "prophylactic rather than urgent"
+yesterday went live within 24 hours — and the engine's own scout loaded it.**
+
+Yesterday I simulated `_host_page` against all 134 uncovered queries and found
+none routing to `/index.html`, which `_needs_its_own_page` (`techniques.py:623`)
+reads as *"nowhere to live, write it a guide."* I re-ran the same simulation
+today against the 138 uncovered queries. **Two now route there, and both are
+queries this morning's scout added:**
+
+- `gutter blown off house by wind`
+- `does homeowners insurance cover gutter damage`
+
+The first is the finding-B mechanism exactly. The site already has
+`/services/emergency-gutter-repair.html` ("What Storm Damage Usually Looks Like
+in York County", "What to Do in the First Few Hours") **and**
+`/guides/who-to-call-when-gutter-is-falling-off-house.html` ("Who you actually
+call", "Why gutters pull away from the house"). A wind-blown gutter is what both
+pages are about. It would have been the **eighth** near-duplicate of this shape.
+The reason neither caught it: `SERVICE_HINTS` (`techniques.py:1004`) has entries
+for guards, soffit, cleaning, repair and installation but **no storm words at
+all**, despite a storm page existing; and `_topic_guide`'s subset test fails
+because `{blown, wind}` are not in the falling-off guide's slug.
+
+**The structural half, which is the part worth keeping:** the scout writes
+`keywords_added` straight into the tracked universe on the same morning it files
+the matching technique as an *unactivated candidate* (T095). `money_pages` reads
+the universe raw. So the queries arrive live while the judgement that was
+supposed to accompany them sits in a candidate nobody approved — and the scout's
+reasoning about them lives in a free-text `notes` field no generator reads.
+
+**I fixed the routing half** (below), and proved the fix is narrow:
+simulated against all 178 queries in `uncovered` + `discovered_untracked`,
+before and after, **exactly one route changed** — the offending query, from
+`/index.html` to the storm page — and nothing was taken from a page that
+already had it. I did **not** touch the `_topic_guide` direction bug; yesterday's
+reasoning for leaving it still holds and it is still the right fix only once
+T092's consolidation plan exists.
+
+**C. The insurance query is a licensing exposure, the guardrail is absent, and
+the one precedent got it right by luck.**
+
+This morning's scout attached an unusually specific warning to T095: in
+Pennsylvania, adjusting or negotiating a claim on a homeowner's behalf requires a
+public adjuster licence, and offering to waive or absorb a deductible is
+insurance fraud. It then adopted `does homeowners insurance cover gutter damage`
+into the tracked universe. That query routes to `/index.html`, so **`money_pages`
+is the technique that will write it** — on the next funded morning, if the
+deploy ever lands — and `MONEY_SYSTEM` (`techniques.py:570`) contains **no
+insurance, claim, adjuster or deductible constraint of any kind.** Nor does
+`STRENGTHEN_SYSTEM`.
+
+Then the good news, which I have to report because it cuts against the alarm: the
+site **already** carries insurance prose, and it is correct.
+`/services/emergency-gutter-repair.html` was built from a hand-written brief
+(`techniques.py:1333`) that asked for *"how insurance claims usually treat gutter
+damage"* and said nothing about licensing, and the model volunteered the right
+framing anyway — *"We are not a public adjuster and cannot promise what your
+insurer will approve"*, *"we do not make coverage decisions"*, photographs and an
+itemised written estimate an adjuster can review, no deductible talk. **So the
+risk is real and the base rate is one for one in our favour.** That is not a
+guardrail, it is a coin that came up heads. I put the rule in the prompt.
+
+**D. The 40 newly-discovered queries include two that are not human demand at
+all.** `factors that affect gutter cleaning cost -filetype:pdf` (46
+impressions, position 37.5) carries a search operator — that is a tool scraping,
+not a homeowner — and `nemo` (10 impressions, position 7.2) is a cartoon fish.
+Minor, but worth recording before someone treats 40 as a demand count: the
+honest number of real queries in that list is 38, and zero of them are in York
+County.
+
+### What I researched today
+
+**A note on the research itself, because it is thinner than I want.** Every
+`WebFetch` I attempted was refused by this container's network egress policy —
+searchengineland.com, scalevise.com and dev.to were all blocked by name. I have
+search-result summaries but could not open a single primary source to check
+sample sizes or methodology. **Treat every figure below as an unverified
+secondary summary.** If this is going to be a daily research step, the
+environment's Network access setting needs the research domains allowed
+(Allowed domains under the environment's Edit → Network access; steps at
+https://code.claude.com/docs/en/cloud-environments#network-access), or every
+entry after this one carries the same caveat.
+
+**1. The finding that genuinely changes something: a service-area business's
+proximity is computed from its hidden address, and a hidden address is itself the
+#7 local ranking factor.** For a business with no storefront, Google calculates
+distance from the verified physical address it does not display — not from the
+service areas listed. Up to 20 service areas can be set, and the boundary should
+stay inside about two hours' drive.
+
+**Why this matters more than any tactic on my list: it puts a structural ceiling
+on the owner's goal as currently written.** "More than 50% of York County gutter
+searches in the top 3" spans Hanover to Wrightsville — roughly 35 miles. If
+Eric's verified address is in or near York city, the Hanover and Spring Grove
+buckets may be hard to win in the local pack *at any level of relevance or
+prominence*, because proximity is doing work no amount of on-page work can
+touch. Nobody in 71 days of this journal has raised that, including me, and it
+reframes what "50% of the county" can mean: the achievable version is probably
+**top-3 in the proximity-reachable core, plus organic (not map) rank in the
+outer towns**. One more reason the Business Profile sitting is the gate — the
+address and the service-area list are both read during it.
+- https://pushleads.com/how-to-set-up-and-rank-your-google-business-profile-as-a-service-area-business-w/
+- https://www.mapranks.com/2026/06/29/google-maps-optimization-service-area-businesses/
+- https://criticnest.com/service-area-business-google/
+
+Also from that set, and checkable during the same sitting: **if a profile has
+ever been moved, Google reverts the ranking radius to wherever it was originally
+verified.** Worth knowing what address this listing was verified at.
+
+**2. A correction to this morning's scout, which rejected a candidate on a
+half-true premise.** The scout rejected AI-crawler plumbing and more schema
+work, reasoning that AI engines *"read the third-party ecosystem — BuildZoom,
+Reddit, aggregators — more than your own site."* That is true of ChatGPT and
+false of Gemini. A cited 2026 study reports **Gemini pointing at the business's
+own website in 80.7% of local citations, against 48.8% for ChatGPT**, which sends
+**44.7%** to directories and review platforms. Profile completeness is reported
+as the heaviest single input for Gemini (22%) and Google AI Overviews (25%).
+Engine agreement is very low — the same top business recommended 4.2% of the
+time, overlapping domains 8%.
+
+**The practical reading: the scout's conclusion survives, its reason does not.**
+Third-party presence (T053, BuildZoom, the HIC record) is the right lever *for
+ChatGPT*. For Gemini and AI Overviews the lever is the profile and the site —
+which is to say the profile sitting again, not a markup pass. I am still not
+proposing new schema work: `techniques.py` already emits FAQPage and
+LocalBusiness JSON-LD on every generated page, which I verified again and which
+the stored prompt rightly singles out as the mistake not to repeat.
+- https://searchengineland.com/business-websites-gemini-citations-local-ai-search-study-485506
+- https://localdominator.co/ai-source-authority-mapping/
+- https://spartansem.com/how-ai-search-recommends-local-businesses/
+
+**3. One concrete number that sharpens the riskiest item on my list.** An HVAC
+business is reported to have fallen from local-pack position 1 to **position 31**
+by switching its primary category from the specific "Air Conditioning Repair
+Service" to the broader "Air Conditioning Contractor". Primary category remains
+the #1 individual ranking factor; GBP signals ~32% of pack weight, reviews ~20%
+(up from 16% in 2023). This does not change my advice — it changes its risk
+profile. **Write the current category down before touching it, prefer the
+specific over the broad, and change nothing else in the same sitting.**
+- https://thevalleymarketinggroup.com/blog/google-business-profile-ranking-factors-2026/
+- https://savogroup.com/blog/google-business-profile-home-services/
+- https://wolfpackadvising.com/blog/how-to-rank-higher-on-google-maps/
+
+**Rejected today, with reasons.**
+- *FAQPage / LocalBusiness structured data* — already shipped on every generated
+  page. Verified in `techniques.py` again. Recorded because the stored prompt
+  asks for it to be.
+- *llms.txt and AI-crawler plumbing* — rejected by the scout this morning and
+  rejected again here. Finding 2 above changes the reason, not the answer:
+  nothing is gated on markup.
+- *More town pages* — 15 area pages, 11 owned visitors in 71 days, `top3` 0.
+- *Review incentives, gating, "ask the happy ones"* — prohibited. A suspension
+  costs more than this business can earn back.
+- *A second listing or an address nearer Hanover* — guideline violation, and
+  finding 1 is not an invitation to fake proximity.
+- *Paid lead marketplaces and Local Services Ads* — already T086; spends money,
+  Eric's call, and premature while the free profile is unopened.
+- *Writing pages for the geo-neutral head terms* — position 2.5 on "gutter
+  installation" earns zero clicks because the searcher is not in York County.
+
+### Recommendations
+
+Eight. Items 1 and 2 are free and take minutes, and item 1 now gates the
+engine's *reasoning* and not only its reporting.
+
+1. **Divine — deploy `growth/`. Day 7. A stale judge is now feeding the scout a
+   false premise.**
+   ```
+   git -C /root/nemo-repo fetch origin main && git -C /root/nemo-repo reset --hard origin/main
+   bash /root/nemo-repo/deploy/deploy_growth.sh            # read-only report first
+   bash /root/nemo-repo/deploy/deploy_growth.sh --apply
+   ```
+   *Buys, in order of what it costs not to have:* a `review.py` that prints
+   `/28d` instead of `/day` (`review.py:45`) so the ledger stops telling the
+   scout the site earns 15 clicks a day; the `earned()` guard that withdraws
+   T002's `works: true` at 6 < 8; `gsc.pages`, the only way to judge the Dover
+   and homepage rewrites before the next twenty land; `code_version`;
+   `keywords.ranked`; `traffic.log_visitors`; the ten town buckets; the 23-title
+   generator fix from 2ea9bdb; and today's two fixes.
+   *How I would know:* tomorrow's snapshot carries a `code_version` block,
+   `by_town` has 17 buckets, and no verdict says `/day`.
+   *Checked:* four fields absent against `snapshot.py:200,208,231`; three
+   `/day` verdicts dated 2026-10-06 in today's snapshot against
+   `review.py:45`. **Divine's, ~10 minutes.**
+
+2. **Divine — the watchdog's `--email`. My funding prediction comes due
+   tomorrow.** Append `--email divinejdavis@gmail.com` to
+   `deploy/cron-nemo-growth:69`. `cmd_watchdog` returns early when healthy, so
+   this adds no mail on a good day; the 26-day silence that ended on 10-04 is
+   what its absence cost. Today is productive morning 3 of the 3–5 BUDGET.md
+   says a top-up buys.
+   *How I would know:* the engine is still writing on 10-11, or Divine gets mail
+   when it stops.
+   *Checked:* cron line 69 read today, still no `--email`. **Divine's, minutes.**
+
+3. **Eric — the Business Profile sitting. Day seventy-one. Fifteen minutes,
+   free, and today it gained a reason that outranks every tactic on this list.**
+   Finding 1 above: for a business with no storefront, **proximity is measured
+   from the address Google has on file and does not display**, and a hidden
+   address is the #7 ranking factor. That means the sitting is where we learn
+   whether "50% of York County" is even reachable in the map pack, or whether the
+   honest target is top-3 in the core plus organic rank in the outer towns.
+   **(a) Which address is this profile verified at, and has it ever been moved?**
+   A moved listing reverts its ranking radius to the original verification point.
+   **(b) The service-area list** — up to 20 towns or postcodes, inside ~2 hours'
+   drive; filled in, and never shrunk.
+   **(c) The real hours**, then set the profile, `index.html:211-220` and
+   `techniques.py:883-885` to the same numbers in one pass — at least one of the
+   three is wrong today (18:00 vs 20:00 weekday close). Being open at the time of
+   search is the #5 pack factor; an 18:00 close filters the profile out of the
+   after-work searches this trade lives on. Only publish hours the phone can
+   honestly cover.
+   **(d) Performance → Calls, last 28 days.** Still the single most valuable two
+   minutes on this list (T049), and still the thing that would change my mind
+   fastest.
+   **(e) Performance → Searches, last 6 months** (T093) — the only view of Maps
+   demand Search Console cannot see. It is also what would finally source or kill
+   the "~300 profile views" figure the ledger has been quoting unsourced.
+   **(f) Edit profile → "Collected info"** — what Google's automated assistant
+   recorded, from where, when; delete anything wrong.
+   **(g) Pending suggested edits**, and confirm the profile's notification email
+   is one Eric reads — a stranger's edit auto-applies after four days if the
+   website corroborates it.
+   **(h) Website URL → `/services/seamless-gutter-installation.html?utm_source=gbp`**,
+   not the homepage (diversity update; the 10-05 entry explains the reversal).
+   **(i)** itemised Services, **(j)** one photo from a finished job, **(k)** read
+   off the review count and star average — "13 reviews / 4.2 stars" is 71 days
+   unverified.
+   **Then, separately and last, the primary category.** **Write down what it is
+   set to before touching it**, prefer the specific category over the broad one,
+   and change nothing else the same day: a reported HVAC case went from position 1
+   to 31 on exactly that swap. The profile name reads **"NEMO Seamless Gutter"**
+   and nothing more. No street address. No messaging (removed 2024-07-31 — T082
+   should be retired as impossible). No Q&A panel — it is gone.
+   *How I would know:* `local_visitors` above 2-in-45-days, and a second
+   `call_taps` day.
+   *Checked:* no GBP code path exists anywhere in `growth/` — which is also why
+   the 300-views figure has no source; hours conflict read today in
+   `index.html:211-220`. **Eric's, and only Eric's.**
+
+4. **Divine — run the two out-of-area scripts. Seventh day of asking.**
+   ```
+   cd /var/www/nemo-seamless-gutter
+   python3 deploy/repair_out_of_area_prose.py          # then --apply
+   python3 deploy/retire_out_of_area.py                # then --apply
+   ```
+   Zero of the 38 real newly-discovered queries are in York County; all 40 have
+   zero clicks. *Honest bound:* this removes a contradiction between the copy and
+   the `areaServed` schema; expect the other-county rows to leave
+   `discovered_untracked` within 3–6 weeks of re-crawl, and treat any York County
+   **rank** movement as unproven.
+   *Checked:* York Springs page still on disk and still the one `york-springs`
+   entry in `sitemap.xml`; `_off_area_prose` / `OUT_OF_AREA` in `techniques.py`
+   are generation-time only and cannot repair what is already written.
+   **Divine's, ~5 minutes.**
+
+5. **Divine — the deterministic pass over the 23 over-long titles. Carried from
+   10-05, still exactly 23.** For each page under `guides/` and `services/`,
+   strip the brand suffix from the existing `<title>`, run it back through
+   `techniques._page_title()`, write it back if it changed. No model call, no new
+   technique, idempotent, revertible. Verified again today: 23 of 43 titles over
+   65 characters, all in `guides/` and `services/`, none in `areas/`; three carry
+   the business name twice. `improve_ctr` cannot reach them — one page per
+   morning, underperformers only, `CTR_COOLDOWN_DAYS = 21`.
+   *Expected effect:* a modest CTR gain on 23 truncated snippets and the removal
+   of three that read as broken. **Not a rank change.**
+   *How I would know:* per-page clicks against impressions — which needs item 1.
+   *Checked:* measured all 43 live titles today. **Divine's, ~15 minutes.
+   Needs item 1 to be measurable, not to be correct.**
+
+6. **Eric to supply, Divine to ship — the PA HIC registration number, insurance
+   and warranty line (T075).** HICPA requires `PA` plus the registration number
+   clearly and conspicuously in **all advertisements**, and a public website
+   advertising gutter installation in Pennsylvania is one. Second reason,
+   unchanged from 10-05 and reinforced by finding 2: state licence-board records
+   are among the sources AI engines check, and publishing the number is what lets
+   them tie the record to the site — which is the *ChatGPT* half of the citation
+   split, the half the profile cannot reach.
+   *Checked:* grep for `hicpa`, "registration number", `HIC #` or `PA#####`
+   across every `.html`, `.py` and `.js` returns zero hits.
+   **Eric supplies the number; Divine ships it.**
+
+7. **Divine — ledger hygiene on the droplet. No deploy needed; it is six of
+   eleven steps now.** (a) **Retire T082** as *not possible* (GBP messaging
+   removed 2024-07-31). (b) **Retire or re-scope T001, T002, T018** — exhausted
+   queues, `noop` again this morning, and the stale `review.py` is writing
+   `works: true` against them. (c) **Promote T042** on the openness finding.
+   (d) Fold the scout's trade-partner note into T030 as it asked. These are
+   status edits to `techniques.json`, which lives on the droplet precisely so
+   they need no deploy.
+   *Checked:* today's `last_build` log carries six `noop` details verbatim;
+   T001/T002/T018 verdicts dated 2026-10-06 in today's snapshot.
+   **Divine's, ~5 minutes.**
+
+8. **Nobody yet — watch for a second `no text in reply`, then act.** Finding A is
+   one undiagnosed data point and I will not propose a code change to
+   `improve_ctr` on it. My message fix (below) means the *next* one names its
+   stop reason, which is the difference between a two-minute diagnosis and a
+   paid reproduction. If it recurs **and** reads `stop_reason=max_tokens`, raise
+   `MIN_MAX_TOKENS` or pass a larger budget from `improve_ctr`; if it reads
+   `refusal`, read the page it tripped on; if `pause_turn`, raise
+   `MAX_CONTINUATIONS`. Each is a different two-line change and guessing between
+   them now would be the kind of unfounded fix this journal is supposed to catch.
+   *Checked:* `llm.py:352` against the parse-failure branch at `:361-370`; first
+   occurrence of this string in 32,600 lines of journal. **No action today.**
+
+**Not recommended, deliberately.** (i) The `_topic_guide` direction bug —
+yesterday's reasoning stands: inverting that subset test risks suppressing a page
+that should exist, `test_a_genuinely_new_topic_still_gets_its_own_page` guards
+against it, and it belongs with T092's consolidation plan. (ii) `review.py:132`'s
+unreachable retire branch — real, one character, and a change to what the engine
+retires without being asked. Eric's call, as 09-30 decided. (iii) Any change to
+the scout's keyword-adoption path, which is the structural half of finding B. The
+right fix is probably that `keywords_added` should land as proposals rather than
+straight into the tracked universe, and that is a design decision about the
+engine's autonomy, not a defect repair.
+
+**What I changed in the repo myself, in this commit.** Three small changes, all
+inert until item 1 ships.
+- `growth/techniques.py` — added a storm-words entry to `SERVICE_HINTS`
+  (`storm, wind, blown, blew, hail, torn, ripped, emergency` →
+  `/services/emergency-gutter-repair.html`), placed ahead of the clean/repair
+  line for the same reason the soffit line is, so "gutter repair after storm"
+  does not land on the cleaning page. Proven narrow: simulated against all 178
+  queries in `uncovered` + `discovered_untracked`, before and after, and
+  **exactly one route changed** — `gutter blown off house by wind`, from
+  `/index.html` to the storm page. Nothing was taken from a page that already
+  had it.
+- `growth/techniques.py` — added the PA public-adjuster constraint to
+  `MONEY_SYSTEM`: what we document (photographs, an itemised written estimate an
+  adjuster can review), that the insurer decides, and the three prohibitions —
+  never say damage is or will be covered, never offer to handle, file or
+  negotiate a claim, never offer to waive, absorb, discount or rebate a
+  deductible. **I deliberately did not add it to `STRENGTHEN_SYSTEM`**, which
+  carries the same exposure: no insurance query currently routes to a page that
+  already exists, so adding it there would be speculative, and I would rather
+  record the hole here than widen the diff. If an insurance query ever routes to
+  an existing page, that prompt needs the same five lines.
+- `growth/llm.py` — `call_json`'s empty-reply branch now names the stop reason,
+  the way the parse-failure branch below already did. Today's failure
+  left four words and no evidence; tomorrow's will say which of max_tokens,
+  refusal or pause_turn it was.
+- **Tests: added `StormRoutingTest` (5 tests) and `InsurancePromptGuardTest`
+  (2 tests) to `growth/test_techniques.py`, and
+  `test_an_empty_reply_names_the_stop_reason_too` plus
+  `test_an_empty_reply_with_no_stop_reason_still_reads_cleanly` to
+  `growth/test_llm.py`; changed none; removed none — no behaviour was deleted.**
+  The storm tests pin the query that would have shipped, the four other storm
+  phrasings, the ordering against the repair line, that ordinary repair and
+  install queries are untouched, and that a missing storm page falls through
+  rather than erroring. 342 Python tests and 9 node tests pass via
+  `scripts/test.sh`. The booking journey was not run and is not required: this
+  commit touches no `index.html`, `booking.js`, `booking.css`, `styles.css`,
+  `script.js` or `server/`.
+
+### Reasoning and uncertainties
+
+**The blunt version.** Seventeen days of `top3` at zero, seventy-one days of an
+unopened Business Profile, seven days of an undeployed one-command fix against a
+queue eight weeks deep, and today the first day the staleness provably corrupted
+a decision rather than just a report: the scout opened its morning with a click
+rate thirty times too high and a profile-views figure with no source, and
+concluded from them that this is "not a traffic problem" — the opposite of what
+the real numbers say and of what this journal concluded on 10-02. That is the
+most important thing I found today and it is downstream of item 1.
+
+**What I got wrong yesterday, stated plainly.** I singled out `avg_position`'s
+six monotone readings as "the one line I will call directional". It reversed the
+next morning. Hedging it was right; naming it at all was more than 13 clicks can
+support, and I should hold the same standard against myself that I hold against
+`scoreboard.works`.
+
+**What I am not claiming.** The storm-routing fix prevents one duplicate page; it
+is worth very little on its own and nothing at all for rank. The insurance prompt
+rule prevents a page that has not been written, on a model that got the same
+material right unprompted once already — I am buying cheap insurance against a
+low-probability, high-cost outcome, not fixing a live defect. The `llm.py` change
+produces no content whatsoever; it makes the next failure readable. None of the
+three competes with the two things I still believe are binding: a profile nobody
+has opened in seventy-one days, and nothing physical in York County carrying the
+phone number.
+
+**The constraint arithmetic, restated because the scout got it backwards this
+morning.** 2.4 visitors a day and ~0.5 Search Console clicks a day cannot produce
+a phone call. At a top-decile 10% conversion rate that is under half a call a
+month. No amount of title, schema, routing or CTA work changes that at this
+traffic level. I keep fixing on-site defects because they are cheap, provable and
+mine to fix — not because I think they are the lever.
+
+**Where I might be wrong.** (i) On finding 1, the proximity ceiling: I do not
+know Eric's verified address, so I cannot say whether Hanover is 8 miles or 30
+from it, and the whole argument could be a non-issue — which is itself a reason
+item 3(a) exists. I may also be over-reading secondary summaries I could not open
+the primary sources for. (ii) On finding A: I have asserted only that this is not
+a billing failure, which the same morning's successful scout establishes. Any
+claim about *which* of the three causes it was would be invention, and if the
+answer turns out to be something I have not listed, item 8's branches are wrong.
+(iii) On the storm-routing fix: adding `emergency` to a hint list ahead of
+`repair` is a routing precedence change, and although the 178-query simulation
+found nothing displaced, that set is not the full tracked universe —
+`keywords.json` is droplet-owned and I cannot read it. The honest bound is "no
+displacement among the 178 queries visible to me". (iv) On seasonality: York
+County is at peak leaf-fall, the best month of this trade's year, and `top3` is
+zero through it. If the profile sitting happens and nothing moves by
+mid-November, then "the profile outranks the website" is not holding here and the
+next question is whether 13 reviews caps the pack regardless — with finding 1
+adding a second candidate answer, that proximity does.
+
+**What would change my mind fastest, unchanged for four days:** the
+Performance → Calls number from item 3(d). If the profile is generating calls
+Eric is already answering, this journal has been measuring the wrong funnel for
+seventy-one days. If it is zero, then item 3 is the entire plan — and item 3(e)
+is what would finally tell us whether "~300 profile views" was ever a real
+number or just a sentence the ledger learned to repeat.

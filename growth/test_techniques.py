@@ -98,6 +98,84 @@ class TopicGuideTest(unittest.TestCase):
         self.assertIsNone(T._topic_guide(_Ctx(blank.name), "york gutters"))
 
 
+class StormRoutingTest(unittest.TestCase):
+    """2026-10-06: the morning's scout adopted "gutter blown off house by wind".
+
+    _host_page sent it to /index.html, which money_pages reads as "nowhere to
+    live, write it a guide" — against /services/emergency-gutter-repair.html and
+    /guides/who-to-call-when-gutter-is-falling-off-house.html, which both already
+    answer it. That would have been the eighth near-duplicate of this shape.
+    """
+
+    PAGES = ("services/emergency-gutter-repair.html",
+             "services/gutter-cleaning-repair.html",
+             "services/seamless-gutter-installation.html",
+             "index.html")
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        for rel in self.PAGES:
+            d = os.path.dirname(os.path.join(self.tmp.name, rel))
+            if d:
+                os.makedirs(d, exist_ok=True)
+            open(os.path.join(self.tmp.name, rel), "w").write("<html>")
+        self.ctx = _Ctx(self.tmp.name)
+
+    def _route(self, q):
+        return T._host_page(self.ctx, {"query": q, "target": None})
+
+    def test_the_query_that_would_have_shipped_an_eighth_duplicate(self):
+        self.assertEqual(self._route("gutter blown off house by wind"),
+                         "/services/emergency-gutter-repair.html")
+
+    def test_the_other_storm_words_route_there_too(self):
+        for q in ("gutter torn off by storm york pa",
+                  "emergency gutter repair",
+                  "hail damaged gutters york pa",
+                  "wind blew gutter off house",
+                  "downspout ripped off in storm"):
+            self.assertEqual(self._route(q),
+                             "/services/emergency-gutter-repair.html", msg=q)
+
+    def test_storm_beats_the_repair_line_rather_than_the_other_way_round(self):
+        # "repair" is in the cleaning page's word list, so order decides this.
+        self.assertEqual(self._route("gutter repair after storm york pa"),
+                         "/services/emergency-gutter-repair.html")
+
+    def test_ordinary_repair_and_install_queries_are_untouched(self):
+        self.assertEqual(self._route("gutter repair york pa"),
+                         "/services/gutter-cleaning-repair.html")
+        self.assertEqual(self._route("gutter installation york pa"),
+                         "/services/seamless-gutter-installation.html")
+
+    def test_no_storm_page_falls_through_instead_of_erroring(self):
+        os.remove(os.path.join(self.tmp.name,
+                               "services/emergency-gutter-repair.html"))
+        self.assertEqual(self._route("gutter blown off house by wind"),
+                         "/index.html")
+
+
+class InsurancePromptGuardTest(unittest.TestCase):
+    """The scout's 2026-10-06 note: in PA, adjusting or negotiating a claim for a
+    homeowner needs a public adjuster licence. It adopted "does homeowners
+    insurance cover gutter damage" the same morning, and that query routes to
+    /index.html, so money_pages is the technique that will write the page. The
+    note lives in free text no generator reads; the rule belongs in the prompt.
+    """
+
+    def test_money_system_states_the_licence_limit(self):
+        s = T.MONEY_SYSTEM.lower()
+        for phrase in ("public adjuster", "deductible", "insurer decides"):
+            self.assertIn(phrase, s, msg=phrase)
+
+    def test_money_system_forbids_the_three_things_that_are_offences(self):
+        s = T.MONEY_SYSTEM.lower()
+        self.assertIn("never say damage is or will be covered", s)
+        self.assertIn("never offer to handle, file or negotiate a claim", s)
+        self.assertIn("waive, absorb, discount or rebate a deductible", s)
+
+
 class JsonLdEscapingTest(unittest.TestCase):
     """Model text lands in JSON-LD, which sits inside a <script> block.
 
