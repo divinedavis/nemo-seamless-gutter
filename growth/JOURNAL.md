@@ -32596,3 +32596,26 @@ Performance → Calls number from item 3(d). If the profile is generating calls
 Eric is already answering, this journal has been measuring the wrong funnel for
 seventy days. If it is zero, the ~300 monthly profile views are this business's
 only real audience and item 3 is the entire plan.
+
+## 2026-10-06 — engine run
+
+Goal: **0.0%** top-3 share of 234 tracked queries (target 50%).
+2026-10-05: 3 visitors (2 organic, 0 maps) · 0 bookings, 0 phone leads.
+
+**Built:**
+- `adopt_queries` — ok: adopted 1 real search(es) into the tracked universe: soffit and fascia installation spring grove pa
+- `improve_ctr` — FAILED: generation failed for areas/seamless-gutters-red-lion-pa.html: no text in reply
+- `geo_answer_first_content_pass` — ok: every ranking page already opens with a direct answer
+- `strengthen_pages` — ok: added "Gutter Replacement in Dover, PA" to /areas/seamless-gutters-dover-pa.html for 'gutter replacement dover pa'
+- `service_pages` — ok: every queued service already has a page
+- `area_pages` — ok: every queued town already has a page
+- `money_pages` — ok: no query needs its own page — the remaining gaps all belong on pages that exist, which strengthen_pages handles
+- `internal_links` — ok: refreshed nearby-links on 0 page(s)
+- `local_schema` — ok: LocalBusiness schema already current
+- `rebuild_sitemap` — ok: [gen_sitemap] wrote 44 URLs to sitemap.xml
+- `ping_indexnow` — ok: submitted 1 URL(s), HTTP 200
+
+**Scout proposed (as candidates, not running):**
+- T094 Ask for the estimate on every call — two named time slots — NEMO's funnel is full of capture (AI agent, booking widget, callback buttons) and empty of closing: 4 bookings all time. The single cheapest fix is a rule that no call — answered by Eric or by the AI 
+- T095 Wind/ice-torn gutter lane: free damage photo report, honest claim advice — York County gets nor'easter and squall-line wind from October through March, and the morning after one, homeowners search for someone to look at 40 feet of gutter hanging off the fascia — and separate
+- T096 Dated winter price-lock: turn 'maybe in the spring' into a signed slot — Every October estimate that hears '$2,400' answers 'let's do it in the spring', and in York County that homeowner is lost by March because nobody holds the conversation through the dead months. A writ
