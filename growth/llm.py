@@ -136,6 +136,17 @@ MAX_CONTINUATIONS = int(os.environ.get("NEMO_LLM_CONTINUATIONS", "4"))
 
 # The stop_reason of the last reply, so a parse failure can say whether the
 # reply was finished, cut off at max_tokens, or still paused.
+#
+# None means "no reply has been received in this process yet", and nothing else:
+# a reply that carries no stop_reason records the string "absent" instead. The
+# distinction is the whole point. On 2026-10-07 the scout died in the JSON parser
+# and the error printed no stop reason at all, which left two unrelated
+# explanations indistinguishable — the droplet running an llm.py older than the
+# instrumentation, or the API returning a reply with no stop_reason field. (The
+# first was ruled out another way: the same message carried the _dump_unparsed
+# path, and the dump and the stop reason landed in the same commit.) Recording
+# "absent" means the next one says which, instead of costing a paid call and a
+# morning of inference to tell apart.
 LAST_STOP_REASON = None
 
 
@@ -173,7 +184,9 @@ def call_blocks(system, prompt, max_tokens=4000, tools=None, timeout=240,
         content = resp.get("content", [])
         texts.extend(b.get("text", "") for b in content
                      if b.get("type") == "text")
-        LAST_STOP_REASON = resp.get("stop_reason")
+        # "absent" rather than None: see LAST_STOP_REASON above. A falsy value
+        # here would make a real reply indistinguishable from no reply at all.
+        LAST_STOP_REASON = resp.get("stop_reason") or "absent"
         if LAST_STOP_REASON != "pause_turn":
             return texts
         # Send the paused turn straight back. No "continue" message: the API

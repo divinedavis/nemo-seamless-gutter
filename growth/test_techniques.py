@@ -175,6 +175,34 @@ class InsurancePromptGuardTest(unittest.TestCase):
         self.assertIn("never offer to handle, file or negotiate a claim", s)
         self.assertIn("waive, absorb, discount or rebate a deductible", s)
 
+    def test_strengthen_system_carries_the_same_rule(self):
+        """2026-10-07: the exposure is the topic, not the word.
+
+        On 2026-10-06 this rule was deliberately kept out of STRENGTHEN_SYSTEM
+        because no query containing "insurance" routed to a page that already
+        existed. The next morning money_pages wrote
+        /guides/gutter-blown-off-house-by-wind.html and the copy came back
+        carrying an insurance sentence — for a query with no insurance word in
+        it. Four tracked ice-dam-damage queries route to pages that exist, and
+        those are this technique's queue.
+        """
+        s = T.STRENGTHEN_SYSTEM.lower()
+        for phrase in ("public adjuster", "deductible", "insurer decides",
+                       "never say damage is or will be covered",
+                       "never offer to handle, file or negotiate a claim",
+                       "waive, absorb, discount or rebate a deductible"):
+            self.assertIn(phrase, s, msg=phrase)
+
+    def test_the_two_generator_prompts_state_the_rule_identically(self):
+        """One wording, so a later edit to either cannot weaken only one."""
+        def clause(system):
+            # The insurance bullet is the last constraint in both prompts, so it
+            # runs from "On insurance:" to the JSON contract that follows.
+            s = " ".join(system.split())
+            return s[s.lower().index("on insurance:"):
+                     s.index("Return ONLY")].strip()
+        self.assertEqual(clause(T.MONEY_SYSTEM), clause(T.STRENGTHEN_SYSTEM))
+
 
 class JsonLdEscapingTest(unittest.TestCase):
     """Model text lands in JSON-LD, which sits inside a <script> block.

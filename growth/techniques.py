@@ -1026,6 +1026,17 @@ SERVICE_HINTS = [
      "/services/seamless-gutter-installation.html"),
 ]
 
+# The insurance constraint below went into MONEY_SYSTEM on 2026-10-06 and was
+# deliberately left out of here, on the reasoning that no insurance query routed
+# to a page that already existed, so adding it would be speculative. 2026-10-07
+# retired that reasoning on evidence: `money_pages` wrote
+# /guides/gutter-blown-off-house-by-wind.html that morning and the copy came
+# back carrying an insurance sentence, for a query with no insurance word in it.
+# The exposure is attached to the storm/ice-damage *topic*, not to the word. Four
+# tracked uncovered queries of that topic — "ice dam damage gutter replacement
+# york county pa", "ice dam damaged gutters repair pa", "ice dam damaged gutters
+# replace or repair york pa", "ice dam gutter damage repair pa" — route to pages
+# that exist, which is this technique's queue, not money_pages'.
 STRENGTHEN_SYSTEM = """You write one focused section to add to an existing page on a real \
 seamless gutter contractor's website (NEMO Seamless Gutter, York County, Pennsylvania, \
 owner Eric).
@@ -1043,6 +1054,12 @@ or a specific price. You may describe what drives cost.
 - No exclamation marks. Plain, competent tradesman's voice.
 - 2-3 paragraphs. Add bullets only if they genuinely help.
 - Do not repeat the page's existing headings, which are listed below.
+- On insurance: in Pennsylvania, adjusting or negotiating a claim for a homeowner \
+requires a public adjuster licence, which this business does not hold. You may say what \
+we document — photographs and a written, itemised estimate an adjuster can review — and \
+that the insurer decides. Never say damage is or will be covered, never offer to handle, \
+file or negotiate a claim, and never offer to waive, absorb, discount or rebate a \
+deductible.
 
 Return ONLY valid JSON:
 {"h2": "the section heading",

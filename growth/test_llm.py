@@ -175,6 +175,12 @@ class PauseTurnTest(unittest.TestCase):
         p.start()
         self.addCleanup(p.stop)
 
+    def _debug_dir(self):
+        """A DEBUG_DIR for a test that expects _dump_unparsed to write."""
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        return mock.patch.object(llm, "DEBUG_DIR", tmp.name)
+
     def _run(self, replies, **kw):
         with mock.patch.object(llm.urllib.request, "urlopen",
                                side_effect=replies) as u:
@@ -222,6 +228,9 @@ class PauseTurnTest(unittest.TestCase):
             {"content": [{"type": "text", "text": "done"}]}).encode()
         out, u = self._run([ok])
         self.assertEqual((out, u.call_count), (["done"], 1))
+        # "absent", not None: a reply that carried no stop_reason has to stay
+        # distinguishable from no reply at all. See the next two tests.
+        self.assertEqual(llm.LAST_STOP_REASON, "absent")
 
     def test_parse_failure_names_the_stop_reason(self):
         """So the next one is diagnosable from the journal, not the droplet."""
@@ -243,12 +252,46 @@ class PauseTurnTest(unittest.TestCase):
             self.assertIn(f"stop_reason={reason}", str(cm.exception), msg=reason)
 
     def test_an_empty_reply_with_no_stop_reason_still_reads_cleanly(self):
-        """An unset reason must not print "stop_reason=None"."""
+        """An unset reason must not print "stop_reason=None".
+
+        None now means only "no reply received in this process yet", which is
+        why there is nothing to print. A reply that carried no stop_reason
+        records "absent" and does print — see the two tests below.
+        """
         with mock.patch.object(llm, "call_blocks", return_value=[]), \
              mock.patch.object(llm, "LAST_STOP_REASON", None):
             with self.assertRaises(ValueError) as cm:
                 llm.call_json("sys", "prompt")
         self.assertEqual(str(cm.exception), "no text in reply")
+
+    def test_a_parse_failure_says_absent_rather_than_going_quiet(self):
+        """2026-10-07: the scout died in the parser on "I'll research what's
+        currently working..." and the message named no stop reason at all.
+
+        Two unrelated things produce that silence — a droplet running an llm.py
+        older than the instrumentation, or an API reply with no stop_reason
+        field — and the message distinguished neither. The dump path in the same
+        error ruled the first out, but only because the dump and the stop reason
+        happened to land in one commit. "absent" says it outright.
+        """
+        reply = mock.MagicMock()
+        reply.__enter__.return_value.read.return_value = json.dumps(
+            {"content": [{"type": "text", "text": "I'll research that."}]}
+        ).encode()          # no stop_reason field at all, as on 2026-10-07
+        with mock.patch.object(llm.urllib.request, "urlopen",
+                               side_effect=[reply]), self._debug_dir():
+            with self.assertRaises(ValueError) as cm:
+                llm.call_json("sys", "prompt", key="sk-test")
+        self.assertIn("stop_reason=absent", str(cm.exception))
+
+    def test_the_continuation_ceiling_still_names_pause_turn(self):
+        """The ceiling path must not be relabelled "absent" by the change above:
+        a turn that never unpauses is the one cause item 8 can act on."""
+        paused = [_reply([{"type": "text", "text": "I'll research that."}],
+                         "pause_turn")] * 5
+        with mock.patch.object(llm, "MAX_CONTINUATIONS", 1), self._debug_dir():
+            self._run(paused)
+        self.assertEqual(llm.LAST_STOP_REASON, "pause_turn")
 
 
 if __name__ == "__main__":
