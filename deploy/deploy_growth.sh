@@ -12,13 +12,42 @@
 # answer exactly this question, but snapshot.py is itself one of the stale
 # files, so the diagnostic is undeployed along with everything it would report.
 #
-# The result, as of 2026-08-30, is a droplet running a file-by-file patchwork:
-# techniques.py looks current, snapshot.py predates 2026-08-07 (its published
-# output has no `code_version`, no `keywords.ranked`, no `gsc.pages` and none of
-# the `log_*`/`crawl_*` series that SERIES has listed since 08-15), and
-# review.py predates 2026-08-29 (it restamped the six unfounded `works: true`
-# verdicts again this morning). Nobody can tell which is which without hashing
-# the files, so this hashes the files.
+# The result is a droplet running a file-by-file patchwork. Re-measured from the
+# published snapshot on 2026-10-08, each bound read off a dated commit whose
+# effect is present or absent in growth/snapshot.json:
+#
+#   snapshot.py   < 2026-08-05 11:21  no `keywords.ranked` (bea7a47), no
+#                                     `gsc.pages` (aeed46d 08-06), no
+#                                     `code_version` (870a3dc 08-09), no
+#                                     `crawl_*` (727deec 08-07) and no
+#                                     `log_*` (9e18cbf 08-15) series — the
+#                                     published `traffic` keys are exactly
+#                                     SERIES minus those.           ~64 days
+#   review.py     < 2026-08-29        `earned()` (51cf063) not applied: T002
+#                                     still `works: true` at 6 owned visitors
+#                                     against MIN_TOTAL_VISITORS 8. Also
+#                                     < 2026-09-21: six verdicts print `/day`
+#                                     for a 28-day click total (a88f113). ~40 days
+#   llm.py        in [2026-08-05 13:03, 2026-09-05)
+#                                     has `_dump_unparsed` (c957ed9) — the
+#                                     scout's failure names a dump path — but
+#                                     not the pause_turn continuation loop
+#                                     (5e71626), so the 2026-08-29/09-05
+#                                     narration-only scout death recurred on
+#                                     10-07 and 10-08.                ~34 days
+#   keywords.py   < 2026-10-04        `by_town` has 7 buckets, TOWNS has 17
+#                                     (5068de1).                       ~4 days
+#   techniques.py < 2026-10-05        the page published on 10-08 carries a
+#                                     77-char title the generator fix (2ea9bdb)
+#                                     would have shortened.             ~3 days
+#   metrics.py    undetermined        every field that would date it is one
+#                                     snapshot.py does not publish.
+#
+# Two things follow. The spread is two months, not the one week the newest file
+# suggests — so "is my fix live?" has a different answer per file. And nothing
+# in the published snapshot can report this, because the reporter is one of the
+# stale files: that is what makes the forensics above necessary, and it is why
+# this script hashes the files instead.
 #
 # USAGE, on the droplet:
 #
@@ -48,7 +77,9 @@ while [ $# -gt 0 ]; do
     --apply) APPLY=1 ;;
     --root)  DOCROOT="$2"; shift ;;
     --from)  SRC="$2"; shift ;;
-    -h|--help) sed -n '2,40p' "$0"; exit 0 ;;
+    # The header runs to the line above `set -euo pipefail`; keep this range in
+    # step with it, or `--help` stops printing the USAGE block it exists for.
+    -h|--help) sed -n '2,68p' "$0"; exit 0 ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
   shift
