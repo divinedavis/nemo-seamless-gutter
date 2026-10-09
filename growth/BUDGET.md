@@ -36,7 +36,8 @@ duty cycle rather than a guess:
 | 08-31 → 09-02 | 3 | dead — no credit |
 | 09-03 → 09-07 | 5 | **alive** — 2 new pages, 7 page edits |
 | 09-08 → 10-03 | 26 | dead — no credit |
-| 10-04 → ? | 1+ | **alive** — credit restored; 2 page edits on day 1 |
+| 10-04 → 10-08 | 5 | **alive** — credit restored; 3 new pages, 9 page edits |
+| 10-09 → ? | 1+ | dead — no credit |
 
 **Recorded 2026-10-04 by the review agent.** The 09-08 stall did not end on
 09-20 where the table above stopped; it ran **26 mornings**, to 10-03
@@ -53,6 +54,24 @@ the top-up. If the engine is still writing on 10-10, auto-reload is on and
 this row can be closed out; if `last_build` reads `new: 0, changed: 0` with a
 credit error that week, the top-up was a fourth manual one and the threshold
 problem is untouched.
+
+**Scored 2026-10-09 by the review agent — the prediction above was correct.**
+The 10-04 top-up bought exactly **five** productive mornings (10-04 changed 2;
+10-05 new 1, changed 2; 10-06 changed 1; 10-07 new 1, changed 2; 10-08 new 1,
+changed 2 — three new pages and nine edits in all) and then died: on **10-09**
+`last_build` read `new: 0, changed: 0` with `strengthen_pages` and `scout` both
+returning `credit balance is too low`. That is the last day of the predicted
+10-07 → 10-09 window and the top of the predicted 3–5 range, which makes it
+the **fourth consecutive cycle** inside that band (08-14 → 5, 08-28 → 3,
+09-03 → 5, 10-04 → 5). Auto-reload was **not** set alongside the 10-04 top-up,
+so that was a fourth manual one and the threshold problem is untouched. The
+secondary falsifier — "if the engine is still writing on 10-10, auto-reload is
+on" — never got the chance to run; it failed three days early.
+
+Two corrections this scoring forces on the rows above. The 09-08 stall ran to
+10-03 inclusive, so the duty cycle since 08-12 is now **18 productive mornings
+out of 59** (5 + 3 + 5 + 5). And a dead morning is no longer merely unproductive: of the 32
+mornings 09-08 → 10-09, **27** were lost to an empty balance.
 
 **A top-up has bought 3–5 productive mornings, three times in a row.** The
 09-03 top-up lasted exactly five, the top of the predicted range, and then
