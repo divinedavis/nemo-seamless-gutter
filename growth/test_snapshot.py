@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Tests for the snapshot's engine-version stamp.
+"""Tests for the snapshot's engine-version stamp and its indexing block.
 
 Added 2026-08-09. The docroot is not a git checkout, so a commit on main is not
 running until somebody copies it across, and nothing in the snapshot said which
@@ -108,6 +108,105 @@ class CodeFingerprintTest(unittest.TestCase):
         clean, found = S.scrub({"code_version": fp})
         self.assertEqual(clean["code_version"], fp)
         self.assertEqual(found, [])
+
+
+class IndexingBlockTest(unittest.TestCase):
+    """`indexing` has to reach the published file, and must cost no API call.
+
+    Added 2026-10-10. `indexstatus.run()` already executed every morning
+    inside `cmd_measure` and wrote its verdict to /var/log/nemo-growth.log —
+    a file the review agent cannot read, because it reads snapshot.json and
+    nothing else. So the measurement existed and the judgment layer still
+    could not see it, which is the same failure `call_taps` and
+    `log_visitors` were added to fix. It matters because "Google dropped the
+    page" and "Google kept it, nobody searched" are the same zero from here
+    and need opposite responses: the first needs links and crawl signals, the
+    second needs a different query target.
+    """
+
+    CACHE = {
+        "ok": True,
+        "updated": "2026-10-10T06:02:11+00:00",
+        "sitemap_urls": 46,
+        "inspected": 46,
+        "buckets": {"indexed": 40, "crawled_not_indexed": 4,
+                    "discovered_not_indexed": 1, "unknown_to_google": 1},
+        "accept_pct": 87.0,
+        "accept_of_fetched": 90.9,
+        "errors": [],
+    }
+
+    def _build(self, cache):
+        """build() with every droplet-owned source stubbed out.
+
+        No network, no ledger, no docroot — this pins the published *shape*,
+        which is the only thing the review agent ever sees.
+        """
+        stubs = {
+            "keywords": mock.Mock(**{"summary.return_value": {
+                "share_pct": 0.0, "coverage_pct": 42.4, "total": 238,
+                "top3": 0, "top10": 21, "ranked_known": 57, "covered": 101,
+                "by_town": {}, "by_intent": {}, "gaps": [], "ranked": []}}),
+            "review": mock.Mock(**{"scoreboard.return_value": {
+                "works": [], "does_not_work": [], "not_yet_judged": []}}),
+            "ledger": mock.Mock(**{"load_techniques.return_value": [],
+                                   "get_state.return_value": None,
+                                   "today.return_value": "2026-10-10",
+                                   "series.return_value": []}),
+            "metrics": mock.Mock(**{"lead_totals.return_value": {}}),
+            "gsc": mock.Mock(**{"discover.return_value": []}),
+            # The real summary() over a stubbed cache, so the published shape
+            # is the one indexstatus actually produces rather than a fixture
+            # that could drift away from it.
+            "indexstatus": mock.Mock(**{
+                "summary.return_value": _real_summary(cache)}),
+        }
+        with mock.patch.multiple(S, **stubs), \
+             mock.patch.object(S, "_page_inventory", return_value={}):
+            return S.build("/nonexistent")
+
+    def test_build_publishes_the_indexing_summary(self):
+        snap = self._build(self.CACHE)
+        self.assertIn("indexing", snap)
+        ix = snap["indexing"]
+        self.assertTrue(ix["measured"])
+        self.assertEqual(ix["indexed"], 40)
+        self.assertEqual(ix["inspected"], 46)
+        self.assertEqual(ix["unknown_to_google"], 1)
+        self.assertEqual(ix["crawled_not_indexed"], 4)
+        self.assertEqual(ix["accept_pct"], 87.0)
+
+    def test_an_unreadable_cache_publishes_the_reason_not_a_missing_key(self):
+        """A dead instrument must read as dead, not as a quiet success."""
+        snap = self._build({})
+        self.assertIn("indexing", snap)
+        self.assertFalse(snap["indexing"]["measured"])
+
+    def test_reads_the_morning_cache_rather_than_calling_the_api(self):
+        """Publishing must not spend quota or depend on Search Console being up.
+
+        `summary()` takes the cache `cmd_measure` already wrote. If this ever
+        starts calling `run()`, the 6am publish gains a network dependency and
+        a second pass over the URL Inspection quota.
+        """
+        with mock.patch.object(S.indexstatus, "run",
+                               side_effect=AssertionError("called run()")):
+            out = S.indexstatus.summary(self.CACHE)
+        self.assertTrue(out["measured"])
+
+    def test_survives_the_pii_scrub_unchanged(self):
+        """Counts and an ISO timestamp must not look like anything redacted."""
+        ix = _real_summary(self.CACHE)
+        clean, found = S.scrub({"indexing": ix})
+        self.assertEqual(clean["indexing"], ix)
+        self.assertEqual(found, [])
+
+
+def _real_summary(cache):
+    """indexstatus.summary() itself — imported here so the stub above cannot
+    be mistaken for a hand-written copy of the block's shape."""
+    from . import indexstatus
+    return indexstatus.summary(cache)
 
 
 if __name__ == "__main__":

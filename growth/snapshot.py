@@ -19,7 +19,7 @@ import json
 import os
 import re
 
-from . import gsc, keywords, ledger, metrics, review
+from . import gsc, indexstatus, keywords, ledger, metrics, review
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SNAPSHOT_PATH = os.path.join(HERE, "snapshot.json")
@@ -223,6 +223,18 @@ def build(docroot):
         "scoreboard": {"works": [r["id"] for r in sb["works"]],
                        "does_not_work": [r["id"] for r in sb["does_not_work"]],
                        "not_yet_judged": [r["id"] for r in sb["not_yet_judged"]]},
+        # Rank says where a page sits when Google shows it. This says whether
+        # Google kept the page at all — the one distinction rank cannot draw
+        # for a page earning nothing, because "never indexed" and "indexed,
+        # nobody searched" are the same zero and need opposite responses.
+        # indexstatus.run() already executes every morning inside
+        # cmd_measure and writes its verdict to /var/log/nemo-growth.log,
+        # which the review agent cannot read: it reads this file. So the
+        # measurement existed and the judgment layer still could not see it,
+        # the same failure `call_taps` and `log_visitors` were added for
+        # above. summary() with no argument reads that morning's cache
+        # (indexstatus.load()) and makes no API call from here.
+        "indexing": indexstatus.summary(),
         "last_build": ledger.get_state("last_build"),
         "last_scout": ledger.get_state("scout_last"),
         "pages": _page_inventory(docroot),

@@ -37,7 +37,7 @@ duty cycle rather than a guess:
 | 09-03 → 09-07 | 5 | **alive** — 2 new pages, 7 page edits |
 | 09-08 → 10-03 | 26 | dead — no credit |
 | 10-04 → 10-08 | 5 | **alive** — credit restored; 3 new pages, 9 page edits |
-| 10-09 → ? | 1+ | dead — no credit |
+| 10-09 → ? | 2+ | dead — no credit |
 
 **Recorded 2026-10-04 by the review agent.** The 09-08 stall did not end on
 09-20 where the table above stopped; it ran **26 mornings**, to 10-03
@@ -54,6 +54,14 @@ the top-up. If the engine is still writing on 10-10, auto-reload is on and
 this row can be closed out; if `last_build` reads `new: 0, changed: 0` with a
 credit error that week, the top-up was a fourth manual one and the threshold
 problem is untouched.
+
+**Second dead morning recorded 2026-10-10.** `last_build` read `new: 0,
+changed: 0` again with the same `credit balance is too low` string from
+`strengthen_pages` and the scout. Two consecutive dead mornings is what closes
+the secondary falsifier the 10-04 prediction left open: the engine was *not*
+still writing on 10-10, so auto-reload is confirmed absent rather than merely
+unobserved. The duty cycle since 08-12 is now **18 productive mornings out of
+60**.
 
 **Scored 2026-10-09 by the review agent — the prediction above was correct.**
 The 10-04 top-up bought exactly **five** productive mornings (10-04 changed 2;
