@@ -518,8 +518,49 @@ def apply_gsc(rows):
     return n
 
 
+# The goal's denominator must contain only searches this business can serve.
+#
+# `techniques.adopt_queries` has read `techniques.OUT_OF_AREA` at intake since
+# 2026-09-22, but this module's contract is that entries are never deleted
+# (see the docstring above), and nine "… york springs pa" queries were adopted
+# before that guard existed. York Springs is in ADAMS county, twenty miles from
+# York on a different SERP. A tenth arrived on 2026-10-11 — "gutter cleaner
+# york springs pa" — because the droplet is still running pre-guard code, which
+# is how a generation-time guard behaves when it is committed and not deployed.
+#
+# So the exclusion happens at SCORING time rather than at intake or by deletion:
+# the rows stay in keywords.json exactly as the never-delete contract promises,
+# and the aggregates simply do not count them. `excluded_out_of_area` publishes
+# what was skipped and why, because a denominator that quietly shrinks is worse
+# than one that is wrong in a documented way.
+#
+# This is a CHANGE OF BASIS, NOT PROGRESS. `growth_daily.py` states the rule it
+# has to obey — "a jump that came from moving the measuring stick must never be
+# reported as progress" — and on the day it lands `total` and `coverage_pct`
+# move for that reason alone. `top3` is 0 on either basis.
+def _out_of_area(query):
+    """True if a tracked query names somewhere this business does not serve.
+
+    Imports lazily: `techniques` pulls in `llm` at module scope, and the goal
+    metric must not acquire a dependency on a model client to count itself.
+
+    Fails SAFE — an import error scores the query rather than dropping it. A
+    broken import must not be able to shrink the goal's denominator silently,
+    which is the one failure mode that would flatter the number.
+    """
+    try:
+        from .techniques import OUT_OF_AREA
+    except Exception:
+        return False
+    q = (query or "").lower()
+    return any(bad in q for bad in OUT_OF_AREA)
+
+
 def summary():
-    kws = load()
+    scored, excluded = [], []
+    for k in load():
+        (excluded if _out_of_area(k.get("query")) else scored).append(k)
+    kws = scored
     total = len(kws)
     covered = sum(1 for k in kws if k.get("covered"))
     ranked = [k for k in kws if k.get("position")]
@@ -548,6 +589,14 @@ def summary():
         "share_pct": round(100.0 * top3 / total, 1) if total and ranked else None,
         "by_town": by_town,
         "by_intent": by_intent,
+        # Tracked rows the goal deliberately does not score. Published so the
+        # exclusion is auditable from the snapshot alone: a reader who sees
+        # `total` fall can see exactly which queries left and why. See
+        # `_out_of_area`.
+        "excluded_out_of_area": {
+            "count": len(excluded),
+            "queries": sorted(k["query"] for k in excluded if k.get("query")),
+        },
         # Every tracked query Search Console returns a position for, best
         # first. The aggregates above say the top-3 count went 2 -> 1; only
         # this says which query fell, and "which one" is the difference

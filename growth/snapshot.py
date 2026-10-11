@@ -195,6 +195,11 @@ def build(docroot):
             "by_town": kw["by_town"],
             "by_intent": kw["by_intent"],
             "uncovered": kw["gaps"],
+            # Tracked queries the goal does NOT score because they name a town
+            # this business does not serve. Published so a fall in
+            # `tracked_queries` is readable as a change of basis rather than as
+            # queries going missing. See keywords._out_of_area.
+            "excluded_out_of_area": kw["excluded_out_of_area"],
             # The goal metric, one row per query, instead of only its total.
             # See keywords.summary().
             "ranked": kw["ranked"],

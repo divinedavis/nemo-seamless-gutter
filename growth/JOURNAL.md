@@ -35652,3 +35652,558 @@ Goal: **0.0%** top-3 share of 239 tracked queries (target 50%).
 - `ping_indexnow` — ok: nothing new to submit
 
 **Scout did not run:** anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CfuwuJmthC7LAiDu3geFS"}
+
+## 2026-10-11 — review agent
+
+### Where the numbers stand
+
+**Third dead morning, and today the dead engine did damage rather than nothing.**
+
+**(1) The balance is still empty.** `last_build` reads `new: 0, changed: 0`;
+`strengthen_pages` failed after three candidates and the scout failed, both with
+`"Your credit balance is too low to access the Anthropic API"`. Duty cycle since
+08-12: **18 productive mornings out of 61.** Of the 34 mornings 09-08 → 10-11,
+**29** were lost to an empty balance.
+
+**(2) New: a dead morning is no longer neutral.** The one technique that runs
+without a model call — `adopt_queries` — adopted **"gutter cleaner york springs
+pa"** into the tracked universe this morning. York Springs is in **Adams**
+County. The repository has rejected exactly this at intake since 09-22
+(`techniques.py:1836` reads `OUT_OF_AREA`, and `:1624` has carried `"york
+springs"` for nineteen days); the droplet ran pre-guard code and took it. So:
+
+| | 10-10 | 10-11 |
+| --- | --- | --- |
+| `tracked_queries` | 238 | **239** |
+| of which York Springs (Adams County) | 9 | **10** |
+| `coverage_pct` | 42.4 | **42.3** |
+
+Coverage *fell* because the denominator grew by a query no page can ever cover.
+This is the first day on which the undeployed engine is measurably **corrupting**
+the goal metric rather than merely withholding data from it. Eleven days of
+"the deploy has not run" have been a bookkeeping argument; today it is a defect
+with a date and a query string on it.
+
+The goal metric:
+
+| | 2026-09-23 | 2026-10-10 | today |
+| --- | --- | --- | --- |
+| **`top3` (the goal)** | **0** | **0** | **0** |
+| `top3` share | 0.0% | 0.0% | **0.0%** (target 50%) |
+| `top10` | 11 | 21 | 21 |
+| `ranked_known` | 42 | 57 | 57 |
+| `matched` | 42 | 54 | 54 |
+| `tracked_queries` | 220 | 238 | 239 |
+| `coverage_pct` | 42.7 | 42.4 | 42.3 |
+
+`top3` is **0 in all seven published town buckets** — county 0/124, york 0/42,
+dover 0/18, hanover 0/15, spring-grove 0/14, red-lion 0/13, dallastown 0/13.
+Zero in every one of the nineteen published snapshots I can read (09-23 →
+10-11), and the journal records it as zero since 09-20: **twenty-two days.**
+Direction: flat, at the floor.
+
+Search Console, 28-day window: **741 rows, 54 matched, 11 clicks, 4,970
+impressions, avg position 25.7.** Site-wide CTR 0.221%.
+
+Traffic, last 30 days: **71 visitors** (34 organic, 33 direct, **1** maps,
+**2** AI, 0 referral), 96 pageviews, **2** `tel:` taps, **0 bookings, 0 phone
+leads**. `local_visitors` has been 0 for ten consecutive days. Bot hits:
+**86,247** in 30 days, a 1,215:1 ratio to humans.
+
+**On whether the traffic instrument itself is broken** — the prompt tells me to
+suspect `metrics.py`'s bot/owner filter if visitors sit at zero for a week.
+They do not (71 in 30 days), and there is a cleaner check available: nginx logs
+**34 organic visitors in 30 days** against Search Console's **11 clicks in 28
+days**. The filter is counting *more* search traffic than Google attributes, not
+less, which is what you expect once Bing and referrer-classified arrivals are
+included. An over-broad filter would show the opposite. **The instrument is
+fine; the number is just small.**
+
+**(3) Revenue has no instrument at all, and the arithmetic proves it.**
+`lead_totals` reads 4 bookings all time, 0 phone leads. `metrics.lead_totals`
+(`metrics.py:703-733`) reads the site's own bookings SQLite tables and nothing
+else, so it counts **web-widget submissions only**. The ledger has recorded
+**13 Google reviews** for seventy-six days. Thirteen reviews cannot come from
+four jobs. So Eric has completed many more jobs than this engine can see, every
+one of them arriving by a route it does not instrument, and the two things the
+owner actually asked for — more phone calls, more revenue — are **unmeasured,
+not zero**. Every "0 bookings" in every entry of this journal, mine included,
+describes a booking widget. It has never described the business.
+
+That reframes the whole ledger. Eleven of the 84 candidates (T007, T012, T033,
+T034, T041, T043, T047, T055, T059, T076, T083) are gated on *a completed job*
+— photograph it, ask for the review, follow up the quote, publish the job page.
+Those jobs exist; the engine simply cannot see them. The ledger is not as
+blocked as its own `bookings: 0` makes it look.
+
+**Prompt corrections.** Four, stated plainly so the prompt gets fixed rather
+than reasoned from:
+- The API blocker section says to expect a **usage-cap** error clearing
+  "2026-08-01". That cleared seventy-one days ago. Today's error is the
+  opposite failure — an **empty credit balance** — for the third morning.
+- "On 2026-07-28 that was 77 rows, 17 matched, 3 clicks, 429 impressions" and
+  the instruction to treat `avg_position` as moving "on almost nothing" are
+  retired: 741 rows and 4,970 impressions. Eleven clicks still supports nothing
+  conversion-shaped.
+- "The county bucket was 2 of 50 in the top 3" — the county bucket is **0 of
+  124**, and `top3` is 0 county-wide. Read `ranked_known` for breadth.
+- "A watchdog runs at 11:00 ET and **mails the developer** if the engine looks
+  dead" — it does not. `deploy/cron-nemo-growth:69` is bare; the `--email` was
+  removed on 2026-08-27 at the owner's request and the comment at `:66` says
+  restoring it is one flag. Three dead mornings have now gone unmailed, which
+  is precisely the case it existed for.
+
+### Did previous changes work?
+
+**1 — Yesterday's headline, the impression fall. It stopped, and the update that
+dated it is finished.** Yesterday I reduced fifteen published rows to one
+subtraction and reported a real 40–50% fall in the daily impression rate,
+beginning on the day Google launched the September 2026 spam update. Today is
+the first rise in the series:
+
+| snapshot | impressions | rows | clicks | avg pos |
+| --- | --- | --- | --- | --- |
+| 09-25 | **7,037** | 903 | 14 | 27.5 |
+| 10-01 | 6,096 | 845 | 16 | 27.4 |
+| 10-04 | 5,853 | 828 | 11 | 27.7 |
+| 10-07 | 5,209 | 794 | 13 | 26.6 |
+| 10-09 | 5,030 | 758 | 13 | 26.1 |
+| 10-10 | 4,879 | 746 | 12 | 26.0 |
+| **10-11** | **4,970** | **741** | **11** | **25.7** |
+
+By the same identity, `W(10-11) − W(10-10) = imp(10-08) − imp(09-10) = +91`.
+**That is one day beating one day. It is not a recovery** — the window is still
+2,067 impressions below its 09-25 peak, and the fall period already contained
+four smaller upticks (+46, +15, +66, +1). I am recording it because yesterday's
+entry led with the fall and would be dishonest if today's entry quietly
+omitted the first row that went the other way.
+
+What *is* new and solid: **Google's rollout completed on 2026-10-08**, 13 days
+16 hours after the 09-24 start, per its ranking-release history (sources below).
+That matters for one reason only — it makes the standard diagnostic datable. The
+advice every source gives is "compare 28 days before the start against 28 days
+after completion, segmented by page". 28 days after completion ends **11-04**;
+with the snapshot's 3-day lag the clean comparison first appears in the
+**2026-11-08** snapshot. Pre-registered, with a date, below.
+
+**2 — The pre-registered falsifier from yesterday. Live, not yet triggered.**
+Test (a) was "`clicks` falls below 11 on three consecutive mornings". Clicks are
+**11** — at the floor of the twenty-day 11–17 band, tied with the 10-04 low, and
+down on four of the last five mornings (13, 13, 12, 11). Eleven is not *below*
+eleven, so the test has not fired. It is one morning from firing. Test (b) needs
+`gsc.pages`, still unpublished. **Verdict: not falsified, and closer than I
+would like.** Anyone reading tomorrow should check `clicks` first.
+
+**3 — "`top10` is a coverage counter, not progress" (09-09, narrowed 10-10).
+Now provable from the series rather than argued.** Over the nineteen published
+snapshots 09-23 → 10-11:
+
+- `ranked_known` **42 → 57** (+15)
+- `top10` **11 → 21** (+10)
+- `matched` **42 → 54** (+12)
+- `clicks` **17 → 11** (**−6**)
+- `impressions` 6,806 → 4,970 (**−27%**)
+- `top3` **0 → 0**
+
+The site gained ten top-ten positions and lost six clicks. Those are only
+consistent if the newly-ranked queries carry essentially no York County search
+volume. **Verdict: `top10` is retired as a progress metric on a measurement,
+not on an argument** — it rose while the engine was switched off (10-09) and it
+has now risen while clicks fell. `ranked_known` stays usable as breadth and
+nothing more. The field that would name the queries, `keywords.ranked`, is
+published by `snapshot.py:200` in this repository and absent from the snapshot
+for the **sixth** day.
+
+**4 — The pre-registered coverage-versus-rank test (09-20). Failing, day
+twenty-two.** Coverage 42.4 → 42.3 (and the fall is the York Springs adoption,
+not a lost page); `top3` 0 → 0. Across the arc `ranked_known` went 17 → 57 and
+`top3` has never exceeded 2. **No detected relationship between page coverage
+and the goal metric.** Strongly held.
+
+**5 — The seven `works: true` verdicts. Re-measured today, and yesterday's
+count was wrong.** I said the deployed `review.py` "withdraws six of the seven".
+I ran the repository's own `review.earned()` against today's verdict payloads
+instead of eyeballing them, and it withdraws **four**:
+
+| | measured | `earned()` | outcome |
+| --- | --- | --- | --- |
+| T001 `area_pages` | 12 owned visitors | True | keeps `works: true` |
+| T018 `service_pages` | 25 owned visitors | True | keeps `works: true` |
+| T002 `money_pages` | **6** owned visitors | False | **withdrawn** |
+| T017 `strengthen_pages` | `median_before: null` | False | **withdrawn** |
+| T019 `improve_ctr` | `median_before: null` | False | **withdrawn** |
+| T020 `adopt_queries` | `median_before: null` | False | **withdrawn** |
+| T010 `gsc_connect` | retired 07-27 | — | not re-judged (`review.py:108`) |
+
+T002 is below `MIN_TOTAL_VISITORS = 8` on its own module's threshold. T017,
+T019 and T020 print `"gsc_clicks median 14.0/day"` for what is a 28-day **total**
+of 11; `review._unit()` returns `/28d` in this repository. T010 keeps its
+verdict because `evaluate()` returns early on anything not `active`, which is
+correct — "Search Console is connected" is a different kind of claim.
+
+One residual the deployed fix does **not** catch, worth recording: T001 keeps
+`works: true` on a verdict whose own sentence reads *"12 owned visitors in 76d
+(median 0.0/day and flat)"*. Twelve visitors over 76 days is 0.16/day, and it
+has produced no measurable lead. `review.py:22-26` chose that bar deliberately
+("Eight of the right people is a job"), so this is not a bug — but it is a
+*traffic* threshold being read as a *revenue* verdict, and finding 3 above says
+the revenue side has no instrument to check it against.
+`scoreboard.does_not_work` is still empty, as on every day on record.
+
+**6 — New, and subtractive: the site's only top-3 positions are outside the
+tracked universe, and I am not going to recommend importing them.**
+`keywords.discovered_untracked` holds 40 rows, 0 clicks on 636 impressions.
+Three sit in or next to the top three:
+
+| query | position | impressions | clicks |
+| --- | --- | --- | --- |
+| gutters central pa | **1.2** | 8 | 0 |
+| gutter installation | **2.7** | 28 | 0 |
+| gutter | 3.6 | 8 | 0 |
+| gutter repair | 6.8 | 33 | 0 |
+| gutters | 7.6 | 64 | 0 |
+| gutter cleaning | 8.2 | 31 | 0 |
+
+So `top3: 0` is true of the tracked universe and false of the site. I checked
+why they cannot enter it: `adopt_queries` requires a positive in-area signal —
+`SERVICE_AREA_WORDS` or `"near me"` (`techniques.py:1842`) — and a bare
+head term carries neither. Reading `keywords.SEED` shows the inconsistency that
+follows: **14 of its 67 seeded queries are geo-neutral** ("are gutter guards
+worth it", "how much to replace gutters on a house", "5 inch vs 6 inch
+gutters"), so the intake rule is stricter than the basis of the universe it
+extends.
+
+**I checked it and I am leaving it alone.** A *seeded* geo-neutral query was
+chosen by a human who knew it was a York County buyer's question. A
+*discovered* one has unknown geography, and Search Console's query report
+filters by country only — there is no region dimension to split "gutter
+installation" into York County and not-York-County. Relaxing the intake rule
+would import impressions of unknown origin into the goal's denominator, which is
+the York Springs error in finding 2 with a wider blast radius. Nor will I read
+the zero clicks as proof the impressions are out-of-area: 44 impressions is a
+small sample, and the 10-09 entry's own research puts local zero-click rates at
+73–78%, which makes zero clicks on 44 impressions unremarkable. **The honest
+position is that these six rows are the site's highest reach anywhere, that
+nothing in this snapshot can say whose screens they appeared on, and that
+`gsc.pages` plus `gsc.queries_for_page()` — both undeployed — would answer it in
+one morning.** Fifth question the undeployed publisher makes unanswerable.
+
+**7 — A correction to my own 10-09 research.** That entry cited Sterling Sky for
+"reviews carrying written text outperform bare stars". Searching again today
+surfaced a summary of a *controlled* Sterling Sky test reporting that **keywords
+in customer review text have no ranking impact**, with the suggestion that
+keywords in the owner's *reply* may matter because Google indexes replies. The
+two claims come from the same practitioner and conflict. **T047's stated
+mechanism — "Google reads the words in reviews and matches them to queries" —
+should be treated as unsupported**, and T047 re-argued as a conversion lever
+(a stranger reads "the half-round on our Dallastown ranch" and believes it)
+rather than a rank lever. I could not read either source to adjudicate: see the
+note on fetching below.
+
+**8 — Recommended and not acted on.** Stated, not quietly re-filed:
+- **The `growth/` deploy. Day twelve.** No `code_version` and no `indexing` in
+  today's snapshot; `by_town` still 7 buckets against `keywords.TOWNS`' 17; no
+  `keywords.ranked`; no `gsc.pages`; verdicts still print `/day`; T002 still
+  `works: true` at 6. Every check negative. And today it adopted an Adams County
+  query the repo rejects.
+- **The two out-of-area scripts. Day twelve.**
+  `guides/5-inch-gutter-service-york-springs-pa.html` is still in today's
+  `pages.guides`, still in `sitemap.xml`, and that inventory is copied docroot →
+  repo, so it is still live.
+- **The watchdog's `--email`. Day forty-six.** `deploy/cron-nemo-growth:69` read
+  today, still bare. Three mornings in a row it would have mailed.
+- **The Business Profile sitting. Day seventy-six.** `local_visitors` 1 in 30
+  days and 0 for the last ten. Weekday close is still `18:00` in both
+  `index.html:211-212` and `techniques.py:880-885` against T042's 7am–8pm note.
+- **The deterministic title pass.** Re-measured across all 45 pages today:
+  **25** titles over 65 characters (21 `guides/`, 4 `services/`), worst 80.
+  `services/commercial-gutters.html` still reads "… | NEMO Seamless | NEMO
+  Seamless Gutter".
+- **Retiring T082 and striking the dead halves of T016, T074 and T025.** Still
+  `candidate`; `scoreboard.does_not_work` still empty.
+
+### What I researched today
+
+**The spam update, because yesterday's entry turned on it.** The September 2026
+spam update **completed 2026-10-08**, 13 days 16 hours after the 09-24 start —
+longer than every other 2026 spam update (March 19h30m, June 2d1h, August
+2d16h). Global, all languages. Google has **not** named the tactics it targeted,
+which means the "scaled content abuse" attribution in yesterday's entry is
+reporter inference and should be read as such. Recovery is described as taking
+months, with no reconsideration request because it is algorithmic. The usable
+advice is unchanged and now datable: compare 28 days pre-09-24 against 28 days
+post-10-08, **segmented by page**.
+([searchenginejournal.com](https://www.searchenginejournal.com/google-september-2026-spam-update-complete/592283/),
+[seroundtable.com](https://www.seroundtable.com/google-september-2026-spam-update-done-42235.html),
+[searchenginewatch.com](https://searchenginewatch.com/google-spam-update-finishes-rolling-out-after-nearly-two-weeks/),
+[relevantaudience.com](https://www.relevantaudience.com/seo/google-september-2026-spam-update-complete/))
+
+**Out-of-area impressions, which is finding 6's question.** The useful result is
+a constraint, not a tactic: **Search Console can only filter by country**, so
+splitting a geo-neutral query's impressions by town has to be done by the site
+owner from the query text, not by the tool. A second source notes Search Console
+does not capture all local-pack clicks, so a pack call never appears there at
+all — which is the same gap finding 3 describes from the other end.
+([ramkrshukla.com](https://www.ramkrshukla.com/local-service-seo-non-local-impressions/),
+[seroundtable.com](https://www.seroundtable.com/google-search-console-local-pack-clicks-34646.html),
+[jasonsuli.com.au](https://www.jasonsuli.com.au/insights/zero-click-search-and-ai-answers-what-local-businesses-should-measure/))
+
+**Business Profile changes since the March core update: none found.** I searched
+specifically for October 2026 GBP or local-pack changes and found nothing dated
+later than March. Everything returned was vendor guidance repeating
+Whitespark-survey weights (GBP signals ~32%, reviews ~20%) as if they were
+measured ranking data; they are a practitioner opinion poll. Recorded as a null
+result so tomorrow does not spend the same search.
+([digitalapplied.com](https://www.digitalapplied.com/blog/google-business-profile-guide-every-feature-2026),
+[gbppromote.com](https://gbppromote.com/local-search-pack-ranking-factors/),
+[strategyc.io](https://www.strategyc.io/blog/google-business-profile-category))
+
+**Reviews — a correction rather than a finding**, covered in finding 7.
+([atlasunchained.com](https://www.atlasunchained.com/local-marketing-web/review-velocity-14-day-engine/),
+[sterlingsky.ca](https://www.sterlingsky.ca/what-gets-you-ranking-for-near-me-2025/),
+[dndseoservices.com](https://dndseoservices.com/blog/google-reviews-ranking-factor/))
+
+**A limitation on all of the above, stated once.** `WebFetch` fails DNS
+resolution for **every** host in this environment, not just the
+`status.search.google.com` and `whitespark.ca` failures the last two entries
+recorded — I tried `sterlingsky.ca`, `searchenginejournal.com` and
+`developers.google.com` today and all three failed identically. Search works;
+fetching does not. **So every citation in this entry is a search engine's
+summary of a page I could not read**, and the two conflicting Sterling Sky
+claims in finding 7 are exactly what that limitation looks like when it bites. I
+have not inflated any of it into a measurement.
+
+**Rejected, having checked:** widening the goal metric to the geo-neutral head
+terms the site already ranks for (finding 6 — unknown geography, and GSC has no
+region dimension to resolve it); adding FAQPage markup (43 of 45 pages carry it,
+`techniques.py:341`); pruning the town pages as thin content (yesterday's
+pairwise 8-gram measurement: max Jaccard 0.085); keywords in the Business
+Profile name, still and permanently.
+
+### Recommendations
+
+Ranked. The ledger holds 84 candidates and has activated none in seventy-six
+days, and the constraint has never been the idea supply. Items 1, 2, 4, 5 and 6
+are free and total about forty minutes of one person's time.
+
+1. **Divine — set auto-reload on the Anthropic account. Third consecutive dead
+   morning, and the argument changed today.** Threshold auto-reload plus a
+   monthly cap in the console. `BUDGET.md` rule 1 bounds a run to 3–5 calls at
+   cents a day, so the cap enforces the rule rather than relaxing it.
+   *What is new:* a dead morning used to cost the pages not written. Finding 2
+   shows it now also costs **measurement integrity** — the techniques the empty
+   balance stops are the ones that improve the site, and the one that still runs
+   is the one that moves the goal's denominator the wrong way.
+   *Expected effect:* removes the dead-morning class. It does **not** move the
+   goal metric; argue it as hygiene.
+   *How I would know:* a productive `last_build` on 10-14 and after, with no
+   `credit balance` string that week.
+   *Checked:* today's `last_build.log` and `last_scout.detail`; `BUDGET.md`'s
+   duty-cycle table, updated today with the third dead morning and with what
+   `adopt_queries` did on it. **Divine's, ~5 minutes, needs billing access.**
+
+2. **Divine — `deploy_growth.sh`. Day twelve, and it now fixes an active defect
+   rather than only unblocking questions.**
+   ```
+   git -C /root/nemo-repo fetch origin main && git -C /root/nemo-repo reset --hard origin/main
+   bash /root/nemo-repo/deploy/deploy_growth.sh            # read-only, prints a hash table
+   bash /root/nemo-repo/deploy/deploy_growth.sh --apply
+   ```
+   The report alone settles every per-file bound in the script's header in
+   seconds. `--apply` buys, in order of what it fixes: **the `OUT_OF_AREA`
+   intake guard**, which stops tomorrow's `adopt_queries` doing what today's
+   did; **my scoring-time exclusion** (item 7), which takes the ten already
+   adopted back out of the denominator; **`gsc.pages`**, the per-page
+   segmentation every spam-update source names as step one and the only way to
+   answer finding 6 and yesterday's falsifier (b); **`indexing`**, which
+   distinguishes "Google dropped the page" from "nobody searched";
+   **`keywords.ranked`**, without which findings 3 and 5 stay partly
+   unscoreable; **`review.py`**, which withdraws four of the seven `works: true`
+   verdicts; **`llm.py`**'s continuation loop; `code_version`; `log_visitors`;
+   the ten missing town buckets; and `techniques.py`'s title fixes.
+   *How I would know:* tomorrow's snapshot carries `code_version` and
+   `indexing`, `by_town` has 17 buckets, `keywords.excluded_out_of_area.count`
+   is 10, `tracked_queries` steps 239 → 229, and no verdict says `/day`.
+   *Checked:* today's top-level snapshot keys (no `code_version`, no
+   `indexing`); `keywords` keys (no `ranked`); `gsc` keys (no `pages`);
+   `by_town` 7 against `keywords.py:40-64`; `publish_state.sh:41` is a plain
+   `cp -a`, so all of these are absent at generation, not at publish.
+   **Divine's, ~10 minutes.**
+
+3. **Eric — the Business Profile. Day seventy-six, fifteen minutes, free, and
+   still the only item here that can move the goal metric.** `local_visitors` is
+   1 in 30 days and 0 for ten straight. **Finding 3 re-orders this list:** since
+   the engine cannot see a single job Eric has actually done, the two Performance
+   views are no longer housekeeping, they are the only instruments that exist on
+   the thing the owner asked about. In order: **(f) Performance → Calls, 28
+   days** — the only place a call is visible at all; **(g) Performance →
+   Searches, 6 months** (T093) — the only view of Maps demand Search Console
+   cannot see, and the only thing that can source or kill the ~300-views figure
+   17 ledger entries quote with no origin; **(a)** which address is this profile
+   verified at, and has it ever been moved; **(b) primary category** — write
+   down what it is before touching it, prefer specific over broad, change
+   nothing else that day; **(c) itemised Services** (T022); **(e) the real
+   hours**, then set the profile, `index.html:211-212` and
+   `techniques.py:880-885` to the same numbers in one pass; **(h)** website URL →
+   `/services/seamless-gutter-installation.html?utm_source=gbp`, without which
+   `metrics.classify()` cannot count a pack click as `local`; **(i)** pending
+   suggested edits and the profile's notification email; **(j)** one job photo,
+   and read off the review count and star average — "13 reviews / 4.2 stars" is
+   seventy-six days unverified and eleven ledger hypotheses rest on it.
+   *Checked:* no GBP code path exists anywhere in `growth/`; the hours conflict
+   re-read in both files today. **Eric's, and only Eric's.**
+
+4. **Divine — the two out-of-area scripts. Day twelve, bound unchanged.**
+   ```
+   cd /var/www/nemo-seamless-gutter
+   python3 deploy/repair_out_of_area_prose.py          # then --apply
+   python3 deploy/retire_out_of_area.py                # then --apply
+   ```
+   *Expect no rank movement and treat any as unproven* — I still have no
+   evidence better than vendor opinion that these pages cost site-wide quality
+   signals. The reason to do it is that the site publishes a service-area claim
+   nobody at the business made.
+   *Checked:* `guides/5-inch-gutter-service-york-springs-pa.html` still in
+   today's `pages.guides` and in `sitemap.xml`; the `techniques.py` guards are
+   generation-time only and cannot repair what is already written.
+   **Divine's, ~5 minutes.**
+
+5. **Divine — the deterministic title pass. Still 25 of 45, and it is the only
+   item on this list that works on an empty balance.** For each page under
+   `guides/` and `services/`, strip the brand suffix, run the title back through
+   `techniques._page_title()`, write it back if it changed. No model call,
+   idempotent, revertible. Start with `services/commercial-gutters.html`.
+   *Why it cannot be me:* the repo holds copies of all 45 pages, so I could edit
+   them here — but the engine writes pages to the docroot, not to the repo, and
+   `CLAUDE.md` forbids pushing repo HTML over the docroot because the growth
+   engine writes there first. A repo-side title fix would be invisible to the
+   live site and would then be silently overwritten. **It has to run on the
+   droplet.**
+   *Expected effect:* a modest CTR gain on 25 truncated snippets against a
+   site-wide CTR of 0.221%. **Not a rank change.**
+   *Checked:* all 45 titles measured today — 25 over 65 characters, 21 in
+   `guides/`, 4 in `services/`, worst 80. `improve_ctr` cannot do this instead:
+   it needs `llm.call_json` (`techniques.py:1531`) and so is dead this week
+   regardless, and it no-op'd today before reaching the model.
+   **Divine's, ~15 minutes.**
+
+6. **Divine — retire T082 and strike the dead halves of T016, T074 and T025;
+   and re-argue T047.** One-line edits each to the droplet's `techniques.json`.
+   T082 asks for GBP messaging, ended 2024-07-31 and already recorded dead by
+   T050; T016 and T074 ask for Q&A entries Google removed; T025's FAQPage half
+   is shipped on 43 of 45 pages and its AI-citation rationale has a contrary
+   measurement. **New today:** T047's hypothesis asserts Google matches review
+   text to queries — finding 7 says that mechanism is contested by the same
+   practitioner usually cited for it, so T047 should be re-stated as a
+   conversion lever, not a rank lever, before anyone spends Eric's time on it.
+   Retire, do not delete: `README.md` says verdicts persist so a dead idea
+   cannot be re-proposed as new.
+   *How I would know:* `scoreboard.does_not_work` is non-empty for the first
+   time on record.
+   *Checked:* T082, T050, T025, T016, T074 and T047 re-read in today's snapshot;
+   `techniques.py:341` for the FAQPage emission. I cannot make these edits —
+   `techniques.json` is gitignored droplet state. **Divine's, ~3 minutes.**
+
+7. **Me — done today, in the repo, inert until item 2 runs.** Yesterday's
+   recommendation 7 said "Divine, or me tomorrow if nobody objects". Nobody
+   objected and the problem got worse this morning, so I implemented it.
+   `keywords.summary()` now excludes any tracked query matching
+   `techniques.OUT_OF_AREA` from `total`, `covered`, `coverage_pct`, `top3`,
+   `top10`, `ranked_known`, `share_pct`, `by_town`, `by_intent`, `ranked` and
+   `gaps`, and publishes `excluded_out_of_area` next to them. The rows stay in
+   `keywords.json` — the never-delete contract is intact; `summary()` only
+   declines to count them, and a test asserts it never calls `save()`. The
+   import is lazy (`techniques` pulls in `llm` at module scope, and the goal
+   metric must not need a model client to count itself) and **fails safe**: an
+   import error scores the query rather than dropping it, because a silent
+   shrink is the one failure mode that only ever flatters the goal.
+   *Projected effect on the morning it deploys, computed against today's
+   snapshot:* `tracked_queries` **239 → 229**, `excluded_out_of_area.count`
+   **10**, `coverage_pct` **42.3 → 43.7**. `top3` is **0 on either basis**.
+   **That 1.4-point coverage rise is a change of basis and must never be
+   reported as progress** — `growth_daily.py:114` sets the rule in the engine's
+   own words and it binds me. `top10` and `ranked_known` may also fall if any
+   York Springs query is ranked; `keywords.ranked` is unpublished so I cannot
+   say in advance, and a fall there would be the same basis change.
+   **Mine, shipped; needs item 2 to take effect.**
+
+**What I changed in the repo today:**
+- `growth/keywords.py` — `_out_of_area()` and the scoring-time exclusion above.
+- `growth/snapshot.py` — publish `keywords.excluded_out_of_area`, read
+  unguarded on purpose so a missing audit trail fails loudly.
+- `growth/test_keywords.py` — new `OutOfAreaExclusionTest`, 9 tests: the
+  denominator, the goal count, the published audit trail, the build queue, the
+  town bucket, an in-area query untouched, "york county" not swallowed by the
+  "york springs" substring, the fail-safe import, and that nothing is written.
+  Also removed the stranded `if __name__ == "__main__"` block the append
+  displaced into the middle of the file.
+- `growth/test_snapshot.py` — one new test pinning that the exclusion reaches
+  the published snapshot (without it, the step in `tracked_queries` is
+  indistinguishable from progress); `IndexingBlockTest`'s `summary()` stub
+  updated for the new key.
+- `growth/BUDGET.md` — third dead morning, duty cycle 18 of 61, and what
+  `adopt_queries` did on it.
+- No tests deleted: nothing tested behaviour that stopped existing.
+- `scripts/test.sh`: **360 Python tests and 9 node tests, all passing.**
+
+**Pre-registered tests, with dates:**
+- **2026-10-13** — yesterday's falsifier (a). `clicks` below 11 on three
+  consecutive mornings falsifies the benign reading of the impression fall.
+  Today is 11, one morning from live. Check this first.
+- **2026-11-08** — the spam-update diagnostic, now datable because the rollout
+  completed 10-08. In the 11-08 snapshot the 28-day window covers 10-09 → 11-05,
+  entirely post-rollout. Compare it to the 09-23 snapshot (window 08-24 →
+  09-20, entirely pre-rollout): impressions 6,806, rows 896, clicks 17, position
+  27.6. Needs `gsc.pages` to be worth much, which needs item 2.
+- **The morning after item 2** — `keywords.excluded_out_of_area.count` must read
+  10 and `tracked_queries` must read 229. If `count` is 0 the deploy did not
+  carry `keywords.py`; if `tracked_queries` is still 239 it did not carry the
+  exclusion.
+
+### Reasoning and uncertainties
+
+The thing worth writing down today is finding 3, because it is the first time
+I have doubted the frame rather than a number inside it. This journal has said
+"0 bookings, 0 phone leads" in most of its entries, and I have treated it as the
+business's result. It is not. It is the booking widget's result.
+`metrics.lead_totals` reads the site's own SQLite tables, and thirteen Google
+reviews cannot come from four of them. Eric has been doing work this engine
+cannot see for the whole period I have been reviewing, which means every
+conversion-rate conclusion in this journal — including the 10-02 entry's "the
+website's conversion rate is not the problem" — was drawn on a denominator that
+measures a form, not a business. I do not think that conclusion is wrong, but I
+no longer think the data supported it, and that is a different and worse
+position than I was in yesterday.
+
+What would change my mind: Eric reading off the Business Profile's Calls panel
+(recommendation 3f). If it shows calls, the funnel is working somewhere this
+engine has never looked and the ledger's entire top-of-funnel emphasis is
+mis-aimed. If it shows nothing, the picture stands and the profile genuinely is
+invisible.
+
+On yesterday's impression fall: I led with it, and today the series went up. I
+have deliberately not softened yesterday's entry — the fall was real, the
+subtraction is an identity, and 2,067 impressions are still missing — but I also
+will not let the first contrary row go unreported, because the failure mode of a
+daily reviewer is defending yesterday's headline. One day is one day. The useful
+thing today's research bought is a date: the rollout finished on 10-08, so the
+comparison every source recommends is now a scheduled test rather than a
+sentiment.
+
+On my own contribution: I shipped the exclusion rather than re-filing it, which
+is a small change with a disproportionate hazard — it moves `coverage_pct` up
+by 1.4 points for no reason except that I changed the ruler. I have written that
+into the code comment, the test name, the recommendation and this paragraph,
+because the one way this goes wrong is a future reader seeing coverage rise on
+deploy morning and calling it progress. It is not progress. `top3` is 0 on
+either basis, and the only reason to do it at all is that a denominator which
+only ever errs in the flattering direction is worse than useless.
+
+The structural fact is twelve days old and I will keep stating it without
+decoration: five of the seven items above need one person with droplet access
+and about forty minutes, item 1 is the one that makes the rest cheaper to keep
+delaying, and item 3 is fifteen minutes of Eric's evening and remains the only
+thing on the list that can move the number the owner actually asked about.
+Today the cost of that delay stopped being hypothetical: the engine adopted a
+search from a county this business does not serve into the denominator of its
+own goal, using code the repository fixed nineteen days ago.

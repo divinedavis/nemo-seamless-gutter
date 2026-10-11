@@ -427,5 +427,97 @@ class TownCoverage(unittest.TestCase):
                              f"{query!r} targets {target}")
 
 
+class OutOfAreaExclusionTest(unittest.TestCase):
+    """The goal's denominator must hold only searches NEMO can serve.
+
+    Added 2026-10-11. `techniques.adopt_queries` has guarded its intake against
+    `OUT_OF_AREA` since 2026-09-22, but the droplet runs pre-guard code, and on
+    2026-10-11 it adopted "gutter cleaner york springs pa" — Adams County — as
+    the tenth such row. The never-delete contract means the fix cannot be a
+    deletion, so `summary()` excludes them at scoring time and publishes what it
+    skipped. See `keywords._out_of_area`.
+    """
+
+    FIXTURE = [
+        _kw("gutter installation york pa", 2.0),
+        _kw("gutter repair dover pa", 8.5, town="dover"),
+        # Adams County. Adopted before the intake guard existed.
+        _kw("gutter replacement york springs pa", 4.0, covered=False, target=""),
+        _kw("gutter cleaner york springs pa", None, covered=False, target=""),
+        # Montgomery County, and it ranks — so excluding it moves `top3`.
+        _kw("seamless gutters perkasie pa", 2.5, covered=False, target=""),
+    ]
+
+    def _summary(self, kws=None):
+        with mock.patch.object(K, "load", return_value=kws or self.FIXTURE):
+            return K.summary()
+
+    def test_an_out_of_area_query_is_not_in_the_denominator(self):
+        s = self._summary()
+        self.assertEqual(s["total"], 2)
+
+    def test_an_out_of_area_query_cannot_contribute_to_the_goal(self):
+        # "seamless gutters perkasie pa" sits at 2.5. Counting it would report
+        # a top-3 win in a county this business does not serve.
+        s = self._summary()
+        self.assertEqual(s["top3"], 1)
+        self.assertEqual({r["query"] for r in s["ranked"]},
+                         {"gutter installation york pa", "gutter repair dover pa"})
+
+    def test_what_was_excluded_is_published_not_silent(self):
+        # A denominator that quietly shrinks is worse than one documented as
+        # wrong: the reader has to be able to see which rows left.
+        x = self._summary()["excluded_out_of_area"]
+        self.assertEqual(x["count"], 3)
+        self.assertEqual(x["queries"], [
+            "gutter cleaner york springs pa",
+            "gutter replacement york springs pa",
+            "seamless gutters perkasie pa",
+        ])
+
+    def test_an_out_of_area_query_leaves_the_build_queue_too(self):
+        # `gaps` is the uncovered list the report prints as the build queue and
+        # the snapshot publishes. An Adams County query does not belong in it.
+        gaps = self._summary()["gaps"]
+        self.assertNotIn("gutter cleaner york springs pa", gaps)
+        self.assertNotIn("gutter replacement york springs pa", gaps)
+
+    def test_an_out_of_area_query_leaves_its_town_bucket(self):
+        s = self._summary([_kw("gutter repair dover pa", 8.5, town="dover"),
+                           _kw("gutter guards york springs pa", 1.0,
+                               town="dover", covered=False, target="")])
+        self.assertEqual(s["by_town"]["dover"], {"total": 1, "covered": 1,
+                                                 "top3": 0})
+
+    def test_an_in_area_query_is_untouched(self):
+        s = self._summary([_kw("gutter installation york pa", 2.0)])
+        self.assertEqual(s["total"], 1)
+        self.assertEqual(s["top3"], 1)
+        self.assertEqual(s["excluded_out_of_area"]["count"], 0)
+
+    def test_york_county_is_not_caught_by_the_york_springs_rule(self):
+        # The blocklist is matched as a substring, so the one thing that must
+        # not happen is "york" patterns swallowing the service area itself.
+        for q in ("gutters york pa", "gutter replacement york county pa",
+                  "seamless gutters new freedom pa", "gutter guards hanover pa"):
+            self.assertFalse(K._out_of_area(q), q)
+
+    def test_a_broken_import_scores_everything_rather_than_dropping_it(self):
+        # Fail safe: the one unacceptable failure is an exception quietly
+        # shrinking the denominator, because that only ever flatters the goal.
+        with mock.patch.dict("sys.modules", {"growth.techniques": None}):
+            self.assertFalse(K._out_of_area("gutter guards york springs pa"))
+
+    def test_the_excluded_rows_are_still_in_keywords_json(self):
+        # The module's contract is that entries are never deleted. `summary()`
+        # must not be able to write, only to decline to count.
+        fixture = list(self.FIXTURE)
+        with mock.patch.object(K, "load", return_value=fixture), \
+             mock.patch.object(K, "save") as saved:
+            K.summary()
+        saved.assert_not_called()
+        self.assertEqual(len(fixture), 5)
+
+
 if __name__ == "__main__":
     unittest.main()

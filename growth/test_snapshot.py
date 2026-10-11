@@ -146,7 +146,12 @@ class IndexingBlockTest(unittest.TestCase):
             "keywords": mock.Mock(**{"summary.return_value": {
                 "share_pct": 0.0, "coverage_pct": 42.4, "total": 238,
                 "top3": 0, "top10": 21, "ranked_known": 57, "covered": 101,
-                "by_town": {}, "by_intent": {}, "gaps": [], "ranked": []}}),
+                "by_town": {}, "by_intent": {}, "gaps": [], "ranked": [],
+                # Added 2026-10-11 with keywords._out_of_area. build() reads
+                # this key unguarded on purpose: the audit trail for a shrunk
+                # denominator must fail loudly rather than go missing.
+                "excluded_out_of_area": {"count": 10, "queries": [
+                    "gutter cleaner york springs pa"]}}}),
             "review": mock.Mock(**{"scoreboard.return_value": {
                 "works": [], "does_not_work": [], "not_yet_judged": []}}),
             "ledger": mock.Mock(**{"load_techniques.return_value": [],
@@ -175,6 +180,20 @@ class IndexingBlockTest(unittest.TestCase):
         self.assertEqual(ix["unknown_to_google"], 1)
         self.assertEqual(ix["crawled_not_indexed"], 4)
         self.assertEqual(ix["accept_pct"], 87.0)
+
+    def test_build_publishes_what_the_goal_declined_to_score(self):
+        """A denominator that shrank must say which rows left it.
+
+        `keywords.summary()` stopped scoring out-of-area queries on 2026-10-11,
+        which moves `tracked_queries` and `coverage_pct` on the morning it
+        deploys. Unless the excluded rows reach the snapshot, that step is
+        indistinguishable from progress — the one misreading
+        `growth_daily.py` forbids.
+        """
+        snap = self._build(self.CACHE)
+        x = snap["keywords"]["excluded_out_of_area"]
+        self.assertEqual(x["count"], 10)
+        self.assertIn("gutter cleaner york springs pa", x["queries"])
 
     def test_an_unreadable_cache_publishes_the_reason_not_a_missing_key(self):
         """A dead instrument must read as dead, not as a quiet success."""
