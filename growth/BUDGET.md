@@ -247,3 +247,21 @@ They need opposite responses, and the message is the only way to tell them apart
 Ask, in order: what does this cost per run, what does it cost per month, and what
 happens to the daily loop if the cap is hit mid-month? If the answer to the third
 is "the report still says ok on most steps", fix that first.
+
+**Fourth dead morning recorded 2026-10-12.** Same shape: `last_build` read
+`new: 0, changed: 0`, `strengthen_pages` failed after 3 candidates and the scout
+failed, both on `Your credit balance is too low`. The duty cycle since 08-12 is
+now **18 productive mornings out of 62**, and of the 35 mornings 09-08 → 10-12,
+**30** were lost to an empty balance. Four consecutive dead mornings is the
+longest stall since the thirteen-day 09-08 → 09-20 one, and unlike that stall
+this one follows three separate manual top-ups, each of which bought 3–5
+mornings. The pattern has not varied once in six weeks: **a manual top-up buys
+3–5 productive mornings and then the engine stops.** Nothing but threshold
+auto-reload changes that, and rule 1 above is what bounds the spend it would
+authorise.
+
+One thing did *not* repeat today, and it is luck rather than a fix.
+`adopt_queries` no-op'd ("no new in-area searches worth tracking"), so the
+Adams County adoption of 10-11 did not get an eleventh sibling. The pre-guard
+code that admitted the tenth is still what runs; it simply had no candidate this
+morning. `tracked_queries` held at 239 and `coverage_pct` at 42.3.
