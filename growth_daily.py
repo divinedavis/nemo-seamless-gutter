@@ -327,6 +327,38 @@ def cmd_watchdog(args):
     problems = []
     if not when:
         problems.append("The growth engine has never recorded a completed build.")
+    elif stale_days == 1:
+        # One missed morning is already the alarm, and this entry runs late
+        # enough to be sure of it. On a healthy day the 06:00 run writes
+        # last_build hours before this 11:00 check, so stale_days is 0; a 1
+        # here means the run that was due five hours ago never reached the end
+        # of cmd_build. The threshold was >= 2 until 2026-10-13, which gave the
+        # failure a free day: on that date the engine produced nothing, the
+        # morning's publish commit never appeared, and this check said "ok —
+        # last build 2026-10-12" because one day of silence was under the bar.
+        # The cost of that free day is specific rather than theoretical — the
+        # cloud review agent's only view of this machine is growth/snapshot.json,
+        # so a day of it reads yesterday's numbers as though they were today's.
+        #
+        # The diagnostic goes in the alert rather than in a runbook because the
+        # person reading this at 11:00 is the person who has to tell the two
+        # causes apart, and the two need opposite responses.
+        #
+        # This assumes the check runs after the morning's engine run, which its
+        # own cron entry guarantees. Run `growth_daily.py watchdog` by hand
+        # before 06:00 and it will report the run it is standing in front of.
+        problems.append(
+            f"No completed build today — the last one was {when}. This "
+            f"morning's 06:00 run did not reach the end of the build. Two "
+            f"causes look identical from here and need opposite responses; "
+            f"`grep publish /var/log/nemo-growth.log` separates them. A "
+            f"'publish: nothing changed' line dated today means cron ran and "
+            f"growth_daily.py raised before snapshot.write() — seed, measure, "
+            f"review and build are all unwrapped, so look for the last "
+            f"Traceback. No publish line at all today means cron, python or "
+            f"the droplet never got that far. A git or ssh error after a "
+            f"'publish:' line means the opposite — the state here is fine and "
+            f"only the push to GitHub failed.")
     elif stale_days is not None and stale_days >= 2:
         problems.append(f"The last completed build was {when} — {stale_days} days "
                         f"ago. The 06:00 cron is not producing runs.")

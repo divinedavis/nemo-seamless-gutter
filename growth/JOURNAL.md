@@ -36795,3 +36795,656 @@ wrong argument and briefly believing all seven verdicts had collapsed. Both are
 the same failure: reading fast and trusting the first result. The second one I
 caught because the answer disagreed with yesterday's and I checked which of us
 was wrong instead of assuming it was yesterday.
+
+## 2026-10-13 — review agent
+
+### Where the numbers stand
+
+**The engine published nothing this morning. Not a failed run — no run reached
+the end. This is the first missing publish in the eighteen days of publish
+commits on record, and it means today has no numbers at all.**
+
+**(1) The missing publish, and what it rules out.** Every morning from 09-25 to
+10-12 produced a `Publish growth state for <date>` commit between **06:05 and
+06:13 UTC**, eighteen consecutive days, variance eight minutes. Today there is
+none: `origin/main` still ends at yesterday's review commit, the newest
+`snapshot.json` reads `"date": "2026-10-12"`, and it is now **11:11 UTC —
+5h11m past the window.** I fetched `origin/main` to be sure I was not reading a
+stale clone.
+
+This is a **new failure shape**, not another dead morning. The four dead
+mornings 10-09 → 10-12 each still published: the run completed, a technique
+failed inside it, and the snapshot recorded the failure. `publish_state.sh` is
+even deliberately wired to run after the engine regardless (`deploy/cron-nemo-growth:48`
+joins them with `;`, and the comment says "It runs even if the engine failed — a
+snapshot showing a failed run is exactly what the agent needs"). So the absence
+of a commit says the failure is upstream of anything the snapshot can describe.
+
+The mechanism that makes it silent is in `growth/publish_state.sh:81-84`:
+
+```sh
+if git diff --quiet && git diff --cached --quiet && [ -z "$(git status --porcelain)" ]; then
+  echo "publish: nothing changed"
+  exit 0
+fi
+```
+
+`snapshot.json` changes every day only because `generated` and `date` change.
+If `growth_daily.py` dies **before** `snapshot.write()`, nothing in the clone
+differs, and the publisher exits 0 having printed one line. `cmd_daily`
+(`growth_daily.py:211-258`) calls `seed.run()`, `cmd_measure`, `cmd_review` and
+`cmd_build` **unwrapped**, then writes the snapshot, then reports. A raise in any
+of those four produces exactly what I am looking at.
+
+Three causes fit, and they need different responses:
+- **cron ran, the engine raised before the snapshot write** → the log holds
+  `publish: nothing changed` dated today, plus a Traceback.
+- **the push failed** (ssh key, GitHub, network) → the log holds a `publish:`
+  line and then a git error, and the droplet's own state is fine.
+- **cron, python or the droplet never got that far** → no `publish:` line today
+  at all.
+
+`grep publish /var/log/nemo-growth.log` separates them in one command. I cannot
+run it: no droplet access.
+
+**(2) Nobody was told, and the missing `--email` is only half the reason.**
+I expected to write that the watchdog would have mailed if it had a `--email`.
+It would not have. `cmd_watchdog` (`growth_daily.py:308-362`, as it stood this
+morning) alarms on build staleness only at `stale_days >= 2`. `last_build` reads
+2026-10-12, so today `stale_days == 1` — **under the bar.** The two other checks
+are gated on `stale_days == 0`: today's-failed-steps at line 335, and
+`_snapshot_problems`, which returns `[]` on its first condition
+(`if stale_days != 0 or snap_date == build_date`). So at 11:00 the watchdog
+logs **`watchdog: ok — last build 2026-10-12`** and exits 0.
+
+That is worse than the day-48 finding. Restoring `--email` would have mailed
+nothing today. The threshold gave this failure a free day, and the free day is
+not free: the review agent's only view of the droplet is `snapshot.json`, so a
+day of it reviews yesterday's numbers believing them to be today's. I changed
+the threshold to 1 and tested it — see *What I changed* below. It needs a
+deploy, like everything else in `growth/`.
+
+**(3) Eric's morning email is missing too, and he can confirm it.**
+`cmd_report` is the **last** call in `cmd_daily`, after the snapshot block. Any
+crash that cost the snapshot also cost the owner report, which goes daily
+(`cron-nemo-growth:48`, `--owner-email eric@nemoseamlessgutter.com`). So under
+cause 1 or 3 above Eric's inbox is empty this morning, and under cause 2 it is
+not. **That is a free diagnostic that needs no droplet access: ask Eric whether
+his daily email arrived.** The developer's copy is weekly and lands Friday
+10-16 at the earliest.
+
+**(4) The cron fires at 2am ET, not 6am.** Incidental, found while dating the
+publish window. `deploy/cron-nemo-growth:17` sets `CRON_TZ=America/New_York` and
+the comment explains why 06:00 must mean 6am to the business. But every publish
+commit lands at **06:05–06:13 +0000** — committed by the droplet, in UTC. If the
+deployed cron honoured `CRON_TZ`, an EDT 06:00 run would commit at **10:05
+UTC**. It commits at 06:05, so the deployed `/etc/cron.d/nemo-growth` is firing
+at 06:00 **UTC** — 02:05 ET. Consistent with the nine-week-stale deploy. Two
+consequences, both small: Eric's daily report lands at 2am and is at the bottom
+of his inbox by breakfast, and the "11:00" watchdog is 7am ET. Nothing here is
+broken by it; the repo's own comment is simply describing a schedule that is not
+running.
+
+**(5) The goal metric, as of the newest data that exists (2026-10-12).** Not
+today's. Today's is unmeasured, and unmeasured is the finding.
+
+| | 2026-09-24 | 2026-10-11 | 2026-10-12 (newest) | 2026-10-13 |
+| --- | --- | --- | --- | --- |
+| **`top3` (the goal)** | **0** | **0** | **0** | **no data** |
+| `top3` share | 0.0% | 0.0% | **0.0%** (target 50%) | no data |
+| `top10` | 11 | 21 | **22** | no data |
+| `ranked_known` | 42 | 57 | **58** | no data |
+| `matched` | 42 | 54 | **54** | no data |
+| `clicks` | 16 | 11 | **11** | no data |
+| `impressions` | 6,883 | 4,970 | **5,281** | no data |
+| `avg_position` | 27.6 | 25.7 | **26.1** | no data |
+| `tracked_queries` | 220 | 239 | **239** | no data |
+| `coverage_pct` | 42.7 | 42.3 | **42.3** | no data |
+
+`top3` is **0 in all seven published buckets** — county 0/124, york 0/42,
+dover 0/18, hanover 0/15, spring-grove 0/14, red-lion 0/13, dallastown 0/13.
+Zero in every snapshot I can read and recorded as zero since 09-20: **23
+measured days, and a 24th that was not measured.** Direction: flat, with a hole
+in the series.
+
+**(6) Traffic and leads, newest 30-day window (09-12 → 10-11), unchanged from
+yesterday because it is the same data.** 71 visitors (34 organic, 33 direct,
+**1** local/maps, **2** AI, 0 referral, 1 campaign), 96 pageviews, **2** `tel:`
+taps, **0 bookings, 0 phone leads**. Bot hits 87,439 — 1,231:1. `local_visitors`
+0 for the last sixteen days of the window.
+
+The measurement-instrument check still passes and I re-ran it: nginx logs **34
+organic visitors in 30 days** against Search Console's **11 clicks in 28 days**.
+An over-broad bot or owner filter in `metrics.py` would show *fewer* than Google
+attributes, not three times more. The traffic number is small, not wrong — and
+note that today's outage is in the **publisher**, not in `metrics.py`.
+
+**(7) Revenue still unmeasured, not zero.** `lead_totals`: 4 bookings all time,
+0 phone leads, 13 own rows excluded. `metrics.lead_totals` reads only the site's
+own bookings tables, so a phone call that never touched the widget is invisible
+by construction. Thirteen Google reviews cannot come from four jobs. Unchanged
+and still needs Eric's Business Profile Calls panel.
+
+**Prompt corrections.** The prompt is unchanged again, so these still bind:
+- "An automated growth engine runs on the droplet at 06:00 ET each day and
+  **pushes its state to this repo an hour before you run**." Today it did not,
+  and the prompt's "Known blockers" section has no entry for that case. It needs
+  one: **check for a publish commit dated today before trusting `snapshot.json`,
+  because a stale snapshot is indistinguishable from a fresh one by its
+  contents.** (Also see finding 4: the run is at 06:00 UTC, not 06:00 ET.)
+- "A watchdog runs at 11:00 ET and **mails the developer** if the engine looks
+  dead." It does not mail (no `--email`, `cron-nemo-growth:93`), and as of this
+  morning it would not even have flagged this (finding 2). Both halves false.
+- The blocker section still says to expect a **usage-cap** error clearing
+  "2026-08-01". That cleared 73 days ago. The last four measured mornings all
+  failed on an **empty credit balance**, the opposite failure. `BUDGET.md`'s
+  "Read the error text" section is the correct guide.
+- "On 2026-07-28 that was 77 rows, 17 matched, 3 clicks, 429 impressions", and
+  treating `avg_position` as moving on almost nothing: retired. 759 rows, 5,281
+  impressions as of 10-12.
+- "The county bucket was 2 of 50 in the top 3" — it is **0 of 124**.
+
+### Did previous changes work?
+
+**1 — Yesterday's 10-13 falsifier could not be run. Not "not falsified" —
+untested.** The test was: `clicks` **below 11** on three consecutive mornings
+falsifies the benign reading of the impression fall. Yesterday's entry told
+whoever read this morning to "check `clicks` first". There is no `clicks` value
+for today. The test is suspended, not passed, and if tomorrow also fails to
+publish it stays suspended. Recording this distinction because "the test did not
+fire" and "the test could not run" look identical in a summary and mean opposite
+things about how much I know.
+
+The same goes for yesterday's **10-14 test** (impressions rising a third
+morning *and* clicks clearing 13) and for **"the morning after item 2"** and
+**"the morning after item 4"** — all four need a snapshot that does not exist.
+
+**2 — The impression fall: the strongest version of the spam-update reading
+yet, from external dates rather than new data.** I have no new numbers today, so
+I went at the old ones with something I did not have yesterday: the documented
+rollout timeline.
+
+The window identity established on 10-10 is `W(d) − W(d−1) = imp(d−3) −
+imp(d−31)`, which I verified against the code rather than the journal:
+`gsc.py:44-45` sets `LAG_DAYS = 3` and `WINDOW_DAYS = 28`, and
+`gsc.totals()` runs `end = today − 3`, `start = end − 27`. **New today, and it
+matters: `d−3` and `d−31` are exactly 28 days apart, so every step compares the
+same weekday.** Day-of-week is controlled by construction, which I had not
+noticed and which nothing in the journal had noted. That removes the largest
+confounder from a one-day step.
+
+Laying the steps against Barry Schwartz's documented volatility clusters for the
+September 2026 spam update (impact reported **09-25–27, 09-30, 10-04–06**;
+rollout **completed 10-08**, 13d 16h):
+
+| snapshot | Δ window | day entering | vs day leaving | in a documented cluster? |
+| --- | --- | --- | --- | --- |
+| 10-04 | −128 | Thu 10-01 | Thu 09-03 | no |
+| 10-07 | **−711** | **Sun 10-04** | Sun 09-06 | **yes — first day of the 10-04–06 cluster** |
+| 10-09 | −165 | Tue 10-06 | Tue 09-08 | **yes — last day of that cluster** |
+| 10-10 | −151 | Wed 10-07 | Wed 09-09 | no (day after) |
+| 10-11 | +91 | **Thu 10-08** | Thu 09-10 | **rollout completion day** |
+| 10-12 | **+311** | **Fri 10-09** | Fri 09-11 | **first full day after** |
+
+The largest negative step in the series lands on the first day of a documented
+volatility cluster, and the only two positive steps land on the completion day
+and the day after. Like-for-like weekday, nineteen snapshots, prior largest
+positive step +154.
+
+**What that is still not.** Each step is a difference between two days whose own
+levels I cannot see, so "10-04 was weak" holds only if Sun 09-06 was ordinary —
+a Labor Day weekend Sunday, which is exactly the kind of day that is not. The
+window is still **1,756 impressions below the 09-25 peak**; rows are 146 below;
+and **clicks did not move at all** (11 on 10-11 and 10-12, the floor of the
+band). A rank recovery that returns no clicks is finding 3's pattern, not a
+recovery. Verdict: **the dates fit well enough to prefer the spam-update
+reading over the alternatives, and not well enough to call the fall over.** The
+11-08 diagnostic is still the test, and it is still worth little without
+`gsc.pages`.
+
+**3 — "`top10` is a coverage counter, not progress" (09-09, retired as a metric
+10-11). Unchanged, no new data.** 09-24 → 10-12: `top10` 11 → 22 (doubled),
+`ranked_known` 42 → 58, `matched` 42 → 54, `clicks` **16 → 11 (−31%)**,
+`impressions` −23%, `top3` 0 → 0. Still only consistent with the newly-ranked
+queries carrying no York County volume. `discovered_untracked` is the visible
+half of that: **40 rows, 650 impressions, 0 clicks**, mostly Lancaster,
+Montgomery and Berks towns — and `gutter installation` sitting at position
+**2.7** with no region dimension to say whose screens it was on.
+`keywords.ranked`, which would name the ranked queries, is absent for the
+**eighth** day.
+
+**4 — The pre-registered coverage-versus-rank test (09-20). Failing, day 24.**
+Coverage 42.3 → 42.3, `top3` 0 → 0. Over the whole arc `ranked_known` 17 → 58
+and `top3` has never exceeded 2. No detected relationship between page coverage
+and the goal metric.
+
+**5 — The seven `works: true` verdicts. Unchanged, and not re-measured today.**
+Yesterday's re-measurement against `review.earned()` withdrew four (T002 at 6
+owned visitors against `MIN_TOTAL_VISITORS = 8`; T017, T019, T020 on
+`median_before: null`). All verdicts in the snapshot are still dated
+`2026-10-12`, so there is nothing new to judge — the droplet has not re-decided
+them because the droplet has not run. T017 and T019 still print
+`gsc_clicks median 13.5/day` for a 28-day **total of 11**; `review._unit()`
+in this repository returns `/28d`, so the `/day` is the undeployed bug, **day
+fourteen.**
+
+**6 — Recommended and not acted on. Today I mostly cannot tell, which is new.**
+Yesterday's items 2, 4 and 5 all act on the droplet, and the only channel that
+would show me the result is the morning publish. So:
+- **The `growth/` deploy (item 2). Day fourteen, and unverifiable today.** Every
+  check still negative in the newest snapshot — no `code_version`, no
+  `indexing`, no `keywords.ranked`, no `gsc.pages`, no
+  `keywords.excluded_out_of_area`, `by_town` 7 buckets against the **17** in
+  `keywords.TOWNS` (`growth/keywords.py:40-64`), `tracked_queries` 239 not 229 —
+  but that snapshot is yesterday's, and it predates the recommendation landing.
+  If Divine ran it this morning I would have no way to see it. **Stated as
+  unknown, not as ignored.**
+- **`repair_titles.py` (item 4). Unverifiable for the same reason.** I measured
+  the repo's page mirror again today — **47 pages with a `<title>`, 25 over 65
+  characters** (worst `guides/gutter-services-near-me.html` at 80) — identical
+  to yesterday, which is exactly what a missing `rsync` looks like and tells me
+  nothing about the droplet. I did not run `deploy/repair_titles.py` itself; this
+  environment's tooling blocks executing scripts under `deploy/`, so I measured
+  the titles directly instead.
+- **The two out-of-area scripts (item 5). Day fourteen, bound unchanged as of
+  yesterday.** `guides/5-inch-gutter-service-york-springs-pa.html` is still in
+  `pages.guides` and still the one `york-springs` URL in `sitemap.xml`.
+- **The watchdog's `--email`. Day forty-eight** — and see finding 2: restoring
+  it alone would not have caught today.
+- **The Business Profile sitting. Day seventy-eight.** `local_visitors` 1 in 30
+  days.
+- **Retiring T082, striking the dead halves of T016 and T025, rewriting the GBP
+  halves of T036/T052/T024.** Still `candidate`; `scoreboard.does_not_work` is
+  still **empty**, as on every day on record.
+
+### What I researched today
+
+The scout has not run in five days, so this is the only research that happened.
+
+**Whitespark's 2026 Local Search Ranking Factors — business hours are a new
+factor, and they rank fifth for the local pack. This upgrades a candidate that
+has sat for 68 days.** The report (published 2025-11-06, 47 practitioners, 187
+factors) added **"open at time of search"** as a new factor, landing **5th for
+local pack results**, ahead of high star ratings and address visibility. Primary
+GBP category is still **1st**, proximity 2nd, keywords-in-business-title 3rd.
+Review and behavioural signals gained against 2023; on-page, links and citations
+lost ground; dedicated service pages, local content and schema rose; and the
+report now scores factors for **AI-response visibility** as a third category
+alongside pack and local-organic.
+
+Why it matters here, checked in the code before writing it down: the site
+publishes **Mon–Fri 07:30–18:00, Sat 08:00–14:00** (`index.html:211-212` and
+`growth/techniques.py:880-885`, identical in both), while **T042's** own note
+proposes **Mon–Fri 7am–8pm, Sat 8am–1pm**. Both the weekday close and the
+Saturday close disagree, and nobody knows what the Business Profile itself says.
+T042 was argued as a *conversion* problem — a "Closed" label killing the dial.
+The Whitespark finding makes it a **ranking filter** as well, which is a
+different and stronger argument, and gutter panic-searches (storm, overflow)
+happen in exactly the evening and weekend hours in dispute. T042's existing
+evidence cited a vendor blog for this; the largest practitioner survey in local
+SEO is a better source for the same claim.
+([whitespark.ca](https://whitespark.ca/local-search-ranking-factors/),
+[harmo.me](https://harmo.me/en/blog/local-seo-ranking-factors-2026-whitespark),
+[sambretzmann.com](https://sambretzmann.com/2026-local-seo-ranking-factors-overview/),
+[gmbapi.com](https://gmbapi.com/news/local-ranking-factors-comparison-2026-2023/),
+[soci.ai](https://www.soci.ai/blog/local-memo-local-ranking-factors-of-2026-have-arrived/))
+
+**The weight percentages in those summaries contradict each other** (one gives
+the pack GBP signals 32% / reviews 20% / on-page 15%; another gives on-page 19%
+and links 15% overall). I am quoting the *rank* of the hours factor, which the
+sources agree on, and not any percentage.
+
+**AI-citation guidance for contractors: cost pages without costs do not get
+cited. This sharpens T036 rather than proposing anything new.** The consistent
+advice across the 2026 guides is answer-first copy in one or two self-contained
+sentences, question-shaped headings, market-specific location pages, GBP
+attributes declared explicitly so the model can confirm what you offer, review
+text as the evidence it checks claims against — and that **pages without pricing
+information are less likely to be cited for cost questions**, because the model
+cannot answer a price query safely without a number.
+
+Checked against the pages before writing it: `by_intent` makes **price the
+worst-covered intent — 10 of 53 queries — against hire at 83 of 154**. And
+`guides/gutter-cleaning-cost-york-pa.html` has an `<h2>` reading **"Typical
+price ranges"** under which it gives **zero dollar figures**, and says in prose:
+*"We won't promise a specific guaranteed price sight-unseen, because that
+wouldn't be honest."* Meanwhile `how-much-do-seamless-gutters-cost.html` does
+publish $1,500–$4,000 and $7–$14/ft, and
+`how-much-does-leaffilter-cost-per-foot.html` carries **46 dollar figures about
+a competitor's product**. So the site is willing to price NEMO's installs and
+LeafFilter's guards, and refuses to price NEMO's cleaning — which is the exact
+page **T036** names ("a real published price band on a /gutter-cleaning-york-pa
+page"). That is a much better argument for T036's on-site half than the vendor
+conversion statistics in its evidence field, and it is an internal
+inconsistency rather than a borrowed benchmark.
+([searchenginejournal.com](https://www.searchenginejournal.com/ai-overviews-now-answer-most-local-searches-how-to-get-your-business-cited/580757/),
+[thehoth.com](https://www.thehoth.com/blog/how-to-get-cited-in-ai-overviews/),
+[localiq.com](https://localiq.com/blog/ai-overviews/),
+[contently.com](https://contently.com/2026/02/25/how-to-get-cited-google-ai-overviews/),
+[geekpoweredstudios.com](https://www.geekpoweredstudios.com/post/geo-and-ai-search-visibility-texas-contractors))
+
+**The September 2026 spam update: completed 2026-10-08 after 13 days 16 hours.**
+Confirmed by two independent reports. Global, all languages; Google did not say
+which tactics it targeted; it ran far longer than the sub-three-day 2026 spam
+updates before it, and several observers said it behaved more like a core
+update. Impact clusters documented on **09-25–27, 09-30 and 10-04–06**. Nothing
+I found addresses local businesses or the pack specifically, and every source
+says a dip in the window does not prove causation. Used above in finding 2;
+**no recommendation comes off it.**
+([searchenginejournal.com](https://www.searchenginejournal.com/google-september-2026-spam-update-complete/592283/),
+[seroundtable.com](https://www.seroundtable.com/google-september-2026-spam-update-done-42235.html),
+[relevantaudience.com](https://www.relevantaudience.com/seo/google-september-2026-spam-update-complete/))
+
+**Google Business Profile, last week: nothing that touches this business.** The
+only primary-source change I could date is Google's own API changelog, **2026-10-09**
+— dietary-restriction settings for food menus (gluten-free, dairy-free).
+Irrelevant here, and I am recording it so the next reader does not re-search it.
+One vendor claim is worth a look rather than a recommendation: that the
+Performance tab has been **split by surface** — local panel, Maps AI summary,
+AI Overviews impressions. Single agency, page roughly 340 days old, unverified.
+If it is true it changes what recommendation 2 below returns, so: when Eric opens
+Performance, **look for a surface breakdown and write down what the surfaces
+are.** ([developers.google.com](https://developers.google.com/my-business/content/latest-updates),
+[oakinteractive.com](https://oakinteractive.com/whats-new-in-google-business-profile-the-2026-updates-you-cant-ignore/),
+[jxtgroup.com](https://www.jxtgroup.com/google-business-profile-verification-in-2026-new-warnings-video-requirements-how-to-stay-compliant/))
+
+**Rejected, having checked the code or the ledger first:**
+- **"Profiles inactive 30+ days lose impressions"** — single consultancy, admits
+  Google has not confirmed it, and it would only argue for **T008 (`gbp_posts`)**,
+  already a candidate and already constrained by the 10-06 policy. No new slot.
+- **Sticky tap-to-call bar** — shipped on 45/45 pages (`styles.css:252`,
+  `position:fixed; bottom:0`). Named first by every conversion source and
+  already done.
+- **FAQPage structured data** — emitted by `growth/techniques.py:341`, on 43 of
+  45 pages.
+- **"32% fewer local businesses appear in AI local packs than Map Packs"** —
+  single vendor, no methodology. Directionally interesting, not usable.
+- **Keywords in the GBP business name** — ranked 3rd by Whitespark and
+  permanently against Google's guidelines. Not a candidate at any rank.
+- **Anything that puts a price, a dated offer or a phone number into the GBP
+  listing or a Post** — the 10-06 policy change found yesterday. Unchanged
+  today; I found no follow-up coverage and no enforcement date.
+
+**The same limitation as every previous day.** `WebFetch` fails DNS resolution
+for every host in this environment — I tried `whitespark.ca` today and got
+`getaddrinfo ENOTFOUND`. **Every citation above is a search engine's summary of
+a page I could not open.** For the Whitespark report that means I am quoting
+secondary descriptions of a primary source that exists and is free to read;
+anyone with a browser should confirm the hours factor's rank before leaning on
+it.
+
+### Recommendations
+
+Ranked. Items 1 and 2 are new today or newly argued; the rest are carried and
+marked as such, because the ledger's constraint has never been idea supply —
+**96 candidates, none activated in 78 days.**
+
+**1. Divine — find out why this morning produced nothing. New today, and it
+blocks everything else, including tomorrow's review.**
+```
+grep publish /var/log/nemo-growth.log | tail -20     # which of the three causes
+grep -n 'Traceback' -A 20 /var/log/nemo-growth.log | tail -40
+df -h /var /root                                      # a full disk fails both halves
+sudo -u root git -C /root/nemo-repo fetch origin main # the push credential
+```
+The three causes and how the log tells them apart are in finding 1. **Free
+first step with no droplet access at all: ask Eric whether his daily email
+arrived this morning** — it comes after the snapshot write, so "no email" points
+at causes 1 or 3 and "email arrived" points at the push (finding 3).
+*Expected effect:* none on the goal metric. It restores the only channel through
+which anything here is measurable.
+*How I would know:* a `Publish growth state for 2026-10-14` commit tomorrow at
+~06:05 UTC, and a snapshot whose `date` is 2026-10-14.
+*Checked:* `origin/main` fetched today, newest commit `61b7206` (yesterday
+11:23 UTC); `snapshot.json` `date: 2026-10-12`; the 18-day publish history and
+its 06:05–06:13 UTC window; the silent-exit branch at
+`growth/publish_state.sh:81-84`; the unwrapped calls at `growth_daily.py:211-215`.
+**Divine's, ~10 minutes, needs droplet access.**
+
+**2. Eric — the Business Profile, and start with hours. Day seventy-eight,
+fifteen minutes, free, newly argued, and still the only item here that can move
+the goal metric.** Hours have moved from a conversion argument to a ranking one:
+Whitespark's 2026 report makes "open at time of search" the **5th** local-pack
+factor, and the site publishes Mon–Fri 07:30–18:00 / Sat 08:00–14:00 while T042
+proposes 7am–8pm / 8am–1pm. In order:
+- **(e) the real hours** — whatever the AI phone agent can honestly cover —
+  then set the profile, `index.html:211-212` and `techniques.py:880-885` to the
+  same numbers **in one pass**. `techniques.py:869-879` already warns why:
+  Google auto-applies a suggested profile edit after four days when the website
+  corroborates it, so the site's schema is evidence Google reads back, and
+  changing one of the three alone leaves them contradicting each other.
+- **(f) Performance → Calls, 28 days** — the only place a phone call is visible
+  at all, and the only test of finding 7. Note whether the tab is split by
+  surface (see research).
+- **(g) Performance → Searches, 6 months** (T093) — the only view of Maps demand
+  Search Console cannot see, and the only thing that can source or kill the
+  ~300-views figure that seventeen ledger entries quote with no origin.
+- **(b) primary category** — Whitespark's **1st**-ranked factor. Write down what
+  it is before touching it; prefer specific over broad; change nothing else that
+  day. (T016's surviving half — its Q&A half is impossible, Ask Maps generates
+  answers now.)
+- **(c) itemised Services** (T022), **with no prices in them**, per the 10-06
+  policy. **(h)** website URL → `/services/seamless-gutter-installation.html?utm_source=gbp`,
+  without which `metrics.classify()` cannot count a pack click as `local`.
+  **(a)** verified address and whether it has moved. **(i)** pending suggested
+  edits and the notification email. **(j)** one job photo, and read off the real
+  review count and star average — "13 reviews / 4.2 stars" is 78 days unverified
+  and eleven hypotheses rest on it.
+*How I would know:* `local_visitors` leaves 0–1 per 30 days; GBP call clicks
+become a number anyone has ever seen.
+*Checked:* no GBP code path exists anywhere in `growth/`; the hours conflict
+re-read in both files today; T042 and T016 re-read in today's snapshot.
+**Eric's, and only Eric's.**
+
+**3. Divine — `deploy/deploy_growth.sh`. Day fourteen, and it now also carries
+today's watchdog fix.**
+```
+git -C /root/nemo-repo fetch origin main && git -C /root/nemo-repo reset --hard origin/main
+bash /root/nemo-repo/deploy/deploy_growth.sh            # read-only, prints a hash table
+bash /root/nemo-repo/deploy/deploy_growth.sh --apply
+```
+What `--apply` buys, in order of what it fixes: **today's watchdog threshold**,
+without which a single dead morning stays invisible; the **`OUT_OF_AREA` intake
+guard**; the **scoring-time exclusion** that takes ten Adams County queries out
+of the denominator; **`gsc.pages`** (`gsc.fetch_pages` exists at
+`growth/gsc.py:413` in this repo and nowhere in the droplet's output), the
+per-page segmentation the 11-08 diagnostic needs; **`indexing`**, which
+separates "Google dropped the page" from "nobody searched"; **`keywords.ranked`**,
+without which findings 3 and 5 stay partly unscoreable; **`review.py`**, which
+withdraws four of the seven `works: true` verdicts and fixes the `/day` that
+should read `/28d`; `llm.py`'s continuation loop; `code_version`; the ten
+missing town buckets; `techniques.py`'s title fixes.
+*How I would know:* the next snapshot carries `code_version` and `indexing`,
+`by_town` has 17 buckets, `keywords.excluded_out_of_area.count` is 10,
+`tracked_queries` steps 239 → 229, and no verdict says `/day`.
+*Checked:* today's snapshot keys (no `code_version`, no `indexing`); `keywords`
+keys (no `ranked`, no `excluded_out_of_area`); `gsc` keys (no `pages`); `by_town`
+7 against the 17 in `growth/keywords.py:40-64`.
+**Divine's, ~10 minutes. Carried from 09-29.**
+
+**4. Divine — threshold auto-reload on the Anthropic account. Carried, and the
+count is now ambiguous rather than worse.** The last four *measured* mornings
+(10-09 → 10-12) all failed on `"Your credit balance is too low"`. Today's
+balance state is **unknown** — the run never got far enough to report one — so
+I am not calling it a fifth. Auto-reload plus a monthly cap in the console;
+`BUDGET.md` rule 1 bounds a run to 3–5 calls at cents a day, so the cap
+enforces that rule rather than relaxing it. Three manual top-ups have each
+bought 3–5 mornings and then stopped, four times out of four.
+*Expected effect:* removes the dead-morning class. It does **not** move the goal
+metric; argue it as hygiene.
+*Checked:* `last_build.log` and `last_scout.detail` in the newest snapshot;
+`BUDGET.md`'s duty-cycle table, updated today.
+**Divine's, ~5 minutes, needs billing access.**
+
+**5. Eric — write down three real cleaning prices. This is T036's on-site half,
+not a new idea, and it has a better argument today than it had yesterday.**
+Eric writes his actual 2026 cleaning prices for three house sizes on paper —
+single-storey ranch, two-storey, plus the guards-removal adder — and those exact
+numbers replace the empty "Typical price ranges" section on
+`guides/gutter-cleaning-cost-york-pa.html`. **No ranges he would not honour**,
+and **nothing into the GBP listing or a Post** (the 10-06 policy; T036's GBP
+half has to be rewritten per item 7).
+*Why now:* the page carries a price heading with no price while the site prices
+NEMO's installs ($1,500–$4,000, $7–$14/ft) and a competitor's guards (46
+figures). Price is the worst-covered intent in the tracked universe, 10 of 53.
+And the AI-citation research says a cost page without costs does not get cited
+for a cost question.
+*Expected effect:* a conversion and citation lever on the cheapest, most
+seasonal job NEMO sells — a 45-minute ladder visit that ends with Eric standing
+at the fascia of a house that may need gutters. **Unmeasurable at 71 visitors a
+month**, and I will not claim otherwise; the reason to do it is that the page
+currently asks for a call and refuses to answer the question it was written for.
+*Checked:* the page's `<h2>`s and its zero dollar figures, read today; the
+other two cost pages' figures counted; `by_intent.price` 10/53; T036's `notes`
+field, which names this page and this change as its first step.
+**Eric supplies the numbers; it needs a page edit on the droplet and a deploy.**
+
+**6. Divine — the title refit and the two out-of-area scripts. Carried, day
+fourteen, and I cannot tell today whether they ran.**
+```
+cd /var/www/nemo-seamless-gutter
+python3 deploy/repair_titles.py            # report only, then --apply
+python3 deploy/repair_out_of_area_prose.py # then --apply
+python3 deploy/retire_out_of_area.py       # then --apply
+```
+The repo's mirror still measures 47 titles, 25 over 65 characters, and still
+holds `guides/5-inch-gutter-service-york-springs-pa.html` — but that mirror is
+`rsync`ed docroot → repo by the publish that did not happen, so it is evidence
+about yesterday, not about this morning. *Expect no rank movement from the
+out-of-area work and treat any as unproven;* the reason to do it is that the
+site publishes a service-area claim nobody at the business made. For the titles,
+**do not expect `clicks` to move** against a site-wide CTR of 0.21%; the honest
+check is that a second run reports "Every title already fits."
+**Divine's, ~7 minutes total.**
+
+**7. Divine — ledger edits. Carried unchanged from yesterday.** One-line edits
+to the droplet's `techniques.json` (gitignored; I cannot make them). Rewrite the
+**GBP-surface** halves of **T036**, **T052** and **T024** before anyone executes
+them — as written all three put a price, a dated deal or a phone number into a
+listing or a Post, which the 2026-10-06 policy prohibits; each has an intact
+on-site half. Retire **T082** (GBP messaging, ended 2024-07-31). Strike
+**T016's** Q&A half (impossible, not merely deprecated) and keep its category
+half. Strike **T025's** FAQPage half (shipped, 43/45 pages). Re-state **T047**
+as a conversion lever, not a rank lever. **Do not touch T074.** Retire, do not
+delete — `README.md` says verdicts persist so a dead idea cannot be re-proposed
+as new.
+*How I would know:* `scoreboard.does_not_work` is non-empty for the first time
+on record.
+**Divine's, ~5 minutes.**
+
+**8. Eric — the PA HIC number, and whether NEMO is insured. Carried.** The site
+says neither anywhere: `grep -i` for licensed/insured/warranty in `index.html`
+returns nothing; 1 of 45 pages says "licensed", 2 say "insured". One line in the
+hero and the footer — "PA HIC #xxxxx · fully insured". The engine cannot and
+should not do this: `techniques.py:1897` forbids the model from inventing
+licence numbers or certifications, which is correct and must stay.
+**Small in absolute terms and unmeasurable at this traffic.**
+**Eric supplies the number; needs a deploy.**
+
+**Not done, deliberately: I did not restore the watchdog's `--email`.** It was
+removed on 2026-08-27 **at the owner's request** (`cron-nemo-growth:85-88`), and
+re-adding it is his decision, not mine — the file is also inert in this repo
+until someone installs it on the droplet. What I will say is that today is the
+case the flag existed for, and `cmd_watchdog` returns early when the engine is
+healthy, so restoring it reintroduces no daily email. One flag:
+`--email divinejdavis@gmail.com`.
+
+### Reasoning and uncertainties
+
+The whole of today is one finding: **the review ran and the engine's state did
+not arrive**, and the two mechanisms that should have made that loud both
+failed quietly. `publish_state.sh` exits 0 printing "nothing changed" when the
+engine dies before writing a snapshot, because from the publisher's point of
+view nothing *did* change — the one case where "nothing changed" is the alarm is
+the one case it cannot distinguish. And the watchdog, which exists for exactly
+this, waits two days before it will say anything, so the first morning of any
+outage is free. I went looking to confirm the day-48 `--email` finding and found
+something worse behind it, which is the useful shape of the day.
+
+The fix I made is small and I want to be honest about its reach: it changes one
+threshold and the words of one alert. It catches a single missed morning five
+hours after the run was due, it does not mail anyone until the `--email`
+question is settled, and it is the fourteenth day of `growth/` changes sitting
+in a repository that does not deploy itself. A fix nobody installs is a comment.
+I wrote it anyway because item 3's list of what a deploy buys is now long enough
+that one more entry on it is worth more than one more paragraph telling Divine
+to run it.
+
+What I am least sure of is whether the missing publish is a one-morning blip or
+the start of something. A dead cron and a crashed run look identical from here
+and I have no way to look. If tomorrow publishes normally, cause 2 (a failed
+push) becomes the most likely reading and nothing structural is wrong except
+the two silences above. If tomorrow also publishes nothing, then the engine has
+been dead for two days with four pre-registered tests suspended, and the
+watchdog — unfixed on the droplet — will finally alarm into a log nobody reads.
+
+The second thing worth keeping is the **weekday control**. I spent yesterday's
+entry and the two before it treating single-day impression steps as noisy
+because each one is a difference of two unknown days. Half of that worry was
+misplaced: the lag and window constants force the two days to be the same
+weekday, 28 days apart, which I confirmed in `gsc.py` rather than taking from
+the journal. That is why today's spam-update mapping is worth stating — six
+steps, like-for-like weekday, the largest fall on the first day of a documented
+volatility cluster and the only two rises on the completion day and the day
+after. It is still six data points against a rollout that Google declined to
+describe, and the thing it would most need to be real — per-page segmentation —
+is in item 3's list. I would change my mind if `clicks` rises with impressions;
+so far it has not moved off 11.
+
+What has not changed, and is the only sentence in this entry Eric would care
+about: **`top3` is 0, it has been 0 for every one of the 23 days anyone has
+measured it, and the 24th went unmeasured.** Four of the eight items above need
+one person with droplet access and about forty minutes. Item 2 is fifteen
+minutes of Eric's evening and is still the only one that can move that number.
+
+**What I changed in the repo today:**
+- `growth_daily.py` — `cmd_watchdog`'s build-staleness threshold drops from
+  `stale_days >= 2` to a `stale_days == 1` branch of its own, so one missed
+  morning alarms instead of being under the bar. The one-day alert carries the
+  three-cause diagnostic (crash before `snapshot.write()`, cron never ran,
+  push failed) rather than leaving it in a runbook, because the person reading
+  it at 11:00 is the person who has to tell them apart. The `>= 2` branch keeps
+  its multi-day wording. Needs `deploy/deploy_growth.sh` before it does
+  anything.
+- `growth/test_watchdog.py` — **new `WatchdogStalenessTest`, 8 tests**: a
+  healthy morning stays silent; today's failure shape alarms on the *first*
+  morning; the alert carries all three diagnostic strings; one missed morning
+  reports one problem and not two (the snapshot check stays out of it); a
+  seven-day outage keeps the multi-day wording and does not use the one-day
+  text; a never-run engine says so in plainer words; today's failed steps are
+  still reported; a failing Search Console sync is still reported. Mocks the
+  ledger and the calendar so the tests pin dates rather than drifting.
+- `growth/BUDGET.md` — 2026-10-13 recorded as unmeasured rather than as a fifth
+  dead morning, and why the duty-cycle denominator now has a hole in it.
+- `growth/JOURNAL.md` — this entry.
+- **Tests: added 8** (`WatchdogStalenessTest`). **Changed 1** —
+  `test_the_one_day_alert_carries_the_diagnostic` gained the push-failure
+  assertion when I widened the alert text, and its docstring now names three
+  causes instead of two. **Removed none** — nothing here tested behaviour that
+  stopped existing; the `>= 2` branch is still live for outages of two days or
+  more and `SnapshotFreshnessTest` is untouched.
+- `scripts/test.sh`: **392 Python tests and 9 node tests, all passing** (384
+  Python yesterday, +8).
+
+**Pre-registered tests, with dates:**
+- **2026-10-14, before anything else** — is there a `Publish growth state for
+  2026-10-14` commit, and does `snapshot.json` read `date: 2026-10-14`? If not,
+  the engine has been dead two days and that is the entire entry. **Do not
+  analyse a snapshot without checking its date against the calendar first** —
+  today's whole failure was invisible from the file's contents.
+- **Suspended until a snapshot exists, carried from 10-12:** falsifier (a),
+  `clicks` below 11 on three consecutive mornings; the impression turn
+  (impressions rising a third morning *and* clicks clearing 13 — if impressions
+  rise while clicks hold at 11, that is more out-of-area reach and **not** good
+  news); "the morning after item 3" (`keywords.excluded_out_of_area.count` must
+  read 10 and `tracked_queries` 229 — if `count` is 0 the deploy did not carry
+  `keywords.py`); "the morning after the title refit" (a re-run reports "Every
+  title already fits", **not** that `clicks` moved).
+- **2026-11-08** — the spam-update diagnostic, datable because the rollout
+  completed 10-08. The 11-08 snapshot's 28-day window covers 10-09 → 11-05,
+  entirely post-rollout; compare against the 09-24 snapshot (window 08-25 →
+  09-21, entirely pre-rollout: impressions 6,883, rows 892, clicks 16, position
+  27.6). Worth much only with `gsc.pages`, which needs item 3.
+- **The morning after item 3 lands** — `watchdog: ok` must stop appearing on a
+  morning with no build. The honest check on my own change is the next outage,
+  not the next green run.

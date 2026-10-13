@@ -265,3 +265,21 @@ One thing did *not* repeat today, and it is luck rather than a fix.
 Adams County adoption of 10-11 did not get an eleventh sibling. The pre-guard
 code that admitted the tenth is still what runs; it simply had no candidate this
 morning. `tracked_queries` held at 239 and `coverage_pct` at 42.3.
+
+**2026-10-13 is unmeasured, not a fifth dead morning.** The engine published no
+state at all — no `Publish growth state for 2026-10-13` commit, the newest
+`snapshot.json` still dated 2026-10-12 at 5h11m past the 06:05–06:13 UTC window
+that held for the previous eighteen days. `cmd_daily` writes the snapshot near
+the end (`growth_daily.py:248-255`), after `seed.run()`, `cmd_measure`,
+`cmd_review` and `cmd_build`, all unwrapped; a raise in any of those leaves
+yesterday's snapshot in place, so `publish_state.sh:81-84` finds nothing changed
+and exits 0 printing one line. A failed push produces the same silence.
+
+So **the balance state for 2026-10-13 is unknown**: the run never got far enough
+to make a call and report a 400. The duty cycle stands at **18 productive
+mornings out of 62 (08-12 → 10-12)**, with a hole at 10-13 rather than a fifth
+consecutive dead morning on the count — the four measured dead mornings
+10-09 → 10-12 all failed on `Your credit balance is too low`. Resolve the
+outage first (`grep publish /var/log/nemo-growth.log`); until then any claim
+about the balance after 10-12 is a guess, and the "read the error text" rule
+above cannot be applied to an error nobody received.
