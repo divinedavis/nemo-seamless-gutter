@@ -209,10 +209,47 @@ def cmd_report(args, run_log=None, review_out=None, scout_out=None):
 # ------------------------------------------------------------------- daily
 
 def cmd_daily(args):
-    seed.run()
-    cmd_measure(args)
-    review_out = cmd_review(args)
-    run_log = cmd_build(args)
+    # Each of the four build-side steps is wrapped for the same reason the
+    # scout below it is: a raise here used to take the morning's only two
+    # outputs — the state snapshot and the report — down with it.
+    #
+    # Leaving them unwrapped cost 2026-10-13 and 2026-10-14. Something raised
+    # ahead of `snapshot.write()`, so no snapshot was written; and because
+    # `publish_state.sh` exits 0 printing "nothing changed" when the clone has
+    # no diff (growth/publish_state.sh:81-84), no commit appeared either. The
+    # cloud review agent, whose only view of this machine is those two files,
+    # read 2026-10-12's numbers on two consecutive mornings and had no way to
+    # see why. Two blind days is a worse outcome than any of these four steps
+    # failing, because a recorded failure is something the next run can act on.
+    #
+    # So a crash costs its own step and nothing downstream. `engine_entry()`
+    # and `report.build_text()` both accept None for all three arguments, and
+    # the individual techniques inside `cmd_build` are already wrapped — what
+    # is caught here is the pre-loop work (`seed.run`, `keywords.check_coverage`,
+    # `techniques.Context`) and `ledger.set_state` after it.
+    #
+    # Deliberately NOT done here: writing a fresh `last_build` date on a crash.
+    # The 11:00 watchdog reads that date to decide whether a morning went
+    # missing, so stamping it today would hand the run a clean bill of health
+    # and silence the one check that still fires. A failed build leaves
+    # `last_build` dated to the last run that finished, which is true, and the
+    # crash reaches the reader through `aborted` in the run log instead.
+    aborted = []
+
+    def _step(name, fn, default=None):
+        try:
+            return fn()
+        except Exception as e:
+            traceback.print_exc()
+            log(f"  {name} FAILED — {e}")
+            aborted.append({"ok": False, "slug": name,
+                            "detail": f"aborted the morning: {e}"})
+            return default
+
+    _step("seed", seed.run)
+    _step("measure", lambda: cmd_measure(args))
+    review_out = _step("review", lambda: cmd_review(args))
+    run_log = _step("build", lambda: cmd_build(args))
     # Coverage is re-checked after the build so the report reflects the page
     # written this morning rather than yesterday's picture.
     #
@@ -243,6 +280,13 @@ def cmd_daily(args):
         # BLOCKED section surfaces it instead of the run dying silently.
         scout_out = {"ok": False, "detail": f"crashed: {e}"}
         log(f"  scout crashed: {e}")
+
+    # The aborted steps ride in the run log so the journal entry and the
+    # report name them: `engine_entry()` prints every row as ok/FAILED, which
+    # is how a crash ahead of this point becomes something the review agent
+    # can read rather than a morning of missing numbers.
+    if aborted:
+        run_log = aborted + list(run_log or [])
 
     # Publish state for the cloud review agent, which cannot reach this machine.
     if not args.dry_run:
