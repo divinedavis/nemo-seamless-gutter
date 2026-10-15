@@ -146,6 +146,61 @@ fingerprint block. If the published `snapshot.json` has no `code_version`, the
 droplet is running stale engine code and the deploy above has not been run —
 which is also why that diagnostic cannot report its own absence.
 
+## When no publish commit arrives
+
+A morning with **no `Publish growth state for <date>` commit at all** is a
+different failure from a morning that published a snapshot full of failures,
+and it is the one that hides. It happened on 2026-10-13, 10-14 and 10-15, and
+the diagnostic was re-derived from scratch each day, so it lives here now.
+
+Why it is silent: `publish_state.sh` exits 0 printing `publish: nothing changed`
+when no watched path differs. If `growth_daily.py` dies before
+`snapshot.write()`, nothing in the clone *has* changed, so the publisher is
+behaving correctly — the one case where "nothing changed" is the alarm is the
+case it cannot distinguish.
+
+Three causes, which need opposite responses. One command separates them:
+
+    grep publish /var/log/nemo-growth.log | tail -40
+
+* **`publish: nothing changed` dated that morning** — cron ran and the engine
+  raised before the snapshot write. Find the last `Traceback` in the same log.
+* **no `publish:` line for that morning at all** — cron, python or the droplet
+  never got that far. Check `systemctl status cron`, `df -h /var /root` (a full
+  disk fails both halves), and whether `/etc/cron.d/nemo-growth` still exists.
+* **a git or ssh error after a `publish:` line** — the droplet's state is fine
+  and only the push broke. Check the deploy key:
+  `git -C /root/nemo-repo fetch origin main`.
+
+**Free first step with no droplet access:** ask Eric whether his daily report
+email arrived. `cmd_report` is the last call in `cmd_daily`, after the snapshot
+block, so "no email" points at the first two causes and "email arrived" points
+at the push.
+
+**Back the missing days out of the nginx log before they age away.** `measure`
+records yesterday only, and the 45-day series in `snapshot.json` is accumulated
+in the ledger, not recomputed — so a morning that never ran is a permanent hole
+in the traffic and leads history unless it is backfilled while the rotations are
+still on disk (`rotations()` in `metrics.py` reads every kept archive, but the
+log is rotated away after a few days):
+
+    ls -la /var/log/nginx/nemo-access.log*          # how many days are left
+    cd /var/www/nemo-seamless-gutter
+    WEB_ROOT=$PWD python3 growth_daily.py measure --days 5
+
+Safe to re-run: `ledger.record_result` is idempotent per
+`(date, technique, metric)` and `read_results` keeps the newest write, so
+re-measuring a day already recorded cannot double-count it.
+
+**The watchdog cannot catch the third cause.** `0 11 * * *` lives in the same
+`/etc/cron.d/nemo-growth` as the 06:00 run, so anything that kills cron kills
+the alarm with it, and the alarm has had no `--email` since 2026-08-27 in any
+case. The only check that survives a dead droplet is off it: **the absence of a
+publish commit on GitHub**, which is what the 07:00 review agent reads. Restore
+the flag (`--email divinejdavis@gmail.com`) for causes 1 and 2; for cause 3 the
+repository is the heartbeat.
+
+
 ## Running it by hand
 
 Every command takes `--dry-run`, which makes the whole thing read-only:
