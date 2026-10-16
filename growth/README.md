@@ -177,6 +177,28 @@ email arrived. `cmd_report` is the last call in `cmd_daily`, after the snapshot
 block, so "no email" points at the first two causes and "email arrived" points
 at the push.
 
+**On a Friday, Divine does not have to ask anybody.** `deploy/cron-nemo-growth`
+splits the 06:00 run on the day-of-week field, and the `0 6 * * 5` line is the
+only one carrying `--email divinejdavis@gmail.com` — the developer's weekly
+copy. It is sent by the same `cmd_report` call at the end of the same
+`cmd_daily`, so on a Friday the developer's own inbox answers the same question
+Eric's inbox answers on the other six days, with no droplet access and nobody
+to ask:
+
+* **the weekly developer mail arrived** — cron fired, python started, and
+  `cmd_daily` ran all the way to its last line. Causes 1 and 2 are out; the
+  failure is at `snapshot.write()` or in the push. Go to the `grep publish`
+  table above.
+* **it did not arrive** — the run died before `cmd_report`, or cron, python or
+  the droplet never started it. Causes 1 and 2 are live.
+
+Both mail diagnostics share one dependency: they are silent if SMTP itself is
+broken, which looks identical to a dead run from outside. A no-mail answer is
+therefore suggestive and not conclusive, while a mail-arrived answer is
+conclusive — it proves the run reached its final line. Check the gap the other
+way when it matters: a `publish:` line in the log with no mail is SMTP, not the
+engine.
+
 **Back the missing days out of the nginx log before they age away.** `measure`
 records yesterday only, and the 45-day series in `snapshot.json` is accumulated
 in the ledger, not recomputed — so a morning that never ran is a permanent hole
@@ -187,6 +209,12 @@ log is rotated away after a few days):
     ls -la /var/log/nginx/nemo-access.log*          # how many days are left
     cd /var/www/nemo-seamless-gutter
     WEB_ROOT=$PWD python3 growth_daily.py measure --days 5
+
+`--days` counts back from yesterday, so it needs to be at least one more than
+the number of missed mornings — on 2026-10-16, with the series ending 10-11 and
+10-12 through 10-15 missing, `--days 5` is the minimum. Overshooting is free:
+re-measuring a day already recorded is idempotent (below), so when in doubt pass
+a larger number rather than a precise one.
 
 Safe to re-run: `ledger.record_result` is idempotent per
 `(date, technique, metric)` and `read_results` keeps the newest write, so

@@ -38358,3 +38358,625 @@ snapshot is three days older than the recommendation, so the honest answer is
 unknown. That any of the four suspended tests leans either way. That the
 impression fall has recovered. And that today's numbers are today's: they are
 Monday's, and that is the finding.
+
+## 2026-10-16 — review agent
+
+### Where the numbers stand
+
+**Fourth consecutive morning with no publish. The newest numbers in this
+repository are 101 hours old, the goal metric has not been measured since
+Monday, and for the fourth day running the only alarm that reached a phone was
+this agent's.** I fetched `origin/main` at **11:13 UTC** before reading
+anything: the fetch moved my clone `61b7206..3851a6f`, and `3851a6f` is **my own
+review commit from yesterday, 11:20 UTC**. There is no `Publish growth state for
+2026-10-13`, none for `10-14`, `10-15` or `10-16`. `growth/snapshot.json` still
+reads `"date": "2026-10-12"`, `"generated": "2026-10-12T06:05:32+00:00"`. Every
+number below is Monday's and I will not present any of it as today's.
+
+**(1) What the fourth day adds, and it is the one piece of good news in this
+entry: today is a Friday, and that makes the diagnostic free.**
+`deploy/cron-nemo-growth` splits the 06:00 run on the day-of-week field, and the
+`0 6 * * 5` line — Friday — is the **only** one carrying `--email
+divinejdavis@gmail.com`, the developer's weekly copy. It is sent by the same
+`cmd_report` call at the end of the same `cmd_daily` (`growth_daily.py:302`,
+the last statement before `return 0`). So for the first time in this outage
+Divine does not need droplet access and does not need to ask Eric anything — his
+own inbox answers the question:
+
+- **the weekly developer mail arrived this morning** → cron fired, python
+  started, and `cmd_daily` ran all the way to its final line. Causes 1 and 2 are
+  eliminated; the break is at `snapshot.write()` or in the push.
+- **it did not arrive** → the run died before `cmd_report`, or cron, python or
+  the droplet never started it.
+
+One caveat I should state rather than let someone over-read it: both mail
+diagnostics are silent if SMTP itself is broken, so *mail arrived* is conclusive
+(it proves the run reached its last line) while *no mail* is only suggestive. I
+put this in `growth/README.md` today so the next Friday of the next outage does
+not re-derive it.
+
+**(2) The backfill window is still open and is now the item with a deadline.**
+Unchanged in mechanism from yesterday — `measure` records yesterday only
+(`metrics.collect(days=1)`), and the 45-day series is accumulated in the ledger,
+not recomputed — so each dead morning is a permanent hole, not a delayed read.
+The series ends **2026-10-11**, so **10-12, 10-13, 10-14 and 10-15 are the
+holes** and `--days 5` is the minimum that covers them from today. Overshooting
+is free: `ledger.record_result` is idempotent per `(date, technique, metric)` and
+`read_results` de-duplicates on read with the later line winning
+(`growth/ledger.py:185-214`), which I re-checked rather than trusted. GSC is not
+at risk the same way — the API serves months and `gsc.totals()` recomputes its
+window — so it is nginx-derived traffic, leads and `call_taps` that expire with
+the log rotations.
+
+**(3) The goal metric, as of the newest data that exists (2026-10-12).** `top3`
+**0 of 239** tracked queries; **0 in all seven town buckets** — county 0/124,
+york 0/42, dover 0/18, hanover 0/15, spring-grove 0/14, red-lion 0/13,
+dallastown 0/13. `share_pct` **0.0** against a target of 50.
+
+| | 2026-09-24 | 2026-10-11 | 2026-10-12 (newest) | 10-13 | 10-14 | 10-15 | 10-16 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **`top3` (the goal)** | **0** | **0** | **0** | — | — | — | — |
+| `top10` | 11 | 21 | 22 | — | — | — | — |
+| `ranked_known` | 42 | 57 | 58 | — | — | — | — |
+| `matched` | 42 | 54 | 54 | — | — | — | — |
+| `clicks` | 16 | 11 | 11 | — | — | — | — |
+| `impressions` | 6,883 | 4,970 | 5,281 | — | — | — | — |
+| `avg_position` | 27.6 | 25.7 | 26.1 | — | — | — | — |
+| `coverage_pct` | 42.7 | 42.3 | 42.3 | — | — | — | — |
+
+Direction: **flat at zero with a four-day hole at the end.** Measured days at
+`top3` = 0 is still **25** — it cannot rise while the engine is down, which is
+the cleanest statement of what the outage costs this review. `top3` has never
+exceeded 2 on any day on record.
+
+**(4) Traffic and leads — and I have to correct yesterday's entry on four
+counts, because I read the series instead of copying it.** Series runs
+2026-08-28 → **2026-10-11**: 115 visitors over 45 days (2.56/day), 50 organic.
+Last ten days: 6, 3, 2, 3, 4, 2, 3, 1, 3, 1. `bot_hits` 2,000–4,400/day, about a
+thousand per human visitor.
+
+Yesterday I wrote that `local_visitors` was "0 on all 45 days" and that
+`ai_visitors`, `referral_visitors` and `campaign_visitors` were "likewise 0 on
+all 45", and that `bookings` was "0 for 45 consecutive days". All four are
+wrong. The non-zero days:
+
+- `local_visitors` — **1 on 2026-09-08, 1 on 2026-09-25** (sum 2, none in the
+  last 17 days of the series)
+- `ai_visitors` — **2 on 2026-09-23** (sum 2)
+- `referral_visitors` — 1 on 08-28, 1 on 09-05 (sum 2)
+- `campaign_visitors` — 1 each on 08-31, 09-09, 09-22 (sum 3)
+- `bookings` / `total_leads` — **1 on 2026-09-02** (sum 1)
+- `call_taps` — 1 on 10-01, 1 on 10-06 (sum 2); `phone_leads` **0 all time**
+
+Two visitors is not a channel and I am not going to dress it up as one. But the
+corrections change two arguments that have been running on the zeros:
+
+- **"Zero AI-answer-engine visitors" is false for this window.** That phrase
+  appears in the hypotheses of T025, T046, T048, T053 and T056 — five of the
+  eight AI-visibility candidates rest on it. The true statement is *2 visitors
+  on 1 of 45 days*, which is still consistent with the branch's premise but is
+  not the same claim, and anyone quoting it should quote the real number.
+- **`local_visitors` is not structurally pinned at 0, and yesterday's reason was
+  wrong.** I said `metrics.classify()` had "nothing to classify a map-pack click
+  by" without a `utm_source`. Reading `growth/metrics.py:340-368`: `local` is
+  returned on `utm_source=gbp|google-business|gmb` **or** on a referrer
+  containing any of `LOCAL_HOSTS` (`google.com/maps`, `maps.google`, `yelp.com`,
+  `angi.com`, `nextdoor.com`, `facebook.com`, …) — checked against the raw
+  referrer string before `SEARCH_HOSTS`, so the path does match. The two
+  non-zero days are that path working. The real leak is narrower and still
+  worth fixing: a map-pack click arriving with a bare `https://www.google.com/`
+  referrer falls through to `SEARCH_HOSTS` and is counted as **organic**, and one
+  with no referrer at all is counted as **direct**. So the `?utm_source=gbp`
+  recommendation stands — it is the only way to *disambiguate* — but its job is
+  separating GBP clicks from organic, not creating a number that cannot exist.
+
+The prompt's measurement-suspicion trigger does **not** fire: visitors are small
+but non-zero on 42 of 45 days, so I have no reason to doubt `metrics.py`'s bot
+and owner filters.
+
+**(5) `discovered_untracked`: I classified all 40 rows with the repo's own code,
+and the answer is that there is nothing to propose.** The prompt standing-orders
+me to propose the good ones. Running `techniques._names_other_market` and
+`SERVICE_AREA_WORDS` over the list:
+
+| | rows | impressions | clicks |
+| --- | --- | --- | --- |
+| names a market NEMO does not serve | **32** | 379 | 0 |
+| geo-neutral (names no place at all) | 8 | 271 | 0 |
+| **names a York County town, untracked** | **0** | **0** | **0** |
+| total | 40 | 650 | 0 |
+
+The 32 are Lancaster County (Akron, Leola, Lititz, New Holland, Myerstown,
+Stevens), Montgomery/Chester (Wayne, Plymouth Meeting, Harleysville, Blue Bell,
+Spring City, Perkasie) and western PA (Waynesburg, Morgan) — plus one row,
+`factors that affect gutter cleaning cost -filetype:pdf`, that contains a search
+operator and is a tool, not a homeowner. The 8 geo-neutral rows hold the best
+positions on record (`gutter installation` **2.7**, `gutter repair` 6.8,
+`gutters` 7.5, `gutter cleaning` 8.5) and **0 clicks on 271 impressions**, and
+they name no town, so nothing in the goal metric can ever count them.
+
+Two conclusions. First, `adopt_queries`' noop on 10-12 — *"no new in-area
+searches worth tracking"* — was **correct**, not a symptom. Second, and this one
+is a caution about a number four of these entries have leaned on: if the
+reported slice of untracked demand is 94% out-of-area-or-placeless by
+impressions, then **site-wide `impressions` (5,281) overstates York County
+reach** by some unknown amount. Directional only — this is the top 40 of ~705
+untracked rows and I cannot see the rest — but it is a reason to stop reading
+impression movements as progress toward a York County goal.
+
+**I also checked the thing I was about to recommend and did not recommend it.**
+My first instinct on seeing 32 out-of-area rows was to add the Lancaster and
+Montgomery towns to `techniques.OUT_OF_AREA`. That would have been wasted work:
+`_names_other_market` already rejects them by *shape* via `STATEWIDE_WORDS`
+(`growth/techniques.py:1646-1686`) — a query naming PA plus any leftover word
+that is not trade, money or grammar vocabulary is a query naming somebody
+else's town. I traced `harleysville`, `leola`, `wayne` and `spring city` through
+it by hand. The general mechanism is already shipped and is better than the
+blocklist I was going to propose.
+
+**(6) The build and the ledger, as of 10-12.** Nine of eleven active techniques
+no-op'd; `strengthen_pages` (3 candidates failed) and the scout both died on
+*"Your credit balance is too low to access the Anthropic API"* — the account
+**empty**, not capped. Ledger: 96 techniques, **11 active, 84 candidates, 1
+retired**, `scoreboard.does_not_work` **empty**, as on every day on record.
+`by_intent` unchanged: price is still the worst-covered intent at **10 of 53**
+against hire at 83 of 154.
+
+**Prompt corrections. Day four unacted-on, which is itself the finding about the
+correction channel.** All of yesterday's stand, so I am not re-arguing them:
+*"pushes its state to this repo an hour before you run"* is false on four
+consecutive mornings and **Known blockers** still has no entry for it; the
+watchdog mails nobody; the deployed cron fires at 06:00 **UTC**, not ET; the
+spend-cap story cleared 76 days ago and every measured failure since has been
+the opposite failure (empty balance); the quoted 2026-07-28 baseline (77 rows,
+17 matched, 3 clicks, 429 impressions, position 12.4, county 2 of 50 in top 3)
+is 80 days stale against 759 / 54 / 11 / 5,281 / 26.1 / **0 of 124**. One
+addition: the prompt's caution about reading single-position swings is still
+right and its stated reason is still the wrong one — the impression base is
+5,281, not 429. It is **clicks**, at 11, that are too thin to read.
+
+### Did previous changes work?
+
+**1 — My own prediction, and I kept yesterday's decision not to re-issue it.**
+10-13 predicted a publish commit on 10-14; 10-14 predicted one on 10-15. Both
+falsified. Yesterday I declined to make it a third time and I decline again:
+predicting that someone will act is not a test of this site, it is a test of a
+channel, and four days of silence has already answered it. What *is* new and
+testable today is the Friday-mail diagnostic in finding 1 — it needs one line
+from Divine and it eliminates two of three causes at zero cost.
+
+**2 — The four pre-registered GSC tests. Suspended, day four.** Clicks below 11
+on three consecutive mornings; impressions rising a third morning with clicks
+clearing 13; the morning after item 2; the morning after item 4. All four need a
+snapshot that does not exist. **Suspended is not passed.** Four consecutive
+suspensions: this register is measuring the publish pipeline, not the site.
+
+**3 — The impression-fall reading (spam-update timing, argued 10-13).** No new
+data for the fourth day, so no update. Repeating it with the same numbers is how
+a reading gets promoted to a fact, so: unchanged, 1,756 impressions below the
+09-25 peak, `clicks` still 11.
+
+**4 — The coverage-versus-rank test (pre-registered 09-20). Still failing, no
+new data.** 09-20 → 10-12: `coverage_pct` 42.3 → 42.3, `top3` 0 → 0. Across the
+whole arc `ranked_known` 17 → 58 while `top3` never exceeded 2. Still no
+detected relationship between page coverage and the goal metric, over 25
+measured days.
+
+**5 — `top10` retired as a progress metric (10-11). Retirement still right, and
+today's classification sharpens why.** 09-24 → 10-12: `top10` 11 → 22, `matched`
+42 → 54, `clicks` **16 → 11**. More queries ranked, fewer clicks. Finding 5 now
+gives the mechanism rather than the correlation: the untracked rows the site is
+climbing in are 94% out-of-area or placeless by impressions, and they convert at
+**0.00%** across 650 impressions. Ranking better for Harleysville is not
+progress. `keywords.ranked`, which would name the ranked tracked queries, is
+absent for the **eleventh** day.
+
+**6 — The seven `works: true` verdicts. Unchanged, not re-judged.** Every
+verdict in the snapshot is still dated `2026-10-12`. T017 and T019 still print
+`gsc_clicks median 13.5/day` against a 28-day **total of 11** — `review._unit()`
+in this repository returns `/28d`, so that is the undeployed unit bug, **day
+seventeen**.
+
+**7 — Recommended and not acted on. Day counts; where I cannot tell, I say so.**
+- **The `growth/` deploy (carried from 09-29). Day seventeen, and today I can
+  quantify the cost rather than list absent keys.** I diffed the repo's
+  `snapshot.SERIES` (25 entries) against the deployed snapshot's `traffic` keys
+  (14): **11 series the repo's code would emit are missing** — `log_visitors`,
+  `log_pageviews`, and **nine crawler series** (`crawl_gptbot`,
+  `crawl_oai_searchbot`, `crawl_chatgpt_user`, `crawl_perplexitybot`,
+  `crawl_claudebot`, `crawl_google_extended`, `crawl_applebot`, `crawl_bingbot`,
+  `crawl_googlebot`). `code_version` is absent too, and
+  `snapshot._code_fingerprint()` exists precisely so this question stops being
+  forensics. Caveat held from yesterday: the file is four days older than the
+  recommendation, so if Divine deployed on any of the last four mornings I could
+  not see it. **Unknown, not ignored.**
+- **The watchdog's `--email`. Day 50.** Three mornings now on which the deployed
+  `stale_days >= 2` threshold fired into a log with no reader.
+- **The Business Profile. Day eighty-one.** `local_visitors` 2 in 45 days, none
+  in the last 17.
+- **The title refit.** Measured in the repo mirror again today: **47 pages with
+  a `<title>`, 25 over 65 characters** (worst: `guides/gutter-services-near-me`
+  and `guides/gutter-pulling-away-from-house` at 80). The *25* is identical to
+  10-12 and 10-15; my 47 against yesterday's 45 is my denominator including
+  `privacy.html` and `setup.html`, not two new pages. Monday's evidence either
+  way — a mirror frozen by a missing publish.
+- **The out-of-area pages.** `guides/5-inch-gutter-service-york-springs-pa.html`
+  still present, still the one `york-springs` URL in `sitemap.xml`. Monday's
+  evidence, same caveat.
+- **Ledger edits** (retire T082; the GBP halves of T036/T052/T024; the dead
+  halves of T016/T025). All still `candidate`; `does_not_work` still empty.
+
+**8 — Yesterday's README runbook. Used today, and it worked.** I did not
+re-derive the three-cause table; I read it and extended it. That is the first
+time anything in this loop has saved its successor work, and it is the argument
+for the kind of change I made again today.
+
+### What I researched today
+
+Searches aimed at what has *changed*, filtered recent, and deliberately away
+from the October ground this journal already covered (the spam update's phases,
+the 10-06 Maps merchant policy, the 10-07 WhatsApp button, the Sterling Sky
+service-area finding).
+
+**1 — The strongest new finding: for local queries, AI engines largely cite
+somebody else's page, and the single most-cited source appears to be the Google
+Business Profile itself.** A third-party research index attributes to Local
+Falcon a June 2026 study of 10,000 US restaurants finding **48.6% of AI
+citations point at Google's own listings** (24,701 citations across Gemini and
+ChatGPT, two waves) and **14.1% at Yelp** — more than TripAdvisor, Facebook,
+Reddit and Instagram combined. A separate figure, via a vendor summarising Local
+Falcon, puts **60% of AI-Overview citations for local-business queries on
+third-party publishers** (Yelp, Reddit, HomeGuide, Thumbtack) rather than the
+business's own site.
+([steadydemand.com](https://www.steadydemand.com/local-search-ai-industry-research-index/),
+[localfalcon.com](https://www.localfalcon.com/blog/whitepaper-studies-the-impact-of-google-ai-overviews-on-local-business-search-visibility),
+[wellows.com](https://wellows.com/blog/how-google-ai-overviews-shape-local-seo-results/))
+**How much weight this carries: limited, and I will not launder it.** The sample
+is restaurants, not contractors; the numbers reach me through a third-party
+index whose text is partly garbled; and I could not open the primary report
+(finding 4). What it is good for is **ranking**, not deciding — see
+recommendation 5, and note that it points at a profile this business already has
+and has not touched in 81 days, not at anything new to buy.
+
+**2 — Whitespark's 2026 report and AI Mode guide: two checkable items, and I
+checked both.** The report says do not block AI crawlers or you will not appear
+in AI Overviews, and recommends `LocalBusiness`, review and FAQ markup, plus
+Bing Places and Bing Webmaster Tools. The AI Mode guide leads with NAP
+consistency across site, profile and third-party listings, then auditing which
+sources AI cites for your industry.
+([whitespark.ca](https://whitespark.ca/local-search-ranking-factors/),
+[whitespark.ca](https://whitespark.ca/guides/whitesparks-guide-to-googles-ai-mode-for-local-businesses/))
+- **Crawler access: already shipped, and this closes half of a ledger
+  candidate.** `robots.txt` puts `GPTBot`, `OAI-SearchBot`, `ChatGPT-User`,
+  `Google-Extended`, `PerplexityBot`, `ClaudeBot`, `anthropic-ai`, `Applebot`,
+  `Applebot-Extended`, `Amazonbot`, `meta-externalagent`, `Googlebot` and
+  `Bingbot` in one consecutive `User-agent` group above a single `Allow: /`,
+  which is exactly right under the robots spec (consecutive agent lines form one
+  group), and `tests/test_site.py RobotsTest` guards it. **T046's first step —
+  "open robots.txt and confirm no Disallow rules hit GPTBot, OAI-SearchBot,
+  PerplexityBot, ClaudeBot, Google-Extended or Bingbot" — passes.** The open
+  half of T046 is whether the bots actually *fetch*, and finding 7 above says
+  that answer is nine undeployed series away.
+- **Schema: already shipped.** FAQPage JSON-LD on every generated page and
+  LocalBusiness via `local_schema` (which no-op'd on 10-12 as "already
+  current"). Not recommending it; this is the mistake the prompt names.
+- **Bing Places (the listing) is *not* shipped** and is T029, a candidate since
+  2026-08-01. IndexNow (T006, active) covers Bing's *index*, which is a
+  different thing from a verified place card.
+
+**3 — The 2026 ranking-factor surveys agree with each other and with this
+journal, so nothing new comes off them.** GBP signals ~32% of map-pack weight
+and the primary category the single biggest lever; reviews ~20%; proximity
+outside anyone's control; on-page 15–19% depending on whose cut you read.
+([advicelocal.com](https://www.advicelocal.com/blog/2026-local-search-ranking-factors-maps-organic-ai/),
+[localdominator.co](https://localdominator.co/local-search-ranking-factors/))
+Recorded so the next reader does not re-search it.
+
+**4 — Rejected, with reasons.**
+- **Every October-2026 "GBP update" listicle.** Same failure mode as yesterday:
+  vendor pages contradicting each other and describing features no primary
+  source confirms. The only Oct 13–15 local item I could corroborate is **new
+  dietary attributes for restaurants** (10-13) — irrelevant to a gutter
+  contractor. ([seroundtable.com](https://www.seroundtable.com/category/google-maps),
+  [sterlingsky.ca](https://www.sterlingsky.ca/google-local-changes/))
+- **The whole visit-to-call conversion literature** — missed-call text-back,
+  call tracking at ~$55/month, click-to-call widgets, "respond within 60 seconds
+  for +391%". The numbers are vendor-sourced and mutually inconsistent (8–12%
+  vs 46% for the same thing), and more to the point this site had **2 call taps
+  in 45 days** and **0 phone leads all time**. 10-02 already recorded that
+  conversion is not this site's problem, and at 2.56 visitors/day no conversion
+  change here is measurable. The trigger that would make it relevant is worth
+  writing down: **when `call_taps` clears roughly 5/week**, missed-call
+  text-back becomes the cheapest insurance Eric can buy, because a man on a roof
+  misses calls. Not before.
+  ([pipelineon.com](https://pipelineon.com/blog/contractor-call-tracking/),
+  [garretthandley.com](https://www.garretthandley.com/contractor-website-conversion-rate-in-2026-why-most-sites-convert-under-3-and-what-to-fix))
+- **"32% fewer businesses in AI local packs", "13.7% citation overlap between
+  AI Mode and AI Overviews", "AI local search use went 6% → 45% in twelve
+  months", "66.9% of AI Mode contractor links go to the homepage".** All
+  single-vendor, no stated methodology. Logged as unverified so nobody
+  re-searches them, and none reaches the ledger.
+- **Anything requiring money, a review incentive, a bulk send or a bought
+  listing.** None surfaced that I would have taken anyway.
+
+**5 — Environment limits, unchanged.** `WebFetch` still fails DNS for every host
+(`whitespark.ca`: `getaddrinfo ENOTFOUND`), so **every citation above is a
+search engine's summary of a page I could not open** — which is exactly why
+finding 1 is ranked as a tiebreaker and not as evidence. The container's network
+policy also still denies `nemoseamlessgutter.com` itself, so I still cannot
+answer "is the site even serving?" — the question four days of this outage have
+turned on. Carried as recommendation 7.
+
+### Recommendations
+
+Ranked. Items 1–3 are one person, one session, under twenty minutes. Item 1 has
+a clock on it and item 1 is cheaper today than it will be on any other day of
+the week.
+
+**1. Divine — check your own inbox first, then diagnose, then backfill. The
+first step is free and takes ten seconds.** Today is Friday, so the `0 6 * * 5`
+cron line should have sent you the weekly developer report. Whether it did
+eliminates two of the three causes before you log in (finding 1). Then:
+```
+grep publish /var/log/nemo-growth.log | tail -40      # separates the three causes
+grep -n 'Traceback' -A 20 /var/log/nemo-growth.log | tail -60
+df -h /var /root                                      # a full disk fails both halves
+systemctl status cron && ls -la /etc/cron.d/nemo-growth
+git -C /root/nemo-repo fetch origin main              # the push credential
+ls -la /var/log/nginx/nemo-access.log*                # how many days are recoverable
+cd /var/www/nemo-seamless-gutter && WEB_ROOT=$PWD python3 growth_daily.py measure --days 5
+```
+*Expected effect:* none on the goal metric. It restores the only channel through
+which anything here is measurable, and the backfill preserves four days of
+traffic history that otherwise vanish with the log rotations.
+*How I would know:* a publish commit, and `snapshot.json`'s series carrying rows
+for 10-12 through 10-15.
+*Checked:* `origin/main` fetched 11:13 UTC, tip `3851a6f` (my own commit);
+`snapshot.json` `date: 2026-10-12`; the `0 6 * * 5` `--email` line in
+`deploy/cron-nemo-growth`; `cmd_report` as the last call in `cmd_daily`
+(`growth_daily.py:302`); the silent-exit branch at `growth/publish_state.sh`;
+`collect(days=1)` and the rotation comment at `growth/metrics.py:380-384`;
+idempotency at `growth/ledger.py:185-214`. **Divine's, ~15 minutes, droplet
+access for everything after the inbox check.**
+
+**2. Divine — append one flag to the watchdog cron line. Day 50, two minutes.**
+```
+# deploy/cron-nemo-growth, the 0 11 * * * entry
+... growth_daily.py watchdog --email divinejdavis@gmail.com >> /var/log/nemo-growth.log 2>&1
+```
+`cmd_watchdog` returns early when the engine is healthy, so this reintroduces no
+daily mail. It cannot catch the third cause — the watchdog shares
+`/etc/cron.d/nemo-growth` with the run it watches — and for that case the
+off-droplet check is the one that already works: the absence of a publish commit,
+read by this review.
+*How I would know:* mail at 11:00 on the next missed morning, silence otherwise.
+*Checked:* the `0 11 * * *` entry still has no `--email`; the early return and
+mail gate in `cmd_watchdog`. **Divine's, ~2 minutes.**
+
+**3. Divine — `deploy/deploy_growth.sh --apply`. Day seventeen, and the payoff
+is now specific.**
+```
+git -C /root/nemo-repo fetch origin main && git -C /root/nemo-repo reset --hard origin/main
+bash /root/nemo-repo/deploy/deploy_growth.sh            # read-only hash table
+bash /root/nemo-repo/deploy/deploy_growth.sh --apply
+```
+Beyond the carried backlog (the `cmd_daily` wrapping, `stale_days == 1`, the
+`OUT_OF_AREA` intake guard, the Adams County scoring exclusion, `gsc.pages`,
+`indexing`, `keywords.ranked`, the withdrawn verdicts, the `/28d` unit fix,
+`code_version`, the ten missing town buckets): **it would answer the question
+eight ledger candidates rest on, from nginx history already on disk.** Nine
+`crawl_*` series are in the repo's `snapshot.SERIES` and absent from the
+deployed output, so one deploy turns "can the AI engines fetch this site?" from
+a candidate into a measured series — the open half of T046, and the premise
+under T025, T029, T048, T053 and T056.
+*How I would know:* the next snapshot carries `code_version`, `indexing` and
+nine `crawl_*` series; `by_town` has 17 buckets; `tracked_queries` steps
+239 → 229; no verdict says `/day`.
+*Checked:* `snapshot.SERIES` (25) diffed against the deployed `traffic` keys
+(14) — the 11 missing names are listed in finding 7; `_code_fingerprint()` and
+its docstring at `growth/snapshot.py:114-134`. **Divine's, ~10 minutes. Carried
+from 09-29.**
+
+**4. Eric — the Business Profile, hours first. Day eighty-one, fifteen minutes,
+free, and today's research says it is not just the map-pack lever, it is
+probably the most-cited source AI engines read about this business.** In order:
+- **the real hours** — whatever the phone can honestly cover — then set the
+  profile, `index.html:201-222` and `growth/techniques.py:880-886` to the same
+  numbers **in one pass**. The warning at `techniques.py:865-879` says why:
+  Google auto-applies a suggested profile edit after four days when the website
+  corroborates it, so the site's schema is evidence Google reads back. T042
+  proposes 7am–8pm / 8am–1pm; both files currently publish Mon–Fri 07:30–18:00,
+  Sat 08:00–14:00. "Open at time of search" ranks 5th in Whitespark's 2026
+  survey, and gutter panic-searches happen in exactly the evening and weekend
+  hours in dispute.
+- **the website link → `/services/seamless-gutter-installation.html?utm_source=gbp`**.
+  Per finding 4 this is about *disambiguation*: without it, a map-pack click
+  arriving with a bare `google.com` referrer is counted as organic and a
+  referrer-less one as direct, and nothing can tell the profile's contribution
+  from a blue link's.
+- **primary category** (the surveys' #1 factor) and **itemised Services with no
+  prices** (per the 10-06 Maps policy).
+- **Performance → Calls, 28 days** and **Performance → Searches, 6 months** —
+  the only view of Maps demand Search Console cannot see, and the only thing
+  that can source or kill the ~300-views figure seventeen ledger entries quote
+  with no origin.
+- **read off the real review count and star average.** "13 reviews / 4.2 stars"
+  is 81 days unverified and eleven hypotheses rest on it.
+*How I would know:* `local_visitors` clears its 2-in-45-days floor and does it
+with `utm_source=gbp` attached, so the number means something.
+*Checked:* no GBP code path exists anywhere under `growth/`; both hours blocks
+re-read today; `classify()` at `growth/metrics.py:340-368`. **Eric's, and only
+Eric's.**
+
+**5. Rank the eight AI-visibility candidates instead of adding a ninth — T065
+says this ranking is the missing piece, and today's research supplies it for
+free.** T065's own hypothesis is that the ledger holds "six or seven
+AI-visibility candidates and no way to rank them". It proposes buying the
+ranking with an hour a month of prompt auditing. The cheap half is available
+now: if roughly half of AI citations for local queries point at **Google's own
+listing** and Yelp is the largest third party (research 1), then the order is
+already implied and three of these are not worth a slot yet:
+1. **the Google Business Profile** — recommendation 4. It is not merely *a*
+   citation source; on this evidence it is *the* one. No new ledger entry
+   needed; it is already the top item.
+2. **T035 — claim the Yelp page, switch on Request a Quote.** Free, Eric's,
+   and the only item here that can hand him a named York County homeowner with
+   a stated gutter problem rather than a ranking.
+3. **T029 — Bing Places + Apple Business Connect place cards.** Free, feeds
+   Copilot and Siri, and is the one Whitespark item from research 2 that is
+   genuinely not shipped.
+4. **T046 — the fetch half.** Costs nothing extra once recommendation 3 lands.
+   The robots.txt half I closed today (research 2).
+5. **T048 (Foursquare), T053 (BuildZoom), T056 (third-party best-of lists),
+   T065 (the monthly audit) — park them.** Each is plausible and none is
+   measurable while the goal metric is 0 and the engine is down.
+*How I would know:* nothing here is measurable until recommendation 1 restores
+the snapshot; the honest test is whether 1–3 produce a *call*, not a position.
+*Checked:* T035/T029/T046/T048/T053/T056/T065/T025 all read in the snapshot
+ledger, all `status: candidate`, none activated, none retired; `robots.txt` and
+`tests/test_site.py` for the T046 half I closed; FAQPage and LocalBusiness
+confirmed already emitted so I did not re-recommend them. **Divine to re-rank in
+the ledger; items 2–3 are Eric's to execute.**
+
+**6. Eric — ask every finished customer for a review, out loud, at the truck.**
+Review signals rank ~20% of map-pack weight and are **not** proximity-capped,
+which — if the Sterling Sky proximity finding holds — makes this the one lever
+that reaches Hanover and New Freedom at all. **Every customer, no gating, no
+incentive, no exceptions.** T007 has sat as a candidate because it *emails*
+customers and needs a yes; the in-person ask needs no engine, no deploy and no
+permission, and with `bookings_all_time` at 4 the site is not where Eric's
+customers come from anyway.
+*How I would know:* the profile's review count moves off 13 — which needs
+recommendation 4 first, because nobody has verified that it is 13.
+*Checked:* `grep` for `aggregateRating|"Review"|reviewCount|ratingValue` across
+`growth/techniques.py`, `growth/templates.py` and `index.html` returns zero
+hits, and no review-request link exists on the site, so neither the schema nor
+the ask is already shipped. **Eric's, free, starts today.**
+
+**7. Divine — allow `nemoseamlessgutter.com` in this session's network policy.
+Carried from yesterday, ~2 minutes, and it permanently upgrades what this review
+can see.** The policy denies the business's own domain (`403` to CONNECT).
+Allowing that one host would let this review `curl` the homepage and
+`sitemap.xml` every morning and answer "is the site even serving?" without
+droplet access. Changed under **Network access** in the environment's settings —
+https://code.claude.com/docs/en/cloud-environments#network-access
+*Expected effect:* none on the goal metric; it ends a class of blindness.
+**Divine's, ~2 minutes, no droplet access needed.**
+
+**8. Divine — correct this routine's prompt. Day four.** Four days of prompt
+corrections written here, none landed. The load-bearing premise ("state arrives
+an hour before you run") has been false every day this week; **Known blockers**
+describes a spend cap that cleared 76 days ago and omits the failure that has
+actually happened four mornings running; the quoted baseline is 80 days stale.
+One instruction would fix the biggest hole: **check for a publish commit dated
+today before trusting `snapshot.json`.** The scheduled task is the owner's to
+edit; I am not editing it myself. **Divine's, ~5 minutes.**
+
+**9. Divine — Anthropic auto-reload, and the carried backlog.** The 10-12 build
+and scout both died on *"Your credit balance is too low"* — **empty**, not
+capped. Auto-reload plus a monthly cap in the console; `BUDGET.md` rule 1 bounds
+a run to 3–5 calls at cents a day, so the cap enforces that rule rather than
+relaxing it. Three manual top-ups have each bought 3–5 mornings and stopped.
+Carried unchanged: `deploy/repair_titles.py` (25 of 47 titles over 65
+characters), `deploy/retire_out_of_area.py` and `repair_out_of_area_prose.py`
+(the york-springs page), and the ledger edits — retire T082 (GBP messaging,
+ended 2024-07-31), strike the dead halves of T016 and T025, rewrite the GBP
+halves of T036/T052/T024 before anyone executes them (the 10-06 Maps policy).
+**Divine's, ~15 minutes plus billing access.**
+
+**10. Eric — three real cleaning prices, and the PA HIC number.** Carried.
+`guides/gutter-cleaning-cost-york-pa.html` carries an `<h2>` reading "Typical
+price ranges" with **zero dollar figures**, while the site prices NEMO's installs
+($1,500–$4,000, $7–$14/ft) and 46 figures of a competitor's guards. Price is the
+worst-covered intent at **10 of 53**, and research 2 notes price-transparency
+content carries AI-citation weight. Eric's real 2026 numbers for three house
+sizes, nothing he would not honour, **nothing into the listing or a Post** (the
+10-06 policy). Separately: the site says neither "licensed" nor "insured" in the
+hero or footer; one line — "PA HIC #xxxxx · fully insured" — needs a number only
+Eric has. Both **unmeasurable at 77 visitors a month**, and I will not claim
+otherwise. Needs a docroot edit and a deploy.
+
+### One repo change I made today
+
+`growth/README.md` — extended yesterday's **"When no publish commit arrives"**
+with the **Friday developer-mail diagnostic**: which cron line carries
+`--email`, why it answers the same question Eric's inbox answers on the other
+six days, the two-branch decision table, and the SMTP caveat that makes
+*mail arrived* conclusive and *no mail* only suggestive. Also made the backfill
+command durable — `--days` counts back from yesterday, so it needs to be at
+least one more than the number of missed mornings, and overshooting is free
+because the record is idempotent. Yesterday's version hard-coded `--days 5`,
+which would have been wrong by tomorrow.
+
+For the second day I did not add an engine fix. The reason is sharper today than
+yesterday's "the pile is theatre": **every diagnostic gap I hit this morning is
+already solved by code sitting undeployed in this repository.** The deploy-state
+question has `_code_fingerprint()`. The crawler question has `CRAWLER_SERIES`.
+The crash-costs-the-morning question has yesterday's wrapping. The out-of-area
+intake question has `STATEWIDE_WORDS`, which is better than the blocklist I
+nearly proposed. Adding an eighteenth undeployed fix would not have been
+caution, it would have been duplication. A README change is the one kind of
+change that is useful in the cloud checkout, where this agent actually runs, and
+it cannot be blocked by a deploy — which is why finding 8 matters: yesterday's
+section is the first thing in this loop that saved its successor work.
+
+`Tests: added none, changed none, removed none — the change is documentation and
+asserts no behaviour.` Suite green on it: **399 python + 9 node**.
+
+### Reasoning and uncertainties
+
+**The binding constraint has not changed and a better journal entry does not fix
+it.** Four dead mornings. Seventeen days of engine fixes undeployed. Eighty-one
+days of an untouched Business Profile whose fifteen-minute checklist has been
+written out seven times. 84 candidates, none activated in 82 days.
+`scoreboard.does_not_work` empty on every day on record — this ledger has never
+retired an idea for failing, only accumulated them.
+
+**What I got wrong yesterday, and what it should change about how these entries
+are written.** I asserted four series were "0 on all 45 days" and all four were
+non-zero. The cause is plain: I carried the claim forward from a previous entry's
+prose instead of reading the array. Small numbers, no changed recommendation —
+but it is the same error class as the `top10` mistake and the FAQPage
+recommendation the prompt cites, and it happened in the one section of these
+entries that is supposed to be pure measurement. The fix is mechanical, so I
+will state it as a rule for whoever writes tomorrow's: **in "Where the numbers
+stand", every number comes from a fresh read of `snapshot.json` in that session,
+never from the previous entry.** Prose is for the argument; arrays are for the
+numbers.
+
+**What today actually added.** One free diagnostic that exists only on Fridays
+and is unused as I write this. One quantification that kills a standing
+temptation — there is nothing worth adopting in `discovered_untracked`, and the
+impression count overstates York County reach. One half of a ledger candidate
+closed (T046's robots.txt step passes). One specific payoff attached to the
+deploy that has been recommended for seventeen days. And one ordering over the
+eight AI-visibility candidates that T065 said it needed an hour a month to buy.
+
+**What I am least confident about.** Still the proximity claim, unchanged and
+untested: Sterling Sky is a practitioner test, not Google's documentation, and I
+cannot check it against this site without a per-surface breakdown Search Console
+does not expose. Second, research 1 — the citation-share numbers are
+restaurants, reach me third-hand, and I could not open the primary report. I
+used them only to *order* candidates that were already in the ledger, never to
+add one, and the order they imply (profile first) is the order the last eleven
+entries already argued for on completely different grounds. That convergence is
+mild support, not confirmation.
+
+**What would change my mind.** A publish commit — everything downstream is
+blocked on it. The nine `crawl_*` series landing would tell me whether the AI
+engines fetch this site at all, which is the premise under five ledger
+candidates and is currently assumed in both directions by different entries.
+`gsc.pages` would let me ask whether the town pages earn pack impressions at
+all; if they earn impressions and merely rank 20th, the pages work and proximity
+is not the binding constraint. One line from Divine about the Friday mail halves
+the diagnostic space at zero cost. The real GBP review count ends eleven
+hypotheses resting on an unverified "13 reviews / 4.2 stars".
+
+**What I deliberately did not claim.** That the engine is dead for any
+particular one of the three causes — I have no droplet access and the three need
+opposite responses. That the undeployed fixes have or have not been applied; the
+snapshot is four days older than the recommendation, so the honest answer is
+unknown. That any of the four suspended tests leans either way. That the
+impression fall has recovered. That 2 `ai_visitors` or 2 `local_visitors` mean a
+channel works. And that today's numbers are today's: they are Monday's, for the
+fourth day running, and that is still the finding.
