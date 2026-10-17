@@ -163,8 +163,28 @@ Three causes, which need opposite responses. One command separates them:
 
     grep publish /var/log/nemo-growth.log | tail -40
 
-* **`publish: nothing changed` dated that morning** — cron ran and the engine
-  raised before the snapshot write. Find the last `Traceback` in the same log.
+* **`publish: nothing changed` dated that morning** — cron ran, and nothing the
+  publisher watches differs. Two different failures land here and they need
+  opposite responses, so split them with a second grep before doing anything:
+
+      grep 'snapshot: FAILED' /var/log/nemo-growth.log | tail -5
+
+  * **a `snapshot: FAILED — <error>` line** — the engine ran *to completion* and
+    only the snapshot write raised. `snapshot.write()` and
+    `snapshot.append_journal()` share one `try` in `cmd_daily`, and its `except`
+    logs that line and falls through to `cmd_report`. So the docroot's
+    `snapshot.json` and `JOURNAL.md` both freeze at their last good day, the
+    publisher re-copies files identical to what GitHub already has, exits 0, and
+    Eric's report still arrives every morning. **Nothing is lost** — see the
+    backfill note below — and the fix is whatever the error says (a full disk and
+    a permissions change are the usual two).
+  * **no such line** — the engine raised *before* the snapshot block. Find the
+    last `Traceback` in the same log. This is the case that loses data.
+
+  Tell them apart from outside the droplet by shape, before anyone logs in: a
+  frozen `snapshot.json` whose `date` never moves while the engine's own
+  `## <date> — engine run` entries also stop dead on the same day is the first
+  case, because one `try` governs both writes.
 * **no `publish:` line for that morning at all** — cron, python or the droplet
   never got that far. Check `systemctl status cron`, `df -h /var /root` (a full
   disk fails both halves), and whether `/etc/cron.d/nemo-growth` still exists.
@@ -199,20 +219,32 @@ conclusive — it proves the run reached its final line. Check the gap the other
 way when it matters: a `publish:` line in the log with no mail is SMTP, not the
 engine.
 
-**Back the missing days out of the nginx log before they age away.** `measure`
-records yesterday only, and the 45-day series in `snapshot.json` is accumulated
-in the ledger, not recomputed — so a morning that never ran is a permanent hole
-in the traffic and leads history unless it is backfilled while the rotations are
-still on disk (`rotations()` in `metrics.py` reads every kept archive, but the
-log is rotated away after a few days):
+**Back the missing days out of the nginx log before they age away — but check
+first whether anything is actually missing.** `measure` records yesterday only,
+and the 45-day series in `snapshot.json` is accumulated in the ledger, not
+recomputed. The hole is therefore **in the ledger, not in the snapshot**, and
+only `measure` failing to run can make one: `snapshot._series()` re-reads
+`ledger.series("__site__", metric)` on every write, so if the engine has been
+running and only the snapshot write or the push was broken, the ledger already
+holds those mornings and the series fills itself in completely on the first
+successful publish, with no backfill at all. Decide which case you are in from
+the `snapshot: FAILED` grep above before assuming a loss.
+
+Where `measure` genuinely did not run, the morning is a permanent hole unless it
+is backfilled while the rotations are still on disk (`rotations()` in
+`metrics.py` reads every kept archive, but the log is rotated away after a few
+days). Running it in the no-loss case is harmless — it is idempotent — so when
+the two cases cannot be told apart, back-fill anyway:
 
     ls -la /var/log/nginx/nemo-access.log*          # how many days are left
     cd /var/www/nemo-seamless-gutter
-    WEB_ROOT=$PWD python3 growth_daily.py measure --days 5
+    WEB_ROOT=$PWD python3 growth_daily.py measure --days 6   # 5 is exact today
 
-`--days` counts back from yesterday, so it needs to be at least one more than
-the number of missed mornings — on 2026-10-16, with the series ending 10-11 and
-10-12 through 10-15 missing, `--days 5` is the minimum. Overshooting is free:
+`--days N` measures the N complete days ending **yesterday**, so N must reach
+back from yesterday to the first missing day inclusive: with the series ending
+`S` and yesterday `Y`, that is `N = Y - S` days. On 2026-10-17 the series ends
+10-11 and yesterday is 10-16, so `N = 5` covers 10-12 through 10-16 exactly, and
+6 buys a day of margin. Overshooting is free:
 re-measuring a day already recorded is idempotent (below), so when in doubt pass
 a larger number rather than a precise one.
 
