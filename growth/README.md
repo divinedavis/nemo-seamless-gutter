@@ -185,17 +185,50 @@ Three causes, which need opposite responses. One command separates them:
   frozen `snapshot.json` whose `date` never moves while the engine's own
   `## <date> — engine run` entries also stop dead on the same day is the first
   case, because one `try` governs both writes.
-* **no `publish:` line for that morning at all** — cron, python or the droplet
-  never got that far. Check `systemctl status cron`, `df -h /var /root` (a full
-  disk fails both halves), and whether `/etc/cron.d/nemo-growth` still exists.
-* **a git or ssh error after a `publish:` line** — the droplet's state is fine
-  and only the push broke. Check the deploy key:
-  `git -C /root/nemo-repo fetch origin main`.
+* **no `publish:` line for that morning at all** — two very different causes
+  land here, so check for git or ssh error text in the log that morning before
+  concluding anything:
+
+      grep -iE 'permission denied|could not read from remote|publickey|host key|fatal:' \
+        /var/log/nemo-growth.log | tail -10
+
+  * **git or ssh error text present** — the droplet's state is fine and only
+    the git step broke. **Nothing is lost and no backfill is needed:** the
+    engine completed, `snapshot.write()` succeeded, and the docroot and the
+    ledger are both current — only GitHub is behind. Fix the credential:
+    `git -C /root/nemo-repo fetch origin main` reproduces it by hand.
+  * **no git error text either** — cron, python or the droplet never got that
+    far. Check `systemctl status cron`, `df -h /var /root` (a full disk fails
+    both halves), and whether `/etc/cron.d/nemo-growth` still exists. This case
+    loses data; backfill.
+
+  **Do not expect the git error to follow a `publish:` line — it cannot.** An
+  earlier version of this section said to look for "a git or ssh error after a
+  `publish:` line", which no credential failure can produce. The script is
+  `set -euo pipefail` (`publish_state.sh:16`) and its only success echo,
+  `publish: pushed N file(s)`, is on the line *after* the push
+  (`:92-93`), so a failed push exits before printing anything. A dead deploy
+  key is worse still: it fails at `git fetch --quiet origin` (`:35`), ahead of
+  every echo in the file. Either way the morning's log holds git's stderr and
+  no `publish:` line, which is exactly the shape this bullet used to attribute
+  to a dead cron.
+
+  Note also what the push case does to the clone, which is harmless but looks
+  alarming: the commit is created locally (`:83`), the push fails, and the next
+  morning's `git reset --quiet --hard "origin/$BRANCH"` (`:36`) discards it
+  before re-copying from the docroot. So the unpushed commits do not pile up
+  and there is nothing to salvage from `/root/nemo-repo` — one successful push
+  after the fix carries the current state.
 
 **Free first step with no droplet access:** ask Eric whether his daily report
 email arrived. `cmd_report` is the last call in `cmd_daily`, after the snapshot
-block, so "no email" points at the first two causes and "email arrived" points
-at the push.
+block, so "no email" points at the first two causes. "Email arrived" proves the
+run reached its final line, which **narrows the cause to two, not one** — the
+`snapshot: FAILED` branch and the push branch both leave `cmd_report` intact,
+and they need opposite fixes (a disk or permissions problem on the droplet
+versus a git credential). Do not read an arrived email as pointing at the push
+on its own; it says only that cron, python and `cmd_daily` are alive. The two
+greps above separate them.
 
 **On a Friday, Divine does not have to ask anybody.** `deploy/cron-nemo-growth`
 splits the 06:00 run on the day-of-week field, and the `0 6 * * 5` line is the
