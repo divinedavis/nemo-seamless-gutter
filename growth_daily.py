@@ -349,6 +349,44 @@ def _snapshot_problems(build_date, stale_days):
             f"which means the second."]
 
 
+# The three causes of a morning with no publish commit, and the greps that
+# separate them. Shared by both staleness branches of `cmd_watchdog` below.
+#
+# Kept deliberately in step with the "When no publish commit arrives" runbook
+# in growth/README.md. The two drifted once already: on 2026-10-18 the runbook
+# was corrected to say that git's error cannot follow a `publish:` line, and
+# the alert — the copy the person reading at 11:00 actually gets — kept the
+# repudiated version for another day. If one of the two changes, change both.
+_UNPUBLISHED_MORNING_DIAGNOSTIC = (
+    "Three causes look identical from out here and need different responses. "
+    "`grep publish /var/log/nemo-growth.log | tail -40` splits them, and then "
+    "`grep 'snapshot: FAILED' /var/log/nemo-growth.log | tail -5` splits the "
+    "first two. "
+    "(1) 'publish: nothing changed' that morning AND a 'snapshot: FAILED' "
+    "line: the engine ran to its last line and only the snapshot write raised. "
+    "Nothing is lost and no backfill is needed; fix what the error says, "
+    "usually a full disk or a permissions change. "
+    "(2) 'publish: nothing changed' and NO 'snapshot: FAILED': the run raised "
+    "before the snapshot block. Find the last Traceback in the log. This is "
+    "the case that loses the morning's data. "
+    "(3) No 'publish:' line at all: run "
+    "`grep -iE 'permission denied|could not read from remote|publickey|host "
+    "key|fatal:' /var/log/nemo-growth.log | tail -10`. Error text there means "
+    "only the git step broke, the droplet's state is current and nothing is "
+    "lost — fix the credential. No error text there means cron, python or the "
+    "droplet never got that far, so check `systemctl status cron`, "
+    "`df -h /var /root` and whether /etc/cron.d/nemo-growth still exists. "
+    "Do not expect git's error to follow a 'publish:' line: publish_state.sh "
+    "is `set -euo pipefail` and prints nothing before the push, so a failed "
+    "push and a dead deploy key both leave no 'publish:' line at all. "
+    "Two shortcuts that do not work: a frozen growth/snapshot.json next to "
+    "engine-run journal entries that stop on the same day fits (1) and (2) "
+    "equally, because (2) never calls either write; and an arrived report "
+    "email only rules out (2), since cmd_report is the last call in cmd_daily "
+    "and both (1) and (3) leave it intact."
+)
+
+
 def cmd_watchdog(args):
     """Alert if the engine has stopped running.
 
@@ -385,27 +423,33 @@ def cmd_watchdog(args):
         # so a day of it reads yesterday's numbers as though they were today's.
         #
         # The diagnostic goes in the alert rather than in a runbook because the
-        # person reading this at 11:00 is the person who has to tell the two
-        # causes apart, and the two need opposite responses.
+        # person reading this at 11:00 is the person who has to tell the
+        # causes apart, and they need opposite responses.
         #
         # This assumes the check runs after the morning's engine run, which its
         # own cron entry guarantees. Run `growth_daily.py watchdog` by hand
         # before 06:00 and it will report the run it is standing in front of.
         problems.append(
             f"No completed build today — the last one was {when}. This "
-            f"morning's 06:00 run did not reach the end of the build. Two "
-            f"causes look identical from here and need opposite responses; "
-            f"`grep publish /var/log/nemo-growth.log` separates them. A "
-            f"'publish: nothing changed' line dated today means cron ran and "
-            f"growth_daily.py raised before snapshot.write() — seed, measure, "
-            f"review and build are all unwrapped, so look for the last "
-            f"Traceback. No publish line at all today means cron, python or "
-            f"the droplet never got that far. A git or ssh error after a "
-            f"'publish:' line means the opposite — the state here is fine and "
-            f"only the push to GitHub failed.")
+            f"morning's 06:00 run did not reach the end of the build. "
+            + _UNPUBLISHED_MORNING_DIAGNOSTIC)
     elif stale_days is not None and stale_days >= 2:
-        problems.append(f"The last completed build was {when} — {stale_days} days "
-                        f"ago. The 06:00 cron is not producing runs.")
+        # The same diagnostic, because the reader's problem on day 7 is the
+        # problem they had on day 1 — and day 7 is when somebody is actually
+        # reading. Until 2026-10-19 this branch said only "The 06:00 cron is
+        # not producing runs", which (a) dropped the diagnostic exactly when
+        # the outage was long enough for someone to act on it and (b) asserted
+        # one of three indistinguishable causes as fact. That is the branch
+        # that fires on every morning of a real outage, and the only one that
+        # will be mailed once `--email` is restored to the cron entry, so a
+        # confidently wrong cause here sends the reader to `systemctl status
+        # cron` for a failure that may be a dead deploy key or a full disk.
+        problems.append(
+            f"No completed build for {stale_days} days — the last one was "
+            f"{when}. {stale_days} consecutive mornings have produced no run "
+            f"and no publish commit, so the cloud review agent has been "
+            f"reading {when}'s numbers that whole time. "
+            + _UNPUBLISHED_MORNING_DIAGNOSTIC)
 
     failed = [r for r in (last.get("log") or []) if not r.get("ok")]
     if failed and stale_days == 0:

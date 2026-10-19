@@ -181,10 +181,17 @@ Three causes, which need opposite responses. One command separates them:
   * **no such line** — the engine raised *before* the snapshot block. Find the
     last `Traceback` in the same log. This is the case that loses data.
 
-  Tell them apart from outside the droplet by shape, before anyone logs in: a
-  frozen `snapshot.json` whose `date` never moves while the engine's own
-  `## <date> — engine run` entries also stop dead on the same day is the first
-  case, because one `try` governs both writes.
+  **What does not tell them apart:** a frozen `snapshot.json` whose `date`
+  never moves while the engine's own `## <date> — engine run` entries stop dead
+  on the same day. An earlier version of this section offered that shape as an
+  outside-the-droplet test for the first case, on the grounds that one `try`
+  governs both writes. It governs both writes, and that is why the shape proves
+  nothing: in the second case neither write is *called*, so both files freeze
+  together exactly as they do in the first. The shape is what every
+  unpublished morning looks like from the repository — necessary, never
+  sufficient — and reading it as the first case is how a morning that needed a
+  backfill gets filed as "nothing lost". It has to be the log, or the email
+  below.
 * **no `publish:` line for that morning at all** — two very different causes
   land here, so check for git or ssh error text in the log that morning before
   concluding anything:

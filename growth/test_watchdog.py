@@ -157,13 +157,44 @@ class WatchdogStalenessTest(unittest.TestCase):
         """Three causes produce this same silence and need different
         responses, and the alert is where the reader learns to tell them
         apart: a crash before snapshot.write(), a cron that never ran, and a
-        push that failed with the state here intact."""
+        git step that failed with the state here intact."""
         _, lines = self._run({"date": "2026-10-12"}, snap_date="2026-10-12")
         body = " ".join(lines)
         self.assertIn("nemo-growth.log", body)
         self.assertIn("publish: nothing changed", body)
+        self.assertIn("snapshot: FAILED", body)
         self.assertIn("Traceback", body)
-        self.assertIn("only the push to GitHub failed", body)
+        self.assertIn("permission denied", body)
+
+    def test_the_alert_does_not_describe_a_log_shape_that_cannot_occur(self):
+        """Until 2026-10-19 the alert told the reader to look for "a git or
+        ssh error after a 'publish:' line", which no credential failure can
+        produce: `publish_state.sh` is `set -euo pipefail` and its only
+        success echo is the line after the push, so a failed push — and a
+        dead deploy key, which dies at the `git fetch` ahead of every echo —
+        both leave no `publish:` line at all. growth/README.md was corrected
+        on 2026-10-18; this alert, which is the copy the reader actually
+        gets, kept the repudiated version for a day longer. This test is what
+        keeps the two from drifting again."""
+        for last_build in ("2026-10-12", "2026-10-06"):
+            with self.subTest(last_build=last_build):
+                _, lines = self._run({"date": last_build}, snap_date=last_build)
+                body = " ".join(lines)
+                self.assertNotIn("after a 'publish:' line means", body)
+                self.assertIn("Do not expect git's error to follow a "
+                              "'publish:' line", body)
+
+    def test_neither_alert_claims_the_frozen_file_shape_separates_the_causes(self):
+        """A frozen snapshot.json beside engine-run journal entries that stop
+        on the same day fits both the snapshot-FAILED case and the raised-
+        before-the-snapshot-block case, because the second never calls either
+        write. The alert has to say so, because that shape is the only thing
+        visible from outside the droplet and reading it as the first case
+        skips a backfill the second case needs."""
+        _, lines = self._run({"date": "2026-10-06"}, snap_date="2026-10-06")
+        body = " ".join(lines)
+        self.assertIn("fits (1) and (2)", body)
+        self.assertIn("only rules out (2)", body)
 
     def test_one_missed_morning_reports_one_problem_not_two(self):
         """The snapshot check stays out of it: `_snapshot_problems` is silent
@@ -172,13 +203,37 @@ class WatchdogStalenessTest(unittest.TestCase):
         _, lines = self._run({"date": "2026-10-12"}, snap_date="2026-10-12")
         self.assertEqual(len(lines), 1)
 
-    def test_a_longer_outage_keeps_the_multi_day_wording(self):
+    def test_a_longer_outage_keeps_its_own_wording_and_the_day_count(self):
         rc, lines = self._run({"date": "2026-10-06"}, snap_date="2026-10-06")
         self.assertEqual(rc, 1)
         body = " ".join(lines)
         self.assertIn("7 days", body)
-        self.assertIn("not producing runs", body)
+        self.assertIn("2026-10-06", body)
         self.assertNotIn("No completed build today", body)
+
+    def test_a_longer_outage_carries_the_diagnostic_too(self):
+        """The branch that fires on day 2 and after is the one that fires on
+        every morning of a real outage, and the only one `--email` will mail
+        once the flag is back on the 11:00 cron entry. Until 2026-10-19 it
+        dropped the diagnostic entirely — so the alert got terser exactly as
+        the outage got long enough for somebody to act on it."""
+        _, lines = self._run({"date": "2026-10-06"}, snap_date="2026-10-06")
+        body = " ".join(lines)
+        self.assertIn("publish: nothing changed", body)
+        self.assertIn("snapshot: FAILED", body)
+        self.assertIn("Traceback", body)
+        self.assertIn("permission denied", body)
+        self.assertIn("systemctl status cron", body)
+
+    def test_a_longer_outage_does_not_assert_the_cron_as_the_cause(self):
+        """The old multi-day wording was "The 06:00 cron is not producing
+        runs." That is one of three indistinguishable causes stated as fact,
+        and it is the one that sends the reader to `systemctl status cron`
+        for what may be a dead deploy key or a full disk — the same
+        misattribution growth/README.md was corrected for on 2026-10-18."""
+        _, lines = self._run({"date": "2026-10-06"}, snap_date="2026-10-06")
+        body = " ".join(lines)
+        self.assertNotIn("The 06:00 cron is not producing runs", body)
 
     def test_a_never_run_engine_says_so_in_plainer_words(self):
         rc, lines = self._run({})

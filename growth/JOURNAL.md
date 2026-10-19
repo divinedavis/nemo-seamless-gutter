@@ -39940,3 +39940,497 @@ untouched Business Profile. 84 candidates, none activated in 83 days.
 one window a York County gutter contractor's year turns on, and this business is
 spending it with its measurement dark, its content frozen and its highest-leverage
 free asset untouched. That is the finding. Everything above is detail.
+
+## 2026-10-19 — review agent
+
+### Where the numbers stand
+
+**Seventh consecutive morning with no publish. The newest numbers in this
+repository are 168 hours old. The one thing I add today that is not a restatement
+of the last six entries: the free diagnostic that four earlier entries called the
+best first step — ask Eric whether his 06:00 report email arrived — was dropped
+from yesterday's deliberately-shortened recommendation list, while the item that
+requires an SSH session was kept. It goes back at number one.**
+
+I fetched `origin/main` at **11:15 UTC** before reading anything. My clone's
+local `main` was stale at `61b7206`; `origin/main` is at **`167e2c0`**,
+yesterday's review commit, dated 2026-10-18 11:20 UTC. The last `Publish growth
+state` commit is still **`0b2c596`, 2026-10-12 06:05 UTC**. There is no publish
+commit for 10-13, 10-14, 10-15, 10-16, 10-17, 10-18 or 10-19. `snapshot.json`
+still reads `"date": "2026-10-12"`, `"generated": "2026-10-12T06:05:32+00:00"`.
+Every number below is Monday-a-week-ago's and I will not present any of it as
+today's.
+
+**(1) The goal metric, as of the newest data that exists (2026-10-12).** Read
+fresh from `snapshot.json` this session. `top3` **0 of 239** tracked queries,
+**0 in all seven town buckets**: county 0/124, york 0/42, dover 0/18, hanover
+0/15, spring-grove 0/14, red-lion 0/13, dallastown 0/13. `share_pct` **0.0**
+against a target of 50.
+
+| | 2026-09-24 | 2026-10-11 | 2026-10-12 (newest) | 10-13 → 10-19 |
+| --- | --- | --- | --- | --- |
+| **`top3` (the goal)** | **0** | **0** | **0** | — |
+| `top10` | 11 | 21 | 22 | — |
+| `ranked_known` | 42 | 57 | 58 | — |
+| `matched` | 42 | 54 | 54 | — |
+| `clicks` | 16 | 11 | 11 | — |
+| `impressions` | 6,883 | 4,970 | 5,281 | — |
+| `avg_position` | 27.6 | 25.7 | 26.1 | — |
+| `coverage_pct` | 42.3 | 42.3 | 42.3 | — |
+
+The 10-12 column and the bucket counts are mine, read today. The 09-24 and 10-11
+columns are carried from prior entries and labelled as such; those snapshots do
+not exist in this checkout.
+
+Direction, which the prompt asks for every run: **the county bucket is 0 of 124
+and has not moved.** Against the prompt's own 2026-07-28 baseline of 2 of 50 it
+is *down*, and the denominator has grown from 50 to 124 — 74 more tracked
+county queries, none of them top 3. Measured days at `top3` = 0 stays at **25**;
+it cannot rise while the publisher is down, and that is the point. `top3` has
+never exceeded 2 on any day on record.
+
+**(2) Traffic and leads.** Series still runs 2026-08-28 → **2026-10-11**: 115
+visitors and 151 pageviews over 45 days (2.56 visitors/day). Last fourteen days:
+1, 4, 3, 2, 6, 3, 2, 3, 4, 2, 3, 1, 3, 1. Counted today rather than copied:
+`organic_visitors` **50** total, `direct_visitors` **56**, `local_visitors`
+**2 in 45 days** (09-08, 09-25), `ai_visitors` **2** (both 09-23),
+`referral_visitors` **2** (08-28, 09-05), `call_taps` **2** (10-01, 10-06),
+`phone_leads` **0 all time**, `bookings_all_time` **4**. `bot_hits` ran
+2,840–3,830 across the window's last seven days — roughly a thousand bots per
+human. The prompt's measurement-suspicion trigger does **not** fire: visitors
+are non-zero on 42 of 45 days, so this is a small site, not a broken parser.
+
+**One correction to yesterday's entry, because it affects the lead count.** The
+10-18 entry wrote "`bookings` **0** across the whole visible window
+(`bookings_all_time` 4, last on 09-02)". The window opens 2026-08-28, so 09-02
+is *inside* it: the series carries **1 booking, on 2026-09-02**, and
+`total_leads` 1 on the same day. The accurate statement is one booking in 45
+days and none in the 39 days since. Small, and it cuts the wrong way — the
+window is not quite as empty as yesterday said.
+
+**(3) Both content jobs are dead on an empty Anthropic balance, and that is now
+the entire content blocker rather than part of it.** `last_build` 2026-10-12,
+**0 new, 0 changed**. `last_scout` 2026-10-12, `ok: false`, same error. The
+prompt's Known-blockers text is still wrong about this and has been for 79 days
+— it says to expect the self-imposed usage cap ("regain access on 2026-08-01").
+That cleared on 2026-08-01; every measured failure since has been the opposite
+one, an empty account. The data wins, per the prompt's own instruction.
+
+**What I read in the build log that has not been drawn out before.** Ten of the
+eleven techniques noop'd on 10-12, and the noop reasons are not "nothing to do
+today" — they are *queue empty*:
+
+- `area_pages` — "every queued town already has a page"
+- `service_pages` — "every queued service already has a page"
+- `adopt_queries` — "no new in-area searches worth tracking"
+- `geo_answer_first_content_pass` — "every ranking page already opens with a
+  direct answer"
+- `money_pages` — "no query needs its own page — the remaining gaps all belong
+  on pages that exist, **which strengthen_pages handles**"
+
+I checked that last routing claim in the code rather than trusting the log
+string: `growth/techniques.py:649` is where `money_pages` returns exactly that
+detail and hands the residual gaps on. So all 138 uncovered queries now funnel
+into `strengthen_pages` — and `strengthen_pages` is the *only* technique that
+failed on 10-12, on the credit error, three candidates deep (last:
+"fascia and soffit repair spring grove pa"). **The engine has written itself out
+of new-page work.** Its entire remaining content capacity runs through the one
+technique the empty balance blocks. That changes how recommendation 4 should be
+read: topping up the account does not restart "content" in general, it restarts
+the single lever that is left.
+
+**(4) The ledger.** 96 techniques — **11 active, 84 candidates, 1 retired**
+(counted today). `scoreboard`: **7 works, 0 does_not_work, 89 not_yet_judged**.
+`does_not_work` is empty, as on every day on record: in 84 days this ledger has
+never retired an idea for failing, only accumulated. `by_intent` unchanged, and
+**price is still the worst-covered intent at 10 of 53** against hire at 83 of
+154, diy 1 of 8, check 7 of 24. `guides/gutter-cleaning-cost-york-pa.html` still
+carries a "Typical price ranges" heading and **zero dollar figures** (grepped
+today, `grep -c '\$[0-9]'` returns 0).
+
+**(5) `discovered_untracked`, re-counted today.** 40 rows, **650 impressions, 0
+clicks**, and **0 of the 40 name a York County place** — yesterday's check
+against all 31 county towns stands. So `adopt_queries`' noop was correct for the
+seventh day running, and I propose no additions again today, for a reason worth
+stating rather than repeating: the untracked rows that carry real impressions
+are placeless head terms — `gutters` (64 impressions, position 7.5),
+`gutter replacement` (60, 14.6), `gutter repair` (33, 6.8), `gutter cleaning`
+(30, 8.5), `gutter installation` (28, **position 2.7**). Adding those to the
+tracked universe would raise `top3` from 0 to 1 overnight while measuring
+nothing the owner asked about — a placeless "gutter installation" search is not
+a York County search, and it has produced 0 clicks from position 2.7, which is
+what a far-away searcher seeing a York PA address looks like. **The one top-3
+position this site holds is outside the goal's universe by design, and it should
+stay outside it.** Noting it because "top3 = 0" invites someone to fix the
+metric instead of the business, and this is the shortcut that would do it.
+
+### Did previous changes work?
+
+**1 — The pre-registered mechanism test (10-17). Unresolved, day three, and it
+cannot resolve without a publish.** 10-17 predicted that if the diagnosis is
+right, the first successful publish shows the traffic series already carrying
+10-12 onward with no `measure --days` run in between. No publish arrived.
+**Pending, not passed.** It is still the right kind of prediction — it tests a
+mechanism rather than whether a person acts — and it still costs nothing to
+wait.
+
+**2 — The publish prediction. Retired as a test for the fifth day,** and not
+re-issued. 10-13 and 10-14 both predicted a publish commit the next morning;
+both were falsified. Predicting that a person will act is a test of a channel,
+not of this site.
+
+**3 — The four pre-registered GSC tests. Suspended, day seven.** All four need a
+snapshot that does not exist. **Suspended is not passed.** Seven consecutive
+suspensions: this register has now spent a full week measuring the publish
+pipeline rather than the site.
+
+**4 — The coverage-versus-rank test (pre-registered 09-20). Still failing, no
+new data.** 09-20 → 10-12: `coverage_pct` 42.3 → 42.3, `top3` 0 → 0. Across the
+whole arc `ranked_known` 17 → 58 while `top3` never exceeded 2. No detected
+relationship between page coverage and the goal metric over 25 measured days.
+
+**5 — `top10` retired as a progress metric (10-11). Retirement holds.** 09-24 →
+10-12: `top10` 11 → 22, `matched` 42 → 54, `clicks` **16 → 11**. More queries
+ranked, fewer clicks.
+
+**6 — The seven `works: true` verdicts. Unchanged, not re-judged.** Every
+verdict still dated `2026-10-12`. T017 and T019 still print `gsc_clicks median
+13.5/day` against a 28-day **total of 11**; the `/28d` unit fix is in this repo
+and undeployed, **day 20**.
+
+**7 — Yesterday's two README corrections. One of them was itself wrong, and I
+fixed it today.** The 10-18 entry corrected the runbook's push-failure bullet
+(right, and load-bearing) and its free-mail diagnostic (right). But the bullet
+immediately above them still told the reader they could tell the two
+`publish: nothing changed` sub-cases apart from outside the droplet by shape — a
+frozen `snapshot.json` next to engine-run journal entries stopping on the same
+day — "because one `try` governs both writes". One `try` does govern both
+writes, and that is precisely why the shape proves nothing: in the
+raised-before-the-snapshot-block case neither write is *called*, so both files
+freeze together exactly as they do in the `snapshot: FAILED` case. The two
+observable shapes are identical. Reading that shape as the first case is how a
+morning that needed a backfill gets filed as "nothing lost" — the one error in
+this chain with a data cost. Fixed; see the repo changes below.
+
+**8 — Recommended and not acted on.** Day counts, and where I cannot tell, I say
+so.
+- **The `growth/` deploy (carried from 09-29). Day 20.** Still the item that
+  unblocks the most: six entries of engine fixes sit in this repo unable to
+  reach the droplet that needs them. Caveat held: the snapshot is seven days
+  older than the recommendation, so if Divine deployed on any of the last seven
+  mornings I could not see it. **Unknown, not ignored.**
+- **The watchdog's `--email`. Day 53.** Re-read `deploy/cron-nemo-growth` today:
+  the `0 11 * * *` entry still carries no `--email`, and the file's own comment
+  block still explains at length why removing it was costly.
+- **The Business Profile. Day 84.** `local_visitors` 2 in 45 days, none in 20.
+- **The title refit.** Re-measured today: **47 pages with a `<title>`, 25 over
+  65 characters** (worst: `guides/gutter-services-near-me` and
+  `guides/gutter-pulling-away-from-house`, both 80;
+  `guides/who-to-call-when-gutter-is-falling-off-house` 79;
+  `services/commercial-gutters` 77). Identical to 10-12 and every entry since —
+  a mirror frozen by the missing publish.
+- **The scout's hardcoded premise.** Re-verified today: `growth/scout.py:159`
+  still asserts "4.2 stars, 13 reviews, roughly 300 profile views a month" to
+  the model as fact, with `growth/seed.py:101` and `:113` carrying the same
+  figures. 23 of 96 techniques inherit it.
+- **Ledger edits** (retire T082; the GBP halves of T036/T052/T024; the dead
+  halves of T016/T025). All still `candidate`; `does_not_work` still empty.
+- **`guides/5-inch-gutter-service-york-springs-pa.html`** (Adams County, not
+  York) still present, still the one `york-springs` URL in `sitemap.xml`.
+
+**9 — The ask-Eric diagnostic. Recommended on 10-13, 10-14, 10-15, 10-16 and
+10-17; absent from 10-18's list. That is a regression and it is mine to
+report.** Yesterday's entry shortened the list to four items on the sound
+argument that a ten-item list is part of why item 3 was nineteen days old. But
+the item it cut was the only one in the whole chain that needs **no droplet
+access, no API credit, no deploy and no Divine** — and the item it kept at
+number one needs an SSH session that has not happened in seven days. It is still
+in `growth/README.md` under "Free first step with no droplet access", so it was
+not lost from the repo; it was lost from the thing a person reads. Restored at
+number one below.
+
+### What I researched today
+
+Searches aimed at what has *changed*, filtered recent. I grepped the journal
+before searching on every thread. **Three of four threads came back already
+covered, and I spent no recommendation slot on any of them** — recorded so the
+next reader does not re-search them.
+
+**1 — AI-crawler access. Already covered, and already passing; no slot spent.**
+Current GEO write-ups put "allow GPTBot, ClaudeBot and PerplexityBot in
+robots.txt" near the top of every checklist
+([yotpo](https://www.yotpo.com/blog/chatgpt-seo-geo-tips/),
+[jweis](https://jweis.com/blog/ai-search-geo-contractors/),
+[frase](https://www.frase.io/blog/how-to-get-cited-by-ai-search-engines-the-complete-geo-playbook)).
+I checked `robots.txt` rather than assume: one group names `GPTBot`,
+`OAI-SearchBot`, `ChatGPT-User`, `Google-Extended`, `PerplexityBot`,
+`ClaudeBot`, `anthropic-ai`, `Applebot`, `Applebot-Extended`, `Amazonbot` and
+`meta-externalagent`, all under `Allow: /`. Already shipped, already covered in
+this journal on 10-16, and `tests/test_site.py` guards it. T046
+(`ai_crawler_access_audit`) is a candidate for work that is done.
+
+**2 — "Weekly activity now outranks static optimisation." Rejected, unverifiable.**
+A vendor blog asserts Google began weighting weekly photos, posts and review
+replies more heavily from June 2026
+([webking](https://www.webking.com/lab/google-s-2026-local-pack-now-rewards-weekly-activity-here-s-what)).
+No primary source, no methodology, and it is indistinguishable from the
+"dormant profiles decay" claim this journal already logged unverified. The
+*behaviour* it recommends is already recommendation 5's checklist, so nothing
+turns on it either way.
+
+**3 — The 32%-of-local-pack-weight figure. Already in this journal (10-14); no
+slot spent.** Re-surfaced from several vendor pages citing the 2025 Local Search
+Ranking Factors survey. Survey-based estimate, not a Google rule, and already
+recorded as such.
+
+**4 — One genuinely new item, and it is a sequencing caveat rather than a
+tactic.** Multiple 2026 write-ups describe automated Google Business Profile
+enforcement waves and list "excessive or unjustified changes to business
+details" among the triggers, alongside the long-standing ones (keyword-stuffed
+names, virtual addresses, duplicate listings)
+([gridmybusiness](https://gridmybusiness.com/blog/gbp-suspensions-2026),
+[birdeye](https://birdeye.com/blog/google-business-profile-guidelines/),
+[reinstatelabs](https://www.reinstatelabs.com/blogs/google-business-profile-suspension-reasons),
+[wolfpackadvising](https://wolfpackadvising.com/blog/thousands-just-got-their-google-business-profile-suspended/)).
+Sourcing is vendor blogs only — no Google document — so I am recording it as a
+**precaution with weak sourcing**, and attaching it to recommendation 5 as an
+ordering note, not a condition. **It is explicitly not a reason to wait.** A
+profile that has gone 84 days untouched is losing more every week than a
+suspension risk this thinly evidenced; if the caveat turns into a reason to
+delay, discard the caveat. I grepped the journal: "excessive changes" as a
+trigger is not in it; the service-area-address and 20-area-cap material from
+10-14 is, and is unchanged.
+
+**5 — Environment limits, verified today.** Unchanged from yesterday: every
+citation above is a search engine's summary of a page I could not open, and I
+still cannot reach `nemoseamlessgutter.com` from this session, so for the
+seventh day of this outage I cannot answer "is the site even serving?"
+
+### Recommendations
+
+Ranked, and short on purpose — yesterday's argument for a short list was right.
+Items 1 and 2 are the same question asked of two different people; item 1 needs
+nothing but a text message.
+
+**1. Eric — one text message, today. Did your 06:00 NEMO report email arrive on
+each of 10-13 through 10-19?** This is the cheapest diagnostic in the whole
+chain and it is the one that got dropped yesterday. `cmd_report` is the last
+call in `cmd_daily`, *after* the snapshot `try/except`, so:
+- **mail arrived every morning** → the run reached its final line. That rules
+  out the one cause that loses data, and leaves two that need opposite fixes
+  (a disk or permissions failure on the droplet versus a broken git credential).
+  No backfill needed either way.
+- **mail stopped on 10-13** → the run has been dying before its final line.
+  **This is the case that loses the morning's work**, and it moves the backfill
+  from "not needed" to "needed before logrotate takes the nginx logs".
+
+One caveat, stated so nobody over-reads it: mail arriving is conclusive, mail
+*missing* is only suggestive, because broken SMTP looks the same. Friday
+**10-16** is the one morning Divine does not have to ask anybody — the
+`0 6 * * 5` cron line carries `--email divinejdavis@gmail.com`, so his own inbox
+answers it for that date, and the next developer copy is not until Friday
+**10-23**.
+*Expected effect:* none on the goal metric. It halves a diagnostic space that
+has not moved in seven days, for the cost of one text.
+*How I would know it worked:* an answer, either way.
+*Checked:* `cmd_report` at `growth_daily.py:199-206`, the `--owner-email` branch
+at `:202-203`, its position after the snapshot block in `cmd_daily`; the
+`0 6 * * 0-4,6` and `0 6 * * 5` entries in `deploy/cron-nemo-growth`, re-read
+today. **Eric's, one minute — and Divine's to ask.**
+
+**2. Divine — the three greps, read against the corrected table. ~10 minutes.**
+Carried from 10-18 unchanged, because it is right:
+```
+grep publish /var/log/nemo-growth.log | tail -40
+grep 'snapshot: FAILED' /var/log/nemo-growth.log | tail -5
+grep -iE 'permission denied|could not read from remote|publickey|host key|fatal:' \
+  /var/log/nemo-growth.log | tail -10
+df -h /var /root
+```
+`snapshot: FAILED` present → droplet disk or permissions, nothing lost. No
+`publish:` line but git/ssh error text present → the credential broke, nothing
+lost, no backfill, fix the key. Neither → cron, python or the droplet, and
+*that* is the case that loses data.
+*Checked:* `origin/main` fetched 11:15 UTC, tip `167e2c0`; `snapshot.json` date
+`2026-10-12`; `set -euo pipefail` at `growth/publish_state.sh:16`; the push and
+its success echo at `:92-93`; `git fetch --quiet` at `:35`; `git reset --hard`
+at `:36`; the `nothing changed` exit at `:77-78`. **Divine's, ~10 minutes.**
+
+**3. Divine — append one flag to the watchdog cron line, and deploy the fix I
+committed today with it. Day 53, two minutes plus the deploy.**
+```
+# deploy/cron-nemo-growth, the 0 11 * * * entry
+... growth_daily.py watchdog --email divinejdavis@gmail.com >> /var/log/nemo-growth.log 2>&1
+```
+This now matters more than it did yesterday, and in a way worth reading before
+doing it. The watchdog's multi-day branch — the one that fires on every morning
+of an outage this long, and the only one `--email` would have mailed for the
+last six days — carried **no diagnostic at all** and asserted "The 06:00 cron is
+not producing runs" as fact. Restoring the flag without fixing that text would
+have mailed Divine a confidently wrong cause and sent him to
+`systemctl status cron` for what may be a dead deploy key or a full disk. I
+fixed the text today (below); the flag and a `growth/` deploy are what make it
+reach anyone.
+*How I would know:* mail at 11:00 on the next missed morning, silence otherwise.
+`cmd_watchdog` returns early when healthy, so this reintroduces no daily mail.
+*Checked:* the `0 11 * * *` entry re-read today, still no `--email`; the mail
+gate in `cmd_watchdog`. **Divine's, ~2 minutes + deploy.**
+
+**4. Divine — Anthropic auto-reload with a monthly console cap.** Both content
+jobs have written nothing since 10-12 on "credit balance is too low" — empty,
+not capped. Read it with finding 3 above: this is not "content is paused", it is
+the engine's *only remaining* content lever being off, because the other four
+page-writing techniques report their queues empty and route everything they
+would have done into `strengthen_pages`. `BUDGET.md` rule 1 bounds a run to 3–5
+calls at cents a day, so a cap enforces that rule rather than relaxing it.
+Three manual top-ups have each bought 3–5 mornings and stopped.
+*Checked:* `last_build` and `last_scout` both 2026-10-12, both the empty-balance
+error; the `money_pages` → `strengthen_pages` routing at
+`growth/techniques.py:649`; the eleven-entry build log re-read today.
+**Divine's.**
+
+**5. Eric — the Business Profile. Day 84, free, fifteen minutes.** Unchanged
+from 10-17 and 10-18; that checklist stands as written and I am not re-arguing
+it. Two notes only.
+- **Sequencing, from today's research and weakly sourced:** do the review
+  replies first and on their own, then hours, then categories and services, then
+  photos — over a few days rather than rewriting every field of an 84-day
+  dormant profile in one sitting. 2026 vendor reports list bulk changes to
+  business details among automated-enforcement triggers. **If this reads as a
+  reason to postpone, ignore it** — the sourcing is too thin to buy a single
+  further day of doing nothing.
+- The line worth repeating: 23 of 96 ledger techniques rest on "4.2 stars / 13
+  reviews / ~300 views", and those numbers are a hardcoded string in the scout's
+  prompt (`growth/scout.py:159`, `growth/seed.py:101,113`), not an observation.
+  Five minutes in the app either confirms a quarter of this ledger or
+  invalidates it.
+**Eric's, and only Eric's.**
+
+**Parked, carried unchanged, not re-argued:** the `growth/` deploy (day 20, and
+still the item that unblocks the most — it is what makes six entries of engine
+fixes live, today's included); the scout's hardcoded-premise fix, which should
+ride that deploy; Yelp Request a Quote (T035) and Bing Places / Apple Business
+Connect (T029); asking every finished customer for a review out loud, no gating,
+no incentive; `deploy/repair_titles.py` for the 25 over-long titles;
+`deploy/retire_out_of_area.py` for the york-springs page; the ledger edits;
+three real cleaning prices for the cost guide (Eric's — I will not invent prices
+for a real business, and the page promises ranges it does not have); allowing
+`nemoseamlessgutter.com` in this session's network policy; and the prompt
+corrections below.
+
+**Prompt corrections. Day seven, none landed.** Two are load-bearing.
+(a) **Add to Known blockers: check for a publish commit dated today before
+trusting `snapshot.json`** — the prompt's claim that the engine "pushes its
+state to this repo an hour before you run" has now been false on seven
+consecutive mornings. (b) **Retire the spend-cap narrative** — it cleared 79
+days ago and every measured failure since has been the opposite one, an empty
+balance, last seen 10-12. Also stale: the 2026-07-28 baseline (77 rows, 17
+matched, 3 clicks, 429 impressions, position 12.4, county 2 of 50 in top 3)
+against 759 / 54 / 11 / 5,281 / 26.1 / **0 of 124**; and "do not describe rank
+as unmeasured", which is true of 10-12's data and false of today's. (c) Minor:
+the prompt says the watchdog "mails the developer" — it mails nobody, which is
+recommendation 3. The scheduled task is the owner's to edit; I am not editing it
+myself.
+
+### Repo changes I made today
+
+Two, both small, both corrections to the diagnostic chain rather than new
+machinery.
+
+**1. `growth_daily.py` — the watchdog's alert text, in both staleness
+branches.** The multi-day branch (`stale_days >= 2`) said only "The last
+completed build was <date> — N days ago. The 06:00 cron is not producing runs."
+Two defects in one sentence. It **drops the three-cause diagnostic exactly as
+the outage gets long enough for somebody to act on it** — the one-day branch had
+it and the branch that fires on days 2 through 7 did not — and it **asserts one
+of three indistinguishable causes as fact**, which is the same misattribution
+the README was corrected for yesterday. That is the branch that would have been
+mailed on each of the last six mornings had `--email` been set.
+
+While I was in there: the one-day branch's text still told the reader to look
+for "a git or ssh error **after** a `publish:` line", the shape yesterday's
+README fix established cannot occur. The runbook was corrected and the alert —
+the copy the person reading at 11:00 actually gets — kept the repudiated
+version. Fixing one and not the other is how the error survives. I hoisted the
+diagnostic into one shared `_UNPUBLISHED_MORNING_DIAGNOSTIC` string so the two
+branches cannot drift again, wrote the corrected three-way discriminator into
+it, and added the two shortcuts that do *not* work: the frozen-files shape, and
+reading an arrived email as pointing at the push.
+
+**2. `growth/README.md` — the frozen-file shape test, which was invalid.** Under
+the `publish: nothing changed` bullet the runbook offered an
+outside-the-droplet test for telling its two sub-cases apart: a frozen
+`snapshot.json` next to engine-run entries stopping on the same day "is the
+first case, because one `try` governs both writes". It governs both writes, and
+that is why the shape proves nothing — in the second case neither write is
+called, so both files freeze identically. The shape is what *every* unpublished
+morning looks like from this repository: necessary, never sufficient. Replaced
+with a "what does not tell them apart" note saying so, and why it matters —
+reading it as the first case is how a morning that needed a backfill gets filed
+as "nothing lost". This is the one error in the chain with a data cost, and it
+is live in the cloud checkout immediately; it cannot be blocked by the 20-day-old
+deploy. The watchdog fix in (1) cannot take effect until that deploy happens,
+and I am saying so rather than letting it read as fixed.
+
+`Tests: added 4 (the multi-day alert carries the diagnostic; the multi-day alert
+does not assert the cron as the cause; neither alert describes the
+after-a-publish-line shape that cannot occur; neither alert claims the
+frozen-file shape separates the causes), changed 2
+(test_the_one_day_alert_carries_the_diagnostic now asserts the corrected
+discriminator instead of "only the push to GitHub failed";
+test_a_longer_outage_keeps_the_multi_day_wording renamed to
+…_keeps_its_own_wording_and_the_day_count and no longer asserts the wording I
+removed), removed 0.` The second changed test is the important one to notice: it
+previously **asserted the defect** — `assertIn("not producing runs", body)` —
+so the wrong alert text was a tested behaviour, not an oversight. Suite green:
+**403 python + 9 node** (`npm ci --prefix server` first; `node_modules` is
+absent in a fresh checkout).
+
+### Reasoning and uncertainties
+
+**What today actually added.** One process finding: the free diagnostic went
+missing from the list that a person reads, while the expensive one stayed, and I
+put it back at number one. One correction with a data cost: the README's
+frozen-file shape test cannot distinguish the case where nothing is lost from
+the case that needs a backfill. One defect in the alert that the next outage
+would have run into, and that the restored `--email` flag would have mailed:
+the branch that fires on a long outage had no diagnostic and named a wrong
+cause, and a test was pinning that wording in place. One reading of the build
+log that sharpens the credit item: the engine's four other page-writing
+techniques report empty queues and route their residual work into
+`strengthen_pages`, so the empty balance is not part of the content blocker, it
+is all of it. One arithmetic correction to yesterday. And one reason not to
+"fix" `top3` by widening the tracked universe to the head terms where this site
+already ranks 2.7.
+
+**What I am least confident about.** Which cause is live. I still have no
+evidence favouring the disk/permissions case over the credential case over the
+early-crash case — my predecessors' contribution was that the runbook could not
+tell them apart, and mine is that one of its tests actively points the wrong
+way. All three fit every symptom visible from here. Second, the GBP sequencing
+caveat: vendor blogs only, no Google document, and I have marked it as a
+precaution rather than a finding precisely because a thinly-sourced risk is the
+kind of thing that turns into another week of nobody touching the profile.
+Third, every citation today is a search engine's summary of a page DNS would not
+let me open.
+
+**What I deliberately did not claim.** That the ask-Eric diagnostic is my idea —
+it is 10-13's, and my only contribution is noticing it was dropped. That the
+engine fixes of the last six entries have or have not been deployed; seven days
+of staleness makes that unknowable from here. That today's watchdog fix changes
+anything on the droplet — it cannot, until the `growth/` deploy happens. That
+any of the four suspended tests leans either way. That 2 `call_taps` or 2
+`local_visitors` constitute a channel. That today's numbers are today's — they
+are a week old.
+
+**The binding constraint has not changed, and a seventh good journal entry does
+not fix it.** Seven dead mornings. Twenty days of engine fixes undeployed. Seven
+days with no API credit, against an engine whose only remaining content lever is
+the one that credit blocks. Eighty-four days of an untouched Business Profile.
+84 candidates, none activated in 84 days, and `does_not_work` empty on every day
+on record. It is 19 October: leaf-fall is the one window a York County gutter
+contractor's year turns on, roughly three weeks of it are left, and this
+business is spending it with its measurement dark, its content frozen and its
+highest-leverage free asset untouched. The honest summary of this loop's last
+week is that it has produced seven careful reviews of a pipeline and zero
+changes to a business. That is the finding. Everything above is detail.
