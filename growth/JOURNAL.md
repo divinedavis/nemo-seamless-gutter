@@ -40434,3 +40434,415 @@ business is spending it with its measurement dark, its content frozen and its
 highest-leverage free asset untouched. The honest summary of this loop's last
 week is that it has produced seven careful reviews of a pipeline and zero
 changes to a business. That is the finding. Everything above is detail.
+
+## 2026-10-20 — review agent
+
+### Where the numbers stand
+
+**Eighth consecutive morning with no publish. The newest numbers in this
+repository are 197 hours old.** I fetched `origin/main` at 11:13 UTC before
+reading anything; local `main` and `origin/main` are both at `1364271`,
+yesterday's review commit. The last `Publish growth state` commit is still
+**`0b2c596`, 2026-10-12 06:05 UTC**. There is no publish commit for 10-13
+through 10-20. `snapshot.json` still reads `"date": "2026-10-12"`. Nothing
+below is today's data and I will not present it as such.
+
+**But the restatement is not the finding today. The finding is that the
+pipeline everyone has been debugging for eight days restores a lever with a
+measured return of roughly zero on the owner's goal, and the last seven entries
+— mine included in spirit — have been ranking it above the one lever that has
+never been tried. I am inverting that order. The argument is in "Did previous
+changes work?", item 1.**
+
+**(1) The goal metric.** Read fresh from `snapshot.json`. `top3` **0 of 239**
+tracked queries, **0 in all seven town buckets**: county 0/124, york 0/42,
+dover 0/18, hanover 0/15, spring-grove 0/14, red-lion 0/13, dallastown 0/13.
+`share_pct` **0.0** against a target of 50. Direction, which the prompt asks
+for every run: **the county bucket is 0 of 124 and has not moved.** Measured
+days at `top3` = 0 stays at **25**; it cannot rise while the publisher is down.
+
+**(2) Traffic and leads**, counted today rather than copied. Series still runs
+2026-08-28 → **2026-10-11**, 45 days: **115 visitors, 151 pageviews** (2.56/day).
+Last fourteen days: 1, 4, 3, 2, 6, 3, 2, 3, 4, 2, 3, 1, 3, 1. `organic_visitors`
+**50**, `direct_visitors` **56**, `local_visitors` **2** (09-08, 09-25),
+`ai_visitors` **2**, `referral_visitors` **2**, `campaign_visitors` **3**,
+`call_taps` **2** (10-01, 10-06), **`ai_calls` 0 across all 45 days**,
+`bookings` **1** (09-02), `phone_leads` **0**, `bookings_all_time` **4**.
+`bot_hits` 2,840–3,830/day in the last week. Visitors are non-zero on **41 of
+45** days (yesterday's entry said 42; my count is 41, and it changes nothing),
+so the prompt's measurement-suspicion trigger does **not** fire — small site,
+not a broken parser.
+
+**(3) Both content jobs remain dead on an empty Anthropic balance.**
+`last_build` 2026-10-12, **0 new, 0 changed**; `last_scout` 2026-10-12,
+`ok: false`, both "Your credit balance is too low". The prompt's Known-blockers
+text is still wrong about this on day 80 — it says to expect the self-imposed
+usage cap that cleared on 2026-08-01. The data wins, per the prompt's own
+instruction. Ten of eleven techniques noop'd with **empty queues**, and the one
+that failed, `strengthen_pages`, is where the other four page writers route
+their residual work (`growth/techniques.py:649`). The engine has written itself
+out of new-page work.
+
+**(4) The ledger.** 96 techniques — **11 active, 84 candidates, 1 retired**.
+`scoreboard`: **7 works, 0 does_not_work, 89 not_yet_judged**. `does_not_work`
+has been empty on every day on record: in 85 days this ledger has never retired
+an idea for failing. `price` is still the worst-covered intent at **10 of 53**
+(hire 83/154, check 7/24, diy 1/8); 138 queries uncovered.
+
+**(5) `discovered_untracked`:** 40 rows, **650 impressions, 0 clicks**, and 0 of
+the 40 name a York County place. Five of the top twelve name towns in *other*
+counties — Akron, Leola, Myerstown, Perkasie, Lancaster. The site's one top-3
+position is a placeless `gutter installation` (28 impressions, position 2.7, 0
+clicks) and it belongs outside the goal's universe; adopting it would raise
+`top3` from 0 to 1 while measuring nothing Eric asked about. No additions
+proposed, eighth day running.
+
+### Did previous changes work?
+
+**1 — The engine's founding hypothesis: publish pages covering York County
+queries and the goal metric follows. Eighty-five days in, the data says no, and
+this is the first entry to do the whole subtraction.** Prompt baseline
+2026-07-28 against the newest snapshot, 2026-10-12:
+
+| | 2026-07-28 | 2026-10-12 | |
+| --- | --- | --- | --- |
+| GSC `rows` | 77 | 759 | ×9.9 |
+| `impressions` | 429 | 5,281 | ×12.3 |
+| `clicks` | 3 | 11 | +8 |
+| `avg_position` | 12.4 | **26.1** | **worse** |
+| county `top3` | **2 of 50** | **0 of 124** | **down** |
+
+Generated pages went from a handful to **44** (15 areas, 22 guides, 7 services).
+The site now appears for ten times as many queries, twelve times as many
+impressions, mostly far down the page and partly in counties NEMO does not
+serve, converting **0.21%** of impressions into clicks — and the metric the
+owner actually set went from 2 to 0. Eight extra clicks a month and zero top-3
+county positions is the measured 85-day return on the whole page-generation
+programme.
+
+I am deliberately *not* calling this "did not work" in the ledger's sense. Two
+honest confounders: 25 measured GSC days is thin, and pages published in
+September cannot have matured. But the *direction* of `avg_position` is away
+from the goal over 76 days, which is long enough for the first cohort of pages,
+and this is the fourth pre-registered test of the same relationship to come back
+with nothing (see item 4). The defensible statement is: **after 85 days there is
+no detected relationship between page coverage and the goal metric, and the one
+trend that is visible points the wrong way.**
+
+Why it changes the ordering. Restoring the publish pipeline and topping up the
+API balance restores *this* lever — and `strengthen_pages`, the only content
+technique with work left, is the lever in question. That is still worth doing;
+measurement being dark is intolerable on its own terms. But it is not the thing
+most likely to make the phone ring in the three weeks of leaf-fall that remain,
+and it has been sitting at positions 1–4 of every list for a week while the free
+items sat at 5.
+
+**2 — The pre-registered mechanism test (10-17). Unresolved, day four.** Still
+needs a publish that has not happened. **Pending, not passed.**
+
+**3 — The four pre-registered GSC tests. Suspended, day eight.** All four need a
+snapshot that does not exist. **Suspended is not passed.** This register has now
+spent eight days measuring the publish pipeline rather than the site.
+
+**4 — The coverage-versus-rank test (pre-registered 09-20). Still failing, no
+new data.** 09-20 → 10-12: `coverage_pct` 42.3 → 42.3, `top3` 0 → 0. Across the
+whole arc `ranked_known` 17 → 58 while `top3` never exceeded 2. This is the
+narrow version of item 1.
+
+**5 — `top10` retired as a progress metric (10-11). Retirement holds.** 09-24 →
+10-12: `top10` 11 → 22, `matched` 42 → 54, `clicks` **16 → 11**.
+
+**6 — The seven `works: true` verdicts. Unchanged, not re-judged,** every
+verdict still dated 2026-10-12. T017 and T019 still print `gsc_clicks median
+13.5/day` against a 28-day **total of 11**; the `/28d` unit fix is in this repo
+and undeployed, **day 21**.
+
+**7 — Yesterday's two fixes.** The `growth/README.md` frozen-file correction is
+live in this checkout and correct. The `_UNPUBLISHED_MORNING_DIAGNOSTIC`
+watchdog fix cannot reach the droplet until the `growth/` deploy happens, and I
+cannot tell from here whether it has; I am not recording it as in effect.
+
+**8 — Recommended and not acted on.** Day counts; where I cannot see, I say so.
+- **The ask-Eric diagnostic.** Day 8. Restored to number one yesterday after
+  being dropped on 10-18; still unanswered.
+- **The three droplet greps.** Day 4.
+- **The `growth/` deploy** (carried from 09-29). **Day 21.** Eight days of
+  staleness makes it unknowable from here whether Divine deployed; **unknown,
+  not ignored.**
+- **The watchdog's `--email`. Day 54.** Re-read `deploy/cron-nemo-growth` today:
+  the `0 11 * * *` entry still carries no `--email`.
+- **The Business Profile. Day 85.** `local_visitors` 2 in 45 days, 0 in 25.
+- **The title refit.** Re-measured today: **47 titles, 25 over 65 characters**
+  (worst: `guides/gutter-services-near-me` and
+  `guides/gutter-pulling-away-from-house`, both 80).
+- **The scout's hardcoded premise. Fixed today** — see Repo changes.
+- **Ledger edits** (retire T082; the GBP halves of T036/T052/T024; the dead
+  halves of T016/T025). All still `candidate`.
+- **`guides/5-inch-gutter-service-york-springs-pa.html`** (Adams County) still
+  present, still in `sitemap.xml`.
+
+**9 — A failure nobody in this chain has reported, because nobody looked.** I
+checked GitHub Actions, which eight entries of pipeline debugging never did.
+**CI is red on the open server-dependency PRs, and the booking API's
+dependencies have been stuck for 78 days.** PR **#12** (express 4.22→5.3,
+better-sqlite3 11→13, uuid 11→14, node-ical, tsdav, nodemailer, ics) fails
+`scripts/test.sh` with **"server did not start"** on all seven
+`server/test/booking_api.test.js` tests — almost certainly the Express 5 or
+better-sqlite3 major. PR **#1** (uuid, node-ical) has been open since
+2026-08-03. Runs 58 and 59 of `ci.yml` are the failures; every other recent run
+is green, including all eight review commits. This is **not** a growth blocker
+and I am not giving it a recommendation slot. It is a maintenance blocker on the
+one piece of software that captured all four bookings this business has, and it
+will keep every future server bump red until somebody ports the majors.
+
+### What I researched today
+
+I grepped the journal before searching on every thread, and **three of four
+threads came back already covered, so no recommendation slot was spent on
+them.** Recorded so the next reader does not re-search them.
+
+**1 — Review recency versus volume. Already covered (10-14); no slot spent.**
+Contractor guides are consistent that recency and velocity beat raw count, with
+a widely-recirculated anecdote of a 412-review roofer with nothing in 14 months
+being outranked by a 67-review competitor with 11 in 30 days
+([leadadvisors](https://leadadvisors.com/blog/seo-for-contractors/),
+[minyona](https://minyona.com/blog/google-business-profile-contractors),
+[legacysaleseng](https://legacysaleseng.com/google-map-pack-service-guide/)).
+This journal already has the better-sourced version: Whitespark's 187-factor
+work puts review **count at #9 and recency at #11**. Single anecdotes and
+vendor percentage estimates (15%, 16–20%) add nothing to that.
+
+**2 — An October 2026 local-pack ranking change. Searched for, not found;
+rejected.** No Google-announced local ranking update for October 2026. What
+surfaced was practitioner commentary: a "Diversity Update" theory already in
+this journal, and a vague claim that service-area listings face "new
+scepticism" around early October, with no methodology or primary source
+([sterlingsky](https://www.sterlingsky.ca/googles-new-diversity-update/),
+[khatootech](https://khatootech.com/google-business-profile-changes-october-2026/),
+[searchpod](https://searchpod.com/blog/google-local-search-changes)). Sterling
+Sky's standing finding that a service area does **not** itself affect rank —
+rank follows the verified address — is the useful and already-known part
+([sterlingsky](https://www.sterlingsky.ca/does-the-service-area-in-google-my-business-impact-ranking/)).
+
+**3 — Primary sources, for once, and one item that is new here.** I searched
+Google's own properties rather than vendor blogs. Google **Analytics** gained a
+Business Profile link in **June 2026** that reports seven GBP metrics —
+including **calls**, bookings, directions and website clicks — on a rolling
+6-month window
+([Analytics Help](https://support.google.com/analytics/answer/9164320?hl=en)).
+Also dated and primary: the GBP API added scheduled recurring posts (April
+2026) and review **reply URL / moderation state** (July 2026)
+([GBP API change log](https://developers.google.com/my-business/content/change-log)),
+and profile owners can connect Gemini to draft review replies and update hours
+([blog.google](https://blog.google/innovation-and-ai/products/gemini-app/gemini-features-for-businesses/)).
+The journal has **zero** mentions of "GBP metrics", "Business Profile
+performance" or the Analytics link; "Google Analytics" appears once.
+
+**Why that matters here, and what it is not.** I checked the code before making
+anything of it: the site **already runs GA4** — `G-JWSK5E1ZRZ` at
+`index.html:49` — so the link is a settings change, not an install. And
+`analytics.js`'s own comment block explains that `gtag` is blocked for many
+visitors and GA4 has no server-side export, which is exactly why the first-party
+`/e/call-tap` beacon exists. So this is **a dashboard for Eric, not a feed for
+the engine** unless somebody wires the Data API. It is also **not a new
+technique**: **T049 (`call_instrumentation_baseline`, candidate since
+2026-08-08, day 73)** already proposes reading GBP "Calls" from Business Profile
+→ Performance. The Analytics link makes T049's first step repeatable instead of
+a number hand-copied once. Caveat on sourcing: I could not open the Analytics
+Help page from this session, so this is a search engine's summary of a
+Google-owned help page — better than the vendor blogs this journal usually gets,
+still not a page I read.
+
+**4 — Environment limits, verified today.** `curl https://nemoseamlessgutter.com/`
+returns `CONNECT tunnel failed, response 403`. For the eighth day of this outage
+I cannot answer "is the site even serving?"
+
+### Recommendations
+
+Reordered, and that is the point of today's entry. Items 1 and 2 are free, need
+no droplet, no API credit, no deploy and no Divine, and both speak directly to
+"more phone calls". They have been at positions 5+ for a week.
+
+**1. Eric — open Business Profile → Performance, set the range to the last 90
+days, and write down one number: Calls. Five minutes, free, today.** This is
+**T049's first step, a candidate for 73 days**, and it is the cheapest
+high-information act available to this business. The reason it is now number
+one: `ai_calls` is **0 across all 45 measured days**, `phone_leads` **0 all
+time**, `call_taps` **2**. Three completely different failures produce that same
+zero — nobody taps Call (a profile problem), they tap and never dial (friction),
+or they dial and the AI agent loses them (handling) — and the ledger has
+candidates for all three. Without this number Eric spends the rest of leaf
+season guessing which one to fix.
+*Expected effect:* none directly; it chooses the next fix instead of guessing it.
+*How I would know it worked:* three reconcilable numbers — GBP call clicks, site
+tel: taps, calls the agent answered.
+*Checked, to confirm it is not already shipped:* T049 in `snapshot.json` is
+`status: candidate`, never activated; `growth/metrics.py:231` shows `call_taps`
+counts only the `/e/call-tap` beacon, i.e. taps that start **on the site**, and
+`:683` shows `phone_leads` reads the bookings DB `leads` table — neither can see
+a map-pack call, so Google's own figure is the missing third number, not a
+duplicate. **Eric's, five minutes.**
+
+**2. Eric or Divine — link the Business Profile to the existing GA4 property, so
+that number arrives weekly instead of once.** Google Analytics has reported
+seven GBP metrics including calls on a rolling 6-month window since June 2026,
+and the site already has GA4 installed. This is the mechanism for item 1, not a
+separate idea.
+*Expected effect:* turns a one-off manual reading into a standing series, which
+is what the ledger needs before any call-side technique can be judged.
+*How I would know:* GBP calls/directions/website-clicks visible in GA without
+anyone opening the Business Profile app.
+*Checked:* `G-JWSK5E1ZRZ` at `index.html:49` (GA4 already live); the
+`gtag`-is-blocked and no-server-side-export comments at `growth/analytics.js:14-29`,
+which bound what this buys; no ledger technique mentions Analytics or GA4
+(grepped all 96). Requires the same Google account to manage both.
+**Eric's or Divine's, ~15 minutes.**
+
+**3. Eric — one text message: did your 06:00 NEMO report arrive on each of 10-13
+through 10-20?** Day 8 of this ask. `cmd_report` is the last call in `cmd_daily`,
+*after* the snapshot `try/except`, so mail arriving every morning rules out the
+one cause that loses data; mail stopping on 10-13 moves a backfill from "not
+needed" to "needed before logrotate takes the nginx logs". Mail arriving is
+conclusive; mail missing is only suggestive, because broken SMTP looks the same.
+Friday **10-23** is the next morning Divine's own inbox answers this without
+asking anybody — the `0 6 * * 5` line carries `--email divinejdavis@gmail.com`.
+*Checked:* `cmd_report` at `growth_daily.py:199-206`; the `0 6 * * 0-4,6` and
+`0 6 * * 5` entries in `deploy/cron-nemo-growth`, re-read today. **Eric's one
+minute, Divine's to ask.**
+
+**4. Divine — the three greps, ~10 minutes.** Carried unchanged; still the
+fastest way to end the outage.
+```
+grep publish /var/log/nemo-growth.log | tail -40
+grep 'snapshot: FAILED' /var/log/nemo-growth.log | tail -5
+grep -iE 'permission denied|could not read from remote|publickey|host key|fatal:' \
+  /var/log/nemo-growth.log | tail -10
+df -h /var /root
+```
+`snapshot: FAILED` → droplet disk or permissions, nothing lost. No `publish:`
+line but git/ssh error text → the credential broke, nothing lost, fix the key.
+Neither → cron or python, and that is the case that loses data. **One addition
+today:** the 06:00 cron joins the engine and the publisher with `;`, not `&&`
+(`deploy/cron-nemo-growth`, both 06:00 entries, re-read today), so
+`publish_state.sh` is *invoked* even when `growth_daily.py` crashes. A crash
+therefore cannot stop the publisher from running — it can only leave it nothing
+to publish. That does not shrink the three-way space, but it does mean "the run
+died early" and "the publisher never ran" are not the same cause, and the greps
+separate them.
+*Checked:* `set -euo pipefail` at `growth/publish_state.sh:16`; `git fetch` at
+`:35`; the `nothing changed` exit at `:76-78`; the push and its only success
+echo at `:92-93`. **Divine's, ~10 minutes.**
+
+**5. Divine — Anthropic auto-reload with a monthly console cap; and the
+`growth/` deploy, day 21.** Both content jobs have written nothing since 10-12
+on an empty balance, and `strengthen_pages` is the engine's only remaining
+content lever. `BUDGET.md` rule 1 bounds a run to 3–5 calls at cents a day, so a
+cap enforces that rule rather than relaxing it. Three manual top-ups have each
+bought 3–5 mornings. The deploy is what makes 21 days of engine fixes — the
+`/28d` unit fix, yesterday's watchdog diagnostic, today's scout fix — reach the
+droplet. **Read item 1 of "Did previous changes work?" before prioritising this
+above items 1–2: it restores a lever whose measured 85-day return on the goal is
+about zero.** It is still worth doing. It is not the thing that makes the phone
+ring this month. **Divine's.**
+
+**6. Eric — the Business Profile itself. Day 85, free.** Review replies first,
+then hours, then categories and services, then photos, over a few days. The
+checklist stands as written on 10-17 and I am not re-arguing it. One line worth
+repeating: 23 of 96 ledger techniques rest on "4.2 stars / 13 reviews / ~300
+views", and until today those were asserted to the scout as fact. Five minutes
+in the app either confirms a quarter of this ledger or invalidates it.
+**Eric's, and only Eric's.**
+
+**Parked, carried unchanged, not re-argued:** the watchdog's `--email` (day 54);
+Yelp Request a Quote (T035); Bing Places / Apple Business Connect (T029);
+asking every finished customer for a review out loud, no gating, no incentive;
+`deploy/repair_titles.py` for the 25 over-long titles;
+`deploy/retire_out_of_area.py` for the york-springs page; the ledger edits;
+three real cleaning prices for the cost guide (Eric's — I will not invent prices
+for a real business, and `guides/gutter-cleaning-cost-york-pa.html` still
+promises "Typical price ranges" with zero dollar figures); allowing
+`nemoseamlessgutter.com` in this session's network policy; and the server
+dependency majors in finding 9.
+
+**Prompt corrections. Day eight, none landed.** (a) **Add to Known blockers:
+check for a publish commit dated today before trusting `snapshot.json`** — the
+prompt's claim that the engine "pushes its state to this repo an hour before you
+run" has now been false on eight consecutive mornings. (b) **Retire the
+spend-cap narrative** — it cleared 80 days ago; every measured failure since has
+been an empty balance, last seen 10-12. (c) The 2026-07-28 baseline in the
+prompt (77 rows, 17 matched, 3 clicks, 429 impressions, position 12.4, county 2
+of 50) is now useful only as the comparison in item 1 above — it should be
+labelled a historical baseline, not current state. (d) The prompt says the
+watchdog "mails the developer": it mails nobody. The scheduled task is the
+owner's to edit; I am not editing it myself.
+
+### Repo changes I made today
+
+One, and it closes a recommendation rather than adding machinery.
+
+**`growth/scout.py` — the scout's BUSINESS block no longer asserts the Business
+Profile figures as fact.** The line read `Google Business Profile is live: 4.2
+stars, 13 reviews, roughly 300 profile views a month.` Those numbers are seed
+assumptions from 2026-07-27 that nobody has ever checked against the profile,
+and **23 of the ledger's 96 techniques inherit them** — which means the scout
+could not discover the premise was wrong, because the premise was in its own
+prompt. Four prior entries recommended fixing this and it stayed parked. The
+figures are still stated, deliberately, so a proposal can name which number
+needs checking; they are now labelled UNVERIFIED with an instruction not to rest
+a proposal's case on them. I left `growth/seed.py:101,113` alone and am saying
+why rather than leaving it looking overlooked: those strings seed
+`techniques.json`, which is runtime state owned by the droplet and gitignored,
+so editing them changes nothing for the live ledger — only a fresh re-seed. Like
+every other engine change in this repo, this one needs the day-21 `growth/`
+deploy before a scout run sees it.
+
+`Tests: added 2 (the prompt marks the profile figures UNVERIFIED while still
+stating them; the prompt does not carry the "Profile is live: 4.2 stars" shape
+that read as measured data), changed 0, removed 0.` Suite green: **405 python +
+9 node** (`npm ci --prefix server` first; `node_modules` is absent in a fresh
+checkout).
+
+### Reasoning and uncertainties
+
+**What today added.** The subtraction in item 1, which no prior entry had done
+end to end: generated pages up to 44, impressions ×12.3, `avg_position` 12.4 → 26.1, county
+`top3` 2 → 0. That is the argument for moving the free call-measurement items
+above the pipeline items, and it is the only argument here I would defend
+strongly. One primary-sourced research item (the GA ↔ Business Profile link)
+that turns out to be a mechanism for an existing 73-day-old candidate rather
+than a new idea — so I have attached it to T049 instead of spending a slot
+pretending it is new. One failure nobody had looked for, because eight entries
+of pipeline debugging never checked CI: the booking API's dependency upgrades
+are red and 78 days stale. One scout fix landed instead of parked. And one
+reading of the cron that separates two causes previously treated as one.
+
+**What I am least confident about.** First, item 1's verdict. 25 measured GSC
+days is thin, indexing lag is real, and a seasonal demand swing in a county this
+small could move `avg_position` on its own; a competitor adding pages would too.
+What would change my mind: a publish showing `top3` rising while `coverage_pct`
+holds, or `avg_position` recovering toward the teens as the September pages
+mature. I would rather be told I called this early than have an eighth entry
+rank a zero-return lever first. Second, which cause of the outage is live — I
+have no evidence favouring disk, credential or early-crash, and neither did my
+predecessors. Third, the GA link rests on a search summary of a page I could not
+open.
+
+**What I deliberately did not claim.** That the page programme "does not work"
+in the ledger's sense — 25 measured days does not earn that verdict, and the
+ledger's `does_not_work` list staying empty for 85 days is a separate problem I
+am not fixing by guessing. That today's numbers are today's; they are eight days
+old. That the CI failure is a growth problem. That T049 is my idea — it is the
+scout's, from 2026-08-08, and my contribution is noticing it is free and
+first. That yesterday's watchdog fix is in effect on the droplet. That any of
+the suspended tests leans either way.
+
+**The binding constraint.** Eight dead mornings. Twenty-one days of engine fixes
+undeployed. Eight days with no API credit against an engine whose only remaining
+content lever is the one credit blocks. Eighty-five days of an untouched
+Business Profile. 84 candidates, none activated in 85 days. It is 20 October:
+roughly three weeks of leaf-fall remain, and this is the window a York County
+gutter contractor's year turns on. Eight reviews have now described a broken
+pipeline with increasing precision. The honest reading of that is not that the
+pipeline needs a ninth description — it is that the two things that could move
+the phone this month cost nothing, need no machine, and have been sitting at the
+bottom of the list for a week. That is why they are at the top of this one.

@@ -129,6 +129,24 @@ class PromptTest(unittest.TestCase):
         self.assertIn("92 tracked queries are already", text)
         self.assertIn("ONE of them per day", text)
 
+    def test_prompt_marks_the_profile_figures_unverified(self):
+        # 2026-10-20: the BUSINESS block asserted "4.2 stars, 13 reviews,
+        # roughly 300 profile views a month" to the model as fact. The numbers
+        # are seed assumptions from 2026-07-27 that nobody has ever checked
+        # against the profile, and 23 of the ledger's 96 techniques inherit
+        # them — so the scout could not discover the premise was wrong,
+        # because the premise was in its own prompt.
+        text = S.build_prompt(self.root)
+        self.assertIn("UNVERIFIED", text)
+        self.assertIn("4.2 stars", text)       # still stated, so a proposal
+        self.assertIn("13 reviews", text)      # can name what to check
+        self.assertIn("confirmed before the work starts", text)
+
+    def test_prompt_does_not_assert_the_profile_figures_as_fact(self):
+        # The exact shape that read as measured data, and must not come back.
+        text = S.build_prompt(self.root)
+        self.assertNotIn("Profile is live: 4.2 stars", text)
+
     def test_prompt_still_states_the_goal(self):
         # The backlog warning must not have displaced the goal line.
         self.assertIn("0.7% of 146 tracked queries in the top 3",

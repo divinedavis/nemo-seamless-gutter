@@ -156,7 +156,11 @@ def build_prompt(docroot=None):
 
 BUSINESS
 NEMO Seamless Gutter, nemoseamlessgutter.com — seamless gutter contractor in York, PA.
-Google Business Profile is live: 4.2 stars, 13 reviews, roughly 300 profile views a month.
+Google Business Profile is live. Its figures here are UNVERIFIED seed assumptions from
+2026-07-27, never once checked against the profile, so treat them as guesses and not as
+measurements: roughly 4.2 stars, 13 reviews, ~300 profile views a month. Do not rest a
+proposal's case on them. If one of them matters to a proposal, say which number has to
+be confirmed before the work starts.
 The site has a homepage with an online booking widget, an AI phone agent that answers
 calls and captures leads when Eric is on a roof, and these pages already published:
 
