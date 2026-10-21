@@ -1,0 +1,42 @@
+# Did the droplet publish its state this morning?
+#
+# Every other alarm this project has runs on the droplet, so a droplet that
+# stops takes its own alarms with it. deploy/cron-nemo-growth says so in its
+# own comment — "a failure of cron itself surfaces never, because the Friday
+# mail is also a cron job" — and from 2026-10-13 that is exactly what happened:
+# nine mornings with no publish commit, the 11:00 watchdog mailing nobody since
+# 2026-08-27, and the outage visible only to the cloud review agent, which can
+# write it in the journal and nothing else.
+#
+# This job is outside the droplet, which is the whole point, and it is the one
+# thing in this repository that takes effect on push instead of needing a
+# deploy. It fails when growth/snapshot.json is not this morning's; GitHub
+# turns a failing scheduled run into a red mark on the repo and a notification
+# to whoever last edited the cron line below, which is more than silence.
+#
+# Schedule, not push: on push it would fail on every review-agent commit during
+# an outage and drown out ci.yml. 13:17 UTC is after the 06:00 America/New_York
+# run and its publish step in either direction of daylight saving (10:00 UTC in
+# EDT, 11:00 in EST), and after the 11:08 UTC review agent, so a failure here
+# means the morning really produced nothing. Public repo, free minutes, no
+# secrets. GitHub disables scheduled workflows in repositories with no activity
+# for 60 days; this one is committed to daily.
+name: state-freshness
+on:
+  schedule:
+    - cron: '17 13 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  freshness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      # Stdlib only, by design: the check that has to work when the engine
+      # does not cannot depend on the engine's dependencies.
+      - run: python3 -m growth.freshness
