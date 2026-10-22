@@ -50,6 +50,14 @@ SERIES = ("visitors", "pageviews", "log_visitors", "log_pageviews",
           "campaign_visitors", "bot_hits", "call_taps", "ai_calls",
           "bookings", "phone_leads", "total_leads") + metrics.CRAWLER_SERIES
 
+# The rank side of the same ledger, published as dated rows next to the single
+# `gsc_last` row. 90 days rather than `traffic`'s 45: the goal is a rank
+# percentage, Google's confirmed ranking updates are weeks apart, and a window
+# shorter than the gap between them cannot separate one from the other.
+GSC_SERIES = ("gsc_rows", "gsc_matched", "gsc_clicks", "gsc_impressions",
+              "gsc_position", "goal_top3", "goal_share_pct")
+GSC_SERIES_DAYS = 90
+
 PII_PATTERNS = (
     (re.compile(r"\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b"), "phone number"),
     (re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"), "email address"),
@@ -209,8 +217,16 @@ def build(docroot):
         },
         # `pages` is why improve_ctr did or did not pick each page up. See
         # gsc._classify_pages() — a no-op from that technique is otherwise
-        # unauditable from the snapshot alone.
-        "gsc": ({**gsc_last, "pages": gsc.page_report()} if gsc_last
+        # unauditable from the snapshot alone. `series` is the history of the
+        # goal metric itself: without it a reviewer has one row, overwritten
+        # every morning, and the only comparison available is against a
+        # baseline quoted in their prompt — which is how ten consecutive
+        # entries came to read avg_position 12.4 -> 26.1 as a fact about page
+        # coverage, across a 76-day window containing two confirmed Google
+        # spam updates. See gsc.sync().
+        "gsc": ({**gsc_last, "pages": gsc.page_report(),
+                 "series": {m: _series(m, GSC_SERIES_DAYS)
+                            for m in GSC_SERIES}} if gsc_last
                 else gsc_last),
         "techniques": [
             {"id": t["id"], "slug": t["slug"], "name": t["name"],

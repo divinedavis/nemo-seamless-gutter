@@ -221,6 +221,105 @@ class IndexingBlockTest(unittest.TestCase):
         self.assertEqual(found, [])
 
 
+class GscSeriesBlockTest(unittest.TestCase):
+    """The rank history has to reach the published file, not just the ledger.
+
+    Added 2026-10-22, for the same reason as the `indexing` block above: a
+    measurement the engine keeps but does not publish is a measurement the
+    judgment layer cannot use. `gsc_last` is one row, overwritten every
+    morning, and the review agent reads snapshot.json and nothing else — which
+    is how ten consecutive entries came to compare the prompt's 2026-07-28
+    baseline against "the latest row" across a 76-day window containing two
+    confirmed Google spam updates, with no way to date anything inside it.
+    """
+
+    GSC_LAST = {"date": "2026-10-22", "ok": True, "connected": True,
+                "rows": 759, "matched": 54, "clicks": 11,
+                "impressions": 5281, "avg_position": 26.1}
+
+    def _build(self, gsc_last):
+        def series(technique, metric, *a, **kw):
+            assert technique == "__site__", technique
+            return [("2026-10-20", 1), ("2026-10-21", 2), ("2026-10-22", 3)]
+
+        return self._build_with_series(gsc_last, series)
+
+    def _build_with_series(self, gsc_last, series):
+        """build() with every droplet-owned source stubbed; see IndexingBlockTest."""
+        stubs = {
+            "keywords": mock.Mock(**{"summary.return_value": {
+                "share_pct": 0.0, "coverage_pct": 42.3, "total": 239,
+                "top3": 0, "top10": 22, "ranked_known": 58, "covered": 101,
+                "by_town": {}, "by_intent": {}, "gaps": [], "ranked": [],
+                "excluded_out_of_area": {"count": 0, "queries": []}}}),
+            "review": mock.Mock(**{"scoreboard.return_value": {
+                "works": [], "does_not_work": [], "not_yet_judged": []}}),
+            "ledger": mock.Mock(**{"load_techniques.return_value": [],
+                                   "get_state.return_value": gsc_last,
+                                   "today.return_value": "2026-10-22",
+                                   "series.side_effect": series}),
+            "metrics": mock.Mock(**{"lead_totals.return_value": {}}),
+            "gsc": mock.Mock(**{"discover.return_value": [],
+                                "page_report.return_value": []}),
+            "indexstatus": mock.Mock(**{"summary.return_value": {}}),
+        }
+        with mock.patch.multiple(S, **stubs), \
+             mock.patch.object(S, "_page_inventory", return_value={}):
+            return S.build("/nonexistent")
+
+    def test_build_publishes_a_dated_row_per_rank_metric(self):
+        snap = self._build(dict(self.GSC_LAST))
+        series = snap["gsc"]["series"]
+        self.assertEqual(set(series), set(S.GSC_SERIES))
+        self.assertEqual(series["gsc_position"][-1],
+                         {"date": "2026-10-22", "value": 3})
+
+    def test_the_goal_metric_is_one_of_them(self):
+        # The owner's goal is a top-3 share. A history of everything except
+        # the goal would be the same gap in a longer file.
+        snap = self._build(dict(self.GSC_LAST))
+        self.assertIn("goal_top3", snap["gsc"]["series"])
+        self.assertIn("goal_share_pct", snap["gsc"]["series"])
+
+    def test_the_single_row_is_still_published_beside_the_series(self):
+        snap = self._build(dict(self.GSC_LAST))
+        self.assertEqual(snap["gsc"]["avg_position"], 26.1)
+        self.assertEqual(snap["gsc"]["impressions"], 5281)
+
+    def test_no_gsc_state_still_publishes_null_not_an_empty_report(self):
+        """"gsc": null has to keep meaning "no rank data has ever existed"."""
+        snap = self._build(None)
+        self.assertIsNone(snap["gsc"])
+
+    def test_the_window_is_longer_than_the_traffic_window_and_is_applied(self):
+        # Google's confirmed ranking updates are weeks apart; a window shorter
+        # than the gap between them cannot tell one from the other. Asserted
+        # by publishing a longer history than the cap, so this fails if the
+        # days argument is ever dropped at the call site.
+        self.assertGreater(S.GSC_SERIES_DAYS, 45)
+        long_history = [(f"2026-{m:02d}-{d:02d}", d)
+                        for m in (6, 7, 8, 9, 10) for d in range(1, 29)]
+        self.assertGreater(len(long_history), S.GSC_SERIES_DAYS)
+        with mock.patch.object(S, "_series", wraps=S._series) as spy:
+            stubs_series = long_history
+
+            def series(technique, metric, *a, **kw):
+                return stubs_series
+
+            snap = self._build_with_series(dict(self.GSC_LAST), series)
+        self.assertEqual(len(snap["gsc"]["series"]["gsc_position"]),
+                         S.GSC_SERIES_DAYS)
+        self.assertTrue(spy.called)
+
+    def test_survives_the_pii_scrub_unchanged(self):
+        """Dates and counts must not look like anything redacted."""
+        block = {"series": {"gsc_position": [{"date": "2026-10-22",
+                                              "value": 26.1}]}}
+        clean, found = S.scrub({"gsc": block})
+        self.assertEqual(clean["gsc"], block)
+        self.assertEqual(found, [])
+
+
 def _real_summary(cache):
     """indexstatus.summary() itself — imported here so the stub above cannot
     be mistaken for a hand-written copy of the block's shape."""

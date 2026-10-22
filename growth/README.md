@@ -206,7 +206,13 @@ Three causes, which need opposite responses. One command separates them:
     `git -C /root/nemo-repo fetch origin main` reproduces it by hand.
   * **no git error text either** — cron, python or the droplet never got that
     far. Check `systemctl status cron`, `df -h /var /root` (a full disk fails
-    both halves), and whether `/etc/cron.d/nemo-growth` still exists. This case
+    both halves), and whether `/etc/cron.d/nemo-growth` still exists. `cat` it
+    rather than only testing for it, and diff it against
+    `deploy/cron-nemo-growth`: every published snapshot's `generated` timestamp
+    falls at 06:05-06:13 **UTC** (02:05 ET), so the entry that has been running
+    is not honouring the `CRON_TZ=America/New_York` the repo's copy sets. A file
+    that exists can still be an older copy firing at a different hour, mailing
+    nobody, and `crontab -l` may hold a second one. This case
     loses data; backfill.
 
   **Do not expect the git error to follow a `publish:` line — it cannot.** An

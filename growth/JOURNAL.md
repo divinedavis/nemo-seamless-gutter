@@ -41260,3 +41260,453 @@ gutter contractor's year turns on. Nine entries have described a broken
 pipeline. Today's contribution is to stop describing it from inside the only
 channel nobody reads, and to put one alarm somewhere a failure is visible
 without anybody choosing to look.
+
+## 2026-10-22 — review agent
+
+### Where the numbers stand
+
+**Tenth consecutive morning with no publish. The newest numbers in this
+repository are 245 hours old.** I fetched `origin/main` at 11:12 UTC before
+reading anything: local `main` and `origin/main` are both `fc0a30b`, yesterday's
+review commit. The last `Publish growth state` commit is still **`0b2c596`,
+2026-10-12 06:05:37 UTC**, and `snapshot.json` still reads `"date":
+"2026-10-12"` with `"generated": "2026-10-12T06:05:32+00:00"`. There is no
+publish commit for 10-13 through 10-22. Nothing below is today's data.
+
+**(1) The goal metric.** Read fresh from `snapshot.json`: `top3` **0 of 239**
+tracked queries, **0 in all seven town buckets** — county 0/124, york 0/42,
+dover 0/18, hanover 0/15, spring-grove 0/14, red-lion 0/13, dallastown 0/13.
+`share_pct` **0.0** against a target of 50. Direction, which the prompt asks for
+every run: **the county bucket is 0 of 124 and has not moved.** Site-wide GSC is
+759 rows, 54 matched, 11 clicks, 5,281 impressions, `avg_position` 26.1.
+
+**(2) Traffic and leads**, recounted rather than copied. Series still runs
+2026-08-28 → **2026-10-11**, 45 days: **115 visitors, 151 pageviews**
+(2.56/day), non-zero on **41 of 45** days, so the prompt's
+measurement-suspicion trigger does not fire. `organic` 50, `direct` 56,
+`local` **2**, `ai` 2, `referral` 2, `campaign` 3, `call_taps` **2**,
+**`ai_calls` 0 across all 45 days**, `bookings` **1** (09-02), `phone_leads`
+**0**, `bookings_all_time` **4**, `own_rows_excluded` 13, `bot_hits` 135,873.
+
+**(3) Both content jobs remain dead on an empty Anthropic balance.**
+`last_build` 2026-10-12, **0 new, 0 changed**; ten of eleven techniques noop'd
+with empty queues and `strengthen_pages` failed with "Your credit balance is
+too low". `last_scout` the same error. The prompt's Known-blockers text is
+wrong about this on day 82 — it describes the self-imposed usage cap that
+cleared on 2026-08-01. The data wins, per the prompt's own instruction.
+
+**(4) The ledger.** 96 techniques — **11 active, 84 candidates, 1 retired**;
+`scoreboard` **7 works, 0 does_not_work, 89 not_yet_judged**. `does_not_work`
+has been empty every day on record. `coverage_pct` **42.3**, `price` still the
+worst intent at **10 of 53** (hire 83/154, check 7/24, diy 1/8).
+
+**(5) `discovered_untracked`:** 40 rows, **650 impressions, 0 clicks**.
+
+### Did previous changes work?
+
+**1 — Yesterday's GitHub Actions alarm fired, correctly, on its first
+scheduled run. Prediction confirmed; and it has not produced an action in the
+seventeen hours since.** Run `39649517971`, `event: schedule`, `conclusion:
+failure`, head `fc0a30b`. The job printed the whole three-cause diagnostic as a
+`::error::` annotation, so the alarm says what to do and not just that
+something is wrong. Two facts I could not know yesterday:
+
+- **It was 4 hours 48 minutes late.** Scheduled `17 13 * * *`; GitHub started
+  it at **18:05:04 UTC**. Free-tier scheduled runs are queued at low priority
+  and the delay is normal and unbounded. So this alarm is "same day,
+  eventually", not "13:17" — fine for a daily staleness check, and worth
+  writing down before some later entry treats the cron line as a clock. It does
+  not create a false-alarm risk at the current margin: the publisher writes at
+  ~06:05 UTC and `snapshot.json` is dated in the same UTC day, so a spurious
+  one-day reading needs an **18-hour** delay, not a five-hour one. I started to
+  "fix" this by comparing against `America/New_York` instead and reverted it:
+  the premise was wrong (`ledger.today()` is `datetime.date.today()` on a UTC
+  droplet, not an ET date) and the slack it would buy is already there.
+- **`actor` and `triggering_actor` are both `divinedavis`**, which is the half
+  of yesterday's open question I could answer. GitHub routes scheduled-workflow
+  failure mail to the account that last edited the cron line, and that account
+  is the one attributed on the run. Whether it reaches the inbox still depends
+  on notification settings I cannot read, so: **established that it is
+  addressed to Divine, not established that it arrived.** Seventeen hours later
+  `origin/main` has no commit but mine, and the repository has **zero open
+  issues**, so nothing visible has been acted on.
+
+**2 — Correction. Yesterday's finding 1 dated the deploy gap from a commit
+that is not in this branch's history, and from a date that is this
+repository's birthday.** I wrote that `gsc.page_report()` and its call site
+"both entered this repository on 2026-09-27 (`2e826af`)" and concluded the
+droplet runs engine code "older than 2026-09-27", day 22. Both halves of that
+dating are wrong, and I would rather say so than let a later entry build on it:
+
+- **`2e826af` is not an ancestor of `HEAD`.** `git merge-base --is-ancestor
+  2e826af HEAD` exits non-zero; `git branch -a --contains 2e826af` lists
+  nothing. It is a parentless commit on no branch.
+- **`main` has exactly one root, `ce84002`, 2026-09-27 18:02 UTC, and it is a
+  151-file / 70,309-line import.** The whole repository is 50 commits long and
+  begins there. So `git log -S` cannot date *anything* that predates the
+  import: every pre-existing line looks like it "entered on 2026-09-27". The
+  import already contains `snapshot.py:208` emitting `{**gsc_last, "pages":
+  gsc.page_report()}`, and `gsc.py`'s `tracked_totals`, `off_area_totals` and
+  the `gsc_clicks`/`gsc_impressions` record loop.
+
+**What survives the correction is the conclusion, on better evidence than the
+date was.** Fifteen consecutive snapshots were published *after* that import —
+09-28 through 10-12, all at 06:05–06:13 UTC — and **not one of them carries
+`pages`, `tracked` or `off_area`**, which the repository's code emits
+unconditionally whenever `gsc_last` is truthy. The redaction block removed only
+addresses and phone numbers. So the deploy is outstanding and has been for
+**at least 24 days** — and "at least" is the honest form, because git in this
+repository cannot see further back than 2026-09-27. Yesterday's "day 22" was
+roughly the right number reached by the wrong route, which is the worse kind of
+right. Note also that `snapshot._code_fingerprint()` exists precisely to end
+absence-of-a-key forensics, and is itself in the undeployed set.
+
+**3 — Correction. Yesterday's finding 3 was half wrong: the engine does keep a
+dated series, just not of the numbers that matter.** I wrote "there is no
+series." `gsc.py:325` has appended `gsc_clicks` and `gsc_impressions` per day
+via `ledger.record_result(today, "__site__", …)` since the import, and
+`ledger.series()` at `:219` already reads dated rows back. What was missing was
+**position, rows, matched, and the goal's own `top3`/`share_pct`** — and
+nothing published any of it into the snapshot, which is the only file this
+agent reads. The conclusion stands (no usable rank history, so no entry can
+date the 12.4 → 26.1 fall or line it up against the August and September spam
+updates); the mechanism was wrong, and the fix is much smaller than I described
+yesterday as a reason not to write it. **Today I wrote it** — see repo changes.
+
+**4 — The one piece of direct evidence about the goal's causal chain, widened
+slightly.** Re-measured today across `discovered_untracked`: **6 rows at
+position ≤10 carry 192 impressions and 0 clicks**; at ≤20 it is **9 rows, 279
+impressions, 0 clicks**. The two top-3 rows are still `gutters central pa`
+(1.2, 9 impressions) and `gutter installation` (2.7, 28). Still the only place
+in this dataset where rank is not the binding constraint, still 0 clicks, still
+far too small to pre-register — and `improve_ctr` noop'd on 10-12 with "no page
+is due a snippet rewrite" while **25 of 45 generated-page titles exceed 65
+characters** (re-measured today; worst are `guides/gutter-services-near-me` and
+`guides/gutter-pulling-away-from-house`, both 80).
+
+**5 — The out-of-area question: closed, re-checked, nothing added.** I
+re-counted before remembering 10-19 had closed it: 30 of 40 untracked rows name
+a Pennsylvania place outside the service area (Lancaster, Lebanon, Bucks,
+Montgomery, Chester, Delaware, Greene, Washington counties), 356 of 650
+impressions, impression-weighted position 31.6, and **not one of the 40 names a
+York County place**. That reproduces the hand count already written into
+`gsc.off_area_totals`'s own docstring (09-22: 613 of 1,064 impressions) and the
+10-18 grep that established the generated pages do **not** target those towns.
+No slot spent, and recording the re-count only so the next entry does not spend
+a slot rediscovering it either.
+
+**6 — 06:00 UTC, not 06:00 ET: confirmed again, not new.** Established 10-13.
+`generated` is `2026-10-12T06:05:32+00:00` and all fifteen publish commits land
+06:05–06:13 UTC, i.e. 02:05 ET, so the deployed cron is not honouring the
+`CRON_TZ=America/New_York` that `deploy/cron-nemo-growth` sets. New today only
+in that I put it into the runbook, which previously said to check whether
+`/etc/cron.d/nemo-growth` *exists* — see repo changes.
+
+**7 — The pre-registered mechanism test (10-17) and the four pre-registered GSC
+tests (suspended since 10-13). Unresolved, day six and day ten.** All need a
+publish that has not happened. **Pending and suspended are not passed.**
+
+**8 — The coverage-versus-rank test (pre-registered 09-20). No new data.**
+09-20 → 10-12: `coverage_pct` 42.3 → 42.3, `top3` 0 → 0.
+
+**9 — `top10` retired as a progress metric (10-11). Retirement holds.**
+
+**10 — Dependabot: one new PR, and it is the only one with a security
+flavour.** **#14**, `follow-redirects` 1.16.0 → 1.16.1 in `/server`, opened
+2026-10-21 11:29 — seven open now. `follow-redirects` patch releases are
+usually security fixes and this one sits in the booking server's dependency
+tree. Yesterday's correction otherwise holds: of the rest only **#12** is red
+(the Express 5 / better-sqlite3 13 majors). Still not a growth blocker, still
+no recommendation slot — noted because "seven open Dependabot PRs" and "one of
+them is a server security patch" are different facts.
+
+**11 — Recommended and not acted on.** Day counts; where I cannot see, I say so.
+- **The ask-Eric diagnostic.** Day 10, unanswered.
+- **The three droplet greps.** Day 6.
+- **The `growth/` deploy.** **At least 24 days**, restated as a floor per
+  finding 2.
+- **The watchdog's `--email`. Day 56.** Re-read `deploy/cron-nemo-growth:69`
+  today: the `0 11 * * *` entry still carries no `--email`.
+- **The Business Profile. Day 87.** `local_visitors` 2 in 45 days.
+- **The title refit.** 25 of 45 over 65 characters, re-measured today.
+- **Ledger edits** (retire T082; the GBP halves of T036/T052/T024; the dead
+  halves of T016/T025). Re-read today: all still `candidate`.
+- **`guides/5-inch-gutter-service-york-springs-pa.html`** (Adams County) still
+  present, still the one `york-springs` entry in `sitemap.xml`.
+
+### What I researched today
+
+Four searches. **Two returned changes that are already in this journal, one
+returned nothing with a primary source, and one was worth the run.** I grepped
+the journal first and still managed to spend two searches on covered ground;
+recording that so the count is honest.
+
+**1 — Google Business Profile changes, late September to October 2026. Already
+covered; no slot.** The best-documented items are a roughly four-day window in
+which an owner can accept or reject a suggested edit before Google may publish
+it, and a rule removing posts that carry unverified phone numbers, emails or
+social handles; also reported but unconfirmed by Google are sign-in-to-read-all
+reviews, automatic hours testing, and WhatsApp buttons in the local panel
+([sterlingsky.ca](https://www.sterlingsky.ca/google-local-changes/),
+[inkl](https://www.inkl.com/news/google-just-changed-the-rules-for-local-business-profiles-heres-what-owners-should-do-this-month),
+[oakinteractive](https://oakinteractive.com/whats-new-in-google-business-profile-the-2026-updates-you-cant-ignore/)).
+The suggested-edit auto-publish has been in this journal since 2026-10-02 (15
+mentions of "suggested edit"), and it is already clause (i) of the day-87
+Business Profile item.
+
+**2 — The "Diversity Update". Already covered twice; no slot.** It is a 2024
+change, not a 2026 one: one domain's organic result can be suppressed for a URL
+already showing in the local pack, and Sterling Sky's own testing suggests
+pointing the profile at a service or location page rather than the homepage
+([sterlingsky.ca](https://www.sterlingsky.ca/googles-new-diversity-update/),
+[birdeye](https://birdeye.com/blog/google-local-pack/) — which notes Google does
+not use the name). Covered on 10-05 and re-checked on 10-19 and 10-20. **Why I
+am not reviving it:** the workaround protects an organic ranking that the
+profile link is allegedly costing, and this profile sends **2 visitors in 45
+days**, so there is nothing there to protect yet. It becomes worth testing
+*after* the Business Profile is doing something, not before.
+
+**3 — Do Business Profile posts move rankings or calls? Rejected: no primary
+source.** Every result was a marketing blog, and they disagree with each other
+— "not a direct ranking factor but helps freshness" against a claim that
+Google's local algorithm shifted from "prominence" to "popularity" in 2026,
+which I could not confirm anywhere official
+([yadavbikash](https://www.yadavbikash.com/blogs/google-business-profile-ranking-factors/),
+[relativemarketinggroup](https://relativemarketinggroup.com/google-business-profile-posts-a-weekly-publishing-system-for-smbs-in-2026/),
+[webfx](https://www.webfx.com/blog/seo/google-business-profile-benchmarks/)).
+One widely repeated figure — profiles with 100+ photos get 520% more calls — is
+attributed to "Google's own internal data" with no source. Weekly posting is
+cheap and harmless, but nothing here outranks the untouched basics in the
+day-87 item, and I will not spend a slot on it.
+
+**4 — The ranking calendar. Worth the search, and it bounds the next
+snapshot's confounders.** **No confirmed Google core update in October 2026.**
+The last confirmed ranking update is still the **September 2026 spam update**,
+which completed **2026-10-08**, and the last core update was **May 2026**
+([searchengineland](https://searchengineland.com/google-september-2026-spam-update-done-rolling-out-493550),
+[searchengineland, May](https://searchengineland.com/google-may-2026-core-update-rolling-out-now-478430),
+[coalitiontechnologies](https://coalitiontechnologies.com/blog/will-another-google-core-update-coming-after-the-september-2026-spam-update)).
+So for whenever the publisher comes back: **between 2026-10-12 and today no
+confirmed Google ranking update ran.** Any movement in the first snapshot after
+the outage is not attributable to Google's calendar, which is the first time
+that has been true in this journal.
+
+**5 — Environment limits, verified today.** `status.search.google.com` and
+`developers.google.com` still fail DNS from this session, so Google's own
+ranking-release-history page remains unreadable from here and the dates above
+come from search summaries plus Google's prior announcements.
+`nemoseamlessgutter.com` is still unreachable (403 CONNECT), so for the tenth
+day I cannot answer "is the site serving?".
+
+### Recommendations
+
+Items 1 and 2 are unchanged and unchanged in rank: free, no droplet, no API
+credit, no deploy, no Divine, and they speak directly to "more phone calls".
+
+**1. Eric — open Business Profile → Performance, set the range to the last 90
+days, write down one number: Calls. Five minutes, free, today.** T049's first
+step, a candidate since 2026-08-08 (**day 75**). `ai_calls` is **0 across all
+45 measured days**, `phone_leads` **0 all time**, `call_taps` **2**. Three
+different failures produce that same zero — nobody taps Call, they tap and
+never dial, or they dial and the agent loses them — and the ledger has
+candidates for all three. Without this number the rest of leaf season is spent
+guessing which.
+*Expected effect:* none directly; it chooses the next fix instead of guessing it.
+*How I would know it worked:* three reconcilable numbers — GBP call clicks, site
+`tel:` taps, calls the agent answered.
+*Checked:* T049 is `status: candidate` in `snapshot.json`, re-read today, never
+activated; `growth/metrics.py:231` counts `call_taps` only from the
+`/e/call-tap` beacon, i.e. taps starting **on the site**, and `:683` reads
+`phone_leads` from the bookings DB `leads` table — neither can see a map-pack
+call. **Eric's, five minutes.**
+
+**2. Eric or Divine — link the Business Profile to the existing GA4 property.**
+Analytics has reported GBP metrics including calls on a rolling 6-month window
+since June 2026, and the site already runs GA4. This is the mechanism for item
+1, not a separate idea.
+*Checked:* `G-JWSK5E1ZRZ` at `index.html:49`; the `gtag`-is-blocked and
+no-server-side-export comments in `analytics.js` bound what it buys; no ledger
+technique mentions GA4. **~15 minutes.**
+
+**3. Tomorrow morning answers item 4 for free, and it is the last cheap
+diagnostic left. Divine — check your inbox at ~06:10 UTC on Friday
+2026-10-23.** The `0 6 * * 5` cron entry carries `--email
+divinejdavis@gmail.com`, and `cmd_report` is the last call in `cmd_daily`,
+*after* the snapshot `try/except`. So: **mail arrives → the run is executing
+and only the snapshot write or the push is broken (causes 1 and 3; nothing is
+lost). No mail → cron, python or the droplet never got that far (cause 2, the
+one that loses each morning's data).** This is a pre-registered test with a
+date and two outcomes that need opposite responses, it costs nobody anything,
+and it is the only item on this list that resolves without somebody choosing to
+act.
+*Checked:* `growth_daily.py:199-206` for `cmd_report`'s position;
+`deploy/cron-nemo-growth:49` for the Friday entry, both re-read today.
+**Divine's, one minute, tomorrow.**
+
+**4. Divine — the three greps, plus one `cat`. Day 6, ~10 minutes, still the
+fastest way to end the outage.**
+```
+grep publish /var/log/nemo-growth.log | tail -40
+grep 'snapshot: FAILED' /var/log/nemo-growth.log | tail -5
+grep -iE 'permission denied|could not read from remote|publickey|host key|fatal:' \
+  /var/log/nemo-growth.log | tail -10
+cat /etc/cron.d/nemo-growth; crontab -l | grep -i nemo; df -h /var /root
+```
+`snapshot: FAILED` → droplet disk or permissions, nothing lost. No `publish:`
+line but git/ssh error text → the credential broke, nothing lost, fix the key.
+Neither → cron or python, and that is the case that loses data. The `cat` is new
+today and is why: the entry that has been publishing fires at 06:00 **UTC**,
+which the repo's copy does not ask for, so "the file exists" was never the same
+question as "the right file is installed". **Divine's.**
+
+**5. Divine — the `growth/` deploy. At least 24 days, and the evidence is
+fifteen published snapshots rather than a commit date.** Finding 2 restates
+this on firmer ground: `pages`, `tracked` and `off_area` are absent from every
+snapshot the droplet wrote after the repository's first commit, and the
+repository emits all three unconditionally. Today's two engine changes join the
+pile. Pair the deploy with Anthropic auto-reload under a monthly console cap:
+`BUDGET.md` rule 1 bounds a run to 3–5 calls at cents a day, so a cap enforces
+that rule rather than relaxing it, and three manual top-ups have each bought
+3–5 mornings. **Read finding 2 of the 10-21 entry before ranking this above
+items 1–2:** it restores the page writers, and if any part of the position
+decline is a scaled-content demotion, generating more near-identical town pages
+is the wrong direction, not a neutral one. **Divine's.**
+
+**6. Divine — restore `--email divinejdavis@gmail.com` to the `0 11 * * *`
+watchdog entry. Day 56, one flag.** `cmd_watchdog` returns early when there are
+no problems, so it reintroduces no daily mail. Yesterday's GitHub job covers
+only whether state *arrived*; the watchdog can say *why* it did not, and as of
+today it says it with the cron comparison too.
+*Checked:* `deploy/cron-nemo-growth:69`, re-read today — still no `--email`.
+**Divine's, one minute, needs the deploy.**
+
+**7. Eric — the Business Profile itself. Day 87, free.** Review replies, then
+hours, then categories and services, then photos, then pending suggested edits
+(research 1: there is now a clock on those). 23 of 96 ledger techniques rest on
+"4.2 stars / 13 reviews / ~300 views", which nobody has ever checked against
+the profile. **Eric's, and only Eric's.**
+
+**Parked, carried, not re-argued:** the title refit (`deploy/repair_titles.py`,
+25 of 45 over 65 characters — relevant to finding 4); Yelp Request a Quote
+(T035); Bing Places / Apple Business Connect (T029); asking every finished
+customer for a review out loud, no gating, no incentive;
+`deploy/retire_out_of_area.py` for the york-springs page; the ledger edits;
+three real cleaning prices for the cost guide (Eric's — I will not invent
+prices, and `guides/gutter-cleaning-cost-york-pa.html` still promises "Typical
+price ranges" with no dollar figures); allowing `nemoseamlessgutter.com` in
+this session's network policy; merging the green Dependabot PRs, **#14 first**
+on security grounds, and porting the Express 5 / better-sqlite3 majors for #12.
+
+**Prompt corrections. Day ten, none landed.** (a) **Add to Known blockers:
+check for a publish commit dated today before trusting `snapshot.json`** — the
+prompt's claim that the engine "pushes its state to this repo an hour before you
+run" has now been false on ten consecutive mornings. (b) **Retire the
+spend-cap narrative** — it cleared 82 days ago; every measured failure since has
+been an empty balance. (c) The 2026-07-28 baseline (77 rows, 17 matched, 3
+clicks, 429 impressions, position 12.4, county 2 of 50) should be labelled a
+historical baseline, not current state, and whoever labels it should note that
+the spam updates of Aug 18–21 and Sept 24–Oct 8 fall between it and every later
+reading. (d) The prompt says the watchdog "mails the developer": it mails
+nobody, and has not since 2026-08-27.
+
+### Repo changes I made today
+
+Three, in two files of engine code and two copies of one runbook. The first is
+the one I declined to write yesterday.
+
+**1 — `growth/gsc.py`, `growth/snapshot.py`: a dated history for the goal
+metric.** `sync()` now appends `gsc_rows`, `gsc_matched`, `gsc_position`,
+`goal_top3` and `goal_share_pct` alongside the `gsc_clicks` and
+`gsc_impressions` it already recorded, and `snapshot.build()` publishes all
+seven as 90-day dated series inside the `gsc` block. The position is rounded
+once and shared, so the series and the `gsc_last` headline cannot disagree
+about the same morning. `None` is skipped rather than written as null, so a gap
+reads as "not measured that day" instead of becoming a special case for every
+future consumer. 90 days rather than `traffic`'s 45 because Google's confirmed
+ranking updates are weeks apart and a window shorter than the gap between them
+cannot separate one from the other.
+
+**Why I reversed yesterday's decision not to write this.** Yesterday I argued I
+would "rather recommend this than ship a third undeployed engine change."
+Finding 3 changes the sum: the machinery already existed, so this is ~30 lines
+rather than a new subsystem, and finding 2 shows the deploy has been pending for
+at least 24 days — the marginal cost of adding one more small change to an
+already-outstanding deploy is close to zero, while the thing it fixes is the
+measurement of the owner's actual goal. It collects nothing until somebody
+deploys, and I am saying that plainly rather than filing it as progress.
+
+**2 — `growth_daily._UNPUBLISHED_MORNING_DIAGNOSTIC` and `growth/README.md`:
+the cron check is now a comparison, not an existence test.** Both copies said
+to check "whether `/etc/cron.d/nemo-growth` still exists". Finding 6 shows that
+is the weaker question: the entry that has been publishing fires at 06:00 UTC,
+so the installed file is demonstrably not the repository's, and a reader who
+confirms it exists will confirm a file that fires at the wrong hour, mails
+nobody, and may not be the entry doing the publishing. Both copies now say to
+`cat` it, diff it against `deploy/cron-nemo-growth`, and check `crontab -l` for
+a second one. Edited in both places because they are prose copies of the same
+procedure and they have already drifted apart once, on 10-18.
+
+**What I decided not to build, and why.** A step that opens or updates a GitHub
+issue when the freshness job fails. It is the obvious next move and I rejected
+it: GitHub's scheduled-failure mail already addresses Divine (finding 1), an
+issue would reach the same one person through a third channel, and this system
+already has more monitoring than it has action — ten mornings of alarms into an
+outage that nobody has triaged. The constraint is not detection. If the Friday
+mail test in recommendation 3 comes back ambiguous I will revisit it.
+
+`Tests: added 12 (growth/test_gsc.py — sync records all seven metrics, each row
+carries the run date and __site__, the values are the ones measured, the series
+position is the one gsc_last reports, and an absent number leaves a gap rather
+than a null; growth/test_snapshot.py — build publishes a dated row per rank
+metric, the goal metric is among them, the single row survives beside the
+series, no gsc state still publishes null, the 90-day window is longer than
+traffic's and is actually applied at the call site, and the block survives the
+PII scrub; growth/test_watchdog.py — the diagnostic names
+deploy/cron-nemo-growth, CRON_TZ and crontab -l, so "the file exists" cannot
+come back), changed 0, removed 0.` Suite green: **430 python + 9 node**
+(`npm ci --prefix server` first).
+
+### Reasoning and uncertainties
+
+**What today actually added.** Two of my own findings corrected, which is most
+of it. The deploy-gap proof I filed yesterday rested on a commit outside this
+branch's history and on mistaking a 151-file import for the date a change
+landed; the conclusion survives on better evidence (fifteen post-import
+snapshots missing three keys) but the day count is a floor, not a measurement,
+and `git log -S` is useless in a repository whose history starts on 2026-09-27.
+And the rank history I said did not exist partly did — which made writing the
+rest of it cheap enough to stop recommending and just do. Beyond that: the
+alarm I built yesterday works, nearly five hours late, addressed to Divine, and
+so far unanswered; no confirmed Google ranking update has run since the last
+snapshot, which makes the next one unusually clean to read; and `follow-redirects`
+#14 is the one dependency PR with a security flavour.
+
+**What I am least confident about.** First, whether anything reaches a person.
+Ten entries, a push notification most mornings, a red mark on the Actions tab
+since yesterday, and the only measurable responses in this repository are my own
+commits. I cannot see Divine's inbox or Eric's phone, so "no action" is
+inference from silence in the one place I can see. Second, how much of 12.4 →
+26.1 the two spam updates explain — unchanged from yesterday and unresolvable
+until the series above has collected something. Third, whether the Friday mail
+test is as clean as recommendation 3 claims: it assumes the `0 6 * * 5` entry on
+the droplet matches the repository's, and finding 6 is precisely the reason to
+doubt that the deployed cron matches anything. If no mail arrives tomorrow,
+"cron never got that far" and "that entry no longer carries `--email`" look
+identical, and only the `cat` in recommendation 4 separates them. I would rather
+state that limit than present the test as decisive.
+
+**What I deliberately did not claim.** That the deploy gap is exactly 24 days —
+it is at least that. That the droplet runs code "older than 2026-09-27"; I wrote
+that yesterday and it does not follow. That the out-of-area count I recomputed
+is a finding. That Business Profile posts do anything. That today's engine change
+has any effect on rank — it has none, and it collects no data until somebody
+deploys it. That the numbers above are today's; they are ten days old.
+
+**The binding constraint, unchanged and now a day shorter.** Ten dead mornings.
+A deploy outstanding for at least 24 days. Ten days with no API credit.
+Eighty-seven days of an untouched Business Profile. 84 candidates, none
+activated, and `does_not_work` still empty after 87 days. It is 22 October, and
+somewhere between one and three weeks of leaf-fall remain — the window a York
+County gutter contractor's year turns on. Tomorrow's Friday mail is the last
+diagnostic on this list that costs nobody a decision; everything after it needs
+somebody to log in.

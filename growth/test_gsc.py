@@ -20,6 +20,7 @@ No network. These call the pure function with rows shaped the way
 Run: python3 -m growth.test_gsc   (from the repo root)
 """
 import unittest
+from unittest import mock
 
 from . import gsc as G
 
@@ -288,3 +289,91 @@ class ClassifyPagesTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SyncRecordsTheGoalsHistoryTest(unittest.TestCase):
+    """`sync` has to leave a dated row behind, not just overwrite one row.
+
+    Added 2026-10-22. `gsc_last` is a single `set_state` row that every run
+    replaces, and until now only clicks and impressions were also appended to
+    the results ledger. The consequence was not hypothetical: ten consecutive
+    review entries could compare nothing but the prompt's 2026-07-28 baseline
+    against the latest row, so none of them could date the fall in
+    `avg_position` from 12.4 to 26.1, line it up against the August and
+    September 2026 spam updates that both fall inside that window, or say
+    whether `top3` had ever been above zero. The fix is which metrics get
+    written here; `ledger.series` could already read them back.
+    """
+
+    ROWS = [_row("gutter installation york pa", 8.0, 100, 2),
+            _row("seamless gutters hanover pa", 12.0, 40, 1)]
+    TOTALS = {"clicks": 3, "impressions": 140, "position": 9.73}
+    SUMMARY = {"top3": 2, "share_pct": 0.8}
+
+    def _sync(self, totals=None, summary=None):
+        """sync() with every source of truth outside this function stubbed."""
+        recorded, state = {}, {}
+        kw = mock.Mock(**{
+            "apply_gsc.return_value": 17,
+            "summary.return_value": dict(self.SUMMARY if summary is None
+                                         else summary),
+            "load.return_value": [{"query": "gutter installation york pa"}],
+        })
+        ldg = mock.Mock(**{"today.return_value": "2026-10-22"})
+        ldg.record_result.side_effect = (
+            lambda d, t, metric, value: recorded.__setitem__(metric, (d, t, value)))
+        ldg.set_state.side_effect = state.__setitem__
+
+        with mock.patch.object(G, "available", return_value=True), \
+             mock.patch.object(G, "fetch_queries", return_value=self.ROWS), \
+             mock.patch.object(G, "totals",
+                               return_value=dict(self.TOTALS if totals is None
+                                                 else totals)), \
+             mock.patch.object(G, "tracked_totals", return_value={}), \
+             mock.patch.object(G, "off_area_totals", return_value={}), \
+             mock.patch("growth.keywords", kw, create=True), \
+             mock.patch("growth.ledger", ldg, create=True):
+            out = G.sync(quiet=True)
+        return out, recorded, state
+
+    def test_records_rank_and_the_goal_not_only_clicks(self):
+        _, recorded, _ = self._sync()
+        self.assertEqual(
+            set(recorded),
+            {"gsc_clicks", "gsc_impressions", "gsc_rows", "gsc_matched",
+             "gsc_position", "goal_top3", "goal_share_pct"})
+
+    def test_rows_carry_the_run_date_and_the_site_technique(self):
+        _, recorded, _ = self._sync()
+        for metric, (date, technique, _v) in recorded.items():
+            self.assertEqual(date, "2026-10-22", metric)
+            self.assertEqual(technique, "__site__", metric)
+
+    def test_values_are_the_numbers_the_run_measured(self):
+        _, recorded, _ = self._sync()
+        self.assertEqual(recorded["gsc_clicks"][2], 3)
+        self.assertEqual(recorded["gsc_impressions"][2], 140)
+        self.assertEqual(recorded["gsc_rows"][2], 2)
+        self.assertEqual(recorded["gsc_matched"][2], 17)
+        self.assertEqual(recorded["goal_top3"][2], 2)
+        self.assertEqual(recorded["goal_share_pct"][2], 0.8)
+
+    def test_the_series_position_is_the_one_gsc_last_reports(self):
+        # Two roundings of the same float is how a series and a headline come
+        # to disagree about the same morning.
+        out, recorded, state = self._sync()
+        self.assertEqual(recorded["gsc_position"][2], 9.7)
+        self.assertEqual(out["avg_position"], 9.7)
+        self.assertEqual(state["gsc_last"]["avg_position"], 9.7)
+
+    def test_an_absent_number_leaves_a_gap_rather_than_a_null(self):
+        # A null in the series would have to be special-cased by every future
+        # consumer doing arithmetic over it; a missing date reads correctly as
+        # "not measured that morning".
+        _, recorded, _ = self._sync(
+            totals={"clicks": 0, "impressions": 0, "position": None},
+            summary={"top3": 0, "share_pct": None})
+        self.assertNotIn("gsc_position", recorded)
+        self.assertNotIn("goal_share_pct", recorded)
+        self.assertEqual(recorded["goal_top3"][2], 0)
+        self.assertNotIn(None, [v for _d, _t, v in recorded.values()])

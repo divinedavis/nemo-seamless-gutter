@@ -322,12 +322,43 @@ def sync(quiet=False):
                                       "detail": detail})
         return {"ok": False, "connected": True, "detail": detail}
 
-    for k, v in (("gsc_clicks", t["clicks"]), ("gsc_impressions", t["impressions"])):
+    # Rounded once and shared, so that the dated series and the single
+    # `gsc_last` row can never report a different position for the same day.
+    out_position = round(t["position"], 1) if t.get("position") else None
+
+    # One dated row per morning for the goal metric and the rank numbers behind
+    # it. Clicks and impressions have been recorded here since this file's first
+    # commit; position, rows, matched and the goal's own top3/share were not,
+    # and `gsc_last` below is a single row that every run overwrites. The cost
+    # of that has been paid by every review since Search Console was connected:
+    # the only comparison available to them is the prompt's 2026-07-28 baseline
+    # against "the latest row", so no entry has been able to date the
+    # avg_position decline from 12.4 to 26.1, line it up against Google's
+    # confirmed update calendar (the August 2026 spam update of 08-18 to 08-21
+    # and the September one of 09-24 to 10-08 both sit inside that window), or
+    # say whether top3 has ever been above zero. `ledger.series` already reads
+    # these rows back; the gap was only ever what gets written.
+    #
+    # None is skipped rather than written as null: sync() only reaches this
+    # line when Search Console answered, so a missing value means that one
+    # number was absent from the response, and a gap in the series reads as
+    # "not measured that day" while a null would have to be special-cased by
+    # every future consumer doing arithmetic over it.
+    kw = keywords.summary()
+    for k, v in (("gsc_clicks", t["clicks"]),
+                 ("gsc_impressions", t["impressions"]),
+                 ("gsc_rows", len(rows)),
+                 ("gsc_matched", matched),
+                 ("gsc_position", out_position),
+                 ("goal_top3", kw["top3"]),
+                 ("goal_share_pct", kw["share_pct"])):
+        if v is None:
+            continue
         ledger.record_result(ledger.today(), "__site__", k, v)
 
     out = {"ok": True, "connected": True, "rows": len(rows), "matched": matched,
            "clicks": t["clicks"], "impressions": t["impressions"],
-           "avg_position": round(t["position"], 1) if t.get("position") else None,
+           "avg_position": out_position,
            # The county-only view of the same window. See tracked_totals().
            "tracked": tracked_totals(rows, {k["query"] for k in keywords.load()}),
            # Somebody else's market, so that site-wide minus these two is the

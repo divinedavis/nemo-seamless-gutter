@@ -225,6 +225,24 @@ class WatchdogStalenessTest(unittest.TestCase):
         self.assertIn("permission denied", body)
         self.assertIn("systemctl status cron", body)
 
+    def test_the_cron_check_is_a_comparison_not_an_existence_test(self):
+        """`/etc/cron.d/nemo-growth` existing does not mean it is the right file.
+
+        Added 2026-10-22. Every published snapshot's `generated` timestamp
+        falls at 06:05-06:13 UTC — 02:05 in York, Pennsylvania — while
+        `deploy/cron-nemo-growth` sets `CRON_TZ=America/New_York` and intends
+        06:00 local. So the entry that has been running demonstrably is not
+        the repo's copy, and a reader told only to check that the file exists
+        will confirm a file that is firing at the wrong hour, mails nobody
+        (the 11:00 entry's missing `--email`), and may not even be the entry
+        doing the publishing.
+        """
+        _, lines = self._run({"date": "2026-10-06"}, snap_date="2026-10-06")
+        body = " ".join(lines)
+        self.assertIn("deploy/cron-nemo-growth", body)
+        self.assertIn("CRON_TZ=America/New_York", body)
+        self.assertIn("crontab -l", body)
+
     def test_a_longer_outage_does_not_assert_the_cron_as_the_cause(self):
         """The old multi-day wording was "The 06:00 cron is not producing
         runs." That is one of three indistinguishable causes stated as fact,
