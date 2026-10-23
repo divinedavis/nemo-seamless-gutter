@@ -320,3 +320,40 @@ WEB_ROOT=$PWD python3 growth_daily.py status            # the scoreboard
 ```
 
 Logs: `/var/log/nemo-growth.log`.
+
+
+## Standalone docroot repairs (no API credit, no `growth/` deploy)
+
+Five scripts under `deploy/` repair live pages **in place, on the droplet**.
+They are listed here because until today they were discoverable only by
+grepping a 2.6 MB journal, and they are precisely the class of work that is
+still executable when the rest of this engine is not: each one is stdlib-only,
+imports nothing from `growth/`, needs no Anthropic balance, and needs no
+`growth/` deploy. Through the publish outage that began 2026-10-13 they have
+been the only on-site fixes available at all.
+
+```bash
+cd /var/www/nemo-seamless-gutter
+python3 deploy/<script>.py                     # report only, writes nothing
+python3 deploy/<script>.py --apply             # make the change
+python3 deploy/<script>.py --root /some/other  # non-default docroot
+```
+
+| script | what it fixes |
+| --- | --- |
+| `repair_titles.py` | `<title>` tags longer than the 65 characters Google shows, and brands appended twice |
+| `repair_letter_paragraphs.py` | pages published one character per `<p>` |
+| `repair_placeholder_paragraphs.py` | elements whose whole visible text is an unrendered template token |
+| `repair_out_of_area_prose.py` | copy claiming towns NEMO does not serve (repairs, does not delete) |
+| `retire_out_of_area.py` | whole pages and tracked keywords for towns outside the service area |
+
+Every one is report-only without `--apply`, so running the lot to see what they
+would do costs nothing and changes nothing. Read each script's own docstring
+before applying it — they explain what they deliberately leave alone.
+
+**They must run against the docroot, not the repo.** `growth/publish_state.sh`
+rsyncs `areas/`, `guides/` and `services/` **docroot → repo** every morning, so
+the repository's copies of those pages are a read-only mirror: a fix made there
+is overwritten by the next publish and never reaches a visitor. Deploying
+`growth/` is not a substitute either — `techniques.py` applies `TITLE_MAX` to
+the *next* page it writes and does not revisit the pages already on disk.
