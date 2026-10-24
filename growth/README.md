@@ -41,6 +41,38 @@ list:
 
     python3 growth_daily.py status
 
+### Reading the scoreboard's three columns
+
+`review.scoreboard()` files each technique by what sits in its `verdict` field,
+and the three columns are **not** symmetric. This has been misread repeatedly in
+`growth/JOURNAL.md`, where an empty `does_not_work` has been reported as a
+measurement failure or an unsolved puzzle on eleven separate days:
+
+* **`works`** — a verdict with `works: True`. `run()` writes one only where
+  `earned()` agrees the technique's own measurement supports the claim: a
+  technique with URLs of its own must clear `MIN_TOTAL_VISITORS`, and a
+  site-wide one must beat the window before it was switched on. *No
+  pre-activation baseline is not a pass* — it is an unanswerable question.
+* **`does_not_work`** — a verdict with `works: False`. **Exactly two code paths
+  write one** (`review.py:271` and `:294`): retirement for falling below the
+  bar, and retirement for redundancy. Nothing else in the engine does.
+* **`not_yet_judged`** — no verdict at all. This is *also* where a technique
+  lands when `earned()` rejects a positive verdict a previous run stamped,
+  because `run()` calls `clear_verdict()` rather than writing `works: False`.
+  Withdrawing a claim is not a finding of failure.
+
+So an empty `does_not_work` column means **no technique has ever been retired
+for underperforming**. It does not mean nothing has been measured as failing,
+and on its own it is not evidence that the judging is broken.
+
+It is worth knowing which engine version wrote a snapshot before reading its
+verdicts, because the `earned()` gate and the `/28d` unit suffix on
+`gsc_clicks` / `gsc_impressions` both landed on 2026-09-28 (`098c2cc`). A
+snapshot whose verdicts read `works: True` beside a `why` of
+"median 0.0/day and flat", or which prints a `gsc_clicks` median as `/day`,
+was written by engine code older than that commit and overstates the
+scoreboard.
+
 The runtime files (`techniques.json`, `keywords.json`, `results.jsonl`,
 `state.json`) are **gitignored on purpose**. The droplet's copies are the
 measurement history; a stale checkout overwriting them would erase it.

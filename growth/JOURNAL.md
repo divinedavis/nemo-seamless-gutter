@@ -42183,3 +42183,585 @@ October, and the back half of leaf-fall is what is left of the window a York
 County gutter contractor's year turns on. Today's list has one item that needs
 only a droplet login and no decision at all — item 3 — and two that need only an
 inbox.
+
+## 2026-10-24 — review agent
+
+### Where the numbers stand
+
+**Twelfth consecutive morning with no publish. The newest numbers in this
+repository are 293 hours old.** I fetched `origin/main` at 11:16 UTC before
+reading anything: local `main` and `origin/main` are both `949983a`,
+yesterday's review commit. The last `Publish growth state` commit is still
+**`0b2c596`, 2026-10-12 06:05:37 UTC**, and `snapshot.json` still reads
+`"date": "2026-10-12"`, `"generated": "2026-10-12T06:05:32+00:00"`. There is no
+publish commit for 10-13 through 10-24. Nothing below is today's data.
+
+**(1) The goal metric.** Read fresh from `snapshot.json`: `top3` **0 of 239**
+tracked queries, **0 in all seven town buckets** — county 0/124, york 0/42,
+dover 0/18, hanover 0/15, spring-grove 0/14, red-lion 0/13, dallastown 0/13.
+`share_pct` **0.0** against a target of 50. Direction, which the prompt asks for
+every run: **the county bucket is 0 of 124 and has not moved.** Site-wide GSC is
+759 rows, 54 matched, 11 clicks, 5,281 impressions, `avg_position` 26.1.
+
+**(2) Traffic and leads**, recounted rather than copied. Series still runs
+2026-08-28 → **2026-10-11**, 45 days: **115 visitors, 151 pageviews**
+(2.56/day), non-zero on **41 of 45** days, so the prompt's
+measurement-suspicion trigger does not fire. `organic` 50, `direct` 56,
+`local` **2**, `ai` 2, `referral` 2, `campaign` 3, `call_taps` **2**,
+**`ai_calls` 0 across all 45 days**, `bookings` **1** (09-02), `phone_leads`
+**0**, `bookings_all_time` **4**, `own_rows_excluded` 13, `bot_hits` 135,873.
+The newest traffic row is now **13 days** old.
+
+**(3) Both content jobs remain dead on an empty Anthropic balance.**
+`last_build` 2026-10-12, **0 new, 0 changed**; `last_scout` the same date with
+"Your credit balance is too low to access the Anthropic API". The prompt's
+Known-blockers text is wrong about this on day 84 — it describes the
+self-imposed usage cap that cleared on 2026-08-01. The data wins, per the
+prompt's own instruction.
+
+**(4) The ledger.** 96 techniques — **11 active, 84 candidates, 1 retired**;
+`scoreboard` **7 works, 0 does_not_work, 89 not_yet_judged**. `coverage_pct`
+**42.3**, 138 uncovered, `price` still the worst intent at **10 of 53** (hire
+83/154, check 7/24, diy 1/8). **Finding 1 is about why that 7 is really a 3,
+and finding 2 about why the 0 was never the anomaly eleven entries called it.**
+
+**(5) `discovered_untracked`:** 40 rows, **650 impressions, 0 clicks**.
+
+### Did previous changes work?
+
+**1 — The scoreboard says seven techniques work. Under this repository's own
+judging rules it is three, and the four it would withdraw are a positive
+fingerprint of the undeployed engine.** This is the first time I have audited
+the `works` column instead of the empty `does_not_work` one, and it is the
+strongest evidence of the deploy gap yet produced here.
+
+The droplet's seven verdicts, read out of `snapshot.json`:
+
+| id | status | `works` | `why` as written by the droplet |
+| --- | --- | --- | --- |
+| T001 | active | true | 12 owned visitors in 77d (median 0.0/day and flat) |
+| T002 | active | true | 6 owned visitors in 77d (median 0.0/day and flat) |
+| T010 | retired | true | Done. Search Console connected 2026-07-27 |
+| T017 | active | true | gsc_clicks median 13.5**/day** since activation (no pre-activation baseline) |
+| T018 | active | true | 25 owned visitors in 77d (median 0.0/day and flat) |
+| T019 | active | true | gsc_clicks median 13.5**/day** since activation (no pre-activation baseline) |
+| T020 | active | true | gsc_clicks median 13.5**/day** since activation (no pre-activation baseline) |
+
+Three of those sentences state a flat median of zero and report success in the
+same row. Three more claim 13.5 clicks a day for a site that recorded **11
+clicks in the whole GSC window** and 115 visitors in 45 days, and all three
+carry the identical number because they read one site-wide `__site__` series
+rather than anything of their own.
+
+**`growth/review.py` in this repository already fixes both, and says so in its
+own words.** `earned()` (`:192-209`) exists precisely to stop this; its
+docstring quotes the pattern — *"T001 carried the verdict '7 owned visitors in
+33d (median 0.0/day and flat)' with `works: True` — a sentence that states the
+failure and a field that reports success."* And `WINDOW_TOTAL_METRICS`
+(`:120-128`) notes that `gsc.py` records the **28-day window total** once a day,
+so `/day` is the wrong suffix, adding: *"three techniques currently carry a
+verdict that reads as a daily click rate roughly thirty times the real one."*
+Three techniques. T017, T019, T020. Exactly the rows above.
+
+I recomputed the scoreboard by applying `earned()`'s rule to the droplet's own
+`measured` blocks (`MIN_TOTAL_VISITORS = 8`):
+
+- **T001** 12 owned visitors ≥ 8 → **keeps** `works: True`
+- **T018** 25 ≥ 8 → **keeps**
+- **T002** 6 < 8 → **withdrawn**
+- **T017, T019, T020** `median_before: null` → `earned()` returns False → **withdrawn**
+- **T010** `status: retired`, so `evaluate()` skips it and its hand-written verdict stands
+
+**7 works → 3** (T001, T018, T010), four verdicts withdrawn. Note what
+withdrawal is: `run()` calls `clear_verdict()`, not `set_verdict(..., False)`,
+so those four move to `not_yet_judged`. **89 not_yet_judged → 93.** Nothing
+moves to `does_not_work`.
+
+**Why this dates the deploy better than anything before it.** Both `earned()`
+and `WINDOW_TOTAL_METRICS` entered this repository in **`098c2cc`, 2026-09-28
+11:26:47 UTC**, and this time the dating holds, for the reason the 10-22 entry
+established it usually does not:
+
+- `git merge-base --is-ancestor 098c2cc HEAD` **exits 0** — it is in this
+  branch's history, unlike `2e826af`, which I wrongly cited on 10-21.
+- `git show ce84002:growth/review.py | grep -c "def earned"` is **0**, and the
+  same for `WINDOW_TOTAL_METRICS`. Neither string is in the 2026-09-27 import
+  root, so `098c2cc` **added** them rather than touching pre-existing lines.
+  That is the one case where `git log -S` is trustworthy in a repository whose
+  history starts at a 151-file import.
+
+And `098c2cc`'s own commit message records the other side: *"Divine deployed on
+2026-09-27 (ce84002 …). Verified independently: all 43 sitemap lastmod values
+are now 2026-09-27."* So the last verified deploy is **2026-09-27** and the
+first undeployed commit is **2026-09-28** — the gap is pinned on both sides at
+**26 days**, not the open-ended "at least 25" I have been carrying.
+
+The previous proof was that `pages`, `tracked` and `off_area` are *absent* from
+the `gsc` block. That is an absence-of-a-key argument, and this journal has
+already had to correct one of those. This one is a **wrong string present in
+the data**: the droplet printed `/day` where the repository prints `/28d`, and
+stamped `works: True` where the repository withdraws it. Positive evidence,
+independent of the first, same conclusion.
+
+**What it costs in the meantime.** `review.scoreboard()` feeds the morning
+report, so if cron is alive (unresolved — finding 4) Eric's daily mail has been
+telling him seven techniques work, three of them at a click rate thirty times
+the truth, for at least 26 days. That is the first owner-facing *correctness*
+cost I have been able to attach to this deploy, as opposed to lost
+instrumentation. It does not move the deploy above the free items, because it
+still needs Divine and still carries the 10-21 scaled-content caution, but it
+does change what the deploy is worth.
+
+**2 — Correction to a claim I have made on eleven consecutive days. "`does_not_work`
+has been empty every day on record" is not a measurement failure, not a puzzle,
+and not evidence that the judging is broken. It is what the code does.** I have
+written it as a standing anomaly since 10-13 — "a real problem I am not solving
+by guessing" as recently as yesterday. Grepped today, every write path:
+
+```
+review.py:271   set_verdict(r["id"], False, …)     # retired — below the bar
+review.py:294   set_verdict(rr["weak"], False, …)  # retired — redundant
+review.py:279   set_verdict(r["id"], True,  …)     # earned() agreed
+review.py:284   clear_verdict(r["id"])             # earned() did not — no verdict
+```
+
+**Exactly two paths can ever write `works: False`, and both are retirements.**
+A technique that is simply not earning does not land in `does_not_work`; it
+either gets retired (and then it does) or it sits in `not_yet_judged`. And the
+withdrawal path writes *no* verdict by design — `earned()`'s docstring:
+*"Returning False is NOT a finding of failure."* Since exactly one technique has
+ever been retired (T010, retired as **done**, with a hand-written `works: True`
+that no code in this repository produces — it was edited into `techniques.json`
+on the droplet), an empty `does_not_work` column is the only output the engine
+could have produced.
+
+The honest restatement of the real problem, which survives: **nothing has ever
+been retired for underperforming.** That is a fact about 84 candidates never
+activated and 11 active techniques never pruned, not about the verdict
+plumbing. I had the right worry attached to the wrong evidence for eleven days,
+and I have put the explanation in `growth/README.md` today so the next reader
+of that column — me — does not spend a twelfth.
+
+**3 — The on-site AI-answer-engine checklist is already shipped in full. I
+verified all five items against the files rather than the ledger, and reject the
+entire research avenue.** Research 3 below returned the standard GEO playbook
+for contractors. Checked:
+
+- **AI crawlers allowed** — `robots.txt` names `GPTBot`, `OAI-SearchBot`,
+  `ChatGPT-User`, `Google-Extended`, `PerplexityBot`, `ClaudeBot`,
+  `anthropic-ai`, `Applebot`, `Applebot-Extended`, `Amazonbot`,
+  `meta-externalagent` in one group with `Allow: /`. Already done.
+- **FAQPage schema** — on **42 of 44** generated pages. Already done (the prompt
+  itself records a previous run wasting a slot on this).
+- **LocalBusiness schema** — `grep -l LocalBusiness` returns 0, which looks like
+  a gap and is not: **`RoofingContractor` is on 40 pages** and is a
+  schema.org subtype of `LocalBusiness`. Already done.
+- **Service schema** — 22 pages. **BreadcrumbList** 11, **Article** 20. All 44
+  generated pages carry JSON-LD.
+- **Answer-first content and city-specific service pages** — the whole `areas/`
+  tree and 126 Question/Answer pairs.
+
+**So the conclusion is the useful part: the on-site half of AI visibility is
+saturated, and it bought `ai_visitors` 2 in 45 days and `ai_calls` 0.** Every
+remaining AI-citation lever in the ledger is **off-site** — T025 (Brave
+submission), T029 (Bing Places / Apple Business Connect), T048 (Foursquare),
+T053 (BuildZoom) — and every one of them needs a human to claim a listing. No
+amount of further page generation touches it. That is worth more than the
+rejected recommendation would have been.
+
+**4 — The two mail diagnostics. Yesterday was the Friday, and I cannot read
+either inbox.** The `0 6 * * 5` line fired ~29 hours ago, so Divine's one bit
+has been sitting in a mailbox since 2026-10-23 06:00 UTC, and Eric's daily copy
+has now had twelve chances. **Unresolved, day 12 on the Eric half**, which per
+the 10-23 inversion is the stronger instrument: `--owner-email` is on both
+06:00 lines so it goes all seven days and yields a stop date, where `--email` is
+Friday-only. I am not able to advance this from here and am not going to
+re-argue it; it needs somebody to open a mailbox.
+
+**5 — The freshness alarm fired a third time, correctly, and is still
+unanswered.** Run `39998780548`, `event: schedule`, `conclusion: failure`, head
+`949983a`, started **2026-10-23T17:53:26Z** against a `17 13 * * *` cron —
+**4h36m late**, against 4h42m and 4h48m on runs 2 and 1. Free-tier lateness is
+drifting *down* by ~6 minutes a day, which is worth a line only because it
+confirms the margin is stable and nowhere near the 18 hours that would make a
+spurious one-day reading. `actor` and `triggering_actor` are `divinedavis`
+again. The repository has **zero open issues** (checked today) and no commit but
+mine. Today's run has not fired yet — 13:17 UTC plus ~4.6h is ~18:00.
+
+**6 — The title refit. Re-measured, and my own count was slightly wrong.**
+**25 of 44** titles under `areas/`, `guides/` and `services/` exceed 65
+characters — I have written "25 of 45" for two days; 44 is the number of
+generated pages carrying a `<title>`. The count of over-length titles is
+unchanged. Worst: `guides/gutter-services-near-me` and
+`guides/gutter-pulling-away-from-house` at 80,
+`guides/who-to-call-when-gutter-is-falling-off-house` at 79. The three
+duplicate-brand titles reproduce exactly:
+`guides/best-gutter-company-york-county-pa.html` (76),
+`guides/gutter-installer-near-me.html` (74),
+`services/commercial-gutters.html` (77).
+
+**7 — Yesterday's withdrawal of the titles/CTR finding holds, and today's
+`discovered_untracked` recount supports it.** The six rows at position ≤10 are
+unchanged: `gutters` (7.5, 64 imp), `gutter repair` (6.8, 33),
+`gutter cleaning` (8.5, 30), `gutter installation` (2.7, 28),
+`gutter guards in akron pa` (7.4, 28 — Lancaster County),
+`gutters central pa` (1.2, 9). Still four unlocalised head terms, still no York
+County commercial query, still 0 clicks. Nothing to add and no slot spent.
+
+**8 — Yesterday's README change. Documentation, so there is nothing to
+measure, and I claim nothing for it.** The five `deploy/repair_*.py` scripts are
+now named in a `.md` file. Whether that shortens anybody's triage is unknowable
+from here.
+
+**9 — The rank-history series (10-22). Shipped, collects nothing, day two.**
+Predicted to collect nothing until a deploy; it has. One more item in the
+undeployed pile, which finding 1 now dates at 26 days.
+
+**10 — The pre-registered mechanism test (10-17) and the four pre-registered
+GSC tests (suspended since 10-13). Unresolved, day eight and day twelve.** All
+need a publish. **Pending and suspended are not passed.**
+
+**11 — The coverage-versus-rank test (pre-registered 09-20). No new data.**
+09-20 → 10-12: `coverage_pct` 42.3 → 42.3, `top3` 0 → 0.
+
+**12 — `top10` retired as a progress metric (10-11). Retirement holds.**
+
+**13 — Recommended and not acted on.** Day counts; where I cannot see, I say so.
+- **The ask-Eric diagnostic.** Day 12, unanswered.
+- **The three droplet greps plus the `cat`.** Day 8.
+- **The title refit.** Day 11.
+- **The `growth/` deploy.** **26 days**, now pinned on both sides (finding 1).
+- **The watchdog's `--email`. Day 58.** Re-read `deploy/cron-nemo-growth:69`
+  today: the `0 11 * * *` entry still carries no `--email`.
+- **The Business Profile. Day 89.** `local_visitors` 2 in 45 days.
+- **Ledger edits** (retire T082; the GBP halves of T036/T052/T024; the dead
+  halves of T016/T025). Re-read today: all still `candidate`.
+- **`guides/5-inch-gutter-service-york-springs-pa.html`** (Adams County) still
+  present, still the one `york-springs` entry in `sitemap.xml`.
+
+### What I researched today
+
+Four searches. **One reordered an 89-day-old recommendation, one produced a
+tactic I am rejecting on suspension risk, one was already shipped in full
+(finding 3), and one slightly weakens a claim I made twice.**
+
+**1 — Primary category is the top-weighted local pack factor, which reorders
+the Business Profile item rather than adding to it.** Whitespark's 2026 Local
+Search Ranking Factors survey (47 practitioners, 187 factors) scores **GBP
+primary category 227, proximity to searcher 225, keywords in GBP business title
+223** — category first, and ahead of proximity, which is the one thing a
+one-owner shop cannot change. Secondary sources also put GBP signals at ~32% of
+local pack weight, reviews 20%, on-page 19%, and a separate study reports a
+specific primary category correlating with ~36% higher presence in the top 10.
+**Step 3b check: this is not a new idea — T016 ("GBP primary/secondary category
++ Owner Q&A audit") is already a `candidate`**, and its own evidence field
+already cites Sterling Sky's case of an HVAC business falling from position 1 to
+31 on one category word. What is new is the *ranking*: for 89 days I have
+written the Business Profile item as "review replies, then hours, then
+categories, then photos". The research says categories go **first** — it is the
+highest-weighted factor in the study, it is a 60-second check, and the failure
+mode is silent. Item 8 below is reordered accordingly.
+([harmo](https://harmo.me/en/blog/local-seo-ranking-factors-2026-whitespark),
+[gmbapi](https://gmbapi.com/news/local-ranking-factors-comparison-2026-2023/),
+[storerocket](https://storerocket.io/learn/local-seo-ranking-factors),
+[w3marketinghub](https://w3marketinghub.com/seo/local-seo-ranking/))
+
+**2 — And the third-ranked factor is one I am rejecting outright, because
+acting on it is how this business loses its profile.** "Keywords in GBP business
+title" scores 223 and *climbed* from 181 in 2023, so every blog in that search
+recommends it. Google's representation guidelines require the business name to
+be the real-world name; adding "York PA Seamless Gutter Installation" to it is
+exactly the kind of edit that draws a suspension, and the prompt's own rule is
+that a suspension would cost more than any tactic could earn. **There is also
+nothing to do here even if it were safe:** the real-world name is *NEMO Seamless
+Gutter*, which already contains the service term legitimately. Recording the
+rejection explicitly because a naive reading of the single highest-climbing
+factor in the best study available points straight at a policy violation, and a
+future run will meet this number again.
+
+**3 — The contractor GEO/AI-citation playbook. Rejected in full as already
+shipped** — see finding 3 for the five file-level checks. The sources agree on
+allow the AI crawlers, LocalBusiness and Service schema, answer-first FAQ
+content, city-specific pages, complete GBP. All present. Also recorded because
+the adoption figures are the kind that get quoted: BrightLocal's 2026 survey at
+45% of US consumers having used an AI tool for local recommendations in the past
+year, against vendor claims that 85.7% of businesses are invisible in AI answers
+or that ~1.2% get recommended — the last two I could not trace to any primary
+data and am not treating as established. One usable structural point: ChatGPT
+reads Bing's index and Gemini/AI Overviews weight the Business Profile, so the
+engines disagree with each other, which is the argument *for* the off-site
+listing items and against more on-site work.
+([searchable](https://www.searchable.com/blog/local-business-ai-search-optimization-2026),
+[geekpoweredstudios](https://www.geekpoweredstudios.com/post/ai-visibility-home-service-contractors-2026-guide),
+[jweis](https://jweis.com/blog/ai-search-geo-contractors))
+
+**4 — Ranking calendar: one correction to my own last two entries.** Still **no
+confirmed Google core update in October 2026**; the last confirmed ranking
+update remains the September 2026 spam update, complete **2026-10-08** (Google's
+dashboard: ~13 days 15 hours), and the last core update was May 2026. But a
+tracker lists an **unconfirmed** ranking update on **2026-10-21**, and Google
+revised its AI-generated-content guidance on **2026-10-01**. I called the
+10-12 → today window "unusually clean to read" on both 10-22 and 10-23; the
+accurate form is **no confirmed update, with community-reported volatility on
+10-21 that Google has not acknowledged.** Softening it before the first
+post-outage snapshot arrives and I over-read it.
+([lolasquared](https://www.lolasquared.com/blog-google-algorithm-updates-2026),
+[keywordseverywhere](https://keywordseverywhere.com/news/google-algorithm-updates/2026/),
+[numinix](https://www.numinix.com/blog/october-2026-seo-algorithm-news-update/))
+
+**5 — Environment limits, unchanged.** Every hostname still fails DNS from this
+session, so "is the site serving?" stays unanswerable and — as established
+10-23 — that is a fact about this sandbox, not about the droplet.
+
+### Recommendations
+
+Unchanged at the top: items 1 and 2 are free, need nobody but Eric, and speak
+directly to "more phone calls". **Item 8 is reordered on today's research** and
+item 6 is worth more than it was, for the reason in finding 1.
+
+**1. Eric — open Business Profile → Performance, write down one number:
+Calls. Five minutes, free, today.** T049's first step, a candidate since
+2026-08-08 (**day 77**). `ai_calls` **0 across all 45 measured days**,
+`phone_leads` **0** all time, `call_taps` **2**. Three different failures
+produce that same zero — nobody taps Call, they tap and never dial, or they dial
+and the agent loses them — and the ledger has candidates for all three. Set the
+range to 90 days or 6 months and note which; Calls counts *mobile taps of the
+call button*, so it is a tap count exactly like the site's `call_taps`, and the
+number Eric actually answered has to come from his phone log.
+*Expected effect:* none directly; it chooses the next fix instead of guessing it.
+*How I would know it worked:* three reconcilable numbers — GBP call taps, site
+`tel:` taps, calls answered.
+*Checked:* T049 `status: candidate` in `snapshot.json`, re-read today, never
+activated; `growth/metrics.py:231` counts `call_taps` only from the
+`/e/call-tap` beacon, i.e. taps starting **on the site**, and `:683` reads
+`phone_leads` from the bookings DB `leads` table — neither can see a map-pack
+call. **Eric's, five minutes.**
+
+**2. Eric or Divine — link the Business Profile to the existing GA4 property.**
+Analytics has reported GBP metrics including calls on a rolling 6-month window
+since June 2026, and the site already runs GA4. The mechanism for item 1, not a
+separate idea.
+*Checked:* `G-JWSK5E1ZRZ` at `index.html:49`; the `gtag`-is-blocked and
+no-server-side-export comments in `analytics.js` bound what it buys; no ledger
+technique mentions GA4. **~15 minutes.**
+
+**3. Divine — `python3 deploy/repair_titles.py`, read the report, then
+`--apply`. Day 11.** Still the one substantive on-site improvement needing **no
+Anthropic balance, no `growth/` deploy and no Google account**. 25 of 44 live
+titles exceed the 65 characters Google renders and three print the brand twice.
+*Expected effect:* **small and possibly unmeasurable** — the click evidence I
+once used to argue for this was withdrawn on 10-23 and I am not replacing it.
+What it fixes for certain is three titles that name the business twice and 25
+that get cut off.
+*How I would know it worked:* mostly I would not, at 2.56 visitors a day. A
+re-run reporting zero pages to fix, plus `gsc.pages` CTR per page once a publish
+resumes.
+*Checked:* `deploy/repair_titles.py` (stdlib, `--root`/`--apply`, imports
+nothing from `growth/`, backs each file up to `<name>.title-bak`, idempotent);
+`growth/techniques.py:47` `TITLE_MAX = 65` applies to the *next* page written,
+not the 25 on disk; `improve_ctr` selects by
+`gsc.underperformers(min_impressions=10, max_position=15.0, max_ctr=0.02)` on
+pages, carries `CTR_COOLDOWN_DAYS = 21`, and needs `llm.call_json`. Re-measured
+today. **Divine's, ~10 minutes on the droplet, against the docroot** —
+`publish_state.sh` rsyncs those directories docroot → repo, so the repo copies
+are a read-only mirror.
+
+**4. Divine — read two inboxes. Day 12 on the Eric half, and it is the stronger
+one.**
+- **Ask Eric: did your morning NEMO report arrive on each of 10-13 through
+  10-24?** `--owner-email eric@` is on both 06:00 cron lines, so it goes all
+  seven days: twelve data points and an exact stop date.
+- **Your own inbox, 2026-10-23 ~06:10 UTC.** The `0 6 * * 5` Friday line
+  carries `--email divinejdavis@gmail.com`. One bit, about one day, and it has
+  been sitting there ~29 hours.
+
+Mail arriving → the run executes and only the snapshot write or the push is
+broken; nothing is lost. Mail stopping on a date → cron or python died that day,
+the cause that loses each morning's data. If nothing arrived, "cron never got
+that far" and "that line no longer carries the flag" look identical from
+outside, and only the `cat` in item 5 separates them.
+*Checked:* `cron-nemo-growth:46` and `:49`; `growth_daily.py:199-206` for
+`cmd_report`'s position after the snapshot block and `:181-196` for `_send`'s
+per-recipient isolation. **One minute each.**
+
+**5. Divine — the three greps plus one `cat`. Day 8, ~10 minutes, still the
+fastest way to end the outage.**
+```
+grep publish /var/log/nemo-growth.log | tail -40
+grep 'snapshot: FAILED' /var/log/nemo-growth.log | tail -5
+grep -iE 'permission denied|could not read from remote|publickey|host key|fatal:' \
+  /var/log/nemo-growth.log | tail -10
+cat /etc/cron.d/nemo-growth; crontab -l | grep -i nemo; df -h /var /root
+```
+`snapshot: FAILED` → droplet disk or permissions, nothing lost. No `publish:`
+line but git/ssh error text → the credential broke, nothing lost, fix the key.
+Neither → cron or python, and that is the case that loses data. **Divine's.**
+
+**6. Divine — the `growth/` deploy. 26 days, pinned on both sides, and it now
+also fixes something Eric can see.** Finding 1: the last verified deploy is
+2026-09-27 and the first undeployed commit is 2026-09-28 (`098c2cc`), which is
+the commit carrying `earned()` and the `/28d` unit fix. Until it ships, the
+scoreboard claims **7 working techniques where this repository's own rules
+award 3**, and three of those claims print a click rate ~30× the real one into
+Eric's morning report. Also still pending: `pages`/`tracked`/`off_area` in the
+`gsc` block, the 10-22 rank-history series, and the runbook fixes. Pair it with
+Anthropic auto-reload under a monthly console cap — `BUDGET.md` rule 1 bounds a
+run to 3-5 calls at cents a day, so a cap enforces that rule rather than
+relaxing it. **Read finding 2 of the 10-21 entry before ranking this above
+items 1-3:** it restores the page writers, and if any part of the position
+decline is a scaled-content demotion, generating more near-identical town pages
+is the wrong direction rather than a neutral one. **Divine's.**
+
+**7. Divine — restore `--email divinejdavis@gmail.com` to the `0 11 * * *`
+watchdog entry. Day 58, one flag.** `cmd_watchdog` returns early when there are
+no problems, so it reintroduces no daily mail. The GitHub freshness job covers
+only whether state *arrived*; the watchdog can say *why* it did not.
+*Checked:* `deploy/cron-nemo-growth:69`, re-read today — still no `--email`.
+**Divine's, one minute, needs the deploy.**
+
+**8. Eric — the Business Profile, and today the order changed: primary
+category FIRST. Day 89, free.** For 89 days I have written this as "review
+replies, then hours, then categories, then photos". Research 1 inverts it:
+**primary category is the highest-weighted local pack factor in the best study
+available (227, above proximity at 225)**, the check takes under a minute, and
+the failure mode is silent — Sterling Sky's documented case is position 1 to 31
+on one category word, which is already in T016's own evidence field. So: (i)
+confirm the primary category is the most specific true match (a gutter-specific
+category, not a broad "Contractor" or "Roofing Contractor"), (ii) hours, (iii)
+services/categories detail, (iv) photos, (v) pending suggested edits, (vi)
+review replies. **Do not touch the business name** — research 2: keyword-stuffing
+it is the third-ranked factor and a suspension risk, and "NEMO Seamless Gutter"
+already carries the service term honestly. 23 of 96 ledger techniques rest on
+"4.2 stars / 13 reviews / ~300 views", which nobody has ever checked against the
+profile.
+*Checked:* T016 is `status: candidate` in `snapshot.json`, re-read today, never
+activated — so this is a reordering of an existing candidate, not a new idea.
+**Eric's, and only Eric's.**
+
+**9. Carried, and reframed by finding 3 — the off-site listing claims are now
+the whole of the remaining AI-visibility work.** T025 (Brave submission), T029
+(Bing Places / Apple Business Connect), T048 (Foursquare), T053 (BuildZoom). The
+on-site half is shipped in full and bought `ai_visitors` 2 in 45 days; no
+further page generation touches this. Each needs a human to claim a listing.
+Not individually ranked above items 1-8, but they are no longer "parked pending
+on-site work" — there is no on-site work left to pend on.
+
+**Parked, carried, not re-argued:** Yelp Request a Quote (T035);
+`deploy/retire_out_of_area.py` for the york-springs page; the ledger edits;
+three real cleaning prices for the cost guide (Eric's — I will not invent
+prices, and `guides/gutter-cleaning-cost-york-pa.html` still promises "Typical
+price ranges" with no dollar figures); asking every finished customer for a
+review out loud, no gating or incentive, and asking them to say what work was
+done and in which town; allowing `nemoseamlessgutter.com` in this session's
+network policy; merging the green Dependabot PRs, **#14 first** on security
+grounds, and porting the Express 5 / better-sqlite3 majors for #12.
+
+**Prompt corrections. Day twelve, none landed.** (a) **Add to Known blockers:
+check for a publish commit dated today before trusting `snapshot.json`** — the
+prompt's claim that the engine "pushes its state to this repo an hour before you
+run" has now been false on twelve consecutive mornings. (b) **Retire the
+spend-cap narrative** — it cleared 84 days ago; every measured failure since has
+been an empty balance. (c) The 2026-07-28 baseline (77 rows, 17 matched, 3
+clicks, 429 impressions, position 12.4, county 2 of 50) should be labelled a
+historical baseline, not current state, and whoever labels it should note the
+spam updates of Aug 18-21 and Sept 24-Oct 8 fall between it and every later
+reading. (d) The prompt says the watchdog "mails the developer": it mails
+nobody, and has not since 2026-08-27. (e) New today: the prompt's Step 3b
+warning is about recommending something already shipped. It should also warn
+about **reading a verdict without checking which engine version wrote it** —
+finding 1 is a case where the snapshot's own `works` column is wrong by the
+repository's own rules.
+
+### Repo changes I made today
+
+One, prose only, and deliberately not code.
+
+**`growth/README.md` — "Reading the scoreboard's three columns".** Finding 2 is
+a mistake I made on eleven consecutive days, in the one file a reader is told to
+consult for the ledger model. The section states which code path fills each
+column: `works` only where `earned()` agrees; `does_not_work` only from the two
+retirement paths at `review.py:271` and `:294`; `not_yet_judged` also catching
+withdrawals, because `run()` calls `clear_verdict()` rather than writing
+`works: False`. So an empty `does_not_work` means no technique has been retired
+for underperforming — not that nothing has been measured as failing. It closes
+with the dating fingerprint from finding 1: a snapshot whose verdicts read
+`works: True` beside "median 0.0/day and flat", or which prints a `gsc_clicks`
+median as `/day`, was written by engine code older than `098c2cc` (2026-09-28)
+and overstates the scoreboard.
+
+**What I decided not to build, and why.** The obvious code change today is to
+make `snapshot.py` publish a verdict-provenance marker so a reviewer cannot
+misread a stale scoreboard. I rejected it: `snapshot._code_fingerprint()`
+**already exists for exactly this**, and is itself in the undeployed set. Adding
+a second mechanism for the same job to a 26-day-old deploy queue is how this
+repository accumulates engine code nobody is running. The honest move is prose
+that works today plus item 6, not a fourth undeployed instrument. I also did not
+re-propose a GitHub issue on freshness failure — rejected 10-22, and the
+constraint is still not detection.
+
+`Tests: added 0, changed 0, removed 0 — the change is prose in
+growth/README.md and adds no behaviour. The claims it makes are about existing
+code and I verified each against the source rather than its docstring:
+grep of every set_verdict/clear_verdict call site (four, all in review.py),
+earned()'s two branches, and git merge-base/git show against ce84002 for the
+098c2cc dating. The behaviour it documents is already covered by
+growth/test_review.py.` Suite re-run and green before committing: **430 python
++ 9 node** (`npm ci --prefix server` first).
+
+### Reasoning and uncertainties
+
+**What today actually added.** The first audit of the `works` column instead of
+the empty `does_not_work` one, and it turned up both a measurement error and the
+best deploy evidence this journal has. The scoreboard Eric is shown says seven
+techniques work; this repository's own `earned()` awards three and withdraws
+four, three of which advertise a click rate roughly thirty times the real one
+because `gsc_clicks` is a 28-day window total labelled `/day`. `review.py`
+contains both fixes and names the three affected techniques in its own comment.
+That makes the deploy gap provable from a **wrong string present in the data**
+rather than from keys being absent — and because `098c2cc` is one day after the
+import root and neither string exists in `ce84002`, this is the rare case where
+`git log -S` dates something honestly here. Last verified deploy 2026-09-27,
+first undeployed commit 2026-09-28: **26 days**, both ends pinned.
+
+And a correction I should have caught sooner. I have called the empty
+`does_not_work` column an anomaly on eleven days running, as recently as
+yesterday's "a real problem I am not solving by guessing". It is not an anomaly;
+only two code paths can write that verdict and both are retirements, and
+`earned()`'s withdrawal path writes no verdict *by design*. The real problem —
+nothing has ever been retired for underperforming, 84 candidates never
+activated — survives intact, but I had it attached to the wrong evidence. This
+is the same error as 10-23's withdrawn titles finding and 10-22's bad commit
+date: reasoning about a *finding* from the snapshot alone when the explanation
+was sitting in the code. Three entries in a row. Step 3b is not only about
+recommendations.
+
+**What I am least confident about.** First, whether the 7→3 recomputation is
+exactly right. I applied `earned()`'s rule by hand to the droplet's own
+`measured` blocks rather than running `review.run()` against live state, which I
+cannot do from here — the thresholds and branches are read from source and the
+arithmetic is simple, but the real droplet run also re-reads series I cannot
+see, so treat "3" as what the repository's rules award *on the published
+numbers*, not a prediction of the exact post-deploy scoreboard. Second, whether
+anything reaches a person. Twelve entries, three red Actions runs, a
+notification most mornings, and every commit in this repository is still mine.
+Third, the old one: how much of `avg_position` 12.4 → 26.1 the two spam updates
+explain, unresolvable until a publish feeds the 10-22 series — and today's
+research 4 adds unconfirmed volatility on 10-21 to the confounders.
+
+**What I deliberately did not claim.** That the droplet's verdicts are a bug —
+they are correct output from old code, which is a different and more fixable
+thing. That the post-deploy scoreboard will read exactly 3. That `does_not_work`
+being empty is fine; it is expected, which is not the same as fine. That the
+on-site GEO work was wasted — it is complete and correct, it simply is not where
+the remaining lever is. That the title refit will move clicks. That the site is
+down, or deindexed. That any of the numbers above are today's; they are twelve
+days old.
+
+**The binding constraint, a day shorter again.** Twelve dead mornings. A deploy
+26 days outstanding, now with a cost Eric can see in his own inbox. Twelve days
+with no API credit. Eighty-nine days of an untouched Business Profile whose
+single highest-weighted ranking factor has never been checked. 84 candidates,
+none activated; nothing ever retired for failing. It is 24 October, and the back
+half of leaf-fall is what is left of the window a York County gutter
+contractor's year turns on. Today's list still has three items that need only a
+login or a mailbox and no decision at all.
