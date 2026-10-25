@@ -18,6 +18,12 @@ file and `publish_state.sh` pushes it — the repository is the bridge between t
 
 The engine step is: **measure → review → build → scout → report**.
 
+**[`ACTION.md`](ACTION.md) is the short version of what is currently waiting
+on a human** — owners, how long each item has been open, and the one command or
+click each needs. The review agent rewrites it in full every run. `JOURNAL.md`
+is the history and is append-only; `ACTION.md` is only ever the present, which
+is why it is a separate file rather than a section of the log.
+
 ## The five steps
 
 | Step | What it does |

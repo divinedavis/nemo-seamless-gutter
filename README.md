@@ -23,6 +23,7 @@ booking.js        # booking widget (service → date → slot → details → co
 setup.html        # one-time owner setup page (connect email + calendars)
 assets/           # logo (svg + 4k png), white logo, square icon/favicon, og image
 server/           # booking + two-way calendar-sync API (Node/Express/SQLite)
+growth/           # daily growth engine + review agent; see growth/ACTION.md for open items
 ```
 
 ## Booking + two-way calendar sync
