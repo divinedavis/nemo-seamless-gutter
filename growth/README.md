@@ -184,6 +184,65 @@ fingerprint block. If the published `snapshot.json` has no `code_version`, the
 droplet is running stale engine code and the deploy above has not been run —
 which is also why that diagnostic cannot report its own absence.
 
+
+### Dating the deploy from the repo side — and the shallow-clone trap
+
+Three review entries dated engine code with `git log -S` and got three wrong
+answers, because **the cloud review agent's clone is shallow.** `git clone`
+runs at depth 50, so `.git/shallow` sits about fifty commits back from HEAD and
+moves every day. Inside a shallow clone:
+
+* `git log --reverse | head -1` reports the **boundary**, not the root. On
+  2026-10-26 it read `704522d` (2026-09-29); the real root is `8915a38`,
+  2026-06-23.
+* The boundary commit appears to **add every file it contains**, because its
+  parent is absent. `098c2cc` is a one-purpose commit about coverage matching;
+  `git show --stat` renders it as "151 files changed, 71009 insertions(+)". The
+  2026-10-22 entry read that as a 151-file import and the 2026-10-24 entry then
+  dated `earned()` and `WINDOW_TOTAL_METRICS` to it. Both strings are older:
+  `earned()` is 51cf063, **2026-08-29**; `WINDOW_TOTAL_METRICS` is a88f113,
+  **2026-09-21**.
+* `git log -S` therefore dates anything older than the boundary **to the
+  boundary**, which silently makes every deploy gap look younger than it is.
+
+**So: run `git fetch --unshallow` before any claim of the form "this entered in
+commit X".** It is read-only and takes seconds. Check with
+`git rev-parse --is-shallow-repository`.
+
+**Dating the engine without git at all.** Each published key is emitted
+unconditionally by the `snapshot.py` that wrote the file, so the keys present in
+`growth/snapshot.json` bracket the droplet's code age from both sides. This is
+positive evidence and it survives a shallow clone:
+
+| Published key | Publish line entered |
+| --- | --- |
+| `keywords.discovered_untracked` | 2026-07-27 (8551ceb) |
+| `keywords.ranked` | 2026-08-05 (bea7a47) |
+| `gsc.pages` | 2026-08-06 (aeed46d) |
+| top-level `code_version` | 2026-08-09 (870a3dc) |
+| `keywords.excluded_out_of_area` | 2026-10-11 (209beba) |
+
+A present key means the droplet's code is **at least** that new; an absent one
+means it is **older**. `snapshot.json` of 2026-10-12 carries
+`discovered_untracked` and none of the four below it, so the engine that wrote
+it dates to **2026-07-27 → 2026-08-04** — a deploy gap of 82 days as of
+2026-10-26, not the 27 days three entries reported from boundary-dated `git
+log -S`.
+
+Two traps inside that method. Absence only dates code when the key is emitted
+unconditionally — a key behind an `if` can be missing for its own reasons.
+And `kw["ranked"]` would raise `KeyError` in a current `snapshot.py`, so a
+snapshot that was written *successfully* without `ranked` proves the
+droplet's `snapshot.py` itself is old, not merely its `keywords.py`.
+
+**What a 09-27 deploy did and did not cover.** `098c2cc` records that Divine
+deployed on 2026-09-27, verified against 43 `sitemap.xml` `lastmod` values and
+site-wide duplicate titles. That is `deploy_web.sh` evidence — HTML in the
+docroot. `deploy/deploy_growth.sh` is a **separate** script shipping only
+`growth/*.py` plus `growth_daily.py`, and sitemap timestamps say nothing about
+it. Do not read a verified web deploy as a verified engine deploy; that
+conflation is what put the engine gap at 27 days instead of 82.
+
 ## When no publish commit arrives
 
 A morning with **no `Publish growth state for <date>` commit at all** is a

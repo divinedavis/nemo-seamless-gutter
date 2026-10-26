@@ -43246,3 +43246,558 @@ failing. Four correct alarms, zero answers, and every commit in this repository
 is still mine. Today's list has three items that need only a login and no
 decision at all, and the season they would act on is open for about three more
 weeks.
+
+## 2026-10-26 — review agent
+
+### Where the numbers stand
+
+**Fourteenth consecutive morning with no publish. The newest numbers in this
+repository are 341 hours old.** I fetched `origin/main` at 11:10 UTC before
+reading anything: local `main` and `origin/main` are both `d7654dd`,
+yesterday's review commit. The last `Publish growth state` commit is still
+**`0b2c596`, 2026-10-12 06:05:37 UTC**, and `snapshot.json` still reads
+`"date": "2026-10-12"`, `"generated": "2026-10-12T06:05:32+00:00"`. There is no
+publish commit for 10-13 through 10-26. Nothing below is today's data.
+
+**(1) The goal metric.** Read fresh from `snapshot.json`: `top3` **0 of 239**
+tracked queries, **0 in all seven town buckets** — county 0/124, york 0/42,
+dover 0/18, hanover 0/15, spring-grove 0/14, red-lion 0/13, dallastown 0/13.
+`share_pct` **0.0** against a target of 50. Direction, which the prompt asks for
+every run: **the county bucket is 0 of 124 and has not moved.** Site-wide GSC is
+759 rows, 54 matched, 11 clicks, 5,281 impressions, `avg_position` 26.1.
+
+**(2) Traffic and leads**, recounted rather than copied. Series still runs
+2026-08-28 → **2026-10-11**, 45 days: **115 visitors, 151 pageviews**
+(2.56/day), non-zero on **41 of 45** days, so the prompt's
+measurement-suspicion trigger does not fire. `organic` 50, `direct` 56,
+`local` **2**, `ai` 2, `referral` 2, `campaign` 3, `call_taps` **2**,
+**`ai_calls` 0 across all 45 days**, `bookings` **1** (09-02), `phone_leads`
+**0**, `bookings_all_time` **4**, `own_rows_excluded` 13, `bot_hits` 135,873.
+The newest traffic row is now **15 days** old.
+
+**(3) Both content jobs remain dead on an empty Anthropic balance.**
+`last_build` 2026-10-12, **0 new, 0 changed**; `last_scout` the same date with
+"Your credit balance is too low to access the Anthropic API". No successful
+content run in **14 days**. The prompt's Known-blockers text is wrong about
+this on **day 86** — it describes the self-imposed usage cap that cleared on
+2026-08-01. The data wins, per the prompt's own instruction.
+
+**(4) The ledger.** 96 techniques — **11 active, 84 candidates, 1 retired**;
+`scoreboard` **7 works, 0 does_not_work, 89 not_yet_judged**. `coverage_pct`
+**42.3**, 138 uncovered, `price` still the worst intent at **10 of 53** (hire
+83/154, check 7/24, diy 1/8).
+
+**(5) `discovered_untracked`:** 40 rows, **650 impressions, 0 clicks** — and
+finding 2 is about what those 40 rows are made of.
+
+### Did previous changes work?
+
+**1 — I can now date the engine deploy properly, and it is 82 days, not 27.
+Three entries dated it with `git log -S` inside a shallow clone, which is the
+one place that command cannot be trusted.**
+
+`git rev-parse --is-shallow-repository` returned **true**: this session's clone
+is **exactly 50 commits**, with `.git/shallow` at `098c2cc` and `704522d`. That
+invalidates the method three entries used, in a consistent direction — it makes
+every gap look *younger* than it is.
+
+- `git log --reverse | head -1` reported `704522d`, 2026-09-29. After
+  `git fetch --unshallow` (277 commits) the real root is **`8915a38`,
+  2026-06-23** — "Launch NEMO Seamless Gutter marketing site + booking".
+- A boundary commit appears to add every file it contains. `git show --stat
+  098c2cc` prints **"151 files changed, 71009 insertions(+)"**, and its actual
+  subject is "Stop coverage being credited by text the page did not write" — a
+  single-purpose commit about `check_coverage` matching. The **10-22** entry
+  read that shape as a 151-file import; the **10-24** entry then dated
+  `earned()` and `WINDOW_TOTAL_METRICS` to `098c2cc`, 2026-09-28, and called
+  `git log -S` "trustworthy" there. The boundary is the least trustworthy place
+  in a shallow clone.
+
+Re-dated on full history:
+
+| string | entry's claim | real |
+| --- | --- | --- |
+| `earned()` | 098c2cc, 09-28 | **51cf063, 2026-08-29** |
+| `WINDOW_TOTAL_METRICS` | 098c2cc, 09-28 | **a88f113, 2026-09-21** |
+| `page_report()` | 2e826af 09-27, then "not in history" | **aeed46d, 2026-08-06** |
+| `_select_discoveries` / `TOP_BY_POSITION` | — | **bea7a47, 2026-08-05** |
+
+**The deploy gap, dated without git at all.** Each published key is emitted
+unconditionally by the `snapshot.py` that wrote the file, so the keys present
+in a snapshot bracket the droplet's code age from both sides. The 2026-10-12
+file **has** `keywords.discovered_untracked` (publish line 2026-07-27) and
+**lacks** `keywords.ranked` (**2026-08-05**), `gsc.pages` (2026-08-06),
+top-level `code_version` (2026-08-09) and `keywords.excluded_out_of_area`
+(2026-10-11). So the engine that wrote it dates to **2026-07-27 → 2026-08-04**:
+**82 days outstanding as of today**, not 27.
+
+This is stronger than absence-of-keys usually is, for one reason:
+`snapshot.py`'s publish line is `kw["ranked"]`, which would raise `KeyError` in
+a current build. A snapshot written **successfully** without `ranked` proves the
+droplet's `snapshot.py` is itself old, not merely its `keywords.py`.
+
+**And the 09-27 premise was never about the engine.** `098c2cc` records that
+Divine deployed on 2026-09-27, "verified independently: all 43 sitemap lastmod
+values are now 2026-09-27, no duplicate titles survive site-wide". That is
+`deploy_web.sh` evidence — HTML in the docroot. `deploy/deploy_growth.sh` is a
+**separate** script shipping only `growth/*.py` plus `growth_daily.py`
+(`deploy_growth.sh:96`), and sitemap timestamps say nothing about it. Three
+entries, mine included, read a verified *web* deploy as a verified *engine*
+deploy. That conflation plus the shallow boundary is the whole of the 27-day
+figure, and **ACTION.md item 9 has been understating this by about 3×.**
+
+I am not claiming the engine is 82 days stale *in effect* — most of those
+commits are instruments for this review, not page-writing logic. What is
+certain is the age, the direction of my error, and that `keywords.ranked`,
+the one thing that would separate a zero-volume tracked query from a
+badly-ranked one, has been sitting undeployed since **2026-08-05**.
+
+**2 — The discovery list is 55% someone else's market, and the fix for exactly
+that was written 2026-08-05 and never shipped. This is a new reading of a list
+every entry has quoted as a total.**
+
+`discovered_untracked` is 40 rows / 650 impressions / 0 clicks. Broken out by
+the county each query names:
+
+| | rows | impressions | share |
+| --- | --- | --- | --- |
+| unlocalised head terms | 8 | 271 | 41.7% |
+| "central pa" | 2 | 23 | 3.5% |
+| **names a town outside York County** | **30** | **356** | **54.8%** |
+| **names a York County town** | **0** | **0** | **0.0%** |
+
+The 356 impressions are **eight counties**: Lancaster 113 (Akron, Leola,
+Lititz, New Holland, Stevens, Lancaster), Montgomery 103 (Plymouth Meeting,
+Harleysville, Blue Bell), Delaware/Chester 69 (Wayne), Lebanon 25 (Myerstown),
+Chester 20 (Spring City), Bucks 17 (Perkasie), Greene 12 (Waynesburg —
+Pittsburgh side of the state), Allegheny 9 (Morgan).
+
+**The list is exactly 40 rows, which is the fingerprint.**
+`gsc._select_discoveries` takes **two** slates — `TOP_BY_IMPRESSIONS = 40` by
+volume, then `TOP_BY_POSITION = 20` best-ranked rows the first slate missed, up
+to 60. Its docstring says why, and it is this case verbatim: *"On 2026-08-04
+Google began showing the site across the Philadelphia suburbs — forty queries
+at 186-530 impressions and zero clicks, ninety miles outside the service area.
+They filled the list. The rows they pushed off were the small, well-ranked
+ones… A flood in someone else's market can crowd out the first list; it cannot
+touch the second."* Forty rows and no second slate means the droplet is running
+**pre-`_select_discoveries`** code — which is independently what finding 1's key
+fingerprints say. Two unrelated signals agreeing on the same pre-08-05 date.
+
+So the one instrument that answers "what is this site close to winning" has
+been returning a crowded-out answer for 82 days, and the patch was written the
+day after the flood started.
+
+**What I am not claiming.** That zero York County rows means zero uncovered
+York County demand — `discovered_untracked` excludes the 239 tracked queries by
+construction, and the tracked universe *is* York County, so York rows are
+partly selected out. A York query outside that exact list of 239 would still
+appear, and none did; that is suggestive and not conclusive, and slate 2 is
+exactly what would settle it. I also cannot tell whether those 705 untracked
+rows are mostly 1–2 impression noise — `fetch_queries` output is not published.
+
+**3 — Prior findings re-checked, all holding.** The 7→3 scoreboard
+recomputation (10-24) holds on byte-identical input; its *dating* is what
+finding 1 corrects, not its arithmetic — `earned()` and `WINDOW_TOTAL_METRICS`
+exist and say what that entry said, they are simply older. The 10-25 ceiling
+arithmetic holds: `ranked_known` 58, achievable maximum **58/239 = 24.3%**
+against a target of 50, `top3` 0. The off-site-listings retraction (10-25)
+holds. `top10`'s retirement (10-11) holds.
+
+**4 — The freshness alarm has now fired five times, all correctly, all
+unanswered.** Run `40214666027`, `event: schedule`, `conclusion: failure`,
+head `d7654dd`, started **2026-10-25T17:04:08Z** against a `17 13 * * *` cron
+— **3h47m late**, against 3h20m, 4h36m, 4h42m and 4h48m on runs 4→1. Free-tier
+lateness is nowhere near the 18 hours that would make a spurious one-day
+reading. `actor` and `triggering_actor` are `divinedavis`. Today's run has not
+fired yet (it is 11:10 UTC). The repository has **zero open issues** and no
+commit but mine.
+
+**5 — The title refit. Re-measured from source today, unchanged.** **25 of 44**
+titles under `areas/`, `guides/` and `services/` exceed 65 characters; **3**
+print the brand twice. Worst: `guides/gutter-services-near-me` and
+`guides/gutter-pulling-away-from-house` at 80,
+`guides/who-to-call-when-gutter-is-falling-off-house` at 79. Day 13.
+
+**6 — The two mail diagnostics. Day 14 on the Eric half**, which is the
+stronger instrument: `--owner-email eric@` is on both 06:00 cron lines, so it
+runs all seven days and yields an exact stop date. `deploy/cron-nemo-growth:69`
+re-read today — the `0 11 * * *` watchdog line still carries **no `--email`**.
+Day 60.
+
+**7 — Recommended and not acted on.** Day counts recomputed from each
+technique's own `added` field today, not carried forward:
+- **The Business Profile audit (T016, added 2026-07-27). Day 91.**
+- **Ask for reviews (T007, 2026-07-27). Day 91.** T047 (2026-08-07) day 80.
+- **Measure the phone (T049, 2026-08-08). Day 79.**
+- **The three droplet greps plus the `cat`.** Day 10.
+- **The title refit.** Day 13.
+- **The `growth/` deploy. 82 days**, re-dated by finding 1.
+- **Publish `top3 / ranked_known` as the headline.** Day 31.
+- **The watchdog's `--email`.** Day 60.
+- **Ledger edits** (retire T082; the GBP halves of T036/T052/T024; the dead
+  halves of T016/T025). Re-read today: all still `candidate`.
+- **`guides/5-inch-gutter-service-york-springs-pa.html`** (Adams County) still
+  present, still the one `york-springs` entry in `sitemap.xml`.
+
+### What I researched today
+
+Four searches. **One is a genuinely new mechanism and earns a slot, one puts an
+expiry date on the oldest open item, one is a confounder note, one found
+nothing usable.**
+
+**1 — GA4 now links to Google Business Profile natively, and this is the first
+mechanism that could get the Calls number without a recurring ask on Eric.**
+Secondary sources agree on the path — GA4 **Admin → Product links → Google
+Business Profile links → Link** — and on the metric set: interactions, website
+clicks, **calls**, direction requests, messages, bookings, menu interactions,
+where `calls` counts calls initiated from the profile button. Dated to around
+June 2026 by one source, not firmly established.
+
+**Step 3b, checked properly.** The *goal* is already T049. The *mechanism* is
+not in the repository or the ledger anywhere: I grepped all 96 techniques for
+`GA4|analytics|product link|gtag` and the only hit is **T091**, which is about
+CNAM and spam-flagging; `JOURNAL.md` has 32 mentions of "GA4" and **zero** of
+"Product links" or "Business Profile links". And the site end already exists —
+`G-JWSK5E1ZRZ` is live on the pages, `analytics.js:32` fires the
+`/e/call-tap` beacon and `:74` binds it to `a[href^="tel:"]`. So this is a new
+item, not a restatement.
+
+Why it matters beyond convenience: `growth/metrics.py:231` counts `call_taps`
+only from that on-site beacon and `:683` reads `phone_leads` from the bookings
+DB, so **neither can see a map-pack call** — the blind spot T049 exists to fill.
+A one-time link makes the profile-side number land next to the site-side one.
+**Limits, stated honestly:** six months of data inside GA4, profiles aggregated,
+GBP metrics unusable in explorations/comparisons/filters, no subproperty
+support, and it still needs one human with both GBP and GA4 admin. It converts
+a repeated ask into a single setup; it does not remove the login.
+([easyinsights](https://easyinsights.ai/blog/google-analytics-google-business-profile-native-integration/),
+[gaoptimizer](https://www.gaoptimizer.com/blog/ga4-google-business-profile-integration/),
+[frontpageadvantage](https://frontpageadvantage.com/how-to-link-google-business-profile-to-google-analytics-a-new-local-seo-reporting-feature/))
+
+**2 — The Business Profile Performance report is a rolling ~six-month window,
+so item 1 has an expiry date nobody has mentioned in 79 days.** The date
+selector offers up to six months and older months drop off; the timestamped
+**call history log was discontinued on 2024-07-31** and sources see no sign of
+it returning; the surviving `Calls` figure is a **tap count**, not connected
+calls. If the six months is even roughly right, the Jul–Aug window — this
+site's own GSC baseline period — starts falling off the back of the report
+around January 2027, and nobody will ever be able to reconstruct it.
+**Vendor-grade:** I found no official Google retention page, so this is stated
+as a reason for urgency and not as a fact about Google's systems. It does not
+change what Eric does, only how long the option stays open.
+([sterlingsky](https://www.sterlingsky.ca/interpret-google-business-profile-performance/),
+[digitalapplied](https://www.digitalapplied.com/blog/marketing-platform-data-retention-limits-2026),
+[progeektech](https://www.progeektech.com/post/why-did-my-google-business-profile-calls-drop-2026))
+
+**3 — Confounders for whenever publishing resumes, extending the 10-25 note.**
+No confirmed Google update in October 2026 touching the local pack. Unconfirmed
+volatility on **10-16** ("felt big") and again **10-20/21**, and the industry is
+expecting a core update that had not rolled out as of those reports. The
+September 2026 spam update completed **2026-10-08 04:37 ET**, four days before
+the last snapshot. So the first post-outage snapshot spans at least two
+unconfirmed volatility events and possibly a core update — it will **not** be
+the clean read the 10-22 entry hoped for.
+([seroundtable](https://seroundtable.com/google-search-ranking-volatility-42347.html),
+[seroundtable](https://www.seroundtable.com/google-search-ranking-volatility-continues-41952.html))
+
+**4 — AI Overviews as an explanation for 5,281 impressions against 11 clicks:
+rejected as unusable here.** Seer's analysis (5.47M queries, 53 brands) found
+brand-cited AI Overview CTR down 61% Q3→Q4 2025 with clicks roughly flat, and
+October impressions roughly doubling while clicks stayed flat; Seer could not
+say whether the impression surge came from AI Overviews appearing on more
+queries or from more citations, and the following month broke the pattern. No
+result addressed local service queries, and Search Console has no AI Overview
+filter, so I cannot test it on this site. **Finding 2 is the better explanation
+for this site's impression growth anyway** — 55% of the discovered footprint is
+in markets 40–200 miles away, which inflates impressions and can never produce
+a click from a York County homeowner.
+([searchenginejournal](https://www.searchenginejournal.com/ai-overview-ctr-fell-61-but-clicks-didnt-collapse/))
+
+**5 — Environment limits, changed in one respect.** Every site hostname still
+fails DNS from this session, so "is the site serving?" stays unanswerable, and
+that remains a fact about this sandbox. What *did* change: `git fetch
+--unshallow` works here, so repo history is no longer a limit — see finding 1.
+
+### Recommendations
+
+Order unchanged at the top: free, nobody but Eric, directly about the phone.
+**Item 1 gains an expiry date** (research 2) and **item 2 gains a cheaper
+mechanism** (research 1, new). Item 8's age is corrected from 27 to 82 days.
+
+**1. Eric — open Business Profile → Performance, write down one number:
+Calls. Five minutes, free, today. T049, day 79.** `ai_calls` **0 across all 45
+measured days**, `phone_leads` **0** all time, `call_taps` **2**. Three
+different failures produce that same zero — nobody taps Call, they tap and
+never dial, or they dial and the agent loses them — and the ledger has
+candidates for all three. Note the date range used; `Calls` counts *taps of the
+call button*, so it is a tap count exactly like the site's `call_taps`, and the
+number Eric actually answered has to come from his phone log.
+**New today:** the report is a rolling ~six-month window (research 2), so the
+summer baseline starts expiring around January 2027. The cost of waiting is no
+longer zero.
+*Expected effect:* none directly; it chooses the next fix instead of guessing.
+*How I would know it worked:* three reconcilable numbers — GBP call taps, site
+`tel:` taps, calls answered.
+*Checked:* T049 `status: candidate` in `snapshot.json`, re-read today;
+`growth/metrics.py:231` counts `call_taps` only from the `/e/call-tap` beacon
+and `:683` reads `phone_leads` from the bookings DB — neither can see a
+map-pack call. **Eric's.**
+
+**2. Eric or Divine — link GA4 to the Business Profile. One-time, free,
+~five minutes, and it is the only item here that makes item 1 stop needing
+Eric every month. NEW today.** GA4 **Admin → Product links → Google Business
+Profile links → Link**. Needs one account with both GBP and GA4 admin.
+*Expected effect:* the profile-side `calls` metric lands beside the site-side
+`call_taps` without a monthly login, filling the blind spot
+`growth/metrics.py` provably has. It does not improve rank and will not make
+the phone ring by itself — it makes the phone *measurable*, which is what
+item 1 has been blocked on for 79 days.
+*How I would know it worked:* a GBP row appears in GA4 with a non-zero
+`calls` figure that can be compared against `call_taps` 2.
+*Checked:* grepped all 96 ledger techniques for `GA4|analytics|product
+link|gtag` — only T091 (CNAM/spam-flag) hits, and it is unrelated;
+`JOURNAL.md` has zero mentions of "Product links" or "Business Profile links";
+GA4 `G-JWSK5E1ZRZ` is already live on the pages and `analytics.js:32,74`
+already beacons `tel:` taps, so only the link is missing. Six-month window and
+no-explorations limits recorded in research 1. **Eric's or Divine's — whoever
+holds both logins.**
+
+**3. Eric — the Business Profile audit, primary category first. Day 91,
+free.** Order set by the 10-24 research: primary category is the
+highest-weighted local pack factor in the best study available (227, above
+proximity at 225), the check takes under a minute, and the failure mode is
+silent. (i) Confirm the primary category is the most specific *true* gutter
+category, (ii) hours, (iii) services/categories detail, (iv) photos, (v)
+pending suggested edits, (vi) review replies. **Do not touch the business
+name** — keyword-stuffing it is a representation-guidelines violation and a
+suspension risk, and "NEMO Seamless Gutter" already carries the service term
+honestly. 23 of 96 ledger techniques rest on "4.2 stars / 13 reviews / ~300
+views", which nobody has ever checked against the profile.
+*Checked:* T016 `added: 2026-07-27`, `status: candidate`, re-read today.
+**Eric's, and only Eric's.**
+
+**4. Eric — ask every finished job for a Google review: one or two a month,
+every month, each naming the work and the town.** Promoted 10-25 on Whitespark
+2026 — review signals ~20% of local pack weight and the only category
+climbing, with the ranked factors being reviews **with text**, **recency** and a
+**sustained influx rather than bursts**. No gating, no incentive, no script put
+in the customer's mouth. The profile sits at 13 reviews.
+*Expected effect:* the most plausible free lever on map-pack rank available
+this month. Slow: months, not weeks.
+*How I would know it worked:* review count and dates on the profile, then the
+town buckets in `keywords.by_town` once a publish resumes.
+*Checked:* T007 (`added: 2026-07-27`, day 91) and T047 (`added: 2026-08-07`,
+day 80) both `status: candidate` today. **Eric's. Now, while there are
+customers to ask.**
+
+**5. Divine — the three greps plus one `cat`. Day 10, ~10 minutes, still the
+fastest way to end the outage.**
+```
+grep publish /var/log/nemo-growth.log | tail -40
+grep 'snapshot: FAILED' /var/log/nemo-growth.log | tail -5
+grep -iE 'permission denied|could not read from remote|publickey|host key|fatal:' \
+  /var/log/nemo-growth.log | tail -10
+cat /etc/cron.d/nemo-growth; crontab -l | grep -i nemo; df -h /var /root
+```
+`snapshot: FAILED` → droplet disk or permissions, nothing lost. No `publish:`
+line but git/ssh error text → the credential broke, nothing lost, fix the key.
+Neither → cron or python, and that is the case that loses each morning's data.
+*Checked:* the branch table in `growth/README.md`, "When no publish commit
+arrives". **Divine's.**
+
+**6. Divine — read two inboxes. Day 14 on the Eric half.** (a) Ask Eric
+whether his morning NEMO report arrived on each of 10-13 through today:
+thirteen-plus data points and an exact stop date. (b) Your own inbox,
+2026-10-23 ~06:10 UTC, from the `0 6 * * 5` Friday line. Mail arriving → the
+run executes and only the snapshot write or the push is broken, nothing lost.
+Mail stopping on a date → cron or python died that day, the cause that loses
+data.
+*Checked:* `cron-nemo-growth:46` and `:49`; `growth_daily.py:199-206`.
+**One minute each.**
+
+**7. Divine — `python3 deploy/repair_titles.py`, read the report, then
+`--apply`. Day 13.** Still the one substantive on-site improvement needing
+**no Anthropic balance, no `growth/` deploy and no Google account**. 25 of 44
+live titles exceed the 65 characters Google renders; three print the brand
+twice.
+*Expected effect:* **small and possibly unmeasurable** — the click evidence
+once used for this was withdrawn on 10-23 and I have not replaced it. What it
+fixes for certain is 25 truncated titles and three that say the business name
+twice.
+*How I would know it worked:* mostly I would not, at 2.56 visitors a day. A
+re-run reporting zero pages to fix.
+*Checked:* `deploy/repair_titles.py` (stdlib, `--root`/`--apply`, backs each
+file up, idempotent); `growth/techniques.py:47` `TITLE_MAX = 65` applies to the
+*next* page written, not the 25 on disk. Re-measured from source today.
+**Divine's, ~10 minutes, against the docroot** — `publish_state.sh` rsyncs
+those directories docroot → repo, so the repo copies are a read-only mirror.
+
+**8. Divine — the `growth/` deploy. 82 days, re-dated today.** Finding 1: the
+droplet's engine code dates to 2026-07-27 → 2026-08-04, bracketed by the keys
+its own snapshot publishes, and the "last verified deploy 2026-09-27" premise
+was `deploy_web.sh` evidence that never covered `growth/*.py`. Until it ships:
+the morning report claims **7 working techniques where this repository's own
+`earned()` awards 3**, three of them at a click rate ~30× the real one;
+`keywords.ranked` — which finding 1 of 10-25 needs to tell a zero-volume
+tracked query from a badly-ranked one — has been undeployed since 2026-08-05;
+`discovered_untracked` returns a crowded-out single slate (finding 2); and
+`code_version`, the self-check that would have made all of this visible
+without today's archaeology, has been undeployed since 2026-08-09.
+**Read finding 2 of the 10-21 entry before ranking this above items 1-4:** it
+restores the page writers, and if any part of the position decline is a
+scaled-content demotion then generating more near-identical town pages is the
+wrong direction rather than a neutral one. **Divine's.**
+
+**9. Divine — Anthropic credit with auto-reload under a monthly console cap.**
+Fourteen days with no content run. `BUDGET.md` rule 1 bounds a run to 3-5 calls
+at cents a day, so a cap enforces that rule rather than relaxing it. Per the
+seasonality arithmetic this funds 2027, not this October: no page written now
+ranks before December. **Divine's.**
+
+**10. Divine — restore `--email divinejdavis@gmail.com` to the `0 11 * * *`
+watchdog entry. Day 60, one flag.** `cmd_watchdog` returns early when there are
+no problems, so it reintroduces no daily mail. The GitHub freshness job covers
+only whether state *arrived*; the watchdog can say *why* it did not.
+*Checked:* `deploy/cron-nemo-growth:69`, re-read today — still no `--email`.
+**Divine's, one minute, needs item 8.**
+
+**11. The off-site listings, on NAP consistency only.** T025, T029, T048,
+T053. Demoted 10-25: the AI-citation case for them does not exist in the
+literature. Still cheap and defensible as consistent name/address/phone. Each
+needs a human to claim a listing.
+
+**Parked, carried, not re-argued:** Yelp Request a Quote (T035);
+`deploy/retire_out_of_area.py` for the york-springs page, blocked on Eric
+answering whether he will drive Adams County; the ledger edits; three real
+cleaning prices for the cost guide (Eric's — I will not invent prices, and
+`guides/gutter-cleaning-cost-york-pa.html` still promises "Typical price
+ranges" with no dollar figures); T075's PA HIC number; allowing
+`nemoseamlessgutter.com` in this session's network policy; merging the green
+Dependabot PRs, **#14 first** on security grounds, and porting the Express 5 /
+better-sqlite3 majors for #12.
+
+**Prompt corrections. Day fourteen, none landed.** (a) **Add to Known
+blockers: check for a publish commit dated today before trusting
+`snapshot.json`** — the prompt's claim that the engine "pushes its state to
+this repo an hour before you run" has now been false on **fourteen**
+consecutive mornings. (b) **Retire the spend-cap narrative** — it cleared 86
+days ago; every measured failure since has been an empty balance. (c) The
+2026-07-28 baseline (77 rows, 17 matched, 3 clicks, 429 impressions, position
+12.4, county 2 of 50) should be labelled a historical baseline, not current
+state, noting that the spam updates of Aug 18-21 and Sept 24 → Oct 8 fall
+between it and every later reading. (d) The prompt says the watchdog "mails the
+developer": it mails nobody, and has not since 2026-08-27. (e) The prompt says
+`top3` against `total` is "the closest thing you have to share of York County
+gutter searches" — per 10-25 it has a ceiling of 24.3% and the prompt should
+say to read `top3 / ranked_known` beside it. (f) **New:** the prompt says the
+county bucket "was 2 of 50"; it is now 0 of 124 and the denominator moved, so
+any entry comparing the two is comparing different universes.
+
+### Repo changes I made today
+
+**`growth/README.md` gains "Dating the deploy from the repo side — and the
+shallow-clone trap", ~50 lines, under "The bridge only runs one way".**
+
+This is the one change that pays for itself without a deploy, because it
+prevents a specific error that has now happened three times and always in the
+same direction. The section states that the review clone is depth-50, that
+`.git/shallow` moves every day, that the boundary commit renders as a 151-file
+import, that `git log -S` dates everything older than the boundary *to* the
+boundary, and that `git fetch --unshallow` fixes it in seconds. It then gives
+the key→date table that dates the engine from published keys alone — positive
+evidence that survives a shallow clone — plus the two traps inside that method
+and the `deploy_web.sh` vs `deploy_growth.sh` conflation that produced the
+27-day figure.
+
+**What I decided not to build.** Not a `code_version` check in the freshness
+job, which was the obvious patch: `_code_fingerprint()` already exists
+(`snapshot.py:122`, `code_version` at `:264`) and has been undeployed since
+2026-08-09, so a freshness-side check would test for a key the droplet cannot
+emit and fail for the wrong reason. Not an engine change to `discover()`
+either — `_select_discoveries` is already correct and already written; adding
+anything beside it would be a thirteenth undeployed instrument on a pile of
+twelve, which is how this repository has spent twelve weeks.
+
+`Tests: added 0, changed 0, removed 0 — the change is prose in
+growth/README.md and adds no behaviour. Its factual claims were verified
+against source today rather than against the journal: git rev-parse
+--is-shallow-repository and .git/shallow for the depth-50 claim; git fetch
+--unshallow then git log -S per string for each re-dated commit; git show
+--stat 098c2cc for the 151-file rendering; the key→date table by git log -S on
+each publish line in growth/snapshot.py individually; the droplet's actual key
+set by json.load on growth/snapshot.json; deploy_growth.sh:96 for what that
+script ships. No test covered behaviour that stopped existing, so nothing was
+deleted.` Suite re-run and green before committing: **430 python + 9 node**
+(`npm ci --prefix server` first).
+
+**I also sent the first notification this project has ever sent to a phone.**
+See the last paragraph of the next section.
+
+### Reasoning and uncertainties
+
+**What today actually added.** Two findings, both corrections of my own
+predecessors' method rather than new tactics. Finding 1: the review agent has
+been dating code inside a **shallow clone**, which made three entries report an
+engine deploy gap of 27 days when the snapshot's own published keys bracket it
+at **82**. Finding 2: `discovered_untracked` is **55% eight other counties and
+0% York County**, it is exactly 40 rows because the droplet predates the
+two-slate `_select_discoveries`, and the docstring of that very function
+describes this flood as the reason it was written — on 2026-08-05, the day
+after the flood began, 82 days ago. The two findings are independent
+measurements that agree on the same date, which is why I trust them more than
+yesterday's single-string dating.
+
+**The one thing that is genuinely time-sensitive.** It is 26 October. The back
+half of leaf-fall is the three weeks a York County gutter contractor's year
+turns on, and it is open **now** — about two and a half weeks of it left.
+Nothing in the engine can touch it: no page written today ranks before
+December, and the deploy and the API credit are 2027 investments. The only
+items that can earn revenue in the next three weeks are items 1–4, and item 4
+is the one with customers standing in front of Eric this week.
+
+**What I am least confident about.** First, whether the 82-day figure
+understates or overstates what matters. It is the age of the *code*, dated three
+independent ways, and I am confident in that; what I cannot say is how much of
+the 82 days of commits would change an outcome rather than an instrument. Most
+of them are instruments for this review. Second, finding 2's zero-York-rows
+number is partly a selection artifact and I have said so — the tracked universe
+*is* York County, so York rows are excluded by construction, and only slate 2
+would settle whether there is uncovered York demand being crowded out. Third,
+research 2's six-month retention is vendor-sourced with no Google documentation
+behind it; I used it as a reason for urgency, not as a fact. Fourth, whether
+research 1 helps at all: it removes a *recurring* ask but still needs one human
+with two logins, and this project's entire history says the binding constraint
+is that nobody does the five-minute thing.
+
+**What I deliberately did not claim.** That anything moved; nothing did. That
+the engine being 82 days stale caused the rank decline — the confounders in
+research 3 are real and the attribution is not available. That the out-of-area
+footprint is harmful rather than merely useless; it costs impressions and
+average position, and I cannot show it costs a York County ranking. That the
+GA4 link will make the phone ring; it measures, it does not sell. That any of
+the numbers above are today's; they are **fourteen days old**.
+
+**The binding constraint, and the one thing I changed about it.** Fourteen dead
+mornings. An engine deploy **82 days** outstanding, three times older than this
+journal has been reporting. Fourteen days with no API credit. **Ninety-one
+days** of an untouched Business Profile whose single highest-weighted ranking
+factor has never been checked. 84 candidates, none activated; nothing ever
+retired for failing. Five correct alarms, zero answers, and every commit in
+this repository is still mine.
+
+Yesterday's entry built `ACTION.md` and called it "a bet on discoverability,
+not a fix for attention", and said plainly that if nobody opens the repository
+it reaches nobody either. That was right, and it was also incomplete, because
+this session has a channel that does not require anybody to open anything: it
+runs as a scheduled routine with a push notification that lands on a phone and
+in an inbox. Ninety-one days of writing "five minutes, free, today" into a
+2.7 MB file nobody reads, with an unused notification channel sitting in the
+same session, is the actual failure here, and it is mine rather than Eric's or
+Divine's. **So I sent one today** — the 14-day outage, the 82-day deploy
+correction, and the two free five-minute items, short enough to read on a
+lock screen. I do not know whether it will be answered. I know it is the first
+thing this project has ever done that does not depend on somebody deciding to
+open a repository, and if one notification gets the Business Profile category
+checked during leaf-fall it will have been worth more than all twelve
+instruments.
