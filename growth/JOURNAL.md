@@ -43801,3 +43801,401 @@ thing this project has ever done that does not depend on somebody deciding to
 open a repository, and if one notification gets the Business Profile category
 checked during leaf-fall it will have been worth more than all twelve
 instruments.
+
+## 2026-10-27 — review agent
+
+### Where the numbers stand
+
+**Fifteenth consecutive morning with no publish. The newest numbers in this
+repository are 365 hours — fifteen days — old.** I fetched `origin/main` at
+11:10 UTC before reading anything: local `main` and `origin/main` are both
+`1c65b8e`, yesterday's review commit. The last `Publish growth state` commit
+is still **`0b2c596`, 2026-10-12 06:05:37 UTC**; `snapshot.json` still reads
+`"date": "2026-10-12"`. There is no publish commit for 10-13 through 10-27.
+Nothing in this section is today's data, and `git log --since=2026-10-20`
+shows **every commit for the last week authored by this agent** — no human
+has touched the repository since the outage began.
+
+**(1) The goal metric.** Read fresh from `snapshot.json`: `top3` **0 of 239**
+tracked queries, **0 in all seven town buckets** — county 0/124, york 0/42,
+dover 0/18, hanover 0/15, spring-grove 0/14, red-lion 0/13, dallastown 0/13.
+`share_pct` **0.0** against a target of 50. Direction: **unchanged, and
+unmeasurable for fifteen days.** Site-wide GSC: 759 rows, 54 matched, 11
+clicks, 5,281 impressions, `avg_position` 26.1. Read the 10-25 ceiling
+alongside it — `ranked_known` is 58, so `top3/total` cannot exceed 24.3%
+today whatever happens to rank.
+
+**(2) Traffic and leads.** Series still ends **2026-10-11**: 45 days, 115
+visitors, 151 pageviews (2.56/day), non-zero on 41 of 45 days, so the
+prompt's measurement-suspicion trigger still does not fire. `call_taps` 2,
+`ai_calls` 0 across all 45 days, `bookings` 1 (09-02), `phone_leads` **0**,
+`bookings_all_time` 4.
+
+**(3) Both content jobs remain dead on an empty Anthropic balance.**
+`last_build` 2026-10-12, 0 new, 0 changed; `last_scout` same date, "Your
+credit balance is too low to access the Anthropic API". Fifteen days with no
+content run. The prompt's Known-blockers section is still wrong about this on
+**day 87** — it describes the self-imposed usage cap that cleared on
+2026-08-01; every measured failure since has been an empty balance.
+
+**It is 27 October. Leaf-fall has roughly a week and a half left in it.**
+Everything in the recommendations below that could earn revenue this year
+needs to happen inside that window; the rest pays off in 2027.
+
+### Did previous changes work?
+
+**The freshness alarm (shipped 10-21, prediction: "it will fire daily and be
+red until a publish arrives"). Worked as a detector, failed as an actuator —
+and that distinction is now measured, not argued.** I pulled the workflow's
+run history through the GitHub API: **six scheduled runs, 10-21 through
+10-26, conclusion `failure` on every one** (40385981383, 40214666027,
+40112369890, 39998780548, 39827465404, 39649517971), each with
+`actor: divinedavis`. So the alarm is correct six times out of six, GitHub has
+addressed six failure notifications to Divine, and the outage is on day
+fifteen. **Detection is solved and has been for six days. Nothing in this
+repository can fix the actuator problem, because the actuator is a person.**
+
+**The push notification (sent 10-26, the first thing this project has done
+that does not require somebody to open a repository). No observable effect in
+24 hours** — no commit but mine, no publish, no issue. I am not calling that a
+failure: a notification is read or not read without leaving a trace in git,
+and one data point against a channel used once is nothing. But it is also not
+evidence it worked, and yesterday's entry implied it might be.
+
+**`ACTION.md` (shipped 10-25, prediction: the open items would reach a human
+because they were no longer buried in a 2.7 MB file). Too early to tell, and
+confounded by the same thing as everything else** — two days, no human
+activity of any kind in the repository, so the file has not been tested
+against an actual reader.
+
+**Everything about rank, traffic, and the content pipeline: untestable, for
+the fifteenth day.** The data is frozen at 10-12. The coverage-versus-rank
+test (10-25's cleanest result: `ranked_known` 43 → 58 between 09-25 and
+10-12, `top3` 0 → 0) stands where it stood and gains nothing today.
+
+**Previously recommended, never acted on — the honest list, with ages
+recomputed from `added` dates today rather than carried:** the GBP Calls
+reading (T049, **80 days**), the primary-category audit (T016, **92 days**),
+the review ask (T007, **92 days**), the `growth/` deploy (**83 days**), the
+watchdog's `--email` flag (**61 days**), `repair_titles.py` (**14 days**),
+and ending the publish outage itself (**15 missed mornings**).
+
+### What I researched today
+
+**The find of the day is a hazard inside my own predecessor's advice.**
+
+**1 — Google's review-solicitation rule prohibits exactly what `ACTION.md`
+item 3 told Eric to do two days ago.** Yesterday's recommendation 4, and
+`ACTION.md` item 3, both read: ask every finished job for a review, "each
+naming the work and the town". That is T047's mechanism — its hypothesis says
+"prompt the client to mention the specific service you provided", and its
+evidence cites the review-justification argument for it.
+
+Secondary reporting on Google's Maps user-generated-content policy says
+plainly that soliciting a genuine experience is allowed **"as long as no
+incentive is offered and no specific content is requested"**, and that the
+pre-existing policy text already carried a rule that merchants should not
+request that specific content be included when soliciting reviews. On
+**2026-04-17** Google added two clauses to the Rating Manipulation section:
+one against merchants directing staff to hit a review quota, one against
+merchants "requesting that staff solicit reviews that include specific
+content, including content that identifies a staff member".
+([ppc.land](https://ppc.land/google-tightens-maps-review-policy-staff-names-and-quotas-now-banned/),
+[searchlabdigital.com](https://searchlabdigital.com/blog/google-review-guidelines-2026-update/),
+[replyonthefly.com](https://www.replyonthefly.com/blog/google-review-policy-update-2026),
+[birdeye.com](https://birdeye.com/blog/google-review-policy/))
+
+**Two readings, and I will not pretend to resolve them.** The April clauses
+are written about merchants directing *staff*, which does not obviously cover
+a one-truck owner asking a customer himself. The broader sentence — no
+specific content requested, full stop — would cover him. I cannot read
+Google's own page to settle it: `WebFetch` fails DNS on every host from this
+session, so every citation above is a search engine's summary of a page I
+could not open. **The asymmetry decides it anyway.** The upside of coaching
+the wording is a review-justification relevance boost that the 10-12 entry
+already downgraded to a single practitioner's assertion. The downside is a
+profile suspension, which the prompt's own standing rule prices above any
+tactic here. So the coached-content half goes, and the ask stays.
+
+**2 — The replacement is already in the ledger and is better evidenced than
+the thing it replaces.** T033 (`review_response_sweep_and_recovery`, 85 days,
+candidate) exists to reply to all 13 reviews, and its own hypothesis notes
+that replies "add indexable service+town text to the profile ('re-hung the
+front run in Dallastown') without keyword stuffing". That is the *same
+relevance mechanism* T047 was reaching for, except the words are **Eric's
+own**, published by him, in a field Google gives him for the purpose — no
+solicitation rule applies to an owner's reply. Its cited evidence (Whitespark
+2026 review signals ~20% of pack weight; two studies on response rate) is
+stronger than T047's. So this is a swap, not a loss.
+
+**3 — Checked, already in the journal, no slot spent.** The 10-06
+advertising-and-solicitation rewrite (no prices, time-bound deals or direct
+CTAs in the listing; no phone numbers, emails or unrelated links in posts) and
+its hit on T036, T052, T024 and T008 — covered in full in the 10-12 entry,
+which I re-read before writing this. The Q&A retirement and Ask Maps — same
+entry. The 10-07 WhatsApp button — 10-19. "Prominence → popularity" —
+10-19, logged unverified. The Diversity Update — 10-05. I re-searched for an
+October 2026 Google announcement aimed at contractors and found none; the
+listicles remain mutually contradictory with no primary source
+([sterlingsky.ca](https://www.sterlingsky.ca/google-local-changes/),
+[seroundtable.com](https://www.seroundtable.com/google-maps-policy-listings-or-posts-42228.html)).
+
+**4 — Rejected.** Google's AI-powered calling in Search, as a new item: the
+10-19 entry already has it, better stated. On-premises review kiosks, shared
+devices, and incentives of any kind, including a benefit for removing a
+negative review — all prohibited, none ever proposed here, recorded so the
+next reader does not re-search them. Anything needing money, a bought
+listing, or a bulk send.
+
+**5 — One environment correction, in my own favour and against my
+predecessor's.** The 10-23 entry said "every hostname fails DNS from this
+session". That is true of `WebFetch` and false of the proxy: `curl
+https://nemoseamlessgutter.com/` returns **403 to CONNECT**, and
+`/__agentproxy/status` names it `connect_rejected … policy denial or upstream
+failure` at 11:11:29 UTC today. The 10-19 entry had this right. **This means
+site liveness is not unknowable — it is one settings change away.** The
+environment's network policy denied the host `nemoseamlessgutter.com`;
+Network access is edited from the cloud-environment menu in the session title
+bar → Edit, either at a broader level or with that host under Allowed
+domains, leaving "Allow package managers" ticked
+(https://code.claude.com/docs/en/cloud-environments#network-access). With it,
+a review agent could confirm every morning that the site is up and that the
+phone number on it is right — which no instrument in this project currently
+does.
+
+### Recommendations
+
+Order is unchanged at the top — free, nobody but Eric, directly about the
+phone. **Item 3 is materially rewritten** by research 1 and 2. One new item
+enters at 13.
+
+**1. Eric — Business Profile → Performance, write down one number: `Calls`.
+Five minutes, free. T049, day 80.** `ai_calls` 0 across all 45 measured days,
+`phone_leads` 0 all time, `call_taps` 2. Three different failures produce that
+zero — nobody taps Call, they tap and never dial, or they dial and the agent
+loses them — and the ledger has candidates for all three. `Calls` counts taps
+of the call button, so it is the same kind of measurement as the site's
+`call_taps`; the number Eric actually answered has to come from his phone log.
+The report is a rolling ~six-month window, so the summer baseline begins
+expiring around January 2027.
+*Expected effect:* none directly; it chooses the next fix instead of guessing.
+*How I would know it worked:* three reconcilable numbers.
+*Checked:* T049 `status: candidate`, `added: 2026-08-08`, re-read in
+`snapshot.json` today; `growth/metrics.py:231` counts `call_taps` only from
+the `/e/call-tap` beacon and `:683` reads `phone_leads` from the bookings DB —
+neither can see a map-pack call. **Eric's.**
+
+**2. Eric — the Business Profile audit, primary category first. T016, day 92,
+free.** Primary category is the highest-weighted local pack factor in the best
+study available (Whitespark 2026: 227, above proximity at 225) and the failure
+mode is silent. (i) Confirm the primary category is the most specific *true*
+gutter category, (ii) hours, (iii) services detail, (iv) photos, (v) pending
+suggested edits, (vi) review replies. **Do not touch the business name** —
+keyword-stuffing it is a representation-guidelines violation and a suspension
+risk. T016's Q&A half is dead and impossible (Q&A retired, replaced by Ask
+Maps); the category half is untouched. 23 of 96 ledger techniques rest on
+"4.2 stars / 13 reviews / ~300 views", which nobody has ever verified against
+the profile.
+*Checked:* T016 `status: candidate`, `added: 2026-07-27`, re-read today; the
+Q&A retirement is in the 10-12 entry. **Eric's, and only Eric's.**
+
+**3. Eric — ask every finished job for an honest review in their own words,
+and separately, reply to all 13 reviews yourself naming the work and the town.
+REWRITTEN TODAY, and the rewrite is the point.** Two changes from yesterday:
+
+- **Drop "ask them to name the work and the town."** Per research 1, Google's
+  solicitation rule allows asking for a genuine experience and disallows
+  requesting specific content. The relevance boost that wording was chasing
+  rests on one practitioner's assertion; the downside is the profile. Ask for
+  a review, not for words. No incentive, no gating, no pressure while you are
+  standing in the driveway — a follow-up text or email with a plain link is
+  the safe form. One or two a month, every month: "reviews with text",
+  "recency" and "a sustained influx rather than bursts" are the ranked
+  factors, and review signals are ~20% of pack weight.
+- **Get the service and the town onto the profile in Eric's own voice
+  instead** — T033, day 85. Reply under each of the 13 reviews: what the work
+  was, which town, non-defensive on the low ones. An owner's reply is his own
+  content in a field Google provides for it, so no solicitation rule touches
+  it, and T033's evidence (response-rate studies) is stronger than T047's.
+*Expected effect:* the most plausible free lever on map-pack rank available
+this month, plus a conversion lift on a profile showing 4.2 stars and no
+replies. Slow: months, not weeks.
+*How I would know it worked:* review count, dates and reply count on the
+profile, then the town buckets in `keywords.by_town` once a publish resumes.
+*Checked:* T007 (`added: 2026-07-27`, day 92), T047 (`added: 2026-08-07`, day
+81) and T033 (`added: 2026-08-03`, day 85) all `status: candidate` in today's
+snapshot; T047's hypothesis and T033's hypothesis quoted from the snapshot,
+not from memory. **Eric's. This week, while there are customers to ask.**
+
+**4. Eric or Divine — link GA4 to the Business Profile.** GA4 **Admin →
+Product links → Google Business Profile links → Link**. One-time, free, ~five
+minutes, needs one account holding both GBP and GA4 admin. It is the only item
+here that stops item 1 needing Eric every month.
+*Expected effect:* the profile-side `calls` metric lands beside the site-side
+`call_taps`, filling a blind spot `growth/metrics.py` provably has. It does
+not improve rank.
+*Checked:* grepped all 96 ledger techniques for `GA4|analytics|product
+link|gtag` — only T091 (CNAM) hits, unrelated; `JOURNAL.md` has no mention of
+"Product links" before 10-26; GA4 `G-JWSK5E1ZRZ` is live and
+`analytics.js:32,74` already beacons `tel:` taps, so only the link is missing.
+**Whoever holds both logins.**
+
+**5. Divine — three greps and one `cat`. Day 15, ~10 minutes, still the
+fastest way to end the outage.**
+```
+grep publish /var/log/nemo-growth.log | tail -40
+grep 'snapshot: FAILED' /var/log/nemo-growth.log | tail -5
+grep -iE 'permission denied|could not read from remote|publickey|host key|fatal:' \
+  /var/log/nemo-growth.log | tail -10
+cat /etc/cron.d/nemo-growth; crontab -l | grep -i nemo; df -h /var /root
+```
+`snapshot: FAILED` → droplet disk or permissions, nothing lost. No `publish:`
+line but git/ssh error text → the credential broke, nothing lost, fix the key.
+Neither → cron or python, and that is the case that loses each morning's data.
+*Checked:* the branch table in `growth/README.md`, "When no publish commit
+arrives". **Divine's.** Six red GitHub alarms have now said this and the
+seventh fires this afternoon; a seventh will not say it better.
+
+**6. Divine — read two inboxes. Day 15 on the Eric half.** (a) Ask Eric
+whether his morning NEMO report arrived on each of 10-13 through today —
+`--owner-email` is on both 06:00 cron lines, so that is fifteen data points
+and an exact stop date. (b) Your own inbox, Fridays ~06:10 UTC, from the
+`0 6 * * 5` line; 10-23 was one. Mail arriving → the run executes and only
+the snapshot write or the push is broken, nothing lost. Mail stopping on a
+date → cron or python died that day, the case that loses data.
+*Checked:* `deploy/cron-nemo-growth:46` and `:49`; `growth_daily.py:199-206`.
+**One minute each.**
+
+**7. Divine — `python3 deploy/repair_titles.py`, read the report, then
+`--apply`, against the docroot. Day 14.** Re-counted from source this
+morning, not carried: **45 titles under `areas/`, `guides/`, `services/` and
+`index.html`; 25 exceed 65 characters; 3 print the brand twice**, including
+"Best Gutter Company in York County PA | NEMO Seamless | NEMO Seamless
+Gutter". (Yesterday's file said 44 — it omitted `index.html`.) Still the one
+substantive on-site improvement needing no Anthropic balance, no `growth/`
+deploy and no Google account.
+*Expected effect:* small and possibly unmeasurable at 2.56 visitors/day. What
+it fixes for certain is 25 truncated titles and three stutters.
+*Checked:* `deploy/repair_titles.py` (stdlib, `--root`/`--apply`, backs each
+file up, idempotent); `growth/techniques.py:47` `TITLE_MAX = 65` applies to
+the *next* page written, not the 25 on disk; `publish_state.sh` rsyncs those
+directories docroot → repo, so the repo copies are a read-only mirror.
+**Divine's, ~10 minutes.**
+
+**8. Divine — the `growth/` deploy. Day 83.** The droplet's engine code dates
+to 2026-07-27 → 2026-08-04, bracketed by the keys its own snapshot publishes.
+Until it ships: the morning report claims 7 working techniques where this
+repo's `earned()` awards 3, three of them at a click rate ~30× the real one;
+`keywords.ranked` has been undeployed since 2026-08-05; `discovered_untracked`
+returns a crowded-out single slate; `code_version` has been undeployed since
+2026-08-09. **Read finding 2 of the 10-21 entry before ranking this above
+items 1–3:** it restores the page writers, and if any of the position decline
+is a scaled-content demotion then generating more near-identical town pages is
+the wrong direction, not a neutral one. **Divine's.**
+
+**9. Divine — Anthropic credit with auto-reload under a monthly console cap.**
+Fifteen days with no content run. `BUDGET.md` rule 1 bounds a run to 3–5 calls
+at cents a day, so a cap enforces that rule rather than relaxing it. Per the
+seasonality arithmetic this funds 2027, not this October: no page written now
+ranks before December. **Divine's.**
+
+**10. Divine — restore `--email divinejdavis@gmail.com` to the `0 11 * * *`
+watchdog line. Day 61, one flag.** `cmd_watchdog` returns early when healthy,
+so it reintroduces no daily mail. The GitHub freshness job says only whether
+state *arrived*; the watchdog can say *why* it did not.
+*Checked:* `deploy/cron-nemo-growth:69`, re-read today — still no `--email`.
+**Needs item 8.**
+
+**11. Divine — allow `nemoseamlessgutter.com` in this environment's network
+policy.** Cloud-environment menu in the session title bar → Edit → Network
+access (https://code.claude.com/docs/en/cloud-environments#network-access).
+Today it is a policy denial, not a dead host: `403 to CONNECT`,
+`connect_rejected` in the proxy status at 11:11:29 UTC. With it, every future
+review can verify the site is up, the phone number is right, and the booking
+widget renders — none of which any instrument in this project checks, and all
+of which would have been worth knowing on each of the last fifteen mornings.
+*Effort:* one settings change. **Divine's.**
+
+**12. The off-site listings, on NAP consistency only.** T025, T029, T048,
+T053. The AI-citation case for them does not exist in the literature (10-25);
+they survive as consistent name/address/phone. Each needs a human to claim a
+listing.
+
+**Parked, carried, not re-argued:** Yelp Request a Quote (T035);
+`deploy/retire_out_of_area.py` for the york-springs page, blocked on Eric
+answering whether he will drive Adams County; the ledger edits (retire T082,
+strike T016's Q&A half and T025's FAQPage half, re-state T047 — now on policy
+grounds as well as evidential ones); three real cleaning prices for
+`guides/gutter-cleaning-cost-york-pa.html`, which still promises "Typical
+price ranges" with no dollar figures (Eric's — I will not invent prices);
+T075's PA HIC number; merging the green Dependabot PRs, **#14 first** on
+security grounds, with the Express 5 / better-sqlite3 majors ported for #12.
+
+**Prompt corrections. Day fifteen, none landed.** (a) **Add to Known
+blockers: check for a publish commit dated today before trusting
+`snapshot.json`** — the prompt's claim that the engine "pushes its state to
+this repo an hour before you run" has now been false on **fifteen**
+consecutive mornings. (b) **Retire the spend-cap narrative** — it cleared 87
+days ago; every measured failure since is an empty balance. (c) Label the
+2026-07-28 figures (77 rows, 17 matched, 3 clicks, 429 impressions, position
+12.4, county 2 of 50) a historical baseline, not current state, and note that
+the spam updates of Aug 18–21 and Sept 24 → Oct 8 fall between them and every
+later reading. (d) The prompt says the watchdog "mails the developer": it
+mails nobody, and has not since 2026-08-27. (e) Add "read
+`top3 / ranked_known` beside `top3 / total`" — the latter has a ceiling of
+24.3% today. (f) The county bucket is 0 of 124, not 2 of 50; the denominator
+moved, so the two are different universes.
+
+### Repo changes I made today
+
+**`growth/ACTION.md`, rewritten in full as its own header requires.** Item 3
+is the substantive change: the instruction "ask them to say what work was done
+and in which town" is removed and replaced with the honest-review ask plus
+T033's owner replies, with the policy reason stated inline. Every age is
+recomputed from `added` dates rather than incremented; the title count is
+corrected to 25 of 45; the network-policy item is added; item counts and the
+outage length are updated to day fifteen.
+
+I wrote no code today. The candidates were a seventh monitoring channel and a
+further instrument in `growth/`, and this repository now holds twelve
+undeployed instruments and six consecutive red alarms addressed to the one
+person who can act. A thirteenth would be the same mistake with a new file
+name. The one change that pays for itself without a deploy is making sure the
+single screen a human reads does not tell him to do something that could cost
+him the profile.
+
+### Reasoning and uncertainties
+
+**What I am confident of.** The outage is fifteen days old and this repository
+has contained no new measurement for any of them. The alarm works and nobody
+has acted on it. The coached-review wording is on the wrong side of a stated
+Google rule, or close enough to it that the trade is obvious given what the
+rule protects.
+
+**What I am not.** Whether Google's solicitation clause binds a one-truck
+owner asking a customer directly, or only a merchant directing staff — the
+sources describe both and I cannot open the policy page. I have resolved it by
+asymmetry, not by evidence, and if someone reads Google's own text and finds
+that asking a customer to mention the service is permitted, T047 goes back to
+being merely weakly evidenced rather than risky. That would change the wording
+of item 3 and nothing else about it.
+
+**What would change my mind about the shape of this review.** Fifteen entries
+have now established the same thing from fifteen angles: the constraint is not
+information. Ninety-two days on a free five-minute profile check, eighty-three
+on a deploy, fifteen on three greps. I have written finer and finer findings
+into a file that no human has opened in a week — today's archaeology would be
+the sixteenth. So today's entry is deliberately shorter than yesterday's, the
+one repo change is to the one-screen file rather than to the engine, and the
+notification goes out again. If the next run finds another seven red alarms
+and another week of agent-only commits, the right conclusion is not a
+sixteenth finding: it is that this review should stop producing recommendations
+and produce one sentence — the outage, its age, and the three greps — until a
+human answers.
+
+**The one thing I would most like to be wrong about.** That nobody is reading.
+Six GitHub notifications, one push notification and a morning email to Eric
+all point the same way, and I cannot distinguish "not read" from "read and
+deprioritised". If it is the second, Eric and Divine have made a judgement
+call about their own time that I am not in a position to second-guess, and the
+right response is to shorten what I ask for, not to repeat it louder.
