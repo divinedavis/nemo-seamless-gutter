@@ -44199,3 +44199,179 @@ all point the same way, and I cannot distinguish "not read" from "read and
 deprioritised". If it is the second, Eric and Divine have made a judgement
 call about their own time that I am not in a position to second-guess, and the
 right response is to shorten what I ask for, not to repeat it louder.
+
+## 2026-10-28 — review agent
+
+**Sixteenth consecutive morning with no publish. This entry is deliberately
+short, because yesterday's said it would be.** The 10-27 entry closed: "If the
+next run finds another seven red alarms and another week of agent-only commits,
+the right conclusion is not a sixteenth finding: it is that this review should
+stop producing recommendations and produce one sentence — the outage, its age,
+and the three greps — until a human answers." It found exactly that. So I am
+honouring it rather than writing a sixteenth archaeology into a file nobody has
+opened in nine days.
+
+### Where the numbers stand
+
+Nothing in this section is today's data. I fetched `origin/main` at 11:12 UTC
+before reading anything: local and remote are both `793d2ab`, yesterday's
+review commit. The last `Publish growth state` commit is still **`0b2c596`,
+2026-10-12 06:05:37 UTC**; `snapshot.json` still reads `"date": "2026-10-12"`.
+**389 hours old.** No publish commit exists for 10-13 through 10-28, and
+`git log --since=2026-10-20` is still **every commit authored by this agent** —
+no human has touched the repository since the outage began.
+
+- **Goal metric:** `top3` **0 of 239**, **0 in all seven town buckets** (county
+  0/124, york 0/42, dover 0/18, hanover 0/15, spring-grove 0/14, red-lion
+  0/13, dallastown 0/13). `share_pct` **0.0** against a target of 50.
+  Direction: **unchanged, and unmeasurable for sixteen days.** `ranked_known`
+  58, so `top3/total` has a ceiling of 24.3% today whatever rank does.
+- **Site-wide GSC:** 759 rows, 54 matched, 11 clicks, 5,281 impressions,
+  `avg_position` 26.1.
+- **Traffic and leads:** series still ends **2026-10-11** — 45 days, 115
+  visitors, 151 pageviews (2.56/day), non-zero on **41 of 45** days, so the
+  prompt's measurement-suspicion trigger still does not fire. `call_taps` 2,
+  `ai_calls` 0, `bookings` 1 (09-02), `phone_leads` **0**, `bookings_all_time` 4.
+- **Both content jobs still dead on an empty balance.** `last_build` 2026-10-12,
+  0 new, 0 changed; `last_scout` same date, "Your credit balance is too low to
+  access the Anthropic API". The prompt's Known-blockers section is still wrong
+  about this on **day 88** — it describes the self-imposed usage cap that
+  cleared on 2026-08-01; every measured failure since has been an empty balance.
+
+**It is 28 October.** Leaf-fall has about a week left. After that, nothing on
+the list earns revenue before 2027.
+
+### Did previous changes work?
+
+**The freshness alarm: seven scheduled runs, 10-21 through 10-28's predecessor,
+conclusion `failure` on every one.** Run 7 is `40562540349` (2026-10-27
+18:43 UTC, `event: schedule`, `actor: divinedavis`), joining the six in
+yesterday's entry. **Detection has now been correct seven times out of seven
+and has changed nothing in seven days.** The actuator is a person; nothing in
+this repository reaches one.
+
+**The push notification (sent 10-26 and again 10-27): still no observable
+effect.** No commit but mine, no issue, no publish. As I said yesterday, that
+is not evidence of failure — a notification leaves no trace in git either way —
+but two sends and nothing is worth recording honestly. I sent a third today,
+before writing this, and shortened it to the outage plus the four commands.
+
+**`ACTION.md` (10-25): four days, still untested against a human reader.**
+
+**Everything about rank, traffic and content: untestable, sixteenth day.** The
+coverage-versus-rank null result (`ranked_known` 43 → 58 between 09-25 and
+10-12, `top3` 0 → 0) stands and gains nothing.
+
+**Never acted on, ages recomputed from `added` today:** the GBP Calls reading
+(T049, **81 days**), the primary-category audit (T016, **93 days**), the review
+ask (T007, **93 days**), the `growth/` deploy (**84 days**), the watchdog's
+`--email` flag (**62 days**), `repair_titles.py` (**15 days**), and the outage
+itself (**16 missed mornings**).
+
+### What I researched today
+
+Two searches, not a sweep. Yesterday's entry left exactly one question open and
+I spent the research on closing it.
+
+**1 — Yesterday's open uncertainty is now resolved, and it resolves in favour
+of the change my predecessor made on asymmetry alone.** The 10-27 entry removed
+"ask them to name the work and the town" from `ACTION.md` item 3 because
+Google's solicitation rule *might* cover a one-truck owner coaching a customer,
+and could not tell whether the April 2026 clauses — written about merchants
+directing *staff* — reached him. They do not need to. Google's own allowance
+sentence, quoted consistently across today's sources, permits a merchant to
+"solicit or encourage the posting of content that does represent a genuine
+experience, **without offering incentives to do so or attempting to influence
+the rating or the contents of the review**". The final clause is general, is
+about the merchant rather than his staff, and predates April. Coaching a
+customer to name the service is an attempt to influence the contents. One
+source states directly that the content rule covers asking a customer to
+mention a specific service, package or keyword, not only staff names.
+([cloutly.com](https://cloutly.com/blog/google-review-policy/),
+[ppc.land](https://ppc.land/google-tightens-maps-review-policy-staff-names-and-quotas-now-banned/),
+[launchcodex.com](https://launchcodex.com/blog/seo-geo-ai/google-business-profile-review-policy-update/),
+[replyonthefly.com](https://www.replyonthefly.com/blog/google-review-policy-update-2026),
+[mckinneycv.com](https://www.mckinneycv.com/resources/google-review-policy-guide/))
+
+So **T047 is not merely weakly evidenced, it is against policy, and should be
+retired rather than left a candidate** — the one ledger edit I would make today
+if ledger edits were mine to make. T007 (ask, plainly worded) and T033 (reply in
+Eric's own voice) are unaffected and remain the whole of item 3. Caveat
+unchanged and still honest: these are secondary sources. `WebFetch` fails DNS
+from this session, so I have not read Google's policy page, only consistent
+quotations of one sentence from it.
+
+**2 — No confirmable October 2026 local ranking change.** Google's own help
+text as of this month still describes local results as "mainly based on
+relevance, distance, and popularity"
+([ppc.land](https://ppc.land/local-pack/)). A Whitespark Q3 2026 roundup dated
+10-08 exists but I could only see its title. **Rejected:** a claim that
+accounts uploading owner photos monthly held position through October churn
+while six-month-stale profiles lost ~1.8 pack positions — no methodology, a
+low-authority mirror site, and the idea is **already in the ledger** as T022
+(itemised Services + weekly job photo) and T083 (backfill 100 job photos), so
+it would buy no slot even if it were sound. Recorded so nobody re-chases it.
+([storerocket.io](https://storerocket.io/learn/local-seo-ranking-factors))
+
+### Recommendations
+
+**One sentence, as promised: end the publish outage — it is sixteen days old,
+and it is three greps and one `cat`.**
+
+```
+grep publish /var/log/nemo-growth.log | tail -40
+grep 'snapshot: FAILED' /var/log/nemo-growth.log | tail -5
+grep -iE 'permission denied|could not read from remote|publickey|host key|fatal:' \
+  /var/log/nemo-growth.log | tail -10
+cat /etc/cron.d/nemo-growth; crontab -l | grep -i nemo; df -h /var /root
+```
+
+`snapshot: FAILED` → droplet disk or permissions, nothing lost. No `publish:`
+line but git/ssh error text → the credential broke, nothing lost, fix the key.
+**Neither → cron or python died, and that is the case that loses each morning's
+data permanently.** Branch table: `growth/README.md`, "When no publish commit
+arrives". **Divine's, ~10 minutes.**
+
+Everything else — Eric's three free five-minute items at 93, 93 and 81 days,
+the 84-day deploy, the Anthropic credit, the title refit, the watchdog flag, the
+network policy, the Dependabot merges — is **unchanged from yesterday and is on
+one screen in `growth/ACTION.md`**. I am not re-ranking or re-arguing a list
+whose top item has been free, five minutes and unactioned for three months.
+Re-stating it a sixteenth time in different words is the thing that has not 
+worked.
+
+### Repo changes I made today
+
+**`growth/ACTION.md`, rewritten in full as its own header requires — and
+shortened.** The four diagnostic commands are now **inlined in item 7** instead
+of pointing at a README section, removing the one click between a reader and the
+fix. Ages recomputed from `added` dates. Item 3's policy basis upgraded from
+"asymmetry" to Google's own allowance clause, with the note that T047 should be
+retired outright. Outage counters to day sixteen and seven red alarms.
+
+**No code.** This repository holds thirteen undeployed instruments and seven red
+alarms addressed to the one person who can act. A fourteenth would be the same
+mistake with a new file name, and I said so yesterday.
+
+### Reasoning and uncertainties
+
+**What I am confident of.** The outage is sixteen days old; this repository has
+contained no new measurement for any of them; the alarm is correct and inert;
+and the coached-review wording is now on the wrong side of a Google sentence
+rather than merely on the wrong side of a bet.
+
+**What I am not.** Whether anyone is reading. Seven GitHub notifications, three
+push notifications and a daily email to Eric all point the same way, and I still
+cannot distinguish "not read" from "read and deprioritised". If it is the
+second, that is Eric and Divine's judgement about their own time and not mine to
+second-guess — and the correct response to it is a shorter ask, not a louder
+one, which is what this entry is.
+
+**What would change my mind.** A publish commit, a human commit, or a reply. Any
+of the three and the next entry goes back to being a full review: there would be
+sixteen days of fresh data to read, and the first snapshot after the outage will
+be unusually clean, since no confirmed Google ranking update has run inside the
+gap. Absent all three, the next entry should be this one, shorter.
+
+**The thing I will not do.** Discover a seventeenth finding tomorrow to justify
+the run. The constraint has not been information for a long time.
