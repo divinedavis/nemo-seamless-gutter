@@ -356,6 +356,39 @@ class Rotations(unittest.TestCase):
         got = [os.path.basename(p) for p in metrics.rotations(self.log)]
         self.assertEqual(got, ["nemo-access.log"])
 
+    def test_dateext_rotations_are_read_newest_first(self):
+        """logrotate's `dateext` names archives by date, not by number.
+
+        Matching only `.1`/`.2.gz` left this returning the live log alone, so a
+        backfill over a dead fortnight read one day and reported success.
+        """
+        for n in ("nemo-access.log", "nemo-access.log-20261030.gz",
+                  "nemo-access.log-20261101", "nemo-access.log-20261031.gz"):
+            self.touch(n)
+        got = [os.path.basename(p) for p in metrics.rotations(self.log)]
+        self.assertEqual(got, ["nemo-access.log",
+                               "nemo-access.log-20261101",
+                               "nemo-access.log-20261031.gz",
+                               "nemo-access.log-20261030.gz"])
+
+    def test_a_dashed_dateformat_is_also_a_rotation(self):
+        """logrotate's `dateformat` is configurable; -%Y-%m-%d is common."""
+        for n in ("nemo-access.log", "nemo-access.log-2026-10-30.gz",
+                  "nemo-access.log-2026-11-01"):
+            self.touch(n)
+        got = [os.path.basename(p) for p in metrics.rotations(self.log)]
+        self.assertEqual(got, ["nemo-access.log",
+                               "nemo-access.log-2026-11-01",
+                               "nemo-access.log-2026-10-30.gz"])
+
+    def test_a_date_suffix_that_is_not_a_date_is_ignored(self):
+        self.touch("nemo-access.log")
+        self.touch("nemo-access.log-backup")
+        self.touch("nemo-access.log-2026110.gz")
+        self.touch("nemo-access.log-old")
+        got = [os.path.basename(p) for p in metrics.rotations(self.log)]
+        self.assertEqual(got, ["nemo-access.log"])
+
 
 class PageviewBeacon(BaseCollect):
     """From PV_START, a visitor is a browser that fired /e/pv.

@@ -382,6 +382,22 @@ def rotations(path):
     logrotate has kept, so the whole set is enumerated rather than the first two
     guessed at. Lines are date-filtered anyway, so reading an extra archive
     costs a scan and changes no number.
+
+    Both of logrotate's naming schemes are recognised, because getting this
+    wrong fails silently in the worst possible way. Without `dateext` it writes
+    `nemo-access.log.1`, `.2.gz`; with `dateext` — the default on RHEL-family
+    distributions and a one-line opt-in anywhere else — it writes
+    `nemo-access.log-20261019.gz` instead. Matching only the numeric form means
+    `rotations()` returns the live log alone, so a `measure --days 21` backfill
+    reads today and reports success having recovered nothing. That is
+    unrecoverable by the time anyone notices, since the point of the backfill is
+    that the logs are about to rotate away.
+
+    `dateformat` is itself configurable, so both the default `-%Y%m%d` and the
+    commonly written `-%Y-%m-%d` are accepted: the suffix may hold dashes, but
+    it must carry exactly eight digits, which keeps a hand-made
+    `nemo-access.log-backup` or `.log-old` out of the set. Sorting on the digits
+    alone makes the two formats order identically.
     """
     out = [path]
     d, base = os.path.dirname(path) or ".", os.path.basename(path)
@@ -389,14 +405,24 @@ def rotations(path):
         names = os.listdir(d)
     except OSError:
         return out
-    keyed = []
+    numbered, dated = [], []
     for n in names:
-        if not n.startswith(base + "."):
+        if not n.startswith(base) or n == base:
             continue
-        suffix = n[len(base) + 1:].removesuffix(".gz")
-        if suffix.isdigit():
-            keyed.append((int(suffix), os.path.join(d, n)))
-    return out + [p for _, p in sorted(keyed)]
+        suffix = n[len(base):].removesuffix(".gz")
+        if suffix[:1] == "." and suffix[1:].isdigit():
+            numbered.append((int(suffix[1:]), os.path.join(d, n)))
+            continue
+        if suffix[:1] != "-":
+            continue
+        digits = suffix[1:].replace("-", "")
+        if len(digits) == 8 and digits.isdigit():
+            dated.append((digits, os.path.join(d, n)))
+    # Numeric ascending and date descending are both newest-first. The two
+    # schemes do not coexist in practice; if they ever did, order still changes
+    # no number because read_log() filters every line by date.
+    return (out + [p for _, p in sorted(numbered)]
+            + [p for _, p in sorted(dated, reverse=True)])
 
 
 def read_log(dates, path=None):

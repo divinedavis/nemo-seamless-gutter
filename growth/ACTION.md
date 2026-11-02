@@ -1,11 +1,12 @@
 # Open items — what is waiting on a human
 
-**Rewritten by the review agent on every run. Generated 2026-11-01.**
+**Rewritten by the review agent on every run. Generated 2026-11-02.**
 If the date above is not roughly today's, this file is stale and
 [`JOURNAL.md`](JOURNAL.md)'s last entry wins. Nothing here is a decision; every
-line is a recommendation Eric or Divine can accept or reject. The 2026-11-01
-run changed counters and ages and added item 0a, the one command on this list
-that is cheaper today than tomorrow: traffic history is now being lost.
+line is a recommendation Eric or Divine can accept or reject. The 2026-11-02
+run changed counters and ages and rewrote item 0a: that one command now answers
+two questions, because the backfill it feeds was found to read nothing at all
+on one of logrotate's two naming schemes.
 
 Why this file exists: `JOURNAL.md` is append-only and 2.8 MB. That is correct
 for a decision log — it shows what was believed at the time — but it means the
@@ -13,7 +14,7 @@ for a decision log — it shows what was believed at the time — but it means t
 take five minutes each, need nobody's permission, and the oldest has been open
 for **97 days**.
 
-**It is 1 November, leaf-fall is over, and we are now inside the next window
+**It is 2 November, leaf-fall is over, and we are now inside the next window
 with about two weeks left.** The autumn spike passed end to end with the engine dead. But
 **ice-dam season (Jan–Feb) is the second spike**, and vendor estimates put a
 long-tail local page at roughly 8–12 weeks from publish to useful rank — so
@@ -28,22 +29,39 @@ these are vendor timings, not Google's, and the lane needs a snowy winter.
 
 ## Item 0 — the one that blocks everything else
 
-**The engine has published nothing for twenty mornings** (last publish
-`0b2c596`, 2026-10-12 06:05 UTC). Every number this project reports is 485
-hours old. The GitHub freshness alarm has gone red on **eleven consecutive
-scheduled runs**, 10-21 through 10-31, each notification addressed to Divine.
+**The engine has published nothing for twenty-one mornings** (last publish
+`0b2c596`, 2026-10-12 06:05 UTC). Every number this project reports is 509
+hours old. The GitHub freshness alarm has gone red on **twelve consecutive
+scheduled runs**, 10-21 through 11-01, each notification addressed to Divine.
 
 **Item 0a, ten seconds, do it first: `ls -la /var/log/nginx/nemo-access.log*`.**
-Traffic history is no longer merely frozen, it is being destroyed. `measure`
-records yesterday only and the series is accumulated, not recomputed, so each
-dead morning is a permanent hole; the recovery reads whatever logrotate kept,
-and the packaged Debian/Ubuntu nginx policy keeps **~14 days**. On day 20 that
-puts roughly **10-13 to 10-18 past recovery**, with one more lost daily. The
-listing above is the real deadline and may prove this wrong — it is the only
-number here that gets worse while nobody looks at it. **GSC rank data is safe**
-(the API backfills ~16 months); nginx traffic is the perishable half. After
-fixing the cron, backfill with `growth_daily.py measure --days 20`, which is
-idempotent per `(date, technique, metric)`.
+Traffic history is no longer merely frozen, it is being destroyed, and that one
+listing now answers **two** questions.
+
+*How much is left.* `measure` records yesterday only and the series is
+accumulated, not recomputed, so each dead morning is a permanent hole; the
+recovery reads whatever logrotate kept, and the packaged Debian/Ubuntu nginx
+policy keeps **~14 days**. On day 21 that puts roughly **10-13 to 10-18 past
+recovery — six mornings** — with one more lost daily. The oldest timestamp in
+the listing is the real deadline and may prove this wrong. **GSC rank data is
+safe** (the API backfills ~16 months); nginx traffic is the perishable half.
+
+*Whether the backfill can read it.* **Look at how the archives are named.**
+Until today `growth/metrics.py:377` matched only logrotate's numeric scheme
+(`nemo-access.log.1`, `.2.gz`). With `dateext` set — not the Debian/Ubuntu
+default, but the RHEL-family one and a one-line opt-in anywhere — logrotate
+writes `nemo-access.log-20261019.gz`, which matched nothing, so the backfill
+would have read **today's live log only, recorded one day and exited 0**. The
+2026-11-02 run fixed this and added three tests, but **the fix is in this repo,
+not on the droplet**: it needs item 9, `deploy/deploy_growth.sh`.
+
+| Listing shows | Backfill today | Then |
+| --- | --- | --- |
+| `nemo-access.log.1`, `.2.gz` | works as described | run it; the fix is insurance |
+| `nemo-access.log-20261019.gz` | **silently recovers nothing** | item 9 first, then run it |
+
+After fixing the cron, backfill with `growth_daily.py measure --days 21`, which
+is idempotent per `(date, technique, metric)`.
 
 **This and item 10 are now one decision with a deadline.** Neither half works
 alone: credit buys nothing while cron publishes nothing, and a repaired cron
@@ -67,9 +85,9 @@ cat /etc/cron.d/nemo-growth; crontab -l | grep -i nemo; df -h /var /root
 | no `publish:` line, but git/ssh error text | the deploy key broke | none — fix the key |
 | **neither** | **cron or python died** | **each morning's data, permanently** |
 
-**Cadence recommendation, 2026-10-30, still unactioned on 10-31:** the review
+**Cadence recommendation, 2026-10-30, still unactioned on 11-02 (third day):** the review
 agent has recommended that this daily review drop to **weekly** until a publish
-commit lands — seven entries have now re-read the same 19-day-old file. The
+commit lands — nine entries have now re-read the same 21-day-old file. The
 agent did **not** change the schedule; that is Eric and Divine's call.
 Trigger `trig_0188mo2mgq6J6uqw3KE6ZMjd`, one edit to its cron expression.
 Revert to daily when publishing resumes.
@@ -86,10 +104,10 @@ against the repo's; do not just check that a file exists.
 
 | # | Item | Open | Where |
 | --- | --- | --- | --- |
-| 1 | **Business Profile → Performance → write down the `Calls` number.** Note the date range used. That report is a rolling ~six-month window, so the summer baseline starts expiring around January 2027 — waiting costs data permanently. | 84 d | T049 |
-| 2 | **Business Profile audit, primary category FIRST.** Most specific *true* gutter category; then hours, services detail, photos, pending suggested edits, review replies. **Do not touch the business name** — keyword-stuffing it risks suspension, and "NEMO Seamless Gutter" already carries the service term. (T016's Q&A half is dead — Google retired Q&A; the category half is not.) | 97 d | T016 |
-| 3 | **Ask every finished job for an honest Google review — and reply to the 13 you already have.** Do *not* ask customers to mention the service or the town. Google's allowance lets a merchant "solicit or encourage the posting of content that does represent a genuine experience, **without offering incentives to do so or attempting to influence the rating or the contents of the review**" — that last clause is general, is about the merchant himself, and predates the April 2026 staff-quota clauses, so coaching the wording is out. Ask for a review, not for words: no incentive, no gating, no pressure in the driveway; a follow-up text or email with a plain link is the safe form, 1–2 a month, every month. **Then get the service and town onto the profile in your own voice:** reply under each of the 13 reviews naming what the work was and which town, non-defensive on the low ones. An owner's reply is his own content in a field Google provides for it, so no solicitation rule touches it. | 97 d / 90 d | T007, T033 |
-| 4 | **Link GA4 to the Business Profile: GA4 → Admin → Product links → Google Business Profile links → Link.** One-time, ~5 min, needs one account holding both GBP and GA4 admin. Puts the profile's `calls` metric beside the site's `call_taps`, which `growth/metrics.py` provably cannot see — so item 1 stops needing a monthly login. | 5 d | research 2026-10-26 |
+| 1 | **Business Profile → Performance → write down the `Calls` number.** Note the date range used. That report is a rolling ~six-month window, so the summer baseline starts expiring around January 2027 — waiting costs data permanently. | 86 d | T049 |
+| 2 | **Business Profile audit, primary category FIRST.** Most specific *true* gutter category; then hours, services detail, photos, pending suggested edits, review replies. **Do not touch the business name** — keyword-stuffing it risks suspension, and "NEMO Seamless Gutter" already carries the service term. (T016's Q&A half is dead — Google retired Q&A; the category half is not.) | 98 d | T016 |
+| 3 | **Ask every finished job for an honest Google review — and reply to the 13 you already have.** Do *not* ask customers to mention the service or the town. Google's allowance lets a merchant "solicit or encourage the posting of content that does represent a genuine experience, **without offering incentives to do so or attempting to influence the rating or the contents of the review**" — that last clause is general, is about the merchant himself, and predates the April 2026 staff-quota clauses, so coaching the wording is out. Ask for a review, not for words: no incentive, no gating, no pressure in the driveway; a follow-up text or email with a plain link is the safe form, 1–2 a month, every month. **Then get the service and town onto the profile in your own voice:** reply under each of the 13 reviews naming what the work was and which town, non-defensive on the low ones. An owner's reply is his own content in a field Google provides for it, so no solicitation rule touches it. | 98 d / 91 d | T007, T033 |
+| 4 | **Link GA4 to the Business Profile: GA4 → Admin → Product links → Google Business Profile links → Link.** One-time, ~5 min, needs one account holding both GBP and GA4 admin. Puts the profile's `calls` metric beside the site's `call_taps`, which `growth/metrics.py` provably cannot see — so item 1 stops needing a monthly login. | 7 d | research 2026-10-26 |
 | 5 | **Three real gutter-cleaning prices.** `guides/gutter-cleaning-cost-york-pa.html` promises "Typical price ranges" and prints no dollar figures. The agent will not invent them. | carried | — |
 | 6 | **Will you drive York Springs (Adams County, ~25 min)?** Yes → add it to the profile's service area and drop it from `OUT_OF_AREA`. No → `deploy/retire_out_of_area.py --apply`. Either is fine; today's state is a page claiming Adams County under a York County breadcrumb. | carried | — |
 
@@ -99,12 +117,12 @@ Item 0 above comes first. These are the rest.
 
 | # | Item | Open | Where |
 | --- | --- | --- | --- |
-| 7 | **Read two inboxes.** (a) Ask Eric whether his morning NEMO report arrived on each of 10-13 → today: `--owner-email` is on both 06:00 cron lines, so it runs all seven days and yields an exact stop date. (b) Your own inbox, Fridays ~06:10 UTC, from the `0 6 * * 5` line. Mail arriving → the run executes and only the snapshot write or the push is broken, nothing lost. Mail stopping on a date → cron or python died that day. | 20 d | — |
-| 8 | **`python3 deploy/repair_titles.py`, read the report, then `--apply` — against the docroot, not the repo.** **25 of 45** live titles exceed the 65 characters Google renders, and 3 print the brand twice. Needs no API credit and no `growth/` deploy. Expected effect small and probably unmeasurable at 2.56 visitors/day; what it fixes for certain is 25 truncated titles and three stutters. | 18 d | — |
-| 9 | **`deploy/deploy_growth.sh --apply`.** The droplet's engine code dates to 2026-07-27 → 2026-08-04, bracketed by the keys its own snapshot publishes. Until it ships, the morning report claims 7 working techniques where this repo's own `earned()` awards 3, three at a click rate ~30× the real one, and `keywords.ranked`, `gsc.pages` and `code_version` collect nothing. Read the 10-21 scaled-content caution before ranking it above items 1–3. | **87 d** | — |
-| 10 | **Anthropic credit + auto-reload under a monthly console cap — and it is now time-critical, not 2027 planning.** Both content jobs have written nothing since 10-12 on an empty balance. `BUDGET.md` rule 1 bounds a run to 3–5 calls at cents a day, so a cap enforces that rule rather than relaxing it. **Deadline ~mid-November:** at 8–12 weeks publish-to-rank, pages funded now can rank for Jan–Feb ice-dam demand (T090/T095/T096, already in the ledger; `guides/ice-dams-gutters-pennsylvania.html` and `guides/ice-dam-removal-york-pa.html` already ship). Funded later, they cannot, and the next window is autumn 2027. **Paired with item 0 — neither half works without the other.** | 20 d | — |
-| 11 | **Restore `--email divinejdavis@gmail.com` to the `0 11 * * *` watchdog line** (`deploy/cron-nemo-growth:69`). One flag; `cmd_watchdog` returns early when healthy, so it adds no daily mail. The GitHub alarm says only whether state *arrived*; the watchdog can say *why* it did not. Needs item 9. | 65 d | — |
-| 12 | **Allow `nemoseamlessgutter.com` in the cloud environment's network policy.** Cloud-environment menu in the session title bar → Edit → Network access ([docs](https://code.claude.com/docs/en/cloud-environments#network-access)). Today it is a *policy denial*, not a dead host (`403 to CONNECT`, `connect_rejected` in the proxy status, re-confirmed 2026-11-01 11:14:27 UTC). With it, each review can verify the site is up, the phone number is right and the booking widget renders — which nothing in this project currently checks. | 6 d | — |
+| 7 | **Read two inboxes.** (a) Ask Eric whether his morning NEMO report arrived on each of 10-13 → today: `--owner-email` is on both 06:00 cron lines, so it runs all seven days and yields an exact stop date. (b) Your own inbox, Fridays ~06:10 UTC, from the `0 6 * * 5` line. Mail arriving → the run executes and only the snapshot write or the push is broken, nothing lost. Mail stopping on a date → cron or python died that day. | 21 d | — |
+| 8 | **`python3 deploy/repair_titles.py`, read the report, then `--apply` — against the docroot, not the repo.** **25 of 45** live titles exceed the 65 characters Google renders, and 3 print the brand twice. Needs no API credit and no `growth/` deploy. Expected effect small and probably unmeasurable at 2.56 visitors/day; what it fixes for certain is 25 truncated titles and three stutters. | 20 d | — |
+| 9 | **`deploy/deploy_growth.sh --apply`.** The droplet's engine code dates to 2026-07-27 → 2026-08-04, bracketed by the keys its own snapshot publishes. Until it ships, the morning report claims 7 working techniques where this repo's own `earned()` awards 3, three at a click rate ~30× the real one, and `keywords.ranked`, `gsc.pages` and `code_version` collect nothing. Read the 10-21 scaled-content caution before ranking it above items 1–3. **If item 0a's listing shows dated archives, this one blocks the traffic backfill and moves above items 1–3.** | **89 d** | — |
+| 10 | **Anthropic credit + auto-reload under a monthly console cap — and it is now time-critical, not 2027 planning.** Both content jobs have written nothing since 10-12 on an empty balance. `BUDGET.md` rule 1 bounds a run to 3–5 calls at cents a day, so a cap enforces that rule rather than relaxing it. **Deadline ~mid-November:** at 8–12 weeks publish-to-rank, pages funded now can rank for Jan–Feb ice-dam demand (T090/T095/T096, already in the ledger; `guides/ice-dams-gutters-pennsylvania.html` and `guides/ice-dam-removal-york-pa.html` already ship). Funded later, they cannot, and the next window is autumn 2027. **Paired with item 0 — neither half works without the other.** | 21 d | — |
+| 11 | **Restore `--email divinejdavis@gmail.com` to the `0 11 * * *` watchdog line** (`deploy/cron-nemo-growth:69`). One flag; `cmd_watchdog` returns early when healthy, so it adds no daily mail. The GitHub alarm says only whether state *arrived*; the watchdog can say *why* it did not. Needs item 9. | 67 d | — |
+| 12 | **Allow `nemoseamlessgutter.com` in the cloud environment's network policy.** Cloud-environment menu in the session title bar → Edit → Network access ([docs](https://code.claude.com/docs/en/cloud-environments#network-access)). Today it is a *policy denial*, not a dead host (`403 to CONNECT`, `connect_rejected` in the proxy status, re-confirmed 2026-11-02 11:18:38 UTC). With it, each review can verify the site is up, the phone number is right and the booking widget renders — which nothing in this project currently checks. | 6 d | — |
 | 13 | **Merge the green Dependabot PRs, #14 first** (follow-redirects, security). #12 needs the Express 5 / better-sqlite3 majors ported. | carried | — |
 
 ## Ledger edits the agent would make but will not make unasked
@@ -132,7 +150,7 @@ including Google's own review policy. Item 12 fixes this for
 **The prompt driving the review agent is wrong in six places** and has been for
 weeks; the corrections are listed in the 2026-10-27 entry. The two that cause
 real misreading: it says the engine "pushes its state to this repo an hour
-before you run" (false on eighteen consecutive mornings — check for a publish
+before you run" (false on twenty-one consecutive mornings — check for a publish
 commit dated today before trusting `snapshot.json`), and its Known-blockers
 section describes a self-imposed spend cap that cleared on 2026-08-01, when
 every measured API failure since has been an empty credit balance.
