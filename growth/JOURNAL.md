@@ -45404,3 +45404,310 @@ predecessor's advice; that will not be true most days. Absent a publish commit,
 a human commit or a reply, tomorrow's should be shorter again, and the 10-30
 weekly-cadence recommendation stands unanswered on its own merits for a fourth
 day.
+
+## 2026-11-03 — review agent
+
+**Twenty-second consecutive morning with no publish.** Yesterday's entry promised
+it would not manufacture a twenty-second finding to justify this run. It did not
+have to: the one command three entries have told a human to run had still never
+been executed, I ran it end to end, and it works — but running it exposed a
+separate fault in the gate that guards every deploy this project is asking for.
+Both are below. Neither is growth.
+
+### Where the numbers stand
+
+Nothing here is today's data. `git fetch origin main` — local and remote are both
+`326fa0a`, yesterday's review commit. The last `Publish growth state` commit is
+still **`0b2c596`, 2026-10-12 06:05:37 UTC**, authored by `NEMO growth engine`;
+`snapshot.json` still reads `"date": "2026-10-12"`. **533 hours old.** No publish
+commit for 10-13 through 11-03 — **22 missed mornings** — every commit in that
+range is authored by this agent, and there are **zero open issues**.
+
+- **Goal metric:** `top3` **0 of 239**, **0 in all seven town buckets** (county
+  0/124, york 0/42, dover 0/18, hanover 0/15, spring-grove 0/14, red-lion 0/13,
+  dallastown 0/13). `share_pct` **0.0** against a target of 50. Direction:
+  **unchanged, and unmeasurable for twenty-two days.** `top10` 22, `ranked_known`
+  58, coverage 42.3%, so the ceiling on `top3/total` is still 24.3%.
+- **Site-wide GSC:** 759 rows, 54 matched, 11 clicks, 5,281 impressions,
+  `avg_position` 26.1.
+- **Traffic and leads:** series still ends **2026-10-11** — 45 days, 115
+  visitors (2.56/day), 151 pageviews, non-zero on **41 of 45** days, so the
+  prompt's measurement-suspicion trigger still does not fire. `bookings_all_time`
+  4, `phone_leads_all_time` **0**.
+- **Both content jobs still dead on an empty balance.** `last_build` 2026-10-12,
+  0 new, 0 changed; `last_scout` same date, "Your credit balance is too low".
+  The prompt's Known-blockers section remains wrong about this on **day 94** — it
+  describes the spend cap that cleared 2026-08-01.
+- **Freshness alarm: 13 scheduled runs, 10-21 through 11-02, `failure` on every
+  one.** Run 13 is `41536464159` (2026-11-02 22:20:46 UTC). Correct thirteen
+  times out of thirteen; it has changed nothing in thirteen days.
+
+### Did previous changes work?
+
+**1. Yesterday's `rotations()` fix: verified, and the recovery command as a whole
+now works — which nobody had ever checked.** Yesterday shipped dual-scheme
+archive matching and three unit tests, all of which test `rotations()` alone.
+`collect()` recovering a day is tested separately. **Nothing tested them
+together, and the composite is the only form anyone runs.** So I built a
+logrotate-shaped directory — 22 days, one visitor each, two days in the live log
+and twenty in archives — and ran the actual backfill window against it:
+
+```
+numeric (.1, .2.gz …):        20 archives, rotations() opened 20 → 22/22 days recovered
+dateext (-20261019.gz …):     20 archives, rotations() opened 20 → 22/22 days recovered
+window:                       2026-10-12 .. 2026-11-02, inclusive, as intended
+```
+
+**Verdict: worked.** `growth_daily.py measure --days 22` will recover every
+morning whose log survives, on either naming scheme. The two-day-old conditional
+— "on a dated suffix that command is a no-op dressed as a success" — is
+**retired**, and recommendation 1 below drops from two questions to one.
+
+It took three attempts to get a fixture that counted, and the two failures are
+worth recording because they are the shape of the thing: a visit needs an **asset
+request** (the shape gate at `growth/metrics.py:553`) *and*, after `PV_START`
+(2026-08-14), a **`/e/pv` beacon hit** — from that date the beacon is the only
+thing a visitor is counted from. A fixture missing either records zero on a day
+that plainly had one. That is correct behaviour, but it means the backfill
+recovers only what the beacon logged, which I have now turned into a permanent
+test rather than a note.
+
+**2. New fault, found by running the above, in the gate that guards every
+deploy.** After the probe, two unrelated tests —
+`HostingExclusion.test_ec2_visitor_is_not_a_customer` and
+`test_scanner_ptr_is_excluded` — began failing against an **unmodified** repo. I
+confirmed it was not my edit by stashing and re-running: still red at clean
+`326fa0a`. Cause:
+
+- `metrics.hosting_skipper()` memoises PTR lookups in ledger state —
+  `growth/state.json`, gitignored, persistent between runs.
+- `is_hosting()` consults a test's **injected resolver only on a cache miss**
+  (`growth/metrics.py:205`).
+- My probe had called `collect()` with a null resolver over a log containing
+  `203.0.113.20/.21`, those tests' own fixture addresses, caching `""` for both.
+- From then on the injected resolver was never called and both tests asserted
+  against the file.
+
+**Why it is worth more than a tidy-up.** `scripts/test.sh` is the gate in
+`.githooks/pre-push`, `ci.yml`, `deploy_web.sh`, `deploy_api.sh` and
+`deploy_growth.sh`. A poisoned cache makes **every one of those refuse to run**,
+with a failure that reads like a measurement bug rather than stale state — on day
+22, with items 8 and 9 asking Divine for exactly those deploys. **CI cannot catch
+it**: a fresh clone has no `state.json`, which is why thirteen green `ci.yml` runs
+say nothing about it. It only ever fires on a long-lived checkout, which is to say
+on the droplet.
+
+**Stated plainly, because it limits the finding:** the trigger was my own
+throwaway probe, not anything the droplet runs. This is a **demonstrated
+fragility, not evidence that the droplet's `state.json` is poisoned.** I have no
+way to read that file. The repair is cheap and the failure mode is expensive and
+misdiagnosable, which is the whole argument for it.
+
+Fixed and guarded: the module now isolates ledger state, `collect()` gets a fresh
+state file per call, and my own fixture moved off the colliding block. Verified by
+reverting each fix and watching the matching test fail — the backfill test
+recovers 2 days of 22 without the dateext support, and the leak test reports
+`0 != 1` without per-call isolation. **The suite no longer creates
+`growth/state.json` at all**, which it previously did on every run.
+
+**3. The mid-November winter deadline (10-31) — correction, and it loosens my own
+advice rather than tightening it.** That entry, and `ACTION.md` item 10, priced
+the deadline off "8–12 weeks from publish to useful rank", which is a **new-page**
+timing. I checked what the engine would actually do, and it will not write a new
+page. All four uncovered ice-dam queries route to **existing service pages**:
+
+```
+ice dam damage gutter replacement york county pa  → /services/seamless-gutter-installation.html
+ice dam damaged gutters repair pa                → /services/gutter-cleaning-repair.html
+ice dam damaged gutters replace or repair york pa → /services/gutter-cleaning-repair.html
+ice dam gutter damage repair pa                  → /services/gutter-cleaning-repair.html
+```
+
+`money_pages` writes a page only where `_host_page()` returns `None` or
+`/index.html` (`growth/techniques.py:620-640`); here it returns a real page, so
+the work is **`strengthen_pages` adding a section to a page Google already
+indexes** — which is also exactly what the 10-12 build log's own noop said, and
+which `strengthen_pages` is the technique that has been failing on empty credit.
+Neither service page mentions "ice dam" **at all** today; both already carry
+repair-vs-replace sections, which is why they win the routing.
+
+A section on an indexed page is a different and faster mechanism than a new page:
+recrawl in ~1–14 days and ranking movement ~2–8 weeks after, against ~1.74% of
+new pages reaching the top 10 within a year. **So the deadline is softer than
+10-31 stated** — early-December work could still plausibly touch January — and
+"miss mid-November and the window is gone until autumn 2027" is too absolute.
+What does not change: fund it, and the direction of the recommendation. I have
+corrected item 10 rather than deleting the urgency.
+
+**4. Checked before recommending, and therefore not recommended.** I was about to
+propose adding the `/e/pv` beacon to the generated pages, since the backfill
+depends on it. It is already on **all 44** — 15 `areas/`, 22 `guides/`, 7
+`services/` — emitted by `growth/templates.py:68` and shipped by `5068de1`
+(10-04). It cost a check and not a slot.
+
+**5. Unactioned, recomputed from `added` today, not incremented:** primary-category
+audit (T016, **99 days**), the review ask (T007, **99 days**), review replies
+(T033, 92), GBP Calls reading (T049, **87 days**), the `growth/` deploy (90), the
+watchdog `--email` flag (68), `repair_titles.py` (21). The **cadence
+recommendation (10-30) is unactioned on its fourth day** — it asked that this
+review drop to weekly until a publish commit lands. I am again not changing the
+schedule myself; re-pacing the routine is Eric and Divine's call.
+
+**6. Push notifications: nine now, still no observable effect** — no commit but
+mine, no issue, no publish. A notification leaves no trace in git either way, so
+this stays a record, not a verdict. **Site liveness: still unknowable, day 22** —
+`curl` gets `403 CONNECT tunnel failed` and the proxy logged `connect_rejected`
+for `nemoseamlessgutter.com:443` at **11:15:44 UTC** today. A policy denial, not a
+dead host. `ACTION.md` item 12.
+
+### What I researched today
+
+Two questions, both chosen because they could change what I shipped or
+recommended. **No search for new tactics:** the ledger holds 96 techniques, 84 of
+them candidates, the oldest at 99 days, and a ninety-seventh has negative value.
+
+1. **Does a section on an already-indexed page rank faster than a new page?**
+   Yes, directionally, and it is what reframed finding 3. Existing-content
+   optimisation is put at weeks to 2–3 months against 3–6 months for new pages;
+   recrawl of an updated page at 1–14 days with ranking movement 2–8 weeks after;
+   and only ~1.74% of newly published pages reach the top 10 within a year. Every
+   source also warns that cosmetic edits do nothing — the section has to add
+   substance.
+   ([palvdm.com](https://palvdm.com/blog/how-long-for-content-to-rank/),
+   [searchscaleai.com](https://www.searchscaleai.com/blog/how-long-does-seo-take-realistic-timeline-2026/),
+   [ellingtondigital.com](https://ellingtondigital.com/seo/update-old-content-instead-of-creating-new-pages/),
+   [localblog.arcaffiliates.com](https://localblog.arcaffiliates.com/blog/how-long-does-local-seo-take-to-work-2026-timeline/))
+   **Caveat: all SEO vendor blogs, no primary Google source, wide spread.** Same
+   class of evidence as the 8–12 weeks it replaces — which is the point: the old
+   number was not better-sourced, it was just applied to the wrong mechanism.
+2. **Anything new on Business Profile for a contractor since the 10-06 policy
+   rewrite?** One item would matter if true: **a reported ~4-day window to reject
+   a suggested edit before Google may publish it**, covering hours, phone number,
+   categories and "permanently closed". Also reported: post view counts now in
+   the dashboard (10-05), new performance reports rolling out, and review appeals
+   delayed. ([seroundtable.com](https://www.seroundtable.com/november-2026-google-webmaster-report-42431.html),
+   [sterlingsky.ca](https://www.sterlingsky.ca/google-local-changes/),
+   [khatootech.com](https://khatootech.com/google-business-profile-changes-october-2026/))
+   **I could not confirm the 4-day window against a primary source** — `WebFetch`
+   still fails DNS from this session (`ENOTFOUND support.google.com`, re-tested
+   today), so this is a third-party summary and the sources disagree on October's
+   dates. Treated as unconfirmed below, and flagged for Eric to check while he is
+   in the dashboard anyway. **Rejected:** nothing here is a new technique, and I
+   added none.
+
+### Recommendations
+
+**1. `ls -la /var/log/nginx/nemo-access.log*`, then
+`growth_daily.py measure --days 22`.** Ten seconds, then one command. **Now one
+question, not two:** the oldest timestamp tells you how much traffic history
+survives. The naming no longer matters — today's test proves the backfill reads
+both schemes and recovers every surviving day, and it is idempotent per
+`(date, technique, metric)`. On the same 14-day retention evidence, roughly
+**10-13 through 10-19 are already past recovery — seven mornings**, one more
+falling off daily. GSC rank data is safe (~16-month API backfill); nginx traffic
+is the perishable half. **Divine's.** *Checked:* ran the composite path end to
+end rather than inferring it — `growth/test_metrics.py::BackfillAcrossRotations`.
+
+**2. End the publish outage.** Unchanged, twenty-two days old, three greps and one
+`cat`. **Divine's, ~10 minutes.**
+
+```
+grep publish /var/log/nemo-growth.log | tail -40
+grep 'snapshot: FAILED' /var/log/nemo-growth.log | tail -5
+grep -iE 'permission denied|could not read from remote|publickey|host key|fatal:' \
+  /var/log/nemo-growth.log | tail -10
+cat /etc/cron.d/nemo-growth; crontab -l | grep -i nemo; df -h /var /root
+```
+
+`snapshot: FAILED` → droplet disk or permissions, nothing lost. No `publish:`
+line but git/ssh error text → the credential broke, nothing lost, fix the key.
+**Neither → cron or python died, which is the case that loses each morning's data
+permanently.** Branch table: `growth/README.md`.
+
+**3. Item 2 and the Anthropic credit remain one decision — and after today the
+deadline is softer but the content target is sharper.** The winter lane's four
+uncovered queries want an **ice-dam section on `/services/gutter-cleaning-repair.html`
+(three of four) and `/services/seamless-gutter-installation.html` (one)**, which is
+`strengthen_pages`' job and needs credit. Because that is a section on an indexed
+page rather than a new page, early December is probably not fatal — but it is
+still the only revenue-relevant window before autumn 2027, and neither half works
+alone. **Divine's, both halves.** *Checked:* ran `_host_page()` against all four
+queries; grepped both service pages for "ice dam" and found **zero** mentions;
+confirmed `guides/ice-dams-gutters-pennsylvania.html` and
+`guides/ice-dam-removal-york-pa.html` already ship and do **not** win this
+routing. No new technique — T090/T095/T096 already hold the lane.
+
+**4. While Eric is in the dashboard for item 2 anyway: check pending suggested
+edits, and note the Calls number.** Third-party reports say an unreviewed
+suggested edit to hours, **phone number** or category may publish after ~4 days.
+Unconfirmed — treat it as a reason to look, not as a fact — but an unattended
+profile having its **phone number** edited is the one failure that would cost this
+business more than everything else on this list, and nobody has logged in for 99
+days. **Eric's, five minutes, no cost.** *Checked:* `ACTION.md` item 2 already
+lists "pending suggested edits"; this raises its stakes, it is not a new item.
+
+Eric's three free five-minute items stand at **99, 99 and 87 days**, on one screen
+in `growth/ACTION.md`.
+
+### Repo changes I made today
+
+**`growth/test_metrics.py` only — no engine code.** Three things: a
+`BackfillAcrossRotations` class exercising `measure --days 22` end to end over a
+22-day rotated archive set on both naming schemes, including that the window is
+the right fortnight; module-level and per-call isolation of `ledger.STATE_PATH`,
+so the suite reads and writes its own state and **never touches
+`growth/state.json`**; and a `StateIsolation` class pinning that isolation, since
+the fix is invisible when it works. My own fixture moved to the free
+`198.51.100.100+` block — sharing `203.0.113.20/.21` with `HostingExclusion` was
+how this class came to decide that class's result.
+
+**Nineteen days of declining to write engine code, still holding.** None of this
+is a sixteenth undeployed instrument: `ci.yml` runs `scripts/test.sh` on every
+push, so **a test is live the moment it lands** — unlike yesterday's `metrics.py`
+fix, which still needs item 9 and ninety days of waiting to do anything. That is
+the distinction I am using, and the next run should hold me to it.
+
+**`growth/ACTION.md`:** counters to day 22 and 533 hours, the alarm to thirteen
+runs through 11-02, ages recomputed from `added` (T016/T007 99 d, T033 92 d, T049
+87 d, deploy 90 d, watchdog 68 d, titles 21 d), item 0a reduced from two questions
+to one now that the backfill is verified, item 10's deadline reframed onto
+`strengthen_pages` timing with the two service-page targets named, item 2 given
+the suggested-edit note, and the reachability timestamp redated. Edited rather
+than rewritten, for the reason the last several entries gave.
+
+### Reasoning and uncertainties
+
+**What I am confident of.** The outage is twenty-two days old and no measurement
+has entered this repository on any of them. The alarm is correct and inert
+thirteen times over. The backfill recovers 22 of 22 days on both naming schemes —
+I ran it. `HostingExclusion`'s two tests failed against an unmodified repo
+because of a persistent cache entry, and both fixes fail their matching test when
+reverted — I checked each by reverting it. All four ice-dam queries route to
+service pages that contain no ice-dam content.
+
+**What I am not.** Whether the droplet's `state.json` is actually poisoned — I
+cannot read it, the trigger here was my own probe, and I have said so rather than
+dressing a demonstrated fragility as a live incident. Whether 14 days is this
+droplet's real retention; one `ls` settles it. Whether a strengthened section
+actually reaches top 3 for a repair-or-replace query — the engine's
+concentrate-authority design is defensible, but `top3` is **0 of 239** today, so
+nothing about it has yet produced a top-3 anywhere, and I am not going to claim
+this lane is the exception. And the ~4-day suggested-edit window is one
+third-party claim I could not open the primary source for.
+
+**What I am deliberately not claiming.** That any of this moves rank, traffic or
+the phone. Day 22; all three untestable. A verified recovery path and a hermetic
+test gate are both repairs to the machinery that would measure growth, which is
+not the same as growth, and if the cron is never fixed they are worth nothing.
+
+**What would change my mind.** A listing showing shallow retention makes
+recommendation 1 urgent rather than merely first. A reading of the GBP `Calls`
+number (T049, 87 days) showing the phone already ringing from the profile would
+move every content argument below the profile work, as it has every day it has
+gone unread. And a publish commit would make this entry's whole frame obsolete,
+which is the outcome I would prefer.
+
+**The thing I will not do.** Treat a repair to the test gate as progress toward
+fifty percent of York County. It is not. Absent a publish commit, a human commit
+or a reply, tomorrow's entry should be shorter than this one, and the 10-30
+weekly-cadence recommendation stands unanswered on its own merits for a fifth day.

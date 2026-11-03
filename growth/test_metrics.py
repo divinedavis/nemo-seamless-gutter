@@ -6,12 +6,55 @@ Run:  python3 -m growth.test_metrics      (from the site root)
 These exist because every rule here was added to stop something being counted
 that shouldn't be, and a silent regression would look exactly like growth.
 """
+import contextlib
 import datetime
+import gzip
 import os
+import shutil
 import tempfile
 import unittest
 
+from . import ledger
 from . import metrics
+
+# ---------------------------------------------------------------- isolation
+#
+# metrics.hosting_skipper() memoises PTR lookups in ledger state — which lives
+# in growth/state.json, is gitignored, and survives between runs. is_hosting()
+# consults the resolver a test injects ONLY on a cache miss, so a cached entry
+# for a fixture address silently overrides the injected resolver and the test
+# asserts against whatever the file happens to hold.
+#
+# That is reachable, not theoretical. On 2026-11-03 a review-session script that
+# called collect() with a null resolver over a log containing 203.0.113.20/.21
+# cached "" for both, and two HostingExclusion tests then failed against an
+# unmodified repo until the file was deleted. The trigger there was a throwaway
+# probe rather than anything the droplet runs, so this is a demonstrated
+# fragility and NOT evidence that the droplet's own state.json is poisoned.
+# It is worth closing anyway, because scripts/test.sh is the gate in
+# .githooks/pre-push, ci.yml, deploy_web.sh, deploy_api.sh and deploy_growth.sh:
+# were it ever to happen there, every deploy would refuse to run and the failure
+# reads like a measurement bug rather than stale state. CI cannot catch it — a
+# fresh clone has no state.json — so it would only ever fire on a long-lived
+# checkout, which is to say on the droplet.
+#
+# Pointing STATE_PATH at a throwaway file for the module's lifetime makes every
+# test here read and write its own state and touch the real file never.
+
+_REAL_STATE_PATH = ledger.STATE_PATH
+_STATE_DIR = None
+
+
+def setUpModule():
+    global _STATE_DIR
+    _STATE_DIR = tempfile.mkdtemp()
+    ledger.STATE_PATH = os.path.join(_STATE_DIR, "state.json")
+
+
+def tearDownModule():
+    ledger.STATE_PATH = _REAL_STATE_PATH
+    if _STATE_DIR:
+        shutil.rmtree(_STATE_DIR, ignore_errors=True)
 
 DAY = "27/Jul/2026:12:00:00 +0000"
 DATE = "2026-07-27"
@@ -72,6 +115,27 @@ class LogParsing(unittest.TestCase):
         self.assertEqual(m.group("owner"), "-")
 
 
+@contextlib.contextmanager
+def fresh_state():
+    """Give one metrics.collect() call a ledger state file of its own.
+
+    The module-level isolation above keeps the suite off the real state.json.
+    This keeps each call off the *previous call's* state, which is a separate
+    problem with the same cause: the PTR cache is shared, so one test resolving
+    an address to "" decides what a later test injecting a different resolver
+    for that same address will see. Addresses are deliberately disjoint between
+    classes, but a shared mutable cache should not be the thing enforcing that.
+    """
+    d = tempfile.mkdtemp()
+    prev = ledger.STATE_PATH
+    ledger.STATE_PATH = os.path.join(d, "state.json")
+    try:
+        yield
+    finally:
+        ledger.STATE_PATH = prev
+        shutil.rmtree(d, ignore_errors=True)
+
+
 class BaseCollect(unittest.TestCase):
     """Runs metrics.collect() against a throwaway log file.
 
@@ -84,9 +148,10 @@ class BaseCollect(unittest.TestCase):
         with os.fdopen(fd, "w") as f:
             f.write(log_text)
         try:
-            return metrics.collect(days=1,
-                                   end=datetime.date.fromisoformat(date),
-                                   log_path=path, resolver=resolver)[date]
+            with fresh_state():
+                return metrics.collect(days=1,
+                                       end=datetime.date.fromisoformat(date),
+                                       log_path=path, resolver=resolver)[date]
         finally:
             os.unlink(path)
 
@@ -388,6 +453,121 @@ class Rotations(unittest.TestCase):
         self.touch("nemo-access.log-old")
         got = [os.path.basename(p) for p in metrics.rotations(self.log)]
         self.assertEqual(got, ["nemo-access.log"])
+
+
+class BackfillAcrossRotations(unittest.TestCase):
+    """The recovery command, end to end: `measure --days N` over a dead stretch.
+
+    Rotations() enumerating the archives and collect() recovering a day are
+    tested separately above and in BaseCollect. Nothing tested them together,
+    which is the only form anyone actually runs: three journal entries have told
+    a human to repair a multi-week hole with `growth_daily.py measure --days N`,
+    and on 2026-11-03 that path had never once been exercised over more than a
+    single day or a single file. A regression here is invisible — the command
+    exits 0 either way — and by the time it shows up the logs it was meant to
+    read have rotated away.
+    """
+    DAYS = 22                       # the 2026-10-12 → 11-02 publish outage
+    END = datetime.date(2026, 11, 2)
+    MON = ("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+           "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+
+    def day_str(self, d):
+        return f"{d.day:02d}/{self.MON[d.month - 1]}/{d.year}:12:00:00 +0000"
+
+    def one_human(self, d, n):
+        """A page, its stylesheet and the beacon — post-PV_START, all three.
+
+        The asset is what clears the shape gate and the beacon is the only
+        thing a visitor is counted from after PV_START, so a fixture missing
+        either records zero visitors on a day that plainly had one.
+        """
+        day = self.day_str(d)
+        # 198.51.100.100+ is free across this module; .20/.21 in the
+        # 203.0.113 block belong to HostingExclusion and sharing them
+        # made this class decide that class's result.
+        ip = f"198.51.100.{100 + n}"
+        return visit(ip, day=day) + pv(ip, vid=f"vid{n}", day=day)
+
+    def build(self, dirpath, scheme):
+        """One visitor per day, spread over the live log plus one archive each."""
+        live = os.path.join(dirpath, "nemo-access.log")
+        chunks = {i: self.one_human(self.END - datetime.timedelta(days=i), i + 1)
+                  for i in range(self.DAYS)}
+        with open(live, "w") as f:
+            f.write(chunks[1] + chunks[0])
+        for i in range(2, self.DAYS):
+            if scheme == "numeric":
+                name = f"nemo-access.log.{i - 1}" + ("" if i == 2 else ".gz")
+            else:
+                d = self.END - datetime.timedelta(days=i)
+                name = f"nemo-access.log-{d.strftime('%Y%m%d')}.gz"
+            path = os.path.join(dirpath, name)
+            opener = (gzip.open(path, "wt") if path.endswith(".gz")
+                      else open(path, "w"))
+            with opener as f:
+                f.write(chunks[i])
+        return live
+
+    def recovered(self, scheme):
+        with tempfile.TemporaryDirectory() as td:
+            live = self.build(td, scheme)
+            with fresh_state():
+                data = metrics.collect(days=self.DAYS, end=self.END,
+                                       log_path=live, resolver=lambda ip: "")
+            return {d: m["visitors"] for d, m in data.items()}
+
+    def test_numeric_archives_recover_every_day(self):
+        got = self.recovered("numeric")
+        self.assertEqual(len(got), self.DAYS)
+        self.assertEqual([d for d, v in got.items() if not v], [])
+
+    def test_dateext_archives_recover_every_day(self):
+        """The case the 2026-11-02 fix was written for, exercised end to end."""
+        got = self.recovered("dateext")
+        self.assertEqual(len(got), self.DAYS)
+        self.assertEqual([d for d, v in got.items() if not v], [])
+
+    def test_the_window_is_the_days_before_end_inclusive(self):
+        """A backfill that silently measured the wrong fortnight is no backfill."""
+        got = self.recovered("numeric")
+        self.assertEqual(min(got), "2026-10-12")
+        self.assertEqual(max(got), self.END.isoformat())
+
+
+class StateIsolation(BaseCollect):
+    """One test's PTR cache must not decide the next test's result.
+
+    hosting_skipper() memoises lookups in ledger state and consults an injected
+    resolver only on a cache miss, so without per-call isolation the FIRST
+    verdict reached for an address is the one every later test sees. This pins
+    the isolation rather than the production behaviour: the caching is correct
+    for a daily engine run and is not what these assertions are about.
+    """
+
+    ADDR = "198.51.100.200"
+
+    def test_a_cached_verdict_does_not_leak_into_the_next_call(self):
+        host = self.collect(visit(self.ADDR),
+                            resolver=lambda ip: "ec2-1-2-3-4.compute-1.amazonaws.com")
+        self.assertEqual(host["visitors"], 0, "datacenter PTR should exclude")
+        # Same address, a resolver that now calls it a household. A leaked cache
+        # entry would hold the first verdict and report 0 here.
+        home = self.collect(visit(self.ADDR),
+                            resolver=lambda ip: "c-73-45-1-2.hsd1.pa.comcast.net")
+        self.assertEqual(home["visitors"], 1,
+                         "a previous call's PTR cache leaked into this one")
+
+    def test_the_real_state_file_is_never_consulted(self):
+        """The suite must not read or write growth/state.json.
+
+        It is gitignored runtime state owned by the droplet, and on a
+        long-lived checkout it is what made two of these tests fail on
+        2026-11-03 while the repo was unchanged.
+        """
+        self.assertNotEqual(ledger.STATE_PATH, _REAL_STATE_PATH)
+        with fresh_state():
+            self.assertNotEqual(ledger.STATE_PATH, _REAL_STATE_PATH)
 
 
 class PageviewBeacon(BaseCollect):
