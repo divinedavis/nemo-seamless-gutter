@@ -45711,3 +45711,194 @@ which is the outcome I would prefer.
 fifty percent of York County. It is not. Absent a publish commit, a human commit
 or a reply, tomorrow's entry should be shorter than this one, and the 10-30
 weekly-cadence recommendation stands unanswered on its own merits for a fifth day.
+
+## 2026-11-04 — review agent
+
+**Twenty-third consecutive morning with no publish, and this entry adds no new
+finding.** Yesterday's promised a shorter one absent a publish commit, a human
+commit or a reply. None of the three arrived, so this is that entry. The one
+thing I checked that was not already checked closes a question rather than
+opening one: the alarm is being delivered correctly, so the silence is not a
+misrouted notification.
+
+### Where the numbers stand
+
+Nothing here is today's data. `git fetch origin main` — local and remote are both
+`f52d72d`, yesterday's review commit. The last `Publish growth state` commit is
+still **`0b2c596`, 2026-10-12 06:05:37 UTC**, authored by `NEMO growth engine`;
+`snapshot.json` still reads `"date": "2026-10-12"`. **557 hours old.** No publish
+commit for 10-13 through 11-04 — **23 missed mornings** — every commit in that
+range is authored by this agent, and there are **zero open issues**.
+
+- **Goal metric:** `top3` **0 of 239**, **0 in all seven town buckets** (county
+  0/124, york 0/42, dover 0/18, hanover 0/15, spring-grove 0/14, red-lion 0/13,
+  dallastown 0/13). `share_pct` **0.0** against a target of 50. Direction:
+  **unchanged, and unmeasurable for twenty-three days.** `top10` 22,
+  `ranked_known` 58, coverage 42.3%, so the ceiling on `top3/total` is still
+  24.3%.
+- **Site-wide GSC:** 759 rows, 54 matched, 11 clicks, 5,281 impressions,
+  `avg_position` 26.1.
+- **Traffic and leads:** series still ends **2026-10-11** — 45 days,
+  2026-08-28 → 2026-10-11, 115 visitors (2.56/day), 151 pageviews, non-zero on
+  **41 of 45** days, so the prompt's measurement-suspicion trigger still does not
+  fire. 2 call taps in 45 days. `bookings_all_time` 4, `phone_leads_all_time`
+  **0**.
+- **Both content jobs still dead on an empty balance.** `last_build` 2026-10-12,
+  0 new, 0 changed, `strengthen_pages` failing on "Your credit balance is too
+  low"; `last_scout` the same error, same date. The prompt's Known-blockers
+  section remains wrong about this on **day 95** — it describes the spend cap
+  that cleared 2026-08-01.
+- **Freshness alarm: 14 scheduled runs, 10-21 through 11-03, `failure` on every
+  one.** Run 14 is `41709715574` (2026-11-03 20:08:01 UTC). Correct fourteen
+  times out of fourteen; it has changed nothing in fourteen days.
+- **Ledger:** 96 techniques — 84 candidates, 11 active, 1 retired; scoreboard 7
+  works, 0 does-not-work, 89 unjudged. Unchanged for twenty-three days, because
+  nothing has run.
+
+### Did previous changes work?
+
+**1. Yesterday's two fixes held.** `scripts/test.sh` is green — **438 Python + 9
+Node** — and `growth/state.json` **does not exist** after a full run, which is
+the observable half of the hermetic-gate fix. Before yesterday the suite created
+that file on every run. **Verdict: worked**, in the narrow sense that the gate no
+longer poisons itself. It remains a repair to the machinery, not growth.
+
+**2. The one new check: the alarm's delivery is not the fault.** The workflow's
+own comment claims a failing scheduled run notifies "whoever last edited the cron
+line." I had never verified that resolves to a real person. It does — all
+fourteen scheduled runs carry `actor` and `triggering_actor` of **`divinedavis`**
+in the API, which is how GitHub attributes a schedule to the account it notifies.
+
+So the chain is intact end to end: the check is correct, it runs, it fails, and
+GitHub addresses the failure to an account that exists. **Fourteen for fourteen
+on detection, fourteen for fourteen on being ignored.** That is worth recording
+because it kills an idea rather than adding one — there is no fifteenth alarm to
+build, no delivery bug to chase, and any further instrumentation on this axis
+would be waste. The remaining gap is a human reply, which no code in this
+repository can produce.
+
+Incidental, so it is not mistaken for a bug later: the job is scheduled at 13:17
+UTC and run 14 fired at **20:08 UTC**, ~7 hours late. GitHub's free scheduled
+runners drift by hours. Harmless for a once-daily staleness check.
+
+**3. Nothing can be said about rank, traffic or leads.** Day 23, data frozen on
+day 0. No comparison exists to make. Stating that plainly is the correct answer
+and the only honest one.
+
+**4. Unactioned, recomputed from `added` today, not incremented:** primary-category
+audit (T016, **100 days**), the review ask (T007, **100 days**), review replies
+(T033, 93), GBP Calls reading (T049, **88 days**), the `growth/` deploy (91), the
+watchdog `--email` flag (69), `repair_titles.py` (22). The **cadence
+recommendation (10-30) is unactioned on its fifth day.** I am again not changing
+the schedule myself; re-pacing the routine is Eric and Divine's call.
+
+**5. Push notifications: ten now, still no observable effect** — no commit but
+mine, no issue, no publish. A notification leaves no trace in git either way, so
+this stays a record, not a verdict. **Site liveness: still unknowable, day 23** —
+`curl` gets `403 CONNECT tunnel failed` at **11:12:52 UTC** today. A policy
+denial, not a dead host. `ACTION.md` item 12.
+
+### What I researched today
+
+One question only, and it returned nothing usable. **No search for new tactics:**
+the ledger holds 96 techniques, 84 of them candidates, the oldest at 100 days,
+and a ninety-seventh has negative value.
+
+**Is the outage gap (10-12 → 11-04) clean of confirmed Google ranking updates?**
+Still, as far as I can establish, yes — and I could not improve on that. One
+commercial blog asserts a "Google November 2026 core update" with **no link to
+any Google announcement**
+([bilarna.com](https://bilarna.com/blog/google-november-2026-core-update)); the
+rest of the first page is November **2025** volatility reporting
+([seroundtable.com](https://www.seroundtable.com/google-search-ranking-volatility-nov7-40401.html),
+[seroundtable.com](https://www.seroundtable.com/google-search-ranking-volatility-heated-40430.html))
+or undated roundups ([digitrio.com.sg](https://digitrio.com.sg/google-algorithm-updates/)).
+**Rejected as unconfirmed.** The primary source that would settle it —
+Google's Search Status Dashboard — is **unreachable from this session**:
+`ENOTFOUND status.search.google.com`, the same network-policy block that stops
+`curl` reaching the site itself. `ACTION.md` item 12 now covers two hosts worth
+allowing, not one. Carried forward unchanged: the last confirmed event is the
+September 2026 spam update, complete 2026-10-08, outside the gap, with
+unconfirmed third-party volatility on 10-15/16 and 10-24.
+
+### Recommendations
+
+**Unchanged and unranked today, because the ranking has not changed in twenty-three
+days and reshuffling it would be theatre.** The full list with ages is one screen
+in [`growth/ACTION.md`](ACTION.md). The two that matter:
+
+**1. `ls -la /var/log/nginx/nemo-access.log*`, then
+`growth_daily.py measure --days 23`.** Ten seconds, then one command. One
+question: how much traffic history survives. On a daily/rotate-14 policy, roughly
+**10-13 through 10-20 is already past recovery — seven or eight mornings** — one
+more falling off daily; the boundary day is an estimate and the listing settles
+it. GSC rank data is safe (~16-month API backfill); nginx traffic is the
+perishable half. **Divine's.** *Checked:* the composite path was run end to end on
+2026-11-03 (`growth/test_metrics.py::BackfillAcrossRotations`), green again today.
+
+**2. End the publish outage — three greps and one `cat`, ~10 minutes, Divine's.**
+Commands and the branch table are in `ACTION.md` item 0 and
+`growth/README.md`. Paired with the Anthropic credit (item 10): credit buys
+nothing while cron publishes nothing, and a repaired cron writes nothing on an
+empty balance.
+
+**Nothing new is proposed, and that is deliberate.** I checked whether this run
+had a finding worth a slot and it did not. Eric's three free five-minute items
+stand at **100, 100 and 88 days**.
+
+**One offer, not an action.** The 11-02 entry declined to open a GitHub issue on
+the grounds that the alarm already reaches the same inbox daily. Today's check
+confirms that it does — and fourteen deliveries have produced no response, so
+"same inbox" is now an argument against that channel rather than for it. An issue
+is a different artifact: it sits on the repository front page and in the Issues
+tab instead of in a CI-failure email. I am **not** opening one unilaterally —
+it is outward-facing on a public repo and nobody asked — but it is one line on a
+word from Eric or Divine.
+
+### Repo changes I made today
+
+**`growth/ACTION.md` counters only, and no code.** Day 23 and 557 hours, the
+alarm to fourteen runs through 11-03 with the delivery attribution recorded, ages
+recomputed from `added` (T016/T007 100 d, T033 93 d, T049 88 d, deploy 91 d,
+watchdog 69 d, titles 22 d), the retention estimate advanced one day with its
+caveat kept, the backfill command to `--days 23`, the cadence note to its fifth
+day, and the reachability timestamp redated. Edited rather than rewritten, for
+the reason the last several entries gave.
+
+**Twenty days of declining to write engine code, still holding.** Yesterday's
+exception was a test, which `ci.yml` makes live on push. Today has no such
+exception and I did not manufacture one.
+
+### Reasoning and uncertainties
+
+**What I am confident of.** The outage is twenty-three days old and no
+measurement has entered this repository on any of them. The alarm is correct
+fourteen times out of fourteen and is attributed to a real account, so detection
+and delivery are both solved and neither is the blocker. Yesterday's isolation
+fix held — the suite is green and creates no `state.json`. There is no confirmed
+Google ranking update inside the gap that I can source.
+
+**What I am not.** Whether a human has read any of this — ten notifications and
+fourteen alarms leave no trace in git, so I cannot distinguish "ignored" from
+"not received", and today's attribution check narrows that only to the GitHub
+half. Whether 14 days is this droplet's real log retention; one `ls` settles it.
+Whether the site is even up, on day 23.
+
+**What I am deliberately not claiming.** Any movement in rank, traffic or the
+phone. All three are untestable from a file frozen on 10-12, and the honest
+report is that this review has now produced **twenty-three consecutive entries**
+about a dead pipeline rather than about growth — counted from the headings in
+this file, which also corrects `ACTION.md`: it said "ten entries" on day 22 and
+the true figure was twenty-two.
+
+**What would change my mind.** A publish commit, which makes this entry's whole
+frame obsolete and is the outcome I would prefer. A listing showing shallow
+retention, which makes recommendation 1 urgent rather than merely first. A
+reading of the GBP `Calls` number (T049, 88 days) showing the phone already
+ringing from the profile, which would move every content argument below the
+profile work.
+
+**The thing I will not do.** Pad this entry to look like progress. Today's
+honest content is one confirmation, one rejected research result and a set of
+advanced counters; the cadence recommendation standing unanswered on its fifth
+day is the most useful sentence in it.
