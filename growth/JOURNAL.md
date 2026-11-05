@@ -45902,3 +45902,256 @@ profile work.
 honest content is one confirmation, one rejected research result and a set of
 advanced counters; the cadence recommendation standing unanswered on its fifth
 day is the most useful sentence in it.
+
+## 2026-11-05 — review agent
+
+**Twenty-fourth consecutive morning with no publish.** Today is not a pure
+counter entry, though: one repo change shipped (a structured-data gap on four
+pages, plus the test that makes it an invariant), one hypothesis was killed by
+unshallowing the clone, and one of my own findings was a false alarm that I
+caught and withdrew before it reached a recommendation. The outage itself is
+unchanged and still needs a human.
+
+### Where the numbers stand
+
+Nothing below is today's data. `git fetch origin main` — local and remote are
+both `6ac66e9`, yesterday's review commit. The last `Publish growth state`
+commit is still **`0b2c596`, 2026-10-12 06:05:37 UTC**, authored by `NEMO growth
+engine`; `snapshot.json` still reads `"date": "2026-10-12"`. **581 hours old.**
+No publish commit for 10-13 through 11-05 — **24 missed mornings**.
+
+- **Goal metric:** `top3` **0 of 239**, **0 in all seven town buckets** (county
+  0/124, york 0/42, dover 0/18, hanover 0/15, spring-grove 0/14, red-lion 0/13,
+  dallastown 0/13). `share_pct` **0.0** against a target of 50. Direction:
+  **unchanged, and unmeasurable for twenty-four days.** `top10` 22,
+  `ranked_known` 58, coverage 101/239 = 42.3%, so the ceiling on `top3/total` is
+  still 24.3%.
+- **Site-wide GSC:** 759 rows, 54 matched, 11 clicks, 5,281 impressions,
+  `avg_position` 26.1.
+- **Traffic and leads:** series still ends **2026-10-11** — 45 days,
+  2026-08-28 → 2026-10-11, 115 visitors (2.56/day), non-zero on 41 of 45 days,
+  so the prompt's measurement-suspicion trigger still does not fire. 2 call taps
+  in 45 days. `bookings_all_time` 4, `phone_leads_all_time` **0**.
+- **Both content jobs still dead on an empty balance.** `last_build` and
+  `last_scout` both 2026-10-12, both `"Your credit balance is too low"`. The
+  prompt's Known-blockers section is still wrong about this on **day 96** — it
+  describes the spend cap that cleared 2026-08-01.
+- **Freshness alarm: 15 scheduled runs, 10-21 through 11-04, `failure` on every
+  one.** Run 15 is `41906632150` (2026-11-04 20:26:32 UTC). Correct fifteen
+  times out of fifteen; it has changed nothing in fifteen days.
+- **Zero open issues. No human commit.** Checked harder than usual today: I
+  listed every remote branch with its last author. All ten are `dependabot[bot]`,
+  `Claude`, or the engine. `origin/test-push-probe` looked at first like someone
+  debugging the push path — it is a previous review agent's own branch, same
+  commit as `origin/review/2026-09-26`, authored by `Claude`. **No human has
+  touched this repository since the outage began.**
+
+**The traffic hole got bigger, and my predecessor's arithmetic was slightly
+off.** The series ends 10-11, so the first missing day is **10-12**, not 10-13
+(10-13 is the first missed *publish*; the run on 10-13 would have recorded
+10-12). On the packaged Debian/Ubuntu daily/rotate-14 policy the oldest
+recoverable day today is ~**10-22**, which puts **10-12 → 10-21, ten mornings,
+past recovery** — yesterday's entry said "seven or eight". Fourteen mornings
+(10-22 → 11-04) are still recoverable **today**, and one more expires every day.
+The 14-day window remains an estimate; one `ls` settles it.
+
+### Did previous changes work?
+
+**1. Nothing can be said about rank, traffic or leads.** Day 24, data frozen on
+day 0. No comparison exists to make. That is the third consecutive week in which
+this is the only honest answer to the prompt's most important question.
+
+**2. Yesterday's fixes held.** `scripts/test.sh` green — **440 Python + 9 Node**
+(438 before; the two new ones are mine) — and `growth/state.json` does not exist
+after a full run, which is the observable half of the hermetic-gate fix.
+**Verdict: worked**, narrowly. Still a repair to the machinery, not growth.
+
+**3. A hypothesis killed, which is worth more than another worry.** `git log` on
+`growth/publish_state.sh` reported its last change as **`6767e23`, 2026-10-01 —
+"Gate pushes on a secrets scan and the tests"**. That is an alarming thing to
+see eleven days before a publish outage: if a gitleaks/`test.sh` pre-push gate
+had been installed in the droplet's publishing clone, `git push` would fail every
+morning under `set -euo pipefail`, the engine would still run, Eric's mail would
+still arrive, and the signature would look exactly like what we observe.
+**It is false.** `6767e23` is the shallow-clone boundary, so `git log` dates
+everything older *to* it — the trap `README.md` and `ACTION.md` both warn about,
+which I walked into anyway. After `git fetch --unshallow` (287 commits, not 50)
+the real history is two commits, the last **2026-07-27**. So `publish_state.sh`
+has not changed since before the droplet's engine was deployed (07-27 → 08-04):
+**the droplet's copy and this repo's copy are the same file, and no push-gate
+change precedes the outage.** The branch table in `ACTION.md` item 0 stands
+unaltered; this removes a cause rather than adding one.
+
+**4. Unactioned, recomputed from `added` today:** primary-category audit (T016,
+**101 days**), the review ask (T007, **101 days**), review replies (T033, 94),
+GBP `Calls` reading (T049, **89 days**), the `growth/` deploy (92), the watchdog
+`--email` flag (70), `repair_titles.py` (23). The **cadence recommendation
+(10-30) is unactioned on its sixth day.** I am again not changing the schedule
+myself; re-pacing the routine is Eric and Divine's call.
+
+**5. Push notifications: eleven now, no observable effect** — no commit but
+mine, no issue, no publish. **Site liveness: still unknowable, day 24** — `curl`
+gets `403 CONNECT tunnel failed` at **11:13:38 UTC** today and the proxy reports
+`enabled: true` with `selective: false`. A policy denial, not a dead host.
+`ACTION.md` item 12.
+
+### What I researched today
+
+Three searches. `WebFetch` still fails DNS on every host
+(`ENOTFOUND www.seroundtable.com`), so these remain search-engine summaries of
+pages I could not open — including, again, Google's own documentation.
+
+**1. Is the outage gap clean of confirmed Google ranking updates? Yes, and on a
+better source than yesterday had.** Yesterday's entry could only say "as far as
+I can establish", resting on undated roundups. Today's search surfaces a dated
+**November 2026 Google webmaster report** from Search Engine Roundtable stating
+the September 2026 spam update completed in October, with several *unconfirmed*
+fluctuations since and no new core update
+([seroundtable.com](https://www.seroundtable.com/november-2026-google-webmaster-report-42431.html));
+one tracker dates that spam update 24 Sep → 8 Oct
+([mrkeyword.io](https://mrkeyword.io/blog/google-algorithm-updates-2026)) and a
+statistics page says no new ranking update had started by 1 November
+([milan-novotny.com](https://www.milan-novotny.com/statistics/google-algorithm-update-statistics/)).
+**This also refutes, rather than merely failing to confirm, the "Google November
+2026 core update" blog post yesterday's entry flagged** — no Google announcement
+backs it. So: the last confirmed event is outside the gap. When the backfill
+lands, swings inside it should not be attributed to an algorithm update.
+
+**2. Map-pack ranking factors, Oct–Nov 2026 — nothing new, nothing confirmed.**
+Nine results, all agency blogs, all restating relevance/distance/prominence
+([mapranks.com](https://www.mapranks.com/2026/02/23/google-business-seo-2026/),
+[sparkzmarketing.com](https://www.sparkzmarketing.com/post/google-business-profile-ranking-factors-2026-win-local),
+[digimau.com](https://www.digimau.com/google-map-pack-ranking-factors-2026/)).
+The most-cited primary-ish source is the Whitespark survey, which several note
+was **published 2025-11-06** and so predates the window I asked about. Weight
+percentages conflict between sources; **rejected as unreliable.** The one
+consistent claim is that primary category and proximity sit at the top — which
+is **T016, open 101 days**.
+
+**3. Getting cited by AI answer engines for local trade queries.** Also all
+vendor content ([geekpoweredstudios.com](https://www.geekpoweredstudios.com/post/how-to-get-cited-by-ai-search-engines),
+[precisionmarketingpartners.com](https://precisionmarketingpartners.com/what-googles-ai-search-changes-mean-for-local-service-businesses/),
+[footbridgemedia.com](https://www.footbridgemedia.com/marketing-tips/asking-ai-search-for-contractor)).
+**Rejected every statistic** — "45% of homeowners use AI to find a pro", "70%
+more citations", "only 1.2% of local businesses get recommended" — no
+methodology, and two of them contradict each other. What survives is
+directional and already in the ledger: a complete Business Profile, genuine
+recent reviews, and `LocalBusiness`/`Service` structured data are what AI local
+answers draw on. That is **items 1–3 and T004**, not a new idea.
+
+**No ninety-seventh technique, for the fourth week running.** The ledger holds 96
+— 84 candidates, 11 active, 1 retired — oldest candidate 101 days. The research
+step keeps returning things this project wrote down months ago and has not
+executed. That is a finding about the project, not about the research.
+
+### Recommendations
+
+**1. `ls -la /var/log/nginx/nemo-access.log*`, then `growth_daily.py measure
+--days 24`. Divine. Ten seconds, then one command.** Ten mornings
+(10-12 → 10-21) are most likely already gone; fourteen are recoverable today and
+one expires per day. This is the only item on the list that gets permanently
+worse while nobody acts. *Checked:* the composite path is covered end to end by
+`growth/test_metrics.py::BackfillAcrossRotations`, green again today in the full
+suite.
+
+**2. End the publish outage — three greps and one `cat`, ~10 minutes. Divine.**
+Commands and branch table in `ACTION.md` item 0. **Today's unshallowing narrows
+it slightly:** `publish_state.sh` is unchanged since 2026-07-27, so the script
+itself is not the regression and the push-gate theory is dead. Paired with the
+Anthropic credit (item 10) — credit buys nothing while cron publishes nothing,
+and a repaired cron writes nothing on an empty balance.
+
+**3. Eric's three free logins, now 101, 101 and 89 days old.** Unchanged in
+substance, but today's research argues for them twice over: the only
+map-pack claim that was consistent across sources is primary category plus
+proximity (T016), and the only AI-citation claim that survived scrutiny is
+profile completeness plus genuine recent reviews (T007, T033). Both research
+threads landed on work that has been sitting un-started since July. **These need
+no code, no deploy, no API credit and no droplet** — which, on day 24, makes
+them the only lever in this project that is not blocked on something broken.
+
+**4. Deploy today's structured-data fix with `scripts/deploy_web.sh`. Divine,
+and bundle it with `repair_titles.py` (item 8) — one deploy covers both.**
+Expected effect: **small, and probably unmeasurable at 2.56 visitors/day.** I am
+ranking it fourth and labelling it a tidy-up rather than overselling it. What it
+fixes for certain is a real inconsistency: four of the site's forty-four content
+pages were missing the business NAP node. *Checked:* `growth/techniques.py:378`
+`_provider_ld()` emits it on every generated page, which is why 40 of 44 had it;
+the four exceptions are hand-built guides that predate that function. **It needs
+a deploy before it does anything live.**
+
+Everything else, with ages, is one screen in [`growth/ACTION.md`](ACTION.md).
+
+### Repo changes I made today
+
+**A structured-data gap closed, and an invariant added so it cannot recur.**
+T004 ("LocalBusiness structured data") is **active**, and I am not re-proposing
+it — this is a coverage defect inside an active technique. Four pages carried no
+business node in their JSON-LD:
+`guides/5-vs-6-inch-gutters-right-size-for-york-county-homes.html`,
+`guides/gutter-cleaning-cost-york-pa.html`,
+`guides/seamless-vs-sectional-gutters.html` and
+`guides/signs-your-gutters-need-replacing-york-county-pa.html`. Each already had
+an `Article` block with `author`/`publisher`; I added the `about` key holding
+exactly `_provider_ld()`'s node, inserted textually before `mainEntityOfPage` so
+the diff is one line per file and nothing else was reformatted. That node carries
+**no `@id`**, which is deliberate: `techniques.py:787` records a real past bug
+where two nodes sharing `#business` disagreed about opening hours on
+`index.html`, and a node with no `@id` cannot repeat that.
+
+`tests/test_site.py` gains the durable half — two site-wide invariants over all
+47 pages, in the file that already asserts viewport, title and canonical.
+**Unlike anything on the droplet, a test here takes effect on push via `ci.yml`,
+with no deploy.**
+
+**Twenty-one days of declining to write engine code, still holding.** This is
+page markup and a test, not a sixteenth undeployed instrument.
+
+### Reasoning and uncertainties
+
+**My own false alarm, recorded because the process matters more than the
+result.** My first audit flagged those four guides as having **no phone number
+at all** — which would have been a conversion defect on indexed money pages and
+would have led this entry. It was wrong: I matched the literal `717-578-0073`,
+and the pages write `(717) 578-0073`. They each carry 4–5 `tel:` links and the
+number 7–10 times. I caught it by checking the pages instead of trusting my own
+grep, and the finding shrank from "pages that cannot convert" to "pages missing a
+markup block". **The step-3b rule in the prompt is about not trusting assumptions
+over code; this is the same error one level down — not trusting a regex over the
+file.** Had I notified on the first version, Eric would have been pulled to his
+phone for a defect that does not exist.
+
+**What I am confident of.** The outage is 24 days old and no measurement has
+entered this repository on any of them. The alarm is correct 15/15 and reaches a
+real account; detection and delivery are both solved and neither is the blocker.
+No human has committed since the outage began — every branch checked, not
+assumed. `publish_state.sh` has not changed since July. The four-page schema gap
+was real and is now closed in the repo, and the test fails on exactly those four
+files when I revert them.
+
+**What I am not.** Whether any human has read any of this: 11 notifications and
+15 alarms leave no trace in git, so "ignored" and "not received" are still
+indistinguishable from here. Whether 14 days is this droplet's real log
+retention. Whether the site is even up, on day 24. Whether the repo copies of
+those four guides match the live docroot — `strengthen_pages` edits pages in
+place there, so they may have diverged; `deploy_web.sh` refuses to overwrite
+uncommitted live content, which is the safety net rather than a guarantee.
+
+**One number I noticed and am deliberately not acting on.** In
+`discovered_untracked`, `gutter installation` sits at **average position 2.7 on
+28 impressions with 0 clicks** — the best-ranking query the site has, untracked
+and unlocalised. Zero clicks at that position looks bad, but 28 impressions is
+far too thin to call, and a bare generic query is likely answered by a local pack
+rather than a blue link. Noted for whoever reads the next real snapshot, not
+promoted to a recommendation.
+
+**What would change my mind.** A publish commit, which makes this entry's frame
+obsolete and is the outcome I would prefer. A listing showing shallow retention,
+which makes recommendation 1 urgent rather than merely first. A GBP `Calls`
+reading (T049, 89 days) showing the phone already ringing from the profile,
+which would move every content argument below the profile work.
+
+**The thing I will not do.** Claim that today's markup fix is growth. It is
+housekeeping on four pages, worth doing because it was free and wrong, and it
+does not touch the reason this project has produced no measurement in
+twenty-four days.

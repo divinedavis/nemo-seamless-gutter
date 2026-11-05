@@ -10,6 +10,7 @@ phone (and iframe harnesses hide it), a relative link to a file that was never
 committed is a 404 the growth engine then links to from everywhere, and a
 booking mount point that lost its script is a homepage with no way to book.
 """
+import json
 import os
 import re
 import unittest
@@ -57,6 +58,30 @@ def resolve(page_rel, ref):
     return rel
 
 
+LD_JSON = re.compile(r'<script[^>]*application/ld\+json[^>]*>(.*?)</script>', re.S)
+# schema.org has no gutter-specific type; the generator uses RoofingContractor.
+BUSINESS_TYPES = {"RoofingContractor", "LocalBusiness",
+                  "HomeAndConstructionBusiness", "GeneralContractor"}
+PHONE_E164 = "+1-717-578-0073"
+
+
+def _ld_nodes(block):
+    """Every dict in a JSON-LD block, including nested ones (about/provider)."""
+    try:
+        doc = json.loads(block)
+    except ValueError:
+        return []
+    out, stack = [], [doc]
+    while stack:
+        cur = stack.pop()
+        if isinstance(cur, dict):
+            out.append(cur)
+            stack.extend(cur.values())
+        elif isinstance(cur, list):
+            stack.extend(cur)
+    return out
+
+
 class PagesTest(unittest.TestCase):
     def test_there_are_pages_to_check(self):
         self.assertGreater(len(pages()), 30)
@@ -74,6 +99,48 @@ class PagesTest(unittest.TestCase):
             if not re.search(r"<title>[^<]{5,}</title>", s) or 'rel="canonical"' not in s:
                 bad.append(p)
         self.assertEqual(bad, [])
+
+    def test_every_json_ld_block_is_valid_json(self):
+        """A JSON-LD block with a syntax error is silently ignored by Google.
+
+        It is also the exact damage a hand-edit to these pages does, and no
+        other check here would notice: the page renders, the links resolve and
+        the structured data is simply gone.
+        """
+        bad = []
+        for p in pages():
+            for block in LD_JSON.findall(read(p)):
+                try:
+                    json.loads(block)
+                except ValueError as e:
+                    bad.append(f"{p}: {e}")
+        self.assertEqual(bad, [])
+
+    def test_every_content_page_names_the_business_in_structured_data(self):
+        """Every page a searcher can land on carries the NAP node in JSON-LD.
+
+        growth/techniques.py::_provider_ld emits this on every page the engine
+        generates, so the 40 generated pages have always had it. The four
+        hand-built guides predate that function and were never backfilled —
+        found 2026-11-05, four of forty-four content pages carrying the phone
+        in visible HTML and tel: links but not in structured data. This is the
+        invariant rather than a one-time fix, because the gap arose from pages
+        being written outside the generator and will arise again the same way.
+
+        privacy.html and setup.html are exempt: neither is a landing page, and
+        setup.html is owner-only and never indexed.
+        """
+        exempt = {"privacy.html", "setup.html"}
+        missing = []
+        for p in pages():
+            if p in exempt:
+                continue
+            s = read(p)
+            nodes = [n for block in LD_JSON.findall(s) for n in _ld_nodes(block)]
+            if not any(n.get("@type") in BUSINESS_TYPES
+                       and PHONE_E164 in json.dumps(n) for n in nodes):
+                missing.append(p)
+        self.assertEqual(missing, [], "no business NAP node in this page's JSON-LD")
 
     def test_local_links_and_assets_exist(self):
         broken = []
