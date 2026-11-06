@@ -3,6 +3,7 @@ import datetime
 import io
 import json
 import os
+import re
 import sys
 import tempfile
 import unittest
@@ -95,6 +96,94 @@ class CheckTests(unittest.TestCase):
             p = _snapshot(d, json.dumps({"date": "2026-10-12"}))
             _, msg = freshness.check(p, TODAY)
         self.assertIn(growth_daily._UNPUBLISHED_MORNING_DIAGNOSTIC, msg)
+
+
+class PerishableTests(unittest.TestCase):
+    """The one fact in the alarm that expires.
+
+    Rank history survives an outage (Search Console backfills ~16 months);
+    nginx traffic history does not, because `measure` records yesterday only
+    and the series is accumulated. These assert the arithmetic of that loss,
+    which three journal entries got wrong by a day before it was written down.
+    """
+
+    DAY25 = datetime.date(2026, 11, 6)
+
+    def test_first_missing_day_is_the_snapshot_date_not_the_day_after(self):
+        # A snapshot dated D holds data through D-1, because the D run records
+        # yesterday. Counting from D+1 undercounts the hole by a morning.
+        msg = freshness.perishable("2026-10-12", self.DAY25)
+        self.assertIn("25 mornings", msg)
+        self.assertIn("2026-10-12 to 2026-11-05", msg)
+
+    def test_splits_lost_from_still_recoverable(self):
+        msg = freshness.perishable("2026-10-12", self.DAY25)
+        self.assertIn("about 11 of them are already past recovery", msg)
+        self.assertIn("14 are still recoverable today", msg)
+
+    def test_names_the_date_the_whole_hole_expires(self):
+        # Last missing morning (11-05) plus the retention window.
+        msg = freshness.perishable("2026-10-12", self.DAY25)
+        self.assertIn("After 2026-11-19 none of this hole", msg)
+
+    def test_carries_a_runnable_backfill_command(self):
+        msg = freshness.perishable("2026-10-12", self.DAY25)
+        self.assertIn("measure --days 25", msg)
+
+    def test_says_the_retention_figure_is_an_estimate(self):
+        # It is the packaged default, not a reading off the droplet's disk, and
+        # the alarm has to say so or the deadline reads as measured.
+        msg = freshness.perishable("2026-10-12", self.DAY25)
+        self.assertIn("ls -la /var/log/nginx/nemo-access.log*", msg)
+        self.assertIn("packaged default, not a measurement", msg)
+
+    def test_short_outage_has_lost_nothing_yet(self):
+        msg = freshness.perishable("2026-10-12", datetime.date(2026, 10, 13))
+        self.assertIn("1 mornings", msg)
+        self.assertNotIn("past recovery", msg)
+        self.assertIn("all 1 are still recoverable", msg)
+        self.assertIn("start expiring one per day from 2026-10-26", msg)
+
+    def test_loss_begins_exactly_one_retention_window_in(self):
+        # On the boundary day nothing is lost yet; the next day loses one.
+        on = freshness.perishable("2026-10-12", datetime.date(2026, 10, 26))
+        self.assertNotIn("past recovery", on)
+        after = freshness.perishable("2026-10-12", datetime.date(2026, 10, 27))
+        self.assertIn("about 1 of them are already past recovery", after)
+
+    def test_lost_count_never_falls_and_recoverable_never_exceeds_window(self):
+        # Two invariants worth pinning, because both would be wrong in the
+        # direction that reassures: a loss count that can fall would let the
+        # alarm walk back a permanent loss, and a recoverable count above the
+        # retention window would promise a backfill that cannot deliver.
+        start = datetime.date(2026, 10, 12)
+        seen_lost = 0
+        for d in range(1, 120):
+            msg = freshness.perishable(
+                "2026-10-12", start + datetime.timedelta(days=d))
+            self.assertTrue(msg)
+            m = re.search(r"about (\d+) of them are already past", msg)
+            lost = int(m.group(1)) if m else 0
+            self.assertGreaterEqual(lost, seen_lost, f"day {d}: {lost}")
+            seen_lost = lost
+            r = re.search(r"(?:all )?(\d+) are still recoverable", msg)
+            self.assertIsNotNone(r, msg)
+            self.assertLessEqual(
+                int(r.group(1)), freshness.ASSUMED_LOG_RETENTION_DAYS,
+                f"day {d}: {msg}")
+
+    def test_nothing_missing_yields_no_sentence(self):
+        # Defensive: check() only calls this when the file is stale.
+        self.assertEqual(
+            freshness.perishable("2026-11-06", datetime.date(2026, 11, 6)), "")
+
+    def test_stale_message_carries_the_perishable_deadline(self):
+        # The point of the change: the delivered channel states the deadline.
+        with tempfile.TemporaryDirectory() as d:
+            p = _snapshot(d, json.dumps({"date": "2026-10-12"}))
+            _, msg = freshness.check(p, self.DAY25)
+        self.assertIn("being deleted", msg)
+        self.assertIn("After 2026-11-19", msg)
 
 
 class MainTests(unittest.TestCase):

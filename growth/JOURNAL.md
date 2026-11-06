@@ -46155,3 +46155,286 @@ which would move every content argument below the profile work.
 housekeeping on four pages, worth doing because it was free and wrong, and it
 does not touch the reason this project has produced no measurement in
 twenty-four days.
+
+## 2026-11-06 — review agent
+
+**Twenty-fifth consecutive morning with no publish, and today the outage
+acquired an end date.** Not a fix — an expiry. Eleven of the twenty-five
+missing mornings of traffic history are now past recovery, and **after
+2026-11-19 none of this hole can be recovered by anything at all.** That date
+has never appeared in this journal; it is the first thing here that is both new
+and decision-relevant, so it leads. The repo change I made today puts it in the
+one channel that is demonstrably delivered.
+
+### Where the numbers stand
+
+Nothing below is today's data. `git fetch --unshallow` first (287 commits, not
+50 — the trap `ACTION.md` warns about and the 11-05 entry fell into). The last
+`Publish growth state` commit is still **`0b2c596`, 2026-10-12 06:05:37 UTC**,
+authored by `NEMO growth engine`; `snapshot.json` still reads
+`"date": "2026-10-12"`. **605 hours old.** No publish commit for 10-13 through
+11-06 — **25 missed mornings.**
+
+- **Goal metric:** `top3` **0 of 239**, **0 in all seven town buckets** (county
+  0/124, york 0/42, dover 0/18, hanover 0/15, spring-grove 0/14, red-lion
+  0/13, dallastown 0/13). `share_pct` **0.0** against a target of 50.
+  Direction: **unchanged, and unmeasurable for twenty-five days.** `top10` 22,
+  `ranked_known` 58, coverage 101/239 = 42.3%, so the ceiling on `top3/total`
+  is still 24.3%.
+- **Site-wide GSC:** 759 rows, 54 matched, 11 clicks, 5,281 impressions,
+  `avg_position` 26.1.
+- **Traffic and leads:** series still ends **2026-10-11** — 45 days,
+  2026-08-28 → 2026-10-11, 115 visitors (2.56/day), 151 pageviews, non-zero on
+  **41 of 45** days, so the prompt's measurement-suspicion trigger still does
+  not fire. 2 call taps in 45 days, `ai_calls` 0, `phone_leads` **0**.
+  `bookings_all_time` 4, `phone_leads_all_time` **0**.
+- **Both content jobs still dead on an empty balance.** `last_build` and
+  `last_scout` both 2026-10-12, both *"Your credit balance is too low to access
+  the Anthropic API"*. Nine of eleven active techniques no-op'd; only
+  `strengthen_pages` failed, on 3 candidates. The prompt's Known-blockers
+  section is wrong about this on **day 97** — it describes a spend cap that
+  cleared 2026-08-01.
+- **Freshness alarm: 16 scheduled runs, 10-21 through 11-05, `failure` on every
+  one.** Run 16 is `42105678704` (2026-11-05 20:41:14 UTC), attributed by
+  GitHub to `divinedavis`. Correct sixteen times out of sixteen; it has changed
+  nothing in sixteen days.
+- **Zero open issues. No human commit.** `origin/main` is `a3df211`, yesterday's
+  review commit.
+- **Ledger unchanged:** 96 techniques — 84 candidates, 11 active, 1 retired.
+  `scoreboard.does_not_work` **empty**, as on every day on record; 7 `works`,
+  89 unjudged, every verdict dated `2026-10-12`.
+
+**The loss is now a number with a deadline, and here is the arithmetic.** A
+snapshot dated D holds data through D-1, because the D run records yesterday —
+so the first missing day is **10-12**, not 10-13, and the last is **11-05**.
+That is **25 mornings**. On the packaged Debian/Ubuntu logrotate policy
+(daily, rotate 14) the oldest day still on disk today is ~**10-23**, which puts
+**10-12 → 10-22 — eleven mornings — past recovery** (ten yesterday, twelve
+tomorrow), and **10-23 → 11-05 — fourteen mornings — recoverable today.** The
+last of them ages out on **2026-11-19**. After that date the backfill recovers
+nothing from this outage however well it works, and what is gone is the whole
+of leaf-fall peak: the business's best season, with no traffic data at all. The
+14 days remains an estimate; one `ls` settles it.
+
+### Did previous changes work?
+
+**1. Nothing can be said about rank, traffic or leads.** Day 25, data frozen on
+day 0. No comparison exists to make. Fourth consecutive week in which this is
+the only honest answer to the prompt's most important question.
+
+**2. Yesterday's four-page NAP-schema fix holds in the repo and is still
+undeployed.** `tests/test_site.py`'s two site-wide invariants pass over all 47
+pages (15 areas, 22 guides, 7 services, 3 root). The test half is live via
+`ci.yml`; the markup half needs `deploy_web.sh` and does nothing until it ships.
+**Verdict: worked as a repo change, unmeasurable as growth** — which is what
+yesterday's entry predicted of it, so that prediction is upheld.
+
+**3. My own research instinct was wrong twice today, and the code said so both
+times.** This is the step-3b rule doing its job, so both are recorded.
+
+   - I set out to recommend adding the Lancaster and Montgomery County towns
+     (Harleysville, Plymouth Meeting, Leola, Lititz, New Holland, Stevens,
+     Wayne, Blue Bell, Spring City) to `techniques.OUT_OF_AREA`, having seen
+     them all over `discovered_untracked`. **Already handled, and better than a
+     blocklist:** I ran the engine's own `_names_other_market` over all 40 rows
+     and it rejects **33 of 40** by *shape* — `STATEWIDE_WORDS`
+     (`growth/techniques.py:1646-1686`) treats "names PA plus a leftover word
+     that is not trade, money or grammar vocabulary" as somebody else's town.
+     The 7 survivors are the geo-neutral head terms plus one informational
+     query. The 10-16 entry reached this same conclusion and declined the same
+     recommendation; I re-derived it instead of reading it, which cost time.
+   - I then went looking for the out-of-area impression share as a finding.
+     **Already in the journal**, computed on 10-16 with a table: 32 rows / 379
+     impressions out-of-area, 8 rows / 271 impressions geo-neutral, **0 rows
+     naming a York County town**, 0 clicks across all 650. Nothing to add. Its
+     conclusion stands and is worth restating once: site-wide `impressions`
+     overstates York County reach by an unknown amount, so **impression
+     movement is not progress toward this goal** — `top3` is the clean metric
+     and is 0.
+
+**4. Unactioned, recomputed from `added` today:** primary-category audit (T016,
+**102 days**), the review ask (T007, **102 days**), review replies (T033, 95),
+GBP `Calls` reading (T049, **90 days**), the `growth/` deploy (93), the watchdog
+`--email` flag (71), `repair_titles.py` (24), yesterday's schema deploy (1).
+The **cadence recommendation (10-30) is unactioned on its seventh day.** I am
+again not changing the schedule myself: re-pacing this routine changes something
+outside this session that nobody has asked for, and it is Eric and Divine's
+call.
+
+**5. The issue-opening offer, made 11-02 and again 11-04, is unactioned and I
+am not escalating it to an action.** It is outward-facing on a public repo and
+nobody asked. Twelfth notification sent today. **Site liveness: still
+unknowable, day 25** — `curl` gets `403 CONNECT tunnel failed` at **11:10:21
+UTC**, `connect_rejected` in the proxy status. A policy denial, not a dead host
+(`ACTION.md` item 12).
+
+### What I researched today
+
+Three searches. **`WebFetch` still fails DNS on every host** — tried once on
+`www.seroundtable.com`, `ENOTFOUND` — so these remain search-engine summaries
+of pages I could not open, Google's own documentation included.
+
+**1. Confirmed ranking updates: still none in the gap, and now with four
+candidate dates inside it.** No confirmed Google ranking update as of 5–6
+November; the last is the September 2026 spam update, finished ~8 October
+([seroundtable.com](https://www.seroundtable.com/november-2026-google-webmaster-report-42431.html),
+[numinix.com](https://www.numinix.com/blog/november-2026-seo-algorithm-news-update/)).
+**New since yesterday:** reports of *unconfirmed* volatility spiking on
+**20, 21, 24 and 27 October** — all four inside the outage window
+([businessdaduk.com](https://businessdaduk.com/2026/11/02/seo-ppc-digital-marketing-news-19-october-to-2-november-2026/)).
+So when the backfill lands, those four dates are candidate confounders rather
+than clean ground. Unconfirmed, and from one aggregator.
+
+**2. One Search Console change that would affect this project's own
+measurement, flagged not adopted.** Two sources say AI Overviews and AI Mode
+appearances now count **inside** Performance report totals with no separate
+filter, and that a country filter has shipped
+([crawlraven.com](https://crawlraven.com/blog/google-search-console-updates),
+[blog.mean.ceo](https://blog.mean.ceo/google-search-console-news-november-2026/)).
+If true, `gsc.impressions` and `avg_position` now blend AI-surface appearances
+with blue links indistinguishably — which is a second reason, on top of the
+out-of-area contamination in finding 3, to stop reading those two numbers as
+goal signals. **I am not acting on it:** both sources are SEO blogs, I could not
+open Google's page, and the project's conclusion (`top3` is the metric) is
+already the right one either way. Worth one line in whoever's entry can verify
+it.
+
+**3. Visit-to-call conversion for contractors — every number rejected, one
+directional claim kept.** Benchmarks conflict badly: median site conversion
+2–4% ([pipelineon.com](https://pipelineon.com/blog/contractor-website-conversion-rate/))
+vs 3.7% across 750+ sites ([debutmarketing.ca](https://debutmarketing.ca/contractor-website-statistics))
+vs 5.13% cross-industry; phone share of leads 60% vs 78% in the same two
+sources. **Rejected all of them** — vendor studies, no methodology, mutually
+inconsistent. What survives is directional and unsurprising: phone beats forms
+for home services, click-to-call on mobile beats a form on the same page, and a
+chat widget that covers the call button costs calls
+([garretthandley.com](https://www.garretthandley.com/contractor-website-conversion-rate-in-2026-why-most-sites-convert-under-3-and-what-to-fix)).
+**None of it is readable against this site:** 2 call taps on 115 visitors is a
+1.7% tap rate, which sits below every benchmark quoted — and with n=2 that
+comparison is meaningless and I will not make it. The site has no chat widget
+to remove.
+
+**No ninety-seventh technique, for the fifth week running.** The research step
+keeps returning what this project wrote down in July and has not executed. That
+is a finding about the project, not about the research.
+
+### Recommendations
+
+**1. `ls -la /var/log/nginx/nemo-access.log*`, then `growth_daily.py measure
+--days 25`. Divine. Ten seconds, then one command — and now with a hard
+deadline: 2026-11-19.** Eleven mornings are already gone, fourteen are
+recoverable today, and after 11-19 nothing from this hole is recoverable at all.
+This is the only item on the list that gets permanently worse while nobody acts,
+and it is the only one that stops being worth doing on a known date. *Checked:*
+the composite path is covered end to end by
+`growth/test_metrics.py::BackfillAcrossRotations`, green today in the full suite.
+
+**2. End the publish outage — three greps and one `cat`, ~10 minutes. Divine.**
+Commands and branch table in `ACTION.md` item 0. Paired with the Anthropic
+credit (item 10): credit buys nothing while cron publishes nothing, and a
+repaired cron writes nothing on an empty balance. *Checked:* `publish_state.sh`
+unchanged since 2026-07-27 (unshallowed), so the script is not the regression —
+the push-gate theory stays dead.
+
+**3. Eric's three free logins, now 102, 102 and 90 days old.** Unchanged in
+substance. Today's research adds a weak second reason for the `Calls` reading
+(item 1 / T049): several sources claim engagement signals — calls, direction
+requests — now feed local pack visibility directly, which would make that number
+an input and not only a measurement. **Unconfirmed, conflicting percentages,
+rejected as fact** — I raise it because it points at work already on the list,
+not because it is established. **These need no code, no deploy, no API credit
+and no droplet** — which on day 25 makes them the only lever here not blocked on
+something broken.
+
+**4. Deploy the 2026-11-05 structured-data fix with `scripts/deploy_web.sh`,
+bundled with `repair_titles.py` (item 8) — one deploy covers both. Divine.**
+Expected effect small and probably unmeasurable at 2.56 visitors/day; a
+correctness tidy-up, ranked fourth deliberately. **Needs a deploy before it does
+anything live.**
+
+Everything else, with ages, is one screen in [`growth/ACTION.md`](ACTION.md).
+
+### Repo changes I made today
+
+**The alarm now carries the deadline. `growth/freshness.py`, 10 new tests, no
+deploy needed.** The one channel in this project that is provably delivered —
+sixteen GitHub Actions failures, all attributed to a real account — said only
+*"N days stale"* plus the three-cause diagnostic. The perishable half, the half
+with an expiry date, lived in a 2.9 MB journal and a 17 KB `ACTION.md` that
+twenty-five entries of evidence suggest nobody opens. **A number that expires
+belongs in the channel that is delivered**, so I moved it there. The alarm now
+prints, computed rather than hardcoded:
+
+> Traffic history is not merely frozen, it is being deleted. 25 mornings of
+> nginx traffic data are missing (2026-10-12 to 2026-11-05). On a ~14-day
+> log-retention estimate about 11 of them are already past recovery, 14 are
+> still recoverable today, and one more expires every day. After 2026-11-19
+> none of this hole can be recovered by anything. Recover what is left with
+> `growth_daily.py measure --days 25` on the droplet, and read the real
+> retention off `ls -la /var/log/nginx/nemo-access.log*` first — the 14 days
+> above is the packaged default, not a measurement. Rank history is not at
+> risk; Search Console backfills it.
+
+New `perishable()` plus `ASSUMED_LOG_RETENTION_DAYS = 14`. Three choices worth
+recording. The retention figure is **stated as an estimate in the message
+itself**, because nothing in this repository can see the droplet's disk and
+`metrics.rotations()` deliberately enumerates what is actually there rather than
+trusting a constant; it is wrong in the safe direction — if the droplet keeps
+more, the alarm overstates the loss and understates the window, which costs
+nobody anything. The off-by-one that three prior entries made (first missing day
+is the snapshot's own date, not the day after) is **pinned by a named test**
+rather than a comment. And `PerishableTests` asserts two invariants that would
+otherwise fail reassuringly: the lost count can never fall, and the recoverable
+count can never exceed the retention window — a message that walks back a
+permanent loss, or promises a backfill longer than the logs allow, is worse than
+no message.
+
+`scripts/test.sh` green: **450 Python + 9 Node** (440 before; the ten are mine).
+**Unlike anything on the droplet, this takes effect on push via
+`state-freshness.yml` — tomorrow's 13:17 UTC run prints it with no deploy.**
+
+**Twenty-two days of declining to write engine code, and today is a deliberate
+exception.** The rule exists because fifteen undeployed instruments were built
+while the pipeline stayed dead. This is not a sixteenth: it is in the one file
+that runs *off* the droplet, in the one workflow that needs no deploy, and it
+carries a fact that expires in thirteen days. If I had built it in `metrics.py`
+it would have been the mistake the rule is about.
+
+### Reasoning and uncertainties
+
+**Why a deadline rather than a twenty-fifth counter.** Twenty-four prior entries
+established the outage, the cause tree, the delivery of the alarm, the absence of
+a human, and the out-of-area impression contamination. Re-reporting those is how
+a review becomes a slower way of wasting Eric's summer. The one thing genuinely
+new today is that the perishable loss has a terminal date, and the one useful
+thing I could do was put it where it gets read instead of where I write.
+
+**What I am confident of.** 605 hours, 25 missed mornings, 16/16 alarm failures
+with the triggering actor checked in the API rather than assumed, zero open
+issues, `top3` 0 in all seven buckets. `publish_state.sh` unchanged since
+2026-07-27, on an unshallowed clone. 33 of 40 untracked queries rejected by the
+engine's existing shape test — I ran it rather than reasoning about it. The
+alarm's new arithmetic is right at the boundaries, including the day the loss
+starts and the day the hole closes.
+
+**What I am not.** Whether 14 days is this droplet's real retention — the whole
+deadline scales with it, and one `ls` replaces the estimate with a fact. Whether
+any human has read any of this: twelve notifications and sixteen alarms leave no
+trace in git, so "ignored" and "not received" remain indistinguishable from here.
+Whether the site is even up, on day 25. Whether the AI-Overview blending in
+Search Console is real, which matters for every future reading of `impressions`
+and `avg_position`.
+
+**What would change my mind.** A publish commit, which makes this entry's frame
+obsolete and is the outcome I would prefer. A log listing showing retention
+shorter than 14 days, which would mean the deadline has already passed and
+recommendation 1 is only worth doing for what little remains. A listing showing
+retention much longer, which would move recommendation 1 below the profile work.
+A GBP `Calls` reading showing the phone already ringing, which would reorder
+everything below it.
+
+**The thing I will not do.** Claim that moving a sentence into an alarm is
+growth. It is plumbing on the escalation channel, worth doing because the number
+it carries expires on 2026-11-19 and the channel it was buried in has produced
+nothing in twenty-five days. It does not make the phone ring, and it does not
+fix the reason this project has produced no measurement since 12 October.

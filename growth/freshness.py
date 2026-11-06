@@ -34,6 +34,20 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 SNAPSHOT_PATH = os.path.join(HERE, "snapshot.json")
 
+# How many days of nginx archives to assume still exist, for the one sentence
+# below that says how much traffic history is already past saving.
+#
+# It is an estimate, not a reading: `growth.metrics.rotations()` deliberately
+# enumerates whatever logrotate actually kept rather than trusting a number,
+# and nothing in this repository can see the droplet's disk. 14 is the
+# packaged Debian/Ubuntu policy (daily, rotate 14). It is stated as an estimate
+# wherever it is printed, and `ls -la /var/log/nginx/nemo-access.log*` settles
+# it in ten seconds. Wrong in the safe direction: if the droplet keeps more,
+# the alarm has overstated the loss and understated the window, which costs
+# nobody anything. If it keeps fewer, the deadline has already passed and the
+# listing is the only thing that would have said so.
+ASSUMED_LOG_RETENTION_DAYS = 14
+
 
 def stale_days(snapshot_date, today):
     """Whole days between the snapshot's own date and `today`, or None.
@@ -86,7 +100,67 @@ def check(path=None, today=None):
         f"{snap_date} and today is {today.isoformat()}. {days} {morning} have "
         f"produced no publish commit, so the daily review agent has been "
         f"reading {snap_date}'s numbers as its view of the business. "
-        + _diagnostic())
+        + perishable(snap_date, today) + " " + _diagnostic())
+
+
+def perishable(snap_date, today, retention_days=ASSUMED_LOG_RETENTION_DAYS):
+    """What the outage has already destroyed, and the date the rest expires.
+
+    The rest of this alarm says the state file is stale, which is recoverable
+    at any time: Search Console backfills about sixteen months, so rank history
+    survives any outage this project is likely to have. Traffic history does
+    not. `metrics.collect_and_record` records yesterday only and the series is
+    accumulated rather than recomputed, so every missed morning is a hole that
+    stays a hole, and the only thing that fills one is an nginx archive that
+    logrotate has not yet deleted.
+
+    That makes this the one fact in the alarm with a deadline attached, and it
+    was not in it: for twenty-five mornings the delivered message said "N days
+    stale" and the perishable half lived only in a 2.9 MB journal and a
+    hand-written ACTION.md. A number that expires belongs in the channel that
+    is actually delivered.
+
+    A snapshot dated D holds data through D-1, because the D run records
+    yesterday — so the first missing day is D itself, not D+1. Getting that
+    wrong undercounts the loss by a day, which three entries did.
+    """
+    first_missing = datetime.date.fromisoformat(snap_date)
+    last_missing = today - datetime.timedelta(days=1)
+    if last_missing < first_missing:
+        return ""
+    oldest_recoverable = today - datetime.timedelta(days=retention_days)
+    lost = max(0, (min(oldest_recoverable, today) - first_missing).days)
+    recoverable = (last_missing - max(first_missing, oldest_recoverable)).days + 1
+    recoverable = max(0, recoverable)
+    # The last missing morning stays readable until it ages out, so this is the
+    # date after which no part of *today's* hole can be recovered at all. Days
+    # that go missing later carry their own clocks; this is not the date the
+    # engine stops mattering.
+    expires = last_missing + datetime.timedelta(days=retention_days)
+    span = (f"{first_missing.isoformat()} to {last_missing.isoformat()}")
+
+    out = [f"Traffic history is not merely frozen, it is being deleted. "
+           f"{(last_missing - first_missing).days + 1} mornings of nginx "
+           f"traffic data are missing ({span})."]
+    if lost:
+        out.append(f"On a ~{retention_days}-day log-retention estimate about "
+                   f"{lost} of them are already past recovery, {recoverable} "
+                   f"are still recoverable today, and one more expires every "
+                   f"day.")
+    else:
+        out.append(f"On a ~{retention_days}-day log-retention estimate all "
+                   f"{recoverable} are still recoverable today, and they "
+                   f"start expiring one per day from "
+                   f"{(first_missing + datetime.timedelta(days=retention_days)).isoformat()}.")
+    out.append(f"After {expires.isoformat()} none of this hole can be "
+               f"recovered by anything. Recover what is left with "
+               f"`growth_daily.py measure --days {(today - first_missing).days}` "
+               f"on the droplet, and read the real retention off "
+               f"`ls -la /var/log/nginx/nemo-access.log*` first — the "
+               f"{retention_days} days above is the packaged default, not a "
+               f"measurement. Rank history is not at risk; Search Console "
+               f"backfills it.")
+    return " ".join(out)
 
 
 def _diagnostic():
