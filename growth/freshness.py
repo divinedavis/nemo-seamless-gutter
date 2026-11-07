@@ -104,7 +104,7 @@ def check(path=None, today=None):
 
 
 def perishable(snap_date, today, retention_days=ASSUMED_LOG_RETENTION_DAYS):
-    """What the outage has already destroyed, and the date the rest expires.
+    """What the outage has already destroyed, and what the next day costs.
 
     The rest of this alarm says the state file is stale, which is recoverable
     at any time: Search Console backfills about sixteen months, so rank history
@@ -152,14 +152,38 @@ def perishable(snap_date, today, retention_days=ASSUMED_LOG_RETENTION_DAYS):
                    f"{recoverable} are still recoverable today, and they "
                    f"start expiring one per day from "
                    f"{(first_missing + datetime.timedelta(days=retention_days)).isoformat()}.")
-    out.append(f"After {expires.isoformat()} none of this hole can be "
-               f"recovered by anything. Recover what is left with "
-               f"`growth_daily.py measure --days {(today - first_missing).days}` "
-               f"on the droplet, and read the real retention off "
-               f"`ls -la /var/log/nginx/nemo-access.log*` first — the "
-               f"{retention_days} days above is the packaged default, not a "
-               f"measurement. Rank history is not at risk; Search Console "
-               f"backfills it.")
+    if lost:
+        # The sentence this replaces — "after <expires> none of this hole can
+        # be recovered" — was true as written and misleading as read. `expires`
+        # is the newest missing morning plus the window, so it advances one day
+        # for every day the outage continues: on 2026-11-06 it printed
+        # 2026-11-19, on 2026-11-07 2026-11-20, and on 2027-01-01 it would
+        # print 2027-01-14. A date that recedes as fast as you approach it
+        # reads as a fortnight of slack and is the opposite of one. Past the
+        # retention window `recoverable` is pinned at `retention_days` too, so
+        # "14 are still recoverable" has been constant since the window closed
+        # and reads reassuringly static. What is actually true, and what does
+        # not recede, is per morning: one named day dies every day, and waiting
+        # changes which mornings come back, never how many.
+        out.append(f"There is no single cutoff to plan around. "
+                   f"{expires.isoformat()} is when the newest missing morning "
+                   f"ages out, and that date moves a day later for every day "
+                   f"the outage continues, so it is not slack. The deadline is "
+                   f"per morning: {oldest_recoverable.isoformat()} is the "
+                   f"oldest still readable and is the next to be destroyed, "
+                   f"and past the retention window waiting no longer changes "
+                   f"how many mornings a backfill returns "
+                   f"({recoverable}, capped by the window) — only which ones.")
+    else:
+        out.append(f"After {expires.isoformat()} none of this hole can be "
+                   f"recovered by anything.")
+    out.append(f"Recover what is left with "
+                f"`growth_daily.py measure --days {(today - first_missing).days}` "
+                f"on the droplet, and read the real retention off "
+                f"`ls -la /var/log/nginx/nemo-access.log*` first — the "
+                f"{retention_days} days above is the packaged default, not a "
+                f"measurement. Rank history is not at risk; Search Console "
+                f"backfills it.")
     return " ".join(out)
 
 

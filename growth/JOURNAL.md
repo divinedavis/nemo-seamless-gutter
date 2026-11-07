@@ -46438,3 +46438,315 @@ growth. It is plumbing on the escalation channel, worth doing because the number
 it carries expires on 2026-11-19 and the channel it was buried in has produced
 nothing in twenty-five days. It does not make the phone ring, and it does not
 fix the reason this project has produced no measurement since 12 October.
+
+## 2026-11-07 — review agent
+
+**Day 26, and the thing I have to report first is that yesterday's headline was
+wrong.** The 2026-11-06 entry led with "the outage acquired an end date —
+2026-11-19", and `ACTION.md` repeated it as "**after 2026-11-19 no part of the
+current hole can be recovered by anything**". That date is not a deadline. It is
+`today + 13`, and it moves forward one day for every day the outage continues:
+the alarm printed 2026-11-19 yesterday, prints **2026-11-20** today, and on
+2027-01-01 would print 2027-01-14. A reader who took it as a date to act by was
+handed a fortnight of slack that does not exist. I verified this by running
+`perishable()` across a quarter of simulated days rather than reasoning about
+it, fixed the sentence in the one channel that is delivered, and pinned the
+recession with a test. The underlying urgency is unchanged and if anything
+sharper: one named morning of leaf-fall traffic data is destroyed every day, and
+today's casualty is **2026-10-24**.
+
+### Where the numbers stand
+
+Nothing below is today's data. `git fetch --unshallow` first — 289 commits, not
+50. The last `Publish growth state` commit is still **`0b2c596`, 2026-10-12
+06:05:37 UTC**, authored by `NEMO growth engine`; `snapshot.json` still reads
+`"date": "2026-10-12"`. **629 hours old.** No publish commit for 10-13 through
+11-07 — **26 missed mornings.**
+
+- **Goal metric:** `top3` **0 of 239**, **0 in all seven town buckets** (county
+  0/124, york 0/42, dover 0/18, hanover 0/15, spring-grove 0/14, red-lion
+  0/13, dallastown 0/13). `share_pct` **0.0** against a target of 50.
+  Direction: **unchanged, and unmeasurable for twenty-six days.** `top10` 22,
+  `ranked_known` 58, coverage 101/239 = 42.3%, so the ceiling on `top3/total`
+  is still 24.3%.
+- **Site-wide GSC:** 759 rows, 54 matched, 11 clicks, 5,281 impressions,
+  `avg_position` 26.1. Still contaminated for this goal — the 10-16 table found
+  0 rows naming a York County town against 32 out-of-area rows, so impression
+  movement is not progress here.
+- **Traffic and leads:** series still ends **2026-10-11** — 45 days,
+  2026-08-28 → 2026-10-11, 115 visitors (2.56/day), 151 pageviews, non-zero on
+  **41 of 45** days, so the prompt's measurement-suspicion trigger still does
+  not fire. 2 call taps in 45 days, `ai_calls` 0, `phone_leads` **0**.
+  `bookings_all_time` 4, `phone_leads_all_time` **0**.
+- **Both content jobs still dead on an empty balance.** `last_build` and
+  `last_scout` both 2026-10-12, both *"Your credit balance is too low to access
+  the Anthropic API"*. Nine of eleven active techniques no-op'd; only
+  `strengthen_pages` failed, on 3 candidates. The prompt's Known-blockers
+  section is wrong about this on **day 98** — it describes a spend cap that
+  cleared 2026-08-01.
+- **Freshness alarm: 17 scheduled runs, `failure` on every one.** Run 17 is
+  `42284191260`, 2026-11-06 19:57:44 UTC, `event: schedule`, head_sha
+  `2c95e85` — yesterday's commit, so it ran the new code. Attributed by GitHub
+  to `divinedavis`. Seventeen for seventeen on detection, seventeen for
+  seventeen on being ignored.
+- **Zero open issues. No human commit.** Every commit from 10-13 onward is this
+  agent's; `origin/main` is `2c95e85`, yesterday's review commit.
+- **Ledger unchanged:** 96 techniques — 84 candidates, 11 active, 1 retired.
+  `scoreboard.does_not_work` **empty**, as on every day on record; 7 `works`,
+  89 unjudged, every verdict dated `2026-10-12`.
+- **Site liveness: still unknowable, day 26.** `curl` gets `403 CONNECT tunnel
+  failed` at **11:11:57 UTC**, `connect_rejected` against
+  `nemoseamlessgutter.com:443` in the proxy status. A policy denial, not a dead
+  host (`ACTION.md` item 12).
+
+### Did previous changes work?
+
+**1. Nothing can be said about rank, traffic or leads.** Day 26, data frozen on
+day 0. No comparison exists to make. Fourth consecutive week in which this is
+the only honest answer to the prompt's most important question.
+
+**2. Yesterday's prediction that the alarm would carry the deadline: upheld,
+and checked in the delivered artifact rather than in the repo.** I pulled the
+job log for run 17 from the GitHub API. It printed the full perishable
+paragraph — "25 mornings of nginx traffic data are missing (2026-10-12 to
+2026-11-05)… After 2026-11-19 none of this hole can be recovered by
+anything… `growth_daily.py measure --days 25`". So the mechanism works: a change
+to `growth/freshness.py` reaches a human-addressed channel the same day with no
+deploy. Noted for the record, because it is the only channel in this project
+with that property. Incidentally the run fired at 19:57 UTC against a 13:17
+schedule — GitHub's free scheduled runners drift by hours, as the 11-04 entry
+also found.
+
+**3. And the content it delivered was misleading, which is today's finding.**
+`perishable()` computes `expires = last_missing + retention`. While the outage
+continues `last_missing` is always yesterday, so `expires` is always
+`today + 13`. Evaluated across the dates:
+
+| run date | "expires" printed | already lost | recoverable | window that would come back |
+| --- | --- | --- | --- | --- |
+| 2026-11-01 | 2026-11-14 | 6 | 14 | 10-18 → 10-31 |
+| 2026-11-06 | 2026-11-19 | 11 | 14 | 10-23 → 11-05 |
+| **2026-11-07** | **2026-11-20** | **12** | **14** | **10-24 → 11-06** |
+| 2026-11-20 | 2026-12-03 | 25 | 14 | 11-06 → 11-19 |
+| 2027-01-01 | 2027-01-14 | 67 | 14 | 12-18 → 12-31 |
+
+Two things fall out that the old sentence hid. The stated cutoff **recedes as
+fast as it is approached**, so it can never be hit and is not a date to plan
+around. And `recoverable` is **pinned at 14** — it has read "14 are still
+recoverable today" every single day since the window closed on 10-26 and will
+read 14 forever, which is reassuringly static prose for a conveyor belt.
+
+The honest economics, which the code now states: past the retention window,
+waiting does not change **how many** mornings a backfill returns, only **which
+ones**. Acting today recovers 10-24 → 11-06. Acting on 11-20 also recovers
+fourteen mornings — 11-06 → 11-19 — but they are fourteen mornings of a dead
+site in late November, and the leaf-fall data will be gone. The peak itself,
+**10-12 → 10-23, twelve mornings, is already past recovery**. I checked the
+comment above `expires` before writing this: the code's author *did* note that
+"days that go missing later carry their own clocks". The arithmetic was right
+and the delivered sentence was wrong, which is the more dangerous of the two
+failures, because only the sentence gets read.
+
+**4. The 11-05 four-page NAP-schema fix still holds in the repo and is still
+undeployed** (`tests/test_site.py` green over all 47 pages). Unchanged.
+**Verdict: worked as a repo change, unmeasurable as growth.**
+
+**5. Unactioned, recomputed from `added` today:** primary-category audit (T016,
+**103 days**), the review ask (T007, **103 days**), review replies (T033, 96),
+GBP `Calls` reading (T049, **91 days**), the `growth/` deploy (**95 days**, the
+droplet's engine code dating 2026-07-27 → 2026-08-04), the watchdog `--email`
+flag (72), `repair_titles.py` (25), the schema deploy (2). The **cadence
+recommendation (10-30) is unactioned on its eighth day.** I am again not
+changing the schedule myself: re-pacing this routine changes something outside
+this session that nobody has asked for, and it is Eric and Divine's call.
+
+### What I researched today
+
+Three searches. **`WebFetch` still fails DNS on every host from this session**,
+so these are search-engine summaries of pages I could not open, Google's own
+documentation included.
+
+**1. No confirmed Google update, again — and the "November 2026 core update"
+posts are still unsourced.** The confirmed 2026 record is the March core update
+(finished 8 April, 12 days), the May core update, and the September 2026 spam
+update that finished around 8 October. The pages asserting a November core
+update cite no Google announcement
+([bilarna.com](https://bilarna.com/blog/google-november-2026-core-update),
+against [seroundtable.com](https://www.seroundtable.com/google-may-2026-core-update-41435.html)).
+**Rejected as unconfirmed**, consistent with the 11-04 and 11-06 entries. The
+primary source that would settle it, Google's Search Status Dashboard, is
+unreachable from here.
+
+**2. One third-party ranking claim that strengthens an item already on the
+list.** A Search Engine Roundtable report says the **Services** section of a
+Business Profile now affects local rankings, not merely profile completeness
+([seroundtable.com](https://www.seroundtable.com/google-business-profiles-services-impact-local-rankings-34948.html)),
+and Whitespark's 2026 Local Search Ranking Factors survey puts GBP signals at
+32% of local-pack factors with reviews next at 20%. **Not a new
+recommendation** — `ACTION.md` item 2 already asks Eric for "services detail"
+and T022 ("Itemised GBP Services + weekly job photo") has been a candidate for
+101 days. What it changes is the *reason*: services detail is an input, not
+housekeeping. Both figures are third-party and I could not open Google's own
+page, so I am recording it as a reason to look, not a fact.
+
+**3. The AI-citation search returned this project's own August research, almost
+verbatim, which is the week's finding about the research step.** The sources
+agree directionally that AI answer engines recommend local trades out of
+third-party profiles rather than the business's own site — Foursquare, Yelp,
+Angi, BuildZoom, Reddit, Nextdoor
+([pushleads.com](https://pushleads.com/why-local-contractors-with-fewer-than-150-reviews-are-invisible-to-chatgpt-and-p/),
+[flento.io](https://www.flento.io/blog/chatgpt-perplexity-citations-local-businesses),
+[skyforgelab.com](https://www.skyforgelab.com/blog/how-ai-engines-recommend-contractors)).
+**I rejected every statistic**: "70% of ChatGPT local results come from
+Foursquare" and "Yelp appears in 80% of ChatGPT local answers" are mutually
+inconsistent, the samples are 40 queries and 11 cities, and every publisher
+sells GEO services.
+
+And the directional claim is **already in the ledger, seven times over**, which
+I checked in the snapshot rather than assuming: T048 Foursquare (91 days, whose
+own stored evidence is the same 60-70% Foursquare figure I just re-found), T035
+Yelp (96), T029 Apple Business + Bing Places (98), T053 BuildZoom (90), T009 NAP
+citations on directories (103), T044 Reddit r/YorkPA (93), T056 third-party
+"best of" listicles, plus T065 (a monthly AI-answer audit to rank them) and T046
+(verify GPTBot/PerplexityBot/ClaudeBot can fetch the site at all). **No
+ninety-seventh technique, for the sixth week running.**
+
+**So I counted the thing the research keeps bumping into.** Parsing
+`effort:`/`cost:` out of the candidates' own notes: of **84 candidates, 44 are
+free and hours-of-effort**, and 61 are free at any effort. Of those 44, the
+large majority need **no droplet, no Anthropic credit, no deploy and no code** —
+they are things a person does in a browser or on a phone. That list includes
+every item in finding 3 above. This project's bottleneck has never been ideas,
+and for twenty-six days it has not been instrumentation either: it is that none
+of 44 free, hours-long, unblocked items has been picked up in 103 days.
+
+### Recommendations
+
+Ranked, and the ranking has not moved in twenty-six days except where today's
+finding changes the wording of #1.
+
+**1. `ls -la /var/log/nginx/nemo-access.log*`, then `growth_daily.py measure
+--days 26`. Divine. Ten seconds, then one command — and the deadline is
+*today*, not 2026-11-19.** The oldest still-readable morning is **2026-10-24**
+and it is the next to be destroyed; twelve mornings (10-12 → 10-23, the peak of
+leaf-fall) are already past recovery. Waiting does not shrink the fourteen
+mornings a backfill returns, it swaps good ones for worthless ones. *Checked:*
+the composite path is covered end to end by
+`growth/test_metrics.py::BackfillAcrossRotations` on both logrotate naming
+schemes, green today in the full suite.
+
+**2. End the publish outage — three greps and one `cat`, ~10 minutes. Divine.**
+Commands and branch table in `ACTION.md` item 0. Paired with the Anthropic
+credit (item 10): credit buys nothing while cron publishes nothing, and a
+repaired cron writes nothing on an empty balance. *Checked:* `publish_state.sh`
+unchanged since 2026-07-27 on an unshallowed clone, so the script is not the
+regression and the push-gate theory stays dead.
+
+**3. Eric's three free logins — 103, 103 and 91 days old — and this week I would
+add a fourth. Eric.** Items 1-3 unchanged in substance (GBP `Calls` reading;
+primary-category and pending-suggested-edit audit; ask for honest reviews and
+reply to the 13). Today's research gives item 2's *services* half a ranking
+rationale rather than a tidiness one. **The addition: T035, claim the Yelp page
+and switch on Request a Quote (96 days, free, "hours").** I single it out of the
+44 because it is the only candidate in the whole ledger that produces a *named
+York County homeowner with a stated gutter problem* rather than a ranking that
+might one day produce one — which matters when the measurement pipeline is dead
+and every ranking lever is unobservable. *Checked against code, not assumption:*
+nothing in `growth/techniques.py` touches any third-party profile — the eleven
+active techniques are all page generation, schema, sitemap and IndexNow
+(`last_build` log lists them) — so no part of this is shipped or automatable.
+It needs Eric, and only Eric.
+
+**4. Deploy the 2026-11-05 structured-data fix with `scripts/deploy_web.sh`,
+bundled with `repair_titles.py` (item 8) — one deploy covers both. Divine.**
+Expected effect small and probably unmeasurable at 2.56 visitors/day; a
+correctness tidy-up, ranked fourth deliberately. **Needs a deploy before it does
+anything live.**
+
+Everything else, with ages, is one screen in [`growth/ACTION.md`](ACTION.md).
+
+### Repo changes I made today
+
+**`growth/freshness.py`: the alarm stops stating a cutoff it recedes from.**
+Where it printed "After 2026-11-20 none of this hole can be recovered by
+anything", a long outage now prints:
+
+> There is no single cutoff to plan around. 2026-11-20 is when the newest
+> missing morning ages out, and that date moves a day later for every day the
+> outage continues, so it is not slack. The deadline is per morning: 2026-10-24
+> is the oldest still readable and is the next to be destroyed, and past the
+> retention window waiting no longer changes how many mornings a backfill
+> returns (14, capped by the window) — only which ones.
+
+Three choices worth recording. The **short-outage branch keeps the old
+wording**, because before the window closes the whole hole genuinely does have
+one date after which none of it survives, and that date does not recede while
+nothing has been lost yet; a test pins each branch to its own phrasing. The
+**seasonal reading stays out of the code** — "the peak of leaf-fall" is true of
+this hole and would be wrong of an outage in March, so the module states
+arithmetic and this entry states the interpretation. And the recession is
+pinned **across ninety simulated days** rather than at two points, because a
+one-day-apart assertion would pass on an off-by-one that still misleads.
+
+`scripts/test.sh` green: **453 Python + 9 Node** (450 before). Verified by
+reverting `freshness.py` and re-running: four tests go red against the old
+message, which is how I know they bite. **This takes effect on the next
+scheduled run with no deploy**, which finding 2 confirms in a job log rather
+than in hope.
+
+**`growth/ACTION.md`** rewritten for day 26: the receding-deadline correction in
+the header and item 0, counters to 629 hours and 17 alarm runs, ages recomputed
+from `added` dates, and a new item 3a carrying T035 with the 44-of-84 count.
+
+**Twenty-three days of declining to write engine code, and this is the second
+deliberate exception in two days** — which deserves a harder look than yesterday
+gave it. The rule exists because fifteen undeployed instruments were built while
+the pipeline stayed dead. This is not a sixteenth: it is a correction to a
+sentence *this agent's own lineage shipped yesterday* into the one channel that
+is provably delivered, in the one file that runs off the droplet. But two
+consecutive days in `freshness.py` is the beginning of the pattern the rule
+forbids, so I am writing it down: **if tomorrow's run finds itself editing
+`freshness.py` again, that is the rule being broken, not applied.**
+
+### Reasoning and uncertainties
+
+**Why lead with my predecessor's error.** The prompt says that where this
+project's own stated facts contradict what the data shows, the data wins and the
+correction goes in the journal. Yesterday's entry called 2026-11-19 "the first
+thing here that is both new and decision-relevant" and led on it. It was
+decision-relevant in the wrong direction: a receding date read as slack is worse
+than no date, and it went out over the one channel anybody reads. Correcting it
+ranks above anything else I could have added on day 26.
+
+**What I am confident of.** 629 hours, 26 missed mornings, `top3` 0 in all seven
+buckets. Run 17's log text, read from the API rather than inferred. The
+recession, tested across ninety days. That `recoverable` is pinned at the
+retention window whenever anything has been lost — it is `(today-1) - (today-14)
++ 1`, arithmetically 14, not an observation about this outage. That the
+directory/AI-citation lane is already seven ledger candidates, checked by
+grepping the snapshot. The 44-of-84 count, parsed from the candidates' own
+`effort:`/`cost:` notes.
+
+**What I am not.** Whether 14 days is this droplet's real retention — every
+number in finding 3 scales with it, and one `ls` replaces the estimate with a
+fact. If retention is shorter, 10-24 is already gone too. Whether any human has
+read any of this: seventeen alarms and thirteen notifications leave no trace in
+git, so "ignored" and "not received" stay indistinguishable from here. Whether
+the site is even up, day 26. Whether the Services-affects-rankings report is
+true, since I could not open Google's page.
+
+**What would change my mind.** A publish commit, which makes this entry's frame
+obsolete and is the outcome I would prefer. A log listing showing retention
+shorter than 14 days, which would mean recommendation 1 is worth doing only for
+the few days that remain. A GBP `Calls` reading showing the phone already
+ringing, which would reorder everything below it. And one thing that would
+change my mind about the *shape* of these reviews: if any of the 44 free items
+gets done and moves nothing, that is a real verdict, and
+`scoreboard.does_not_work` has been empty on every day on record.
+
+**The thing I will not do.** Claim that fixing a sentence is growth. It is a
+correction to an escalation channel, worth making because the sentence was
+misleading in the direction that invites delay and because it is the only
+channel here with a delivery receipt. It does not make the phone ring, and it
+does not fix the reason this project has produced no measurement since
+12 October.

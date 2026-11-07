@@ -121,10 +121,65 @@ class PerishableTests(unittest.TestCase):
         self.assertIn("about 11 of them are already past recovery", msg)
         self.assertIn("14 are still recoverable today", msg)
 
-    def test_names_the_date_the_whole_hole_expires(self):
-        # Last missing morning (11-05) plus the retention window.
+    def test_long_outage_states_a_per_morning_deadline_not_a_cutoff(self):
+        # Replaces test_names_the_date_the_whole_hole_expires, which asserted
+        # "After 2026-11-19 none of this hole can be recovered by anything".
+        # That sentence was true of the hole as it stood that day and false as
+        # a deadline: see test_the_stated_expiry_recedes_one_day_per_day. The
+        # behaviour it pinned was deliberately removed, so the test is replaced
+        # rather than skipped.
         msg = freshness.perishable("2026-10-12", self.DAY25)
-        self.assertIn("After 2026-11-19 none of this hole", msg)
+        self.assertIn("no single cutoff to plan around", msg)
+        self.assertIn("2026-11-19 is when the newest missing morning ages out",
+                      msg)
+        self.assertIn("moves a day later for every day", msg)
+        # The oldest morning still readable, which is the day actually at risk.
+        self.assertIn("2026-10-23 is the oldest still readable", msg)
+        self.assertNotIn("none of this hole", msg)
+
+    def test_the_stated_expiry_recedes_one_day_per_day(self):
+        # The defect this file now pins. `expires` is the NEWEST missing
+        # morning plus the window, so while the outage continues it advances
+        # with the calendar and can never be reached: a reader who treats it as
+        # a date to act by has been handed permanent slack. Checked across a
+        # quarter rather than at two points.
+        prev = None
+        for d in range(20, 110):
+            today = datetime.date(2026, 10, 12) + datetime.timedelta(days=d)
+            msg = freshness.perishable("2026-10-12", today)
+            m = re.search(r"(\d{4}-\d{2}-\d{2}) is when the newest missing "
+                          r"morning ages out", msg)
+            self.assertIsNotNone(m, msg)
+            got = datetime.date.fromisoformat(m.group(1))
+            self.assertEqual(
+                got, today + datetime.timedelta(
+                    days=freshness.ASSUMED_LOG_RETENTION_DAYS - 1),
+                f"day {d}")
+            if prev is not None:
+                self.assertEqual((got - prev).days, 1, f"day {d}")
+            prev = got
+
+    def test_long_outage_says_waiting_changes_which_days_not_how_many(self):
+        # Past the retention window `recoverable` is pinned at the window, so
+        # the only thing delay changes is the identity of the mornings. An
+        # alarm that reports a constant 14 without saying so reads as stable
+        # when it is in fact a conveyor belt.
+        for d in (25, 40, 90):
+            msg = freshness.perishable(
+                "2026-10-12",
+                datetime.date(2026, 10, 12) + datetime.timedelta(days=d))
+            self.assertIn("capped by the window", msg)
+            self.assertIn("only which ones", msg)
+            self.assertIn(
+                f"({freshness.ASSUMED_LOG_RETENTION_DAYS}, capped", msg)
+
+    def test_short_outage_keeps_its_genuine_cutoff(self):
+        # Before the window closes the whole hole really does have one date
+        # after which none of it survives, and that date does not recede while
+        # nothing has been lost yet. The wording stays there.
+        msg = freshness.perishable("2026-10-12", datetime.date(2026, 10, 20))
+        self.assertIn("After 2026-11-02 none of this hole", msg)
+        self.assertNotIn("no single cutoff", msg)
 
     def test_carries_a_runnable_backfill_command(self):
         msg = freshness.perishable("2026-10-12", self.DAY25)
@@ -183,7 +238,8 @@ class PerishableTests(unittest.TestCase):
             p = _snapshot(d, json.dumps({"date": "2026-10-12"}))
             _, msg = freshness.check(p, self.DAY25)
         self.assertIn("being deleted", msg)
-        self.assertIn("After 2026-11-19", msg)
+        self.assertIn("no single cutoff to plan around", msg)
+        self.assertIn("is the oldest still readable", msg)
 
 
 class MainTests(unittest.TestCase):
